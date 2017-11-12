@@ -1,0 +1,4 @@
+// build time configuration options (set by CMake)
+#define mavtables_VERSION_MAJOR @mavtables_VERSION_MAJOR@
+#define mavtables_VERSION_MINOR @mavtables_VERSION_MINOR@
+#define mavtables_VERSION_PATCH @mavtables_VERSION_PATCH@

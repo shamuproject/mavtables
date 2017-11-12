@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Astyle output
+*.orig
+
+# IDE/Editor files
+*.swp
+
+# Build file
+build
