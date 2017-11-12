@@ -17,12 +17,13 @@
 
 #include <iostream>
 #include "config.hpp"
-// #include "test.hpp"
+#include "util.hpp"
 
 int main(int argc, char **argv)
 {
-    std::cout << "mavtables: v"
-              << mavtables_VERSION_MAJOR << "."
-              << mavtables_VERSION_MINOR << "."
-              << mavtables_VERSION_PATCH << std::endl;
+    std::cout << NAME << ": v"
+              << VERSION_MAJOR << "."
+              << VERSION_MINOR << "."
+              << VERSION_PATCH << std::endl;
+    std::cout << capital_case("a MAVLink router and firewall.") << std::endl;
 }
