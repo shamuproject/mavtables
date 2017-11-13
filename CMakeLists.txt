@@ -13,6 +13,7 @@ add_subdirectory (lib)
 
 # mavtables
 add_executable (mavtables src/mavtables.cpp)
+install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
 add_executable (unit_tests test/CMakeLists.txt)

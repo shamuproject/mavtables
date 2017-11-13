@@ -3,6 +3,9 @@ INSTALL_PREFIX ?= /usr/local
 
 default: release
 
+install:
+	$(MAKE) -j8 -C build install
+
 release:
 	mkdir -p build
 	cd build && $(CMAKE) \
