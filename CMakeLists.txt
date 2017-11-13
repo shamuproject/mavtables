@@ -1,23 +1,23 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.0.2)
+
+set (CMAKE_CXX_STANDARD 17)
+
+# project
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
 set (VERSION_PATCH 1)
 
-configure_file (
-    "${PROJECT_SOURCE_DIR}/src/config.hpp.in"
-    "${PROJECT_BINARY_DIR}/config.hpp"
-    )
+add_subdirectory (lib)
 
-include_directories("${PROJECT_BINARY_DIR}")
+# mavtables
+add_executable (mavtables src/mavtables.cpp)
 
-set(HEADERS
-        src/util.hpp
-        )
+# unit_tests
+add_executable (unit_tests test/CMakeLists.txt)
+target_link_libraries (unit_tests Catch)
+enable_testing()
+add_test(NAME UnitTests COMMAND unit_tests)
 
-set(SOURCES
-        src/mavtables.cpp
-        src/util.cpp
-        )
-
-add_executable (mavtables ${SOURCES} ${HEADERS})
+add_subdirectory (src)
+add_subdirectory (test)
