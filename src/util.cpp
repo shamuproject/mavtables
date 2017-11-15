@@ -21,6 +21,6 @@
 
 std::string capital_case(std::string str)
 {
-    str[0] = toupper(str[0]);
+    str[0] = static_cast<char>(toupper(str[0]));
     return str;
 }

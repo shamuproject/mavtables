@@ -1,3 +1,6 @@
 [submodule "lib/catch"]
 	path = lib/catch
 	url = https://github.com/catchorg/Catch2.git
+[submodule "cmake/codecov"]
+	path = cmake/codecov
+	url = git://github.com/RWTH-HPC/CMake-codecov.git
