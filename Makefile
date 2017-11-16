@@ -1,5 +1,6 @@
 CMAKE = cmake
 INSTALL_PREFIX ?= /usr/local
+COVERAGE = Off
 
 default: release
 
@@ -10,7 +11,7 @@ release:
 	mkdir -p build
 	cd build && $(CMAKE) \
 		-G"Unix Makefiles" \
-		-DENABLE_COVERAGE=Off \
+		-DENABLE_COVERAGE=$(COVERAGE) \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) ..
 	$(MAKE) -j8 -C build
@@ -19,7 +20,7 @@ debug:
 	mkdir -p build
 	cd build && $(CMAKE) \
 		-G"Unix Makefiles" \
-		-DENABLE_COVERAGE=On \
+		-DENABLE_COVERAGE=$(COVERAGE) \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) ..
 	$(MAKE) -j8 -C build
@@ -29,6 +30,7 @@ test: unit_tests
 unit_tests: debug
 	./build/unit_tests
 
+coverage: COVERAGE = On
 coverage: test
 	$(MAKE) -C build lcov-geninfo
 	$(MAKE) -C build lcov-genhtml
