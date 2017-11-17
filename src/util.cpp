@@ -19,6 +19,7 @@
 #include <cctype>
 #include "util.hpp"
 
+
 std::string capital_case(std::string str)
 {
     str[0] = static_cast<char>(toupper(str[0]));

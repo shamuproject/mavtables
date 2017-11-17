@@ -35,6 +35,7 @@ add_test(NAME UnitTests COMMAND unit_tests)
 # add sources and evaluate test coverage
 add_subdirectory (src)
 add_subdirectory (test)
+add_subdirectory (doc)
 add_coverage (mavtables)
 add_coverage (unit_tests)
 coverage_evaluate ()

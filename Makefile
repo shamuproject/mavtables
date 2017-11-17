@@ -39,6 +39,11 @@ coverage: test
 style:
 	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
 
+doc:
+	mkdir -p build
+	cd build && $(CMAKE) ..
+	$(MAKE) -j8 -C build doc
+
 clean:
 	rm -rf build
 	find . -name "*.orig" -delete
@@ -46,5 +51,5 @@ clean:
 remove-subs:
 	$(MAKE) -C lib clean
 
-.PHONY: style debug release test unit_tests coverage style clean remove-subs
+.PHONY: style debug release test unit_tests coverage style doc clean remove-subs
 .SILENT:

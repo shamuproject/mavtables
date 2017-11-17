@@ -1,4 +1,4 @@
-# mavtables
+# mavtables {#mainpage}
 
 MAVLink router and firewall.
 
