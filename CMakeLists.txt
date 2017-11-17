@@ -29,7 +29,7 @@ install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
 add_executable (unit_tests test/CMakeLists.txt)
-target_link_libraries (unit_tests Catch)
+target_link_libraries (unit_tests Catch FakeIt)
 add_test(NAME UnitTests COMMAND unit_tests)
 
 # add sources and evaluate test coverage

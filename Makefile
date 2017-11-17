@@ -32,12 +32,12 @@ unit_tests: debug
 
 coverage: COVERAGE = On
 coverage: test
-	$(MAKE) -C build lcov-geninfo
-	$(MAKE) -C build lcov-genhtml
-	gcovr -r . -e '.*catch.hpp'
+	$(MAKE) -j8 -C build lcov-geninfo
+	$(MAKE) -j8 -C build lcov-genhtml
+	gcovr -r . -e '.*catch.hpp' -e '.*fakeit.hpp'
 
 style:
-	astyle --options=.astylerc "src/*.cpp" "src/*.hpp"
+	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
 
 clean:
 	rm -rf build
