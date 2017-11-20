@@ -37,7 +37,7 @@ $ make
 The installation prefix is `/usr/local` by default but can be changed with
 ```
 $ make
-# make PREFIX=/desire/install/path install
+# make PREFIX=/desired/install/path install
 ```
 
 

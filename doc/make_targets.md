@@ -55,6 +55,12 @@ Generate html documentation with
 `build/doc/html/index.html`.
 
 
+## gh-pages
+
+Generate html documentation and publish to
+[https://shamuproject.github.io/mavtables](https://shamuproject.github.io/mavtables).
+
+
 ## clean
 
 Clean up the project directory.  This does not remove git submodules.
