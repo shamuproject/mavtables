@@ -1,71 +1,76 @@
-# mavtables {#mainpage}
+mavtables {#readme}
+===================
 
-MAVLink router and firewall.
+A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
+more MAVLink endpoints such as autopilots, ground control software, loggers,
+image capture systems, etc.  MAVLink packets will be routed when they are
+addressed and can be filtered based on source system/component and message type.
 
 
+## Links
+
+* [Documentation](https://shamuproject.github.io/mavtables)
+* [Download](https://github.com/shamuproject/mavtables/archive/master.zip)
+* [GitHub](https://github.com/shamuproject/mavtables)
 
 
-## Building
+## Compilation and Installation
 
-Even though `mavtables` uses CMake for building a simple Makefile (which uses
-CMake) is included for convenience.
+In order to compile you will need the following packages:
 
-### Release
+* GCC 7+ or Clang 5+ (needed for C++17 support)
+* [CMake](https://cmake.org/)
 
-```
-$ make
-```
+The following packages are only needed for development work:
 
-### Install
+* [Artistic Style](http://astyle.sourceforge.net/) (used for
+  checking/fixing the code style)
+* [Gcovr](http://gcovr.com/) (coverage report)
+* [LCOV](http://ltp.sourceforge.net/coverage/lcov.php) (detailed coverage html
+  report)
 
+`mavtables` can be easily installed using the standard procedure of
 ```
 $ make
 # make install
 ```
-
-### Debug
-
+The installation prefix is `/usr/local` by default but can be changed with
 ```
-$ make debug
-```
-
-
-
-
-## Testing
-
-### Test
-
-Testing uses [Catch2](https://github.com/catchorg/Catch2) for unit testing.  It
-will be automatically downloaded into `lib/catch`.
-
-```
-$ make test
+$ make
+# make PREFIX=/desire/install/path install
 ```
 
-### Test Coverage
 
-__NOTE: This currently requires GCC to be the default compiler and for
-[lcov](http://ltp.sourceforge.net/coverage/lcov.php) and
-[gcovr](http://gcovr.com/) to be installed.__
+## Running
 
+To run mavtables and begin routing packets
 ```
-$ make coverage
+$ mavtables
+```
+This will use the first configuration file it finds in the config file priority
+order given in the next section.  To force a specific configuration file the
+`-c` or `--config` flag may be used.
+```
+$ mavtables --config <path/to/config>
 ```
 
-This will run all tests and report on the code coverage to the terminal as well
-as placing a coverage report in html format at
-[build/lcov/html/selected_targets/index.html]()
+
+## Configuration File
+
+Both interfaces and filter rules are defined in a configuration file.  The
+format of this configuration file is documented in the comments of
+`examples/mavtables.conf` which is the same file that is installed at
+`/etc/mavtables.conf` when using `make install`.  The configuration file used is
+the first one found in the following order:
+
+1. A file given by the `--config` flag when calling mavtables.
+2. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
+3. `.mavtablesrc` in the current directory.
+4. `.mavtablesrc` at `$HOME/.mavtablesrc`.
+5. The main configuration file at `/etc/mavtables.conf`.
 
 
+## Contributing
 
-
-### Style
-
-Astyle is used to enforce consistent style across `mavtables`.  It can be ran
-(assuming it is installed) with
-```
-$ make style
-```
-which will fix and replace files based on style and store the original files
-with the `.orig` extension.
+Before contributing read the `CONTRIBUTING.md` file which gives guidelines that
+must be followed by all developers working on mavtables.

@@ -1,5 +1,5 @@
 CMAKE = cmake
-INSTALL_PREFIX ?= /usr/local
+PREFIX ?= /usr/local
 COVERAGE = Off
 
 default: release
@@ -13,7 +13,7 @@ release:
 		-G"Unix Makefiles" \
 		-DENABLE_COVERAGE=$(COVERAGE) \
 		-DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) ..
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX) ..
 	$(MAKE) -j8 -C build
 
 debug: 
@@ -22,7 +22,7 @@ debug:
 		-G"Unix Makefiles" \
 		-DENABLE_COVERAGE=$(COVERAGE) \
 		-DCMAKE_BUILD_TYPE=Debug \
-		-DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) ..
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX) ..
 	$(MAKE) -j8 -C build
 
 test: unit_tests

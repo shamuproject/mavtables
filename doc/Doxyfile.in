@@ -792,6 +792,8 @@ WARN_LOGFILE           =
 
 INPUT                  = "@PROJECT_SOURCE_DIR@/src" \
                          "@PROJECT_SOURCE_DIR@/doc" \
+                         "@PROJECT_SOURCE_DIR@/LICENSE.md" \
+                         "@PROJECT_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@PROJECT_SOURCE_DIR@/README.md"
 
 # This tag can be used to specify the character encoding of the source files
@@ -1516,7 +1518,7 @@ FORMULA_TRANSPARENT    = YES
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-USE_MATHJAX            = YES
+USE_MATHJAX            = NO
 
 # When MathJax is enabled you can set the default output format to be used for
 # the MathJax output. See the MathJax site (see:

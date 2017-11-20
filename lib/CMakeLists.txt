@@ -2,7 +2,7 @@
 find_path (CATCH_INCLUDE_DIR catch.hpp HINTS catch/single_include)
 if ((NOT CATCH_INCLUDE_DIR) OR (NOT EXISTS "${CATCH_INCLUDE_DIR}"))
     execute_process (
-        COMMAND git submodule update --init
+        COMMAND git submodule update --init --recursive
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
     )
 endif ()
@@ -19,7 +19,7 @@ find_path (
 )
 if ((NOT FAKEIT_INCLUDE_DIR) OR (NOT EXISTS "${FAKEIT_INCLUDE_DIR}"))
     execute_process (
-        COMMAND git submodule update --init
+        COMMAND git submodule update --init --recursive
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
     )
 endif ()
