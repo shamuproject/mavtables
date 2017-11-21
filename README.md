@@ -1,4 +1,6 @@
-mavtables {#readme}
+<!--- {#readme} --->
+
+mavtables 
 =========
 
 A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
