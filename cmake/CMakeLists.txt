@@ -1,0 +1,5 @@
+set (CMAKE_MODULE_PATH 
+    "${CMAKE_CURRENT_LIST_DIR}/codecov/cmake"
+    ${CMAKE_MODULE_PATH}
+    PARENT_SCOPE
+)

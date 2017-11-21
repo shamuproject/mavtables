@@ -1,0 +1,23 @@
+recursive
+style=allman
+indent=spaces=4
+max-code-length=80
+lineend=linux
+align-pointer=name
+
+# No implicit blocks.
+break-one-line-headers
+add-braces
+
+# Whitespace
+pad-oper
+pad-header
+unpad-paren
+delete-empty-lines
+break-blocks
+
+# Indentation
+indent-classes
+indent-switches
+indent-preproc-block
+indent-preproc-cond
