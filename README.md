@@ -1,5 +1,5 @@
 mavtables {#readme}
-===================
+=========
 
 A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
 more MAVLink endpoints such as autopilots, ground control software, loggers,
