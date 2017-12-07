@@ -1,8 +1,10 @@
 set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.cpp"
 )
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.hpp"
 )
 target_sources (mavtables 
     PRIVATE
