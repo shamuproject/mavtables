@@ -59,8 +59,10 @@ before making a change.
   underscore).
 * Private data members and functions should end in an underscore.
   have an `autodoc` entry in the Sphinx documentation.
-* File name must be lower case and should only include letters, numbers, and
-  underscores.
+* Each class should have it's own source and header file.
+* When a file contains a class the file should be named for the class.  All
+  other file names should be lower case and should only include letters,
+  numbers, and underscores.
 * C++ source code files should use the `.cpp` extension and `.hpp` for header
   files.  `.c` and `.h` should only be used for C files.
 * All header files must have include guards and the name should be the file name
