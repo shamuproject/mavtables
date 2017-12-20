@@ -26,7 +26,7 @@
 DNSLookupError::DNSLookupError(std::string url)
 {
     message_ = "DNSLookupError: Could not find an IP address for \""
-        + url + "\"";
+               + url + "\"";
 }
 
 
