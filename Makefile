@@ -59,7 +59,7 @@ clean:
 
 remove-subs:
 	$(MAKE) -C lib remove-subs
-	$(MAKE) -C lib remove-subs
+	$(MAKE) -C cmake remove-subs
 
 .PHONY: style debug release test unit_tests coverage style doc gh-pages clean remove-subs
 .SILENT:
