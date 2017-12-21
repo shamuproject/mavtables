@@ -14,26 +14,48 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+#ifndef IPADDRESS_HPP_
+#define IPADDRESS_HPP_
+
+
 #include <string>
+#include <iostream>
 
-namespace mavtables
+
+class IPAddress
 {
+    private:
+        unsigned long address_;
+        unsigned int port_;
 
-    class IPAddress
-    {
-        private:
-            unsigned long address_;
-            unsigned int port_;
+    public:
+        /** Copy constructor.
+         *
+         * \param other IP address to copy.
+         */
+        IPAddress(const IPAddress &other) = default;
+        // IPAddress(IPAddress &&other) = default;
+        IPAddress(const IPAddress &other, unsigned int port);
+        IPAddress(std::string address);
+        IPAddress(unsigned long address, unsigned int port = 0);
+        // ~IPAddress() = default;
+        // IPAddress &operator=(const IPAddress &) = default;
+        // IPAddress &operator=(IPAddress &&) = default;
+        unsigned long address() const;
+        unsigned int port() const;
 
-        public:
-            IPAddress(std::string address);
-            IPAddress(unsigned long address, unsigned int port);
-            unsigned long address();
-            unsigned int port();
-            std::string to_string();
-    }
+        friend std::ostream &operator<<(std::ostream &os,
+                                        const IPAddress &ipaddress);
+};
 
-    bool operator<(const IPAddress& a, const IPAddress& b);
-    IPAddress dnslookup(std::string url);
 
-}
+bool operator<(const IPAddress &a, const IPAddress &b);
+bool operator==(const IPAddress &a, const IPAddress &b);
+std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress);
+
+
+IPAddress dnslookup(const std::string &url);
+
+
+#endif // IPADDRESS_HPP_
