@@ -19,19 +19,19 @@
 #include <memory>
 #include <string>
 #include <iostream>
-#include <stdexcept>
 #include <algorithm>
+#include <stdexcept>
 
 #include <cstring>
 #include <netdb.h>
 #include <netinet/in.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/range/irange.hpp>
 
 #include "config.hpp"
 #include "DNSLookupError.hpp"
 #include "IPAddress.hpp"
+#include "comparators.hpp"
 #include "util.hpp"
 
 
@@ -91,7 +91,6 @@ IPAddress::IPAddress(std::string address)
     unsigned long i;
     while (ss >> i)
     {
-        std::cout << i << std::endl;
         octets.push_back(i);
     }
     if (octets.size() != 4)
@@ -187,7 +186,7 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
     {
         os << static_cast<int>(bytes[i]) << ".";
     }
-    os << static_cast<int>(bytes[3]);
+    os << static_cast<int>(bytes[0]);
 
     if (ipaddress.port_ != 0)
     {

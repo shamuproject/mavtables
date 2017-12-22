@@ -21,8 +21,13 @@
 
 #include <string>
 #include <iostream>
+#include <stdexcept>
+#include "comparators.hpp"
+#include "DNSLookupError.hpp"
 
 
+/** An IP address with optional port number.
+ */
 class IPAddress
 {
     private:
@@ -35,13 +40,9 @@ class IPAddress
          * \param other IP address to copy.
          */
         IPAddress(const IPAddress &other) = default;
-        // IPAddress(IPAddress &&other) = default;
         IPAddress(const IPAddress &other, unsigned int port);
         IPAddress(std::string address);
         IPAddress(unsigned long address, unsigned int port = 0);
-        // ~IPAddress() = default;
-        // IPAddress &operator=(const IPAddress &) = default;
-        // IPAddress &operator=(IPAddress &&) = default;
         unsigned long address() const;
         unsigned int port() const;
 
