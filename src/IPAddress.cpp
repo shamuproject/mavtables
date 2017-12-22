@@ -37,7 +37,7 @@
 
 // Private functions.
 #ifdef UNIX
-static IPAddress unix_dnslookup(const std::string &url, unsigned int port);
+    static IPAddress unix_dnslookup(const std::string &url, unsigned int port);
 #elif WINDOWS
 #endif
 
@@ -73,31 +73,41 @@ IPAddress::IPAddress(const IPAddress &other, unsigned int port)
 IPAddress::IPAddress(std::string address)
 {
     port_ = 0;
-
     std::vector<std::string> parts;
-    boost::split(parts, address, [](char c){return c == ':';});
-    if (parts.size() == 2){
+    boost::split(parts, address, [](char c)
+    {
+        return c == ':';
+    });
+
+    if (parts.size() == 2)
+    {
         std::istringstream(parts.back()) >> port_;
         parts.pop_back();
     }
+
     if (parts.size() != 1)
     {
         throw std::invalid_argument("Invalid IP address string.");
     }
+
     address = parts.back();
     std::replace(address.begin(), address.end(), '.', ' ');
     std::vector<unsigned long> octets;
     std::istringstream ss(address);
     unsigned long i;
+
     while (ss >> i)
     {
         octets.push_back(i);
     }
+
     if (octets.size() != 4)
     {
         throw std::invalid_argument("Invalid IP address string.");
     }
-    address_ = (octets[0] << 8*3) | (octets[1] << 8*2) | (octets[2] << 8) | octets[3];
+
+    address_ = (octets[0] << 8 * 3) | (octets[1] << 8 * 2) |
+               (octets[2] << 8) | octets[3];
 }
 
 
@@ -182,16 +192,19 @@ bool operator==(const IPAddress &a, const IPAddress &b)
 std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
 {
     const auto bytes = to_bytes(ipaddress.address_);
+
     for (size_t i = 3; i > 0; --i)
     {
         os << static_cast<int>(bytes[i]) << ".";
     }
+
     os << static_cast<int>(bytes[0]);
 
     if (ipaddress.port_ != 0)
     {
         os << ":" << ipaddress.port_;
     }
+
     return os;
 }
 
@@ -206,11 +219,11 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
  */
 IPAddress dnslookup(const std::string &url)
 {
-#ifdef UNIX
+    #ifdef UNIX
     return unix_dnslookup(url, 0);
-#elif WINDOWS
+    #elif WINDOWS
     return win32_dnslookup(url, 0);
-#endif
+    #endif
 }
 
 
@@ -237,7 +250,8 @@ static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
         throw DNSLookupError(url);
     }
 
-    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)> result(result_ptr, freeaddrinfo);
+    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)> result(result_ptr,
+            freeaddrinfo);
     result_ptr = nullptr;
 
     for (result_ptr = result.get(); result_ptr != nullptr;
@@ -250,7 +264,8 @@ static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
         addresses.insert(IPAddress(address, port));
     }
 
-    if (addresses.empty()){
+    if (addresses.empty())
+    {
         throw DNSLookupError(url);
     }
 

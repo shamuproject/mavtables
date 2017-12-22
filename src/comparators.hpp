@@ -36,7 +36,7 @@
  *  \retval false if \p a is not equal to \p b.
  */
 template <typename T>
-bool operator==(const T&a, const T&b)
+bool operator==(const T &a, const T &b)
 {
     return !(a != b);
 }
@@ -53,7 +53,7 @@ bool operator==(const T&a, const T&b)
  *  \retval false if \p a is equal to \p b.
  */
 template <typename T>
-bool operator!=(const T&a, const T&b)
+bool operator!=(const T &a, const T &b)
 {
     return !(a == b);
 }
@@ -70,7 +70,7 @@ bool operator!=(const T&a, const T&b)
  *  \retval false if \p a is greater than or equal to \p b.
  */
 template <typename T>
-bool operator<(const T&a, const T&b)
+bool operator<(const T &a, const T &b)
 {
     return b > a;
 }
@@ -87,7 +87,7 @@ bool operator<(const T&a, const T&b)
  *  \retval false if \p a is less than or equal to \p b.
  */
 template <typename T>
-bool operator>(const T&a, const T&b)
+bool operator>(const T &a, const T &b)
 {
     return b < a;
 }
@@ -105,7 +105,7 @@ bool operator>(const T&a, const T&b)
  *  \retval false if \p a is greater than \p b.
  */
 template <typename T>
-bool operator<=(const T&a, const T&b)
+bool operator<=(const T &a, const T &b)
 {
     return !(a > b);
 }
@@ -122,7 +122,7 @@ bool operator<=(const T&a, const T&b)
  *  \retval false if \p a is less than \p b.
  */
 template <typename T>
-bool operator>=(const T&a, const T&b)
+bool operator>=(const T &a, const T &b)
 {
     return !(a < b);
 }
