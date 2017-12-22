@@ -93,7 +93,6 @@ bool operator>(const T &a, const T &b)
 }
 
 
-
 /** Less than or equal comparison.
  *
  *  \note Requires > to be defined for type \p T.
