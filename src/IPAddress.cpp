@@ -29,10 +29,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "config.hpp"
+#include "util.hpp"
 #include "DNSLookupError.hpp"
 #include "IPAddress.hpp"
-#include "comparators.hpp"
-#include "util.hpp"
 
 
 // Private functions.
@@ -144,34 +143,98 @@ unsigned int IPAddress::port() const
     return port_;
 }
 
-/** Less than comparison.
- *
- *  \note The address is considered first followed by the port.
+
+/** Equality comparison.
  *
  *  \relates IPAddress
- *  \param a The first IP address.
- *  \param b The second IP address.
- *  \retval true if \p a is less than \p b.
- *  \retval false if \p a is not less than \p b.
+ *  \param lhs The left hand side IP address.
+ *  \param rhs The right hand side IP address.
+ *  \retval true if \p lhs and \p rhs have the same address and port.
+ *  \retval true if \p lhs and \p rhs do not have the same address and port.
  */
-bool operator<(const IPAddress &a, const IPAddress &b)
+bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 {
-    return (a.address() < b.address()) || ((a.address() == b.address())
-                                           && (a.port() < b.port()));
+    return (lhs.address() == rhs.address()) && (lhs.port() == rhs.port());
 }
 
 
 /** Equality comparison.
  *
  *  \relates IPAddress
- *  \param a The first IP address.
- *  \param b The second IP address.
- *  \retval true if \p a and \p b have the same address and port.
- *  \retval true if \p a and \p b do not have the same address and port.
+ *  \param lhs The left hand side IP address.
+ *  \param rhs The right hand side IP address.
+ *  \retval true if \p lhs and \p rhs do not have the same address and port.
+ *  \retval true if \p lhs and \p rhs have the same address and port.
  */
-bool operator==(const IPAddress &a, const IPAddress &b)
+bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
 {
-    return (a.address() == b.address()) && (a.port() == b.port());
+    return (lhs.address() != rhs.address()) || (lhs.port() != rhs.port());
+}
+
+
+/** Less than comparison.
+ *
+ *  \note The address is considered first followed by the port.
+ *
+ *  \relates IPAddress
+ *  \param lhs The left hand side IP address.
+ *  \param rhs The right hand side IP address.
+ *  \retval true if \p lhs is less than \p rhs.
+ *  \retval false if \p lhs is not less than \p rhs.
+ */
+bool operator<(const IPAddress &lhs, const IPAddress &rhs)
+{
+    return (lhs.address() < rhs.address()) || ((lhs.address() == rhs.address())
+            && (lhs.port() < rhs.port()));
+}
+
+
+/** Greater than comparison.
+ *
+ *  \note The address is considered first followed by the port.
+ *
+ *  \relates IPAddress
+ *  \param lhs The left hand side IP address.
+ *  \param rhs The right hand side IP address.
+ *  \retval true if \p lhs is greater than \p rhs.
+ *  \retval false if \p lhs is not greater than \p rhs.
+ */
+bool operator>(const IPAddress &lhs, const IPAddress &rhs)
+{
+    return (lhs.address() > rhs.address()) || ((lhs.address() == rhs.address())
+            && (lhs.port() > rhs.port()));
+}
+
+
+/** Less than or equal comparison.
+ *
+ *  \note The address is considered first followed by the port.
+ *
+ *  \relates IPAddress
+ *  \param lhs The left hand side IP address.
+ *  \param rhs The right hand side IP address.
+ *  \retval true if \p lhs is less than or eqaul to \p rhs.
+ *  \retval false if \p lhs is greater than \p rhs.
+ */
+bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
+{
+    return (lhs < rhs) || (lhs == rhs);
+}
+
+
+/** Greater than comparison.
+ *
+ *  \note The address is considered first followed by the port.
+ *
+ *  \relates IPAddress
+ *  \param lhs The left hand side IP address.
+ *  \param rhs The right hand side IP address.
+ *  \retval true if \p lhs is greater than or equal to \p rhs.
+ *  \retval false if \p lhs is less than \p rhs.
+ */
+bool operator>=(const IPAddress &lhs, const IPAddress &rhs)
+{
+    return (lhs > rhs) || (lhs == rhs);
 }
 
 
