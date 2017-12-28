@@ -1,3 +1,3 @@
 remove-subs:
-	rm -rf catch
-	rm -rf fakeit
+	rm -rf catch/* catch/.*
+	rm -rf fakeit/* catch/.*

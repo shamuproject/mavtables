@@ -1,2 +1,2 @@
 remove-subs:
-	rm -rf codecov
+	rm -rf codecov/* codecov/.*
