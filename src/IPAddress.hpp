@@ -51,11 +51,11 @@ class IPAddress
 
 
 bool operator==(const IPAddress &lhs, const IPAddress &rhs);
-bool operator!=(const IPAddress &a, const IPAddress &b);
+bool operator!=(const IPAddress &lhs, const IPAddress &rhs);
 bool operator<(const IPAddress &lhs, const IPAddress &rhs);
-bool operator>(const IPAddress &a, const IPAddress &b);
-bool operator<=(const IPAddress &a, const IPAddress &b);
-bool operator>=(const IPAddress &a, const IPAddress &b);
+bool operator>(const IPAddress &lhs, const IPAddress &rhs);
+bool operator<=(const IPAddress &lhs, const IPAddress &rhs);
+bool operator>=(const IPAddress &lhs, const IPAddress &rhs);
 std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress);
 
 
