@@ -327,6 +327,7 @@ static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
         addresses.insert(IPAddress(address, port));
     }
 
+    // This should never be true but it's here just in case.
     if (addresses.empty())
     {
         throw DNSLookupError(url);
