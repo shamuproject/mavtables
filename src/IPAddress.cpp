@@ -16,8 +16,10 @@
 
 
 #include <set>
+#include <vector>
 #include <memory>
 #include <string>
+#include <ostream>
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
