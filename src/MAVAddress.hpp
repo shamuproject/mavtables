@@ -37,6 +37,7 @@ class MAVAddress
 {
     private:
         unsigned int address_;
+        void construct_(unsigned int system, unsigned int component);
 
     public:
         MAVAddress(std::string address);

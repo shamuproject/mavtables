@@ -22,40 +22,10 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <cctype>
+
 #include "util.hpp"
 #include "MAVAddress.hpp"
-
-
-/** Construct MAVLink address from a string.
- *
- *  Parse a string of the form "<System ID>.<Component ID>".
- *
- *  Some examples are:
- *      - "0.0"
- *      - "16.8"
- *      - "128.4"
- *
- *  \param address String representing the MAVLink address.
- */
-MAVAddress::MAVAddress(std::string address)
-{
-    std::replace(address.begin(), address.end(), '.', ' ');
-    std::vector<unsigned long> octets;
-    std::istringstream ss(address);
-    unsigned long i;
-
-    while (ss >> i)
-    {
-        octets.push_back(i);
-    }
-
-    if (octets.size() != 2)
-    {
-        throw std::invalid_argument("Invalid MAVLink address string.");
-    }
-
-    address_ = (octets[0] << 8) | octets[1];
-}
 
 
 /** Construct MAVLink address from an address in numeric representation.
@@ -71,11 +41,30 @@ MAVAddress::MAVAddress(unsigned int address)
 {
     if (address > 65535)
     {
-        throw std::out_of_range("address (" + std::str(address) +
+        throw std::out_of_range("address (" + std::to_string(address) +
                                 ") is outside of the allowed range (0 - 65535).");
     }
 
     address_ = address;
+}
+
+
+// Construct from system and component ID's.
+void MAVAddress::construct_(unsigned int system, unsigned int component)
+{
+    if (system > 255)
+    {
+        throw std::out_of_range("system id (" + std::to_string(system) +
+                                ") is outside of the allowed range (0 - 255).");
+    }
+
+    if (component > 255)
+    {
+        throw std::out_of_range("component id (" + std::to_string(system) +
+                                ") is outside of the allowed range (0 - 255).");
+    }
+
+    address_ = ((system << 8) & 0xFF00) | (component & 0x00FF);
 }
 
 
@@ -84,25 +73,62 @@ MAVAddress::MAVAddress(unsigned int address)
  *  \note component=0 and system=0 is the broadcast address.
  *
  *  \param system System ID (0 - 255).
- *  \param system Component ID (0 - 255).
+ *  \param component Component ID (0 - 255).
  *  \throws std::out_of_range if either the System ID or the component ID is out
  *      of range.
  */
 MAVAddress::MAVAddress(unsigned int system, unsigned int component)
 {
-    if (system > 255)
+    construct_(system, component);
+}
+
+
+/** Construct MAVLink address from a string.
+ *
+ *  Parse a string of the form "<System ID>.<Component ID>".
+ *
+ *  Some examples are:
+ *      - "0.0"
+ *      - "16.8"
+ *      - "128.4"
+ *
+ *  \param address String representing the MAVLink address.
+ */
+MAVAddress::MAVAddress(std::string address)
+{
+    // Check validity of address string.
+    if (address.size() < 3 || !(isdigit(address.front()))
+            || !isdigit(address.back()))
     {
-        throw std::out_of_range("system id (" + std::str(system) +
-                                ") is outside of the allowed range (0 - 255).");
+        throw std::invalid_argument("Invalid MAVLink address string.");
     }
 
-    if (component > 255)
+    for (auto c : address)
     {
-        throw std::out_of_range("component id (" + std::str(system) +
-                                ") is outside of the allowed range (0 - 255).");
+        if (!(c == '.' || isdigit(c)))
+        {
+            throw std::invalid_argument("Invalid MAVLink address string.");
+        }
     }
 
-    address_ = ((system << 8) & 0xFF00) | (component & 0x00FF);
+    // Read address string.
+    std::replace(address.begin(), address.end(), '.', ' ');
+    std::vector<unsigned int> octets;
+    std::istringstream ss(address);
+    unsigned int i;
+
+    while (ss >> i)
+    {
+        octets.push_back(i);
+    }
+
+    // Check for correct number of octets.
+    if (octets.size() != 2 || !ss.eof())
+    {
+        throw std::invalid_argument("Invalid MAVLink address string.");
+    }
+
+    construct_(octets[0], octets[1]);
 }
 
 
@@ -133,7 +159,7 @@ unsigned int MAVAddress::system() const
  */
 unsigned int MAVAddress::component() const
 {
-    return address & 0x00FF;
+    return address_ & 0x00FF;
 }
 
 
@@ -242,7 +268,7 @@ bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs)
  *
  *  \relates MAVAddress
  *  \param os The output stream to print to.
- *  \param ipaddress The MAVLink address to print.
+ *  \param mavaddress The MAVLink address to print.
  *  \return The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const MAVAddress &mavaddress)
