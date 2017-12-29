@@ -19,7 +19,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include <ostream>
+#include <sstream>
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
