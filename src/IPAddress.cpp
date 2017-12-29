@@ -158,7 +158,7 @@ bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 }
 
 
-/** Equality comparison.
+/** Inequality comparison.
  *
  *  \relates IPAddress
  *  \param lhs The left hand side IP address.
