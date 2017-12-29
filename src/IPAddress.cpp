@@ -68,6 +68,7 @@ IPAddress::IPAddress(const IPAddress &other, unsigned int port)
  *
  *  \param address String representing the IP address and optionally the port
  *      number.
+ *  \throws std::invalid_argument if string cannot be parsed to an IP address.
  */
 IPAddress::IPAddress(std::string address)
 {
@@ -277,8 +278,7 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
  *  \relates IPAddress
  *  \param url The URL to get an IP address for.
  *  \return IP addresses corrensponding to the given URL.
- *  \throws DNSLookupError if the address cannot be found
- *
+ *  \throws DNSLookupError if the address cannot be found.
  */
 IPAddress dnslookup(const std::string &url)
 {
