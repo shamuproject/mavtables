@@ -32,6 +32,7 @@ class IPAddress
     private:
         unsigned long address_;
         unsigned int port_;
+        void construct_(unsigned long address, unsigned int port);
 
     public:
         /** Copy constructor.
@@ -40,8 +41,8 @@ class IPAddress
          */
         IPAddress(const IPAddress &other) = default;
         IPAddress(const IPAddress &other, unsigned int port);
-        IPAddress(std::string address);
         IPAddress(unsigned long address, unsigned int port = 0);
+        IPAddress(std::string address);
         unsigned long address() const;
         unsigned int port() const;
 
@@ -51,11 +52,11 @@ class IPAddress
 
 
 bool operator==(const IPAddress &lhs, const IPAddress &rhs);
-bool operator!=(const IPAddress &a, const IPAddress &b);
+bool operator!=(const IPAddress &lhs, const IPAddress &rhs);
 bool operator<(const IPAddress &lhs, const IPAddress &rhs);
-bool operator>(const IPAddress &a, const IPAddress &b);
-bool operator<=(const IPAddress &a, const IPAddress &b);
-bool operator>=(const IPAddress &a, const IPAddress &b);
+bool operator>(const IPAddress &lhs, const IPAddress &rhs);
+bool operator<=(const IPAddress &lhs, const IPAddress &rhs);
+bool operator>=(const IPAddress &lhs, const IPAddress &rhs);
 std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress);
 
 

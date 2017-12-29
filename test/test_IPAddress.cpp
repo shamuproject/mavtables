@@ -16,9 +16,9 @@
 
 
 #include <catch.hpp>
+#include <sstream>
+// #include <util.hpp>
 #include "IPAddress.hpp"
-#include <iostream>
-#include <util.hpp>
 
 
 TEST_CASE("IPAddress's store an address and a port number.", "[IPAddress]")
@@ -157,6 +157,33 @@ TEST_CASE("The port of an IP address can be changed during a copy.",
     REQUIRE(b.address() == b_copy.address());
     REQUIRE(b.port() == 65535);
     REQUIRE(b_copy.port() == 0);
+    SECTION("And ensures port number is within range.")
+    {
+        REQUIRE_THROWS_AS(IPAddress(a, static_cast<unsigned int>(-1)),
+                          std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(b, static_cast<unsigned int>(-1)),
+                          std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(a, 65536), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(b, 65536), std::out_of_range);
+    }
+}
+
+
+TEST_CASE("IPAddress's can be constructed from an address and port.",
+          "[IPAddress]")
+{
+    REQUIRE(IPAddress(0x00000000, 0) == IPAddress(0x00000000, 0));
+    REQUIRE(IPAddress(0x12345678, 123) == IPAddress(0x12345678, 123));
+    REQUIRE(IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFF, 65535));
+    SECTION("And ensures address and port are within range.")
+    {
+        REQUIRE_THROWS_AS(IPAddress(static_cast<unsigned long>(-1), 0),
+                          std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(0, static_cast<unsigned int>(-1)),
+                          std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(0x1FFFFFFFF, 65535), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(0xFFFFFFFF, 65536), std::out_of_range);
+    }
 }
 
 
@@ -172,10 +199,39 @@ TEST_CASE("IPAddress's can be constructed from strings.", "[IPAddress]")
     }
     SECTION("And will raise std::invalid_argument if it cannot be parsed.")
     {
+        REQUIRE_THROWS_AS(IPAddress("-1.2.3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.-2.3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.-3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.-4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("+1.2.3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.+2.3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.+3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.+4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1."), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2."), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3."), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.4."), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.4.5"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("a.2.3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.b.3.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.c.4"), std::invalid_argument);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.d"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("192.168.32.128.443"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("192.168.128:443"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("192:168:32:128:443"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("192.1b8.32.128:443"), std::invalid_argument);
+    }
+    SECTION("And ensures address and port are within range.")
+    {
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.4:-1"), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.4:65536"), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress("256.2.3.4"), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress("1.256.3.4"), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress("1.2.256.4"), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress("1.2.3.256"), std::out_of_range);
     }
 }
 
