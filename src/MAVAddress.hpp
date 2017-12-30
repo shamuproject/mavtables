@@ -40,9 +40,14 @@ class MAVAddress
         void construct_(unsigned int system, unsigned int component);
 
     public:
-        MAVAddress(std::string address);
+        /** Copy constructor.
+         *
+         * \param other MAVLink address to copy.
+         */
+        IPAddress(const MAVAddress &other) = default;
         MAVAddress(unsigned int address);
         MAVAddress(unsigned int system, unsigned int component);
+        MAVAddress(std::string address);
         unsigned int address() const;
         unsigned int system() const;
         unsigned int component() const;
