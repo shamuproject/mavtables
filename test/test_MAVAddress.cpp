@@ -17,7 +17,6 @@
 
 #include <catch.hpp>
 #include <sstream>
-// #include <util.hpp>
 #include <stdexcept>
 #include "MAVAddress.hpp"
 
