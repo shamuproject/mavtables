@@ -49,7 +49,7 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
     if (address > 0xFFFFFFFF)
     {
         std::stringstream ss;
-        ss << "address (" << std::hex << address <<
+        ss << "address (0x" << std::hex << address <<
            ") is outside of the allowed range (0x00000000 - 0xffffffff).";
         throw std::out_of_range(ss.str());
     }
