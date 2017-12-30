@@ -44,7 +44,7 @@ class MAVAddress
          *
          * \param other MAVLink address to copy.
          */
-        IPAddress(const MAVAddress &other) = default;
+        MAVAddress(const MAVAddress &other) = default;
         MAVAddress(unsigned int address);
         MAVAddress(unsigned int system, unsigned int component);
         MAVAddress(std::string address);
