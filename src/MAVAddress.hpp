@@ -44,13 +44,18 @@ class MAVAddress
          *
          * \param other MAVLink address to copy.
          */
-        IPAddress(const MAVAddress &other) = default;
+        MAVAddress(const MAVAddress &other) = default;
         MAVAddress(unsigned int address);
         MAVAddress(unsigned int system, unsigned int component);
         MAVAddress(std::string address);
         unsigned int address() const;
         unsigned int system() const;
         unsigned int component() const;
+        /** Assignment operator.
+         *
+         * \param other MAVLink address to copy.
+         */
+        MAVAddress &operator=(const MAVAddress &other) = default;
 };
 
 
