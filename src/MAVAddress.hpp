@@ -51,6 +51,10 @@ class MAVAddress
         unsigned int address() const;
         unsigned int system() const;
         unsigned int component() const;
+        /** Assignment operator.
+         *
+         * \param other MAVLink address to copy.
+         */
         MAVAddress &operator=(const MAVAddress &other) = default;
 };
 

@@ -169,7 +169,7 @@ unsigned int MAVAddress::component() const
  *  \param lhs The left hand side MAVLink address.
  *  \param rhs The right hand side MAVLink address.
  *  \retval true if \p lhs and \p rhs have the same system and component ID's.
- *  \retval true if \p lhs and \p rhs do not have the same system and component
+ *  \retval false if \p lhs and \p rhs do not have the same system and component
  *      ID's.
  */
 bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
@@ -185,7 +185,7 @@ bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side MAVLink address.
  *  \retval true if \p lhs and \p rhs do not have the same system and component
  *      ID's
- *  \retval true if \p lhs and \p rhs have the same system and component ID's.
+ *  \retval false if \p lhs and \p rhs have the same system and component ID's.
  */
 bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
 {

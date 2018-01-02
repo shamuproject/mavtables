@@ -227,6 +227,16 @@ TEST_CASE("MAVAddress's are copyable.", "[MAVAddress]")
 }
 
 
+TEST_CASE("MAVAddress's are assignable.", "[MAVAddress]")
+{
+    MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
+    REQUIRE(a == MAVAddress(0, 0));
+    a = MAVAddress(255, 255);
+    REQUIRE(a == MAVAddress(255, 255));
+}
+
+
 TEST_CASE("MAVAddress's are printable", "[MAVAddress]")
 {
     std::ostringstream oss;
