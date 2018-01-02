@@ -45,6 +45,11 @@ class IPAddress
         IPAddress(std::string address);
         unsigned long address() const;
         unsigned int port() const;
+        /** Assignment operator.
+         *
+         * \param other IP address to copy.
+         */
+        IPAddress &operator=(const IPAddress &other) = default;
 
         friend std::ostream &operator<<(std::ostream &os,
                                         const IPAddress &ipaddress);

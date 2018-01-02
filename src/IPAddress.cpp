@@ -209,7 +209,7 @@ unsigned int IPAddress::port() const
  *  \param lhs The left hand side IP address.
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs have the same address and port.
- *  \retval true if \p lhs and \p rhs do not have the same address and port.
+ *  \retval false if \p lhs and \p rhs do not have the same address and port.
  */
 bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -223,7 +223,7 @@ bool operator==(const IPAddress &lhs, const IPAddress &rhs)
  *  \param lhs The left hand side IP address.
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs do not have the same address and port.
- *  \retval true if \p lhs and \p rhs have the same address and port.
+ *  \retval false if \p lhs and \p rhs have the same address and port.
  */
 bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
 {
