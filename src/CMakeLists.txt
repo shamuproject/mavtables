@@ -1,8 +1,12 @@
 set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/IPAddress.cpp"
 )
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
 )
 target_sources (mavtables 
     PRIVATE

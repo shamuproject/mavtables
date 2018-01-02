@@ -16,22 +16,25 @@
 
 
 #include <string>
-#include <cctype>
-#include "util.hpp"
+#include "DNSLookupError.hpp"
 
 
-/** \defgroup utility
+/** Construct a DNSLookupError given the unresolvable URL.
  *
- *  Utility functions that don't warrant their own file.
+ *  \param url The URL that could not be resolved.
  */
-
-
-/** \brief Capitalize first letter of a string.
- *  \ingroup utility
- *  \bug Index error if given an empty string.
- */
-std::string capital_case(std::string str)
+DNSLookupError::DNSLookupError(std::string url)
 {
-    str[0] = static_cast<char>(toupper(str[0]));
-    return str;
+    message_ = "DNSLookupError: Could not find an IP address for \""
+               + url + "\"";
+}
+
+
+/** Return error string.
+ *
+ *  \return Error string containing unresolvable hostname.
+ */
+const char *DNSLookupError::what() const noexcept
+{
+    return message_.c_str();
 }

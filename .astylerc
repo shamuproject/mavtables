@@ -17,6 +17,7 @@ delete-empty-lines
 break-blocks
 
 # Indentation
+indent-namespaces
 indent-classes
 indent-switches
 indent-preproc-block

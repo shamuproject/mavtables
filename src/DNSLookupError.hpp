@@ -15,23 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#ifndef DNSLOOKUPERROR_HPP_
+#define DNSLOOKUPERROR_HPP_
+
+
 #include <string>
-#include <cctype>
-#include "util.hpp"
+#include <exception>
 
 
-/** \defgroup utility
- *
- *  Utility functions that don't warrant their own file.
+/** Exception type for a failed DNS lookup.
  */
-
-
-/** \brief Capitalize first letter of a string.
- *  \ingroup utility
- *  \bug Index error if given an empty string.
- */
-std::string capital_case(std::string str)
+class DNSLookupError : public std::exception
 {
-    str[0] = static_cast<char>(toupper(str[0]));
-    return str;
-}
+    private:
+        std::string message_;
+
+    public:
+        DNSLookupError(std::string url);
+        const char *what() const noexcept;
+};
+
+
+#endif // DNSLOOKUPERROR_HPP_

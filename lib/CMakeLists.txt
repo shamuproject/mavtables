@@ -9,7 +9,7 @@ endif ()
 set (CATCH_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/catch/single_include")
 list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/catch/*')
 add_library (Catch INTERFACE)
-target_include_directories (Catch INTERFACE "${CATCH_INCLUDE_DIR}")
+target_include_directories (Catch SYSTEM INTERFACE "${CATCH_INCLUDE_DIR}")
 
 
 # FakeIt (a mocking library)
@@ -26,7 +26,7 @@ endif ()
 set (FAKEIT_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/fakeit/single_header/catch")
 list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fakeit/*')
 add_library (FakeIt INTERFACE)
-target_include_directories (FakeIt INTERFACE "${FAKEIT_INCLUDE_DIR}")
+target_include_directories (FakeIt SYSTEM INTERFACE "${FAKEIT_INCLUDE_DIR}")
 
 
 # Pass lcov ignore patters up to parent.
