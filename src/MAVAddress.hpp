@@ -51,6 +51,7 @@ class MAVAddress
         unsigned int address() const;
         unsigned int system() const;
         unsigned int component() const;
+        MAVAddress &operator=(const MAVAddress &other) = default;
 };
 
 
@@ -60,7 +61,7 @@ bool operator<(const MAVAddress &lhs, const MAVAddress &rhs);
 bool operator>(const MAVAddress &lhs, const MAVAddress &rhs);
 bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs);
 bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs);
-std::ostream &operator<<(std::ostream &os, const MAVAddress &ipaddress);
+std::ostream &operator<<(std::ostream &os, const MAVAddress &mavaddress);
 
 
 #endif // MAVADDRESS_HPP_
