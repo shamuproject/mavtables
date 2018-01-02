@@ -17,7 +17,6 @@
 
 #include <catch.hpp>
 #include <sstream>
-// #include <util.hpp>
 #include "IPAddress.hpp"
 
 
@@ -129,46 +128,6 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
 }
 
 
-TEST_CASE("IPAddress's are copyable.", "[IPAddress]")
-{
-    IPAddress a(0x00000000, 0);
-    IPAddress b(0xFFFFFFFF, 65535);
-    IPAddress a_copy = a;
-    IPAddress b_copy(b);
-    REQUIRE(&a != &a_copy);
-    REQUIRE(a == a_copy);
-    REQUIRE(&b != &b_copy);
-    REQUIRE(b == b_copy);
-}
-
-
-TEST_CASE("The port of an IP address can be changed during a copy.",
-          "[IPAddress]")
-{
-    IPAddress a(0x00000000, 0);
-    IPAddress b(0xFFFFFFFF, 65535);
-    IPAddress a_copy(a, 65535);
-    IPAddress b_copy(b, 0);
-    REQUIRE(&a != &a_copy);
-    REQUIRE(a.address() == a_copy.address());
-    REQUIRE(a.port() == 0);
-    REQUIRE(a_copy.port() == 65535);
-    REQUIRE(&b != &b_copy);
-    REQUIRE(b.address() == b_copy.address());
-    REQUIRE(b.port() == 65535);
-    REQUIRE(b_copy.port() == 0);
-    SECTION("And ensures port number is within range.")
-    {
-        REQUIRE_THROWS_AS(IPAddress(a, static_cast<unsigned int>(-1)),
-                          std::out_of_range);
-        REQUIRE_THROWS_AS(IPAddress(b, static_cast<unsigned int>(-1)),
-                          std::out_of_range);
-        REQUIRE_THROWS_AS(IPAddress(a, 65536), std::out_of_range);
-        REQUIRE_THROWS_AS(IPAddress(b, 65536), std::out_of_range);
-    }
-}
-
-
 TEST_CASE("IPAddress's can be constructed from an address and port.",
           "[IPAddress]")
 {
@@ -233,6 +192,55 @@ TEST_CASE("IPAddress's can be constructed from strings.", "[IPAddress]")
         REQUIRE_THROWS_AS(IPAddress("1.2.256.4"), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress("1.2.3.256"), std::out_of_range);
     }
+}
+
+
+TEST_CASE("IPAddress's are copyable.", "[IPAddress]")
+{
+    IPAddress a(0x00000000, 0);
+    IPAddress b(0xFFFFFFFF, 65535);
+    IPAddress a_copy = a;
+    IPAddress b_copy(b);
+    REQUIRE(&a != &a_copy);
+    REQUIRE(a == a_copy);
+    REQUIRE(&b != &b_copy);
+    REQUIRE(b == b_copy);
+}
+
+
+TEST_CASE("The port of an IP address can be changed during a copy.",
+          "[IPAddress]")
+{
+    IPAddress a(0x00000000, 0);
+    IPAddress b(0xFFFFFFFF, 65535);
+    IPAddress a_copy(a, 65535);
+    IPAddress b_copy(b, 0);
+    REQUIRE(&a != &a_copy);
+    REQUIRE(a.address() == a_copy.address());
+    REQUIRE(a.port() == 0);
+    REQUIRE(a_copy.port() == 65535);
+    REQUIRE(&b != &b_copy);
+    REQUIRE(b.address() == b_copy.address());
+    REQUIRE(b.port() == 65535);
+    REQUIRE(b_copy.port() == 0);
+    SECTION("And ensures port number is within range.")
+    {
+        REQUIRE_THROWS_AS(IPAddress(a, static_cast<unsigned int>(-1)),
+                          std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(b, static_cast<unsigned int>(-1)),
+                          std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(a, 65536), std::out_of_range);
+        REQUIRE_THROWS_AS(IPAddress(b, 65536), std::out_of_range);
+    }
+}
+
+
+TEST_CASE("IPAddress's are assignable.", "[IPAddress]")
+{
+    IPAddress a(0x00000000, 0);
+    REQUIRE(a == IPAddress(0x00000000, 0));
+    a = IPAddress(0xFFFFFFFF, 65535);
+    REQUIRE(a == IPAddress(0xFFFFFFFF, 65535));
 }
 
 

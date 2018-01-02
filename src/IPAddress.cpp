@@ -49,7 +49,7 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
     if (address > 0xFFFFFFFF)
     {
         std::stringstream ss;
-        ss << "address (" << std::hex << address <<
+        ss << "address (0x" << std::hex << address <<
            ") is outside of the allowed range (0x00000000 - 0xffffffff).";
         throw std::out_of_range(ss.str());
     }
@@ -209,7 +209,7 @@ unsigned int IPAddress::port() const
  *  \param lhs The left hand side IP address.
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs have the same address and port.
- *  \retval true if \p lhs and \p rhs do not have the same address and port.
+ *  \retval false if \p lhs and \p rhs do not have the same address and port.
  */
 bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -223,7 +223,7 @@ bool operator==(const IPAddress &lhs, const IPAddress &rhs)
  *  \param lhs The left hand side IP address.
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs do not have the same address and port.
- *  \retval true if \p lhs and \p rhs have the same address and port.
+ *  \retval false if \p lhs and \p rhs have the same address and port.
  */
 bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
 {
