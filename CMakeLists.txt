@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.3)
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 3)
+set (VERSION_PATCH 4)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
