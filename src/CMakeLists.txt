@@ -3,12 +3,14 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
 )
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.hpp"
 )
 target_sources (mavtables 
     PRIVATE

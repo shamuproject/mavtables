@@ -65,7 +65,7 @@ bool operator<(const MAVAddress &lhs, const MAVAddress &rhs);
 bool operator>(const MAVAddress &lhs, const MAVAddress &rhs);
 bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs);
 bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs);
-std::ostream &operator<<(std::ostream &os, const MAVAddress &ipaddress);
+std::ostream &operator<<(std::ostream &os, const MAVAddress &mavaddress);
 
 
 #endif // MAVADDRESS_HPP_
