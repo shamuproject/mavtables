@@ -35,13 +35,20 @@ class MAVSubnet
          *
          * \param other MAVLink address to copy.
          */
-        MAVSubnet(const MAVSubnets &other) = default;
-        MAVSubnet(MAVAddress address, unsigned int mask = 0xFFFF);
-        MAVSubnet(MAVAddress address, unsigned int system_mask,
+        MAVSubnet(const MAVSubnet &other) = default;
+        MAVSubnet(const MAVAddress &address, unsigned int mask = 0xFFFF);
+        MAVSubnet(const MAVAddress &address, unsigned int system_mask,
                   unsigned int component_mask);
         MAVSubnet(std::string address);
         bool contains(const MAVAddress &address) const;
+        /** Assignment operator.
+         *
+         * \param other MAVLink address to copy.
+         */
+        MAVSubnet &operator=(const MAVSubnet &other) = default;
 
+        friend bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs);
+        friend bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs);
         friend std::ostream &operator<<(std::ostream &os,
                                         const MAVSubnet &mavsubnet);
 };

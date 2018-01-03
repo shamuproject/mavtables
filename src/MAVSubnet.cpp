@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
 
 #include <vector>
 #include <string>
@@ -84,7 +85,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
         throw std::out_of_range(ss.str());
     }
 
-    mask_ = ((system_mask << 8) & 0x00FF) | (component_mask & 0x00FF);
+    mask_ = ((system_mask << 8) & 0xFF00) | (component_mask & 0x00FF);
 }
 
 
@@ -151,49 +152,60 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
 MAVSubnet::MAVSubnet(std::string subnet)
     : address_(0)
 {
-    // TODO: This function does not currently follow the documented behavior. It
-    // needs to be updated.
-
     // Extract parts of subnet string.
     std::vector<std::string> parts;
-    boost::char_separator<char> sep("/", "\\");
+    boost::char_separator<char> sep("", ":/\\");
     boost::tokenizer<boost::char_separator<char>> tokens(subnet, sep);
 
+    // std::cout << "subnet:" << subnet << std::endl;
     for (auto i : tokens)
     {
         parts.push_back(i);
     }
 
-    try
-    {
-        address_ = MAVAddress(parts.at(0));
-
-        // Parse mask.
-        unsigned int slashmask;
-        std::istringstream(parts.at(2)) >> slashmask;
-
-        // Ensure slashmask is within range.
-        if (slashmask > 0xFFFF)
-        {
-            throw std::out_of_range("slash mask (" + std::to_string(slashmask) +
-                                    ") is outside of allowed range (0 - 16).");
-        }
-
-        // Convert slash mask into regular mask.
-        switch (parts.at(1).at(0))
-        {
-            case '/':
-                mask_ = (0xFFFF << slashmask) & 0xFFFF;
-                break;
-
-            case '\\':
-                    mask_ = (0xFFFF >> slashmask) & 0xFFFF;
-                break;
-        }
-    }
-    catch (std::out_of_range)
+    // Ensure proper format.
+    if (parts.size() != 3)
     {
         throw std::invalid_argument("Invalid MAVLink subnet: \"" + subnet + "\"");
+    }
+
+    address_ = MAVAddress(parts[0]);
+
+    // Determine format of subnet string.
+    unsigned int slashmask;
+    switch (parts[1].at(0))
+    {
+        case ':':
+            mask_ = MAVAddress(parts[2]).address();
+            break;
+
+        case '/':
+            std::istringstream(parts.at(2)) >> slashmask;
+
+            if (slashmask > 16)
+            {
+                throw std::out_of_range(
+                    "forward slash mask ("
+                    + std::to_string(slashmask)
+                    + ") is outside of allowed range (0 - 16).");
+            }
+
+            mask_ = (0xFFFF << (16 - slashmask)) & 0xFFFF;
+            break;
+
+        case '\\':
+            std::istringstream(parts.at(2)) >> slashmask;
+
+            if (slashmask > 8)
+            {
+                throw std::out_of_range(
+                    "backslash mask ("
+                    + std::to_string(slashmask)
+                    + ") is outside of allowed range (0 - 8).");
+            }
+
+            mask_ = (0xFFFF << (8 - slashmask)) & 0x00FF;
+            break;
     }
 }
 
@@ -257,58 +269,86 @@ bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs)
  */
 std::ostream &operator<<(std::ostream &os, const MAVSubnet &mavsubnet)
 {
+    // std::cout << mavsubnet.address_ << " :---: " << std::hex << mavsubnet.mask_ << std::dec << std::endl;
     os << mavsubnet.address_;
-    switch (mavsubnet.mask_) {
+
+    switch (mavsubnet.mask_)
+    {
         case 0b1111111111111111:
             return os << "/16";
+
         case 0b1111111111111110:
             return os << "/15";
+
         case 0b1111111111111100:
             return os << "/14";
+
         case 0b1111111111111000:
             return os << "/13";
+
         case 0b1111111111110000:
             return os << "/12";
+
         case 0b1111111111100000:
             return os << "/11";
+
         case 0b1111111111000000:
             return os << "/10";
+
         case 0b1111111110000000:
             return os << "/9";
+
         case 0b1111111100000000:
             return os << "/8";
+
         case 0b1111111000000000:
             return os << "/7";
+
         case 0b1111110000000000:
             return os << "/6";
+
         case 0b1111100000000000:
             return os << "/5";
+
         case 0b1111000000000000:
             return os << "/4";
+
         case 0b1110000000000000:
             return os << "/3";
+
         case 0b1100000000000000:
             return os << "/2";
+
         case 0b1000000000000000:
             return os << "/1";
+
         case 0b0000000000000000:
             return os << "/0";
+
         case 0b0000000011111111:
             return os << "\\8";
+
         case 0b0000000011111110:
             return os << "\\7";
+
         case 0b0000000011111100:
             return os << "\\6";
+
         case 0b0000000011111000:
             return os << "\\5";
+
         case 0b0000000011110000:
             return os << "\\4";
+
         case 0b0000000011100000:
             return os << "\\3";
+
         case 0b0000000011000000:
             return os << "\\2";
+
         case 0b0000000010000000:
             return os << "\\1";
+
         default:
             return os << ":" << MAVAddress(mavsubnet.mask_);
     }
