@@ -4,6 +4,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
 )
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
@@ -11,6 +12,8 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Connection.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
 )
 target_sources (mavtables 
     PRIVATE
