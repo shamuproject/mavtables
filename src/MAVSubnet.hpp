@@ -20,6 +20,7 @@
 
 
 #include <string>
+#include <ostream>
 
 #include "MAVAddress.hpp"
 

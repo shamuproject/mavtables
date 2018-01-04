@@ -20,6 +20,7 @@
 
 
 #include <string>
+#include <ostream>
 
 
 /** A MAVLink address.

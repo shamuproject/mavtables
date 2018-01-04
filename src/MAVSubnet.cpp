@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
 
 #include <vector>
 #include <string>
@@ -170,9 +169,9 @@ MAVSubnet::MAVSubnet(std::string subnet)
     }
 
     address_ = MAVAddress(parts[0]);
-
     // Determine format of subnet string.
     unsigned int slashmask;
+
     switch (parts[1].at(0))
     {
         case ':':

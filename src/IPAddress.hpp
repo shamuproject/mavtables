@@ -20,7 +20,7 @@
 
 
 #include <string>
-#include <iostream>
+#include <ostream>
 #include <stdexcept>
 #include "DNSLookupError.hpp"
 

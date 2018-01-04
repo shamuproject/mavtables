@@ -92,13 +92,18 @@ TEST_CASE("MAVSubnet's can be constructed from a MAVLink address and a numeric m
 TEST_CASE("MAVSubnet's can be constructed from a MAVLink address, system mask, and component mask.",
           "[MAVSubnet]")
 {
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0, 0) == MAVSubnet(MAVAddress(0x0000), 0));
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 255, 0) == MAVSubnet(MAVAddress(0x0000), 0xFF00));
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0, 255) == MAVSubnet(MAVAddress(0x0000), 0x00FF));
-    REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 255, 255) == MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
-    REQUIRE(MAVSubnet(MAVAddress(0x1234), 64, 128) == MAVSubnet(MAVAddress(0x1234), 0x4080));
-    REQUIRE(MAVSubnet(MAVAddress(0x1234), 128, 64) == MAVSubnet(MAVAddress(0x1234), 0x8040));
-
+    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0, 0) == MAVSubnet(MAVAddress(0x0000),
+            0));
+    REQUIRE(MAVSubnet(MAVAddress(0x0000), 255, 0) == MAVSubnet(MAVAddress(0x0000),
+            0xFF00));
+    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0, 255) == MAVSubnet(MAVAddress(0x0000),
+            0x00FF));
+    REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 255, 255) == MAVSubnet(MAVAddress(0xFFFF),
+            0xFFFF));
+    REQUIRE(MAVSubnet(MAVAddress(0x1234), 64, 128) == MAVSubnet(MAVAddress(0x1234),
+            0x4080));
+    REQUIRE(MAVSubnet(MAVAddress(0x1234), 128, 64) == MAVSubnet(MAVAddress(0x1234),
+            0x8040));
     SECTION("And ensures the system and component masks are within range (0x00 - 0xFF).")
     {
         REQUIRE_THROWS_AS(MAVSubnet(MAVAddress(0x0000), static_cast<unsigned int>(-1),
@@ -121,13 +126,14 @@ TEST_CASE("MAVSubnet's can be constructed from strings.", "[MAVSubnet]")
 {
     SECTION("Using long notation.")
     {
-        REQUIRE(MAVSubnet("255.16:123.234") == MAVSubnet(MAVAddress(255, 16), 123, 234));
+        REQUIRE(MAVSubnet("255.16:123.234") == MAVSubnet(MAVAddress(255, 16), 123,
+                234));
         REQUIRE(MAVSubnet("255.16:0.0") == MAVSubnet(MAVAddress(255, 16), 0, 0));
         REQUIRE(MAVSubnet("255.16:128.0") == MAVSubnet(MAVAddress(255, 16), 128, 0));
         REQUIRE(MAVSubnet("255.16:0.240") == MAVSubnet(MAVAddress(255, 16), 0, 240));
-        REQUIRE(MAVSubnet("255.16:128.240") == MAVSubnet(MAVAddress(255, 16), 128, 240));
+        REQUIRE(MAVSubnet("255.16:128.240") == MAVSubnet(MAVAddress(255, 16), 128,
+                240));
     }
-
     SECTION("Using forward slash notation.")
     {
         REQUIRE(MAVSubnet("255.16/0") == MAVSubnet(MAVAddress(255, 16),
@@ -165,7 +171,6 @@ TEST_CASE("MAVSubnet's can be constructed from strings.", "[MAVSubnet]")
         REQUIRE(MAVSubnet("255.16/16") == MAVSubnet(MAVAddress(255, 16),
                 0b1111111111111111));
     }
-
     SECTION("Using backslash notation.")
     {
         REQUIRE(MAVSubnet("255.16\\0") == MAVSubnet(MAVAddress(255, 16),
@@ -187,7 +192,6 @@ TEST_CASE("MAVSubnet's can be constructed from strings.", "[MAVSubnet]")
         REQUIRE(MAVSubnet("255.16\\8") == MAVSubnet(MAVAddress(255, 16),
                 0b0000000011111111));
     }
-
     SECTION("And ensures the subnet string is valid.")
     {
         REQUIRE_THROWS_AS(MAVSubnet("255.16 255.256"), std::invalid_argument);
@@ -205,19 +209,16 @@ TEST_CASE("MAVSubnet's can be constructed from strings.", "[MAVSubnet]")
         REQUIRE_THROWS_AS(MAVSubnet("255.16:-1.0"), std::invalid_argument);
         REQUIRE_THROWS_AS(MAVSubnet("255.16:0.-1"), std::invalid_argument);
     }
-
     SECTION("And ensures mask is within range.")
     {
         REQUIRE_THROWS_AS(MAVSubnet("255.16/256.255"), std::out_of_range);
         REQUIRE_THROWS_AS(MAVSubnet("255.16/255.256"), std::out_of_range);
     }
-
     SECTION("And ensures forward slash mask is within range.")
     {
         REQUIRE_THROWS_AS(MAVSubnet("255.16/-1"), std::out_of_range);
         REQUIRE_THROWS_AS(MAVSubnet("255.16/17"), std::out_of_range);
     }
-
     SECTION("And ensures backslash mask is within range.")
     {
         REQUIRE_THROWS_AS(MAVSubnet("255.16\\-1"), std::out_of_range);
@@ -280,14 +281,14 @@ TEST_CASE("MAVSubnet's are printable", "[MAVSubnet]")
 }
 
 
-TEST_CASE("The 'contains' determines if a MAVLink address is in the subnet.", "[MAVSubnet]")
+TEST_CASE("The 'contains' determines if a MAVLink address is in the subnet.",
+          "[MAVSubnet]")
 {
     REQUIRE(MAVSubnet("0.0:0.0").contains(MAVAddress("0.0")));
     REQUIRE(MAVSubnet("0.0:0.0").contains(MAVAddress("255.255")));
     REQUIRE(MAVSubnet("0.0:255.255").contains(MAVAddress("0.0")));
     REQUIRE_FALSE(MAVSubnet("0.0:255.255").contains(MAVAddress("1.1")));
     REQUIRE_FALSE(MAVSubnet("0.0:255.255").contains(MAVAddress("255.255")));
-
     SECTION("With subnet 192.0/14")
     {
         MAVSubnet subnet("192.0/14");
@@ -303,7 +304,6 @@ TEST_CASE("The 'contains' determines if a MAVLink address is in the subnet.", "[
         REQUIRE_FALSE(subnet.contains(MAVAddress("0.2")));
         REQUIRE_FALSE(subnet.contains(MAVAddress("255.3")));
     }
-
     SECTION("With subnet 192.0\\6")
     {
         MAVSubnet subnet("192.0\\6");
