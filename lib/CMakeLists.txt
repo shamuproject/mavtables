@@ -29,9 +29,40 @@ add_library (FakeIt INTERFACE)
 target_include_directories (FakeIt SYSTEM INTERFACE "${FAKEIT_INCLUDE_DIR}")
 
 
-# Pass lcov ignore patters up to parent.
+# MAVLink
+find_path (
+    MAVLINK_INCLUDE_DIR mavlink
+    HINTS ${CMAKE_CURRENT_LIST_DIR}/mavlink
+)
+if ((NOT MAVLINK_INCLUDE_DIR) OR (NOT EXISTS "${MAVLINK_INCLUDE_DIR}"))
+    execute_process (
+        COMMAND git submodule update --init --recursive
+        WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+    )
+endif ()
+set (MAVLINK_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/mavlink")
+list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/mavlink/*')
+add_library (MAVLink INTERFACE)
+target_include_directories (MAVLink SYSTEM INTERFACE "${MAVLINK_INCLUDE_DIR}")
+
+
+# Pass lcov ignore patterns up to parent.
 set (
     LCOV_REMOVE_PATTERNS
     ${LCOV_REMOVE_PATTERNS} "${LCOV_REMOVE_LOCAL}"
     PARENT_SCOPE
 )
+
+
+# Set MAVLink include path from MAVLINK_INCLUDE_PATH environment variable.
+if ("$ENV{MAVLINK_INCLUDE_PATH}" STREQUAL "")
+    set (
+        MAVLINK_INCLUDE_PATH "mavlink/v2.0/common"
+        CACHE INTERNAL "Use default MAVLink implementation."
+    )
+else ()
+    set (
+        MAVLINK_INCLUDE_PATH "$ENV{MAVLINK_INCLUDE_PATH}"
+        CACHE INTERNAL "Copied from environment variable."
+    )
+endif ()

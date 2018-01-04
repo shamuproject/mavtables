@@ -7,6 +7,6 @@
 [submodule "lib/fakeit"]
 	path = lib/fakeit
 	url = https://github.com/eranpeer/FakeIt.git
-[submodule "lib/mavlink"]
-	path = lib/mavlink
+[submodule "lib/mavlink/mavlink/v2.0"]
+	path = lib/mavlink/mavlink/v2.0
 	url = https://github.com/mavlink/c_library_v2.git

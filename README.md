@@ -42,6 +42,9 @@ The installation prefix is `/usr/local` by default but can be changed with
 $ make
 # make PREFIX=/desired/install/path install
 ```
+The makefile will download and use the default MAVLink implementation.  This can
+be overridden by setting the `MAVLINK_INCLUDE_PATH` environment variable to the
+directory containing a `mavlink.h` header file.
 
 
 ## Running
