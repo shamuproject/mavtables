@@ -15,47 +15,83 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
+#include <string>
+#include <memory>
+#include <cstdint>
+#include <ostream>
+#include <optional>
 
+#include "Connection.hpp"
 #include "Packet.hpp"
 
 
-Packet(std::weak_ptr<Connection> connection, int priority = 0)
+/** Construct a packet.
+ *
+ *  \param connection Connection packet was received on.
+ *  \param priority Set the priority (default is 0).
+ */
+Packet::Packet(std::weak_ptr<Connection> connection, int priority = 0)
+    : connection_(connection), priority_(priority)
 {
 }
 
 
-std::weak_ptr<Connection> connection() const
+/** Return reference to receiving connection.
+ *
+ *  \return The connection the packet was received on.
+ */
+std::weak_ptr<Connection> Packet::connection() const
 {
     return connection_;
 }
 
 
-std::string packet_type() const
-{
-    
-}
-
-
-int priority() const
+/** Return the priority of the packet.
+ *
+ *  The default priority is 0.  A higher priority packet will be routed before a
+ *  lower priority packet.
+ *
+ *  \return The priority of the packet.
+ */
+int Packet::priority() const
 {
     return priority_;
 }
 
 
-int priority(int priority)
+/** Set the priority of the packet.
+ *
+ *  A higher priority packet will be routed before a lower priority packet.
+ *
+ *  \return The new priority of the packet.
+ */
+int Packet::priority(int priority)
 {
     return priority_ = priority;
 }
 
 
-const std::vector<uint8_t> &data() const
+/** Return the packet data.
+ *
+ *  \return The packet data as a vector of bytes.
+ */
+const std::vector<uint8_t> &Packet::data() const
 {
     return data_
 }
 
 
+/** Test
+ */
 std::ostream &operator<<(std::ostream &os, const Packet &packet)
 {
+    os << packet_type();
+    os << " from " << source_address();
 
+    if (auto dest = dest_address())
+    {
+        os << " to " << dest.value();
+    }
+
+    os << " (" << version() << ")";
 }

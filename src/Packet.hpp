@@ -24,11 +24,16 @@
 #include <memory>
 #include <cstdint>
 #include <ostream>
+#include <optional>
 
 #include "Connection.hpp"
 
 
 /** A MAVLink packet with a reference to the connection it arrived on.
+ *
+ *  This is an abstract class, it is meant to be overridden by classes
+ *  implementing either version 1 or version 2 of the MAVLink packet wire
+ *  protocol.
  */
 class Packet
 {
@@ -51,7 +56,7 @@ class Packet
         virtual unsigned int version() const = 0;
         virtual std::string packet_type() const = 0;
         virtual MAVAddress source_address() const = 0;
-        virtual MAVAddress dest_address() const = 0;
+        virtual std::optional<MAVAddress> dest_address() const = 0;
         int priority() const;
         int priority(int priority);
         const std::vector<uint8_t> &data() const;
