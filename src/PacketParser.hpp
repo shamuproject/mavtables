@@ -15,47 +15,32 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
+#ifndef PACKETPARSER_HPP_
+#define PACKETPARSER_HPP_
+
+
+#include <memory>
+#include <cstdint>
 
 #include "Packet.hpp"
+#include "PacketVersion1.hpp"
+#include "PacketVersion2.hpp"
 
 
-Packet(std::weak_ptr<Connection> connection, int priority = 0)
+/** Parse bytes into a MAVLink packet.
+ */
+class PacketParser
 {
+    private:
+        std::unique_ptr<PacketVersion1>;
+        std::unique_ptr<PacketVersion2>;
+
+    public:
+        bool complete();
+        bool parse_byte(uint8_t byte);
+        std::vector<uint8_t> parse_bytes(const std::vector<uint8_t> bytes);
+        std::unique_ptr<Packet> packet();
 }
 
 
-std::weak_ptr<Connection> connection() const
-{
-    return connection_;
-}
-
-
-std::string packet_type() const
-{
-    
-}
-
-
-int priority() const
-{
-    return priority_;
-}
-
-
-int priority(int priority)
-{
-    return priority_ = priority;
-}
-
-
-const std::vector<uint8_t> &data() const
-{
-    return data_
-}
-
-
-std::ostream &operator<<(std::ostream &os, const Packet &packet)
-{
-
-}
+#endif // PACKETPARSER_HPP_

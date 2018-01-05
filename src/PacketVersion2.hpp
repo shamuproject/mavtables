@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef PACKET_HPP_
-#define PACKET_HPP_
+#ifndef PACKETVERSION2_HPP_
+#define PACKETVERSION2_HPP_
 
 
 #include <string>
@@ -26,45 +26,33 @@
 #include <ostream>
 
 #include "Connection.hpp"
+#include "Packet.hpp"
 
 
-/** A MAVLink packet with a reference to the connection it arrived on.
+/** A MAVLink packet with the version 2 wire protocol.
  */
-class Packet
+class PacketVersion2 : public Packet
 {
-    private:
-        std::weak_ptr<Connection> connection_;
-        int priority_;
-
-    protected:
-        std::vector<uint8_t> data_;
-
     public:
         /** Copy constructor.
          *
          * \param other Packet to copy.
          */
-        Packet(const Packet &other) = default;
-        Packet(std::weak_ptr<Connection> connection, int priority = 0);
-        virtual ~Packet() = default;
-        std::weak_ptr<Connection> connection() const;
-        virtual unsigned int version() const = 0;
-        virtual std::string packet_type() const = 0;
-        virtual MAVAddress source_address() const = 0;
-        virtual MAVAddress dest_address() const = 0;
-        int priority() const;
-        int priority(int priority);
-        const std::vector<uint8_t> &data() const;
+        PacketVersion2(const Packet &other) = default;
+        PacketVersion2(std::weak_ptr<Connection>, int priority = 0);
+        virtual unsigned int version() const;
+        virtual std::string packet_type() const;
+        virtual MAVAddress source_address() const;
+        virtual MAVAddress dest_address() const;
+        bool parse_byte(uint8_t byte);
+        std::vector<uint8_t> parse_bytes(const std::vector<uint8_t> &bytes);
+        bool complete() const;
         /** Assignment operator.
          *
          * \param other Packet to copy.
          */
-        Packet &operator=(const Packet &other) = default;
-
+        PacketVersion2 &operator=(const PacketVersion2 &other) = default;
 };
 
 
-std::ostream &operator<<(std::ostream &os, const Packet &packet);
-
-
-#endif // PACKET_HPP_
+#endif // PACKETVERSION2_HPP_

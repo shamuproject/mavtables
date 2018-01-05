@@ -15,47 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
-
-#include "Packet.hpp"
 
 
-Packet(std::weak_ptr<Connection> connection, int priority = 0)
-{
-}
+
+#include "PacketParser.hpp"
 
 
-std::weak_ptr<Connection> connection() const
-{
-    return connection_;
-}
-
-
-std::string packet_type() const
-{
-    
-}
-
-
-int priority() const
-{
-    return priority_;
-}
-
-
-int priority(int priority)
-{
-    return priority_ = priority;
-}
-
-
-const std::vector<uint8_t> &data() const
-{
-    return data_
-}
-
-
-std::ostream &operator<<(std::ostream &os, const Packet &packet)
-{
-
-}
+bool PacketParser::complete()
