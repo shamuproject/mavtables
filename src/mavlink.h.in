@@ -19,6 +19,16 @@
 #define MAVLINK_H_
 
 
+/** \defgroup mavlink
+ *
+ *  MAVLink utility macros, defines, types and functions.
+ *
+ *  Including this file also includes the main MAVLink C library.  This will be
+ *  the reference implementation using the common dialect by default.  Set the
+ *  `MAVLINK_INCLUDE_PATH` environment variable to the path containing the
+ *  desired `mavlink.h` file to override this.
+ */
+
 #include <stdint.h>
 
 #define MAVLINK_USE_MESSAGE_INFO
@@ -27,38 +37,72 @@
 
 #include "macros.hpp"
 
+/** Magic byte for MAVLink packet version 1.0. 
+ *
+ *  Value is `0xFE`.
+ *
+ *  \ingroup mavlink
+ **/
 #define MAVLINK_PACKET_VERSION1_MAGIC_BYTE MAVLINK_STX_MAVLINK1 // 0xFE
 
-// header = 6 bytes, payload = 255 bytes (max), checksum = 2 bytes
-#define MAVLINK_PACKET_VERSION1_MAX_LENGTH = 263
+/** Maximum length (in bytes) of v1.0 packets.
+ *
+ *  * header = 6 bytes
+ *  * payload = 255 bytes (max)
+ *  * checksum = 2 bytes
+ *
+ *  \ingroup mavlink
+ */
+#define MAVLINK_PACKET_VERSION1_MAX_LENGTH 263
 
+/** MAVLink packet v1.0 header.
+ *
+ *  \ingroup mavlink
+ */
 struct PACKED mavlink_packet_version1_header
 {
-    uint8_t magic;  // Protocol magic marker (0xFE).
-    uint8_t len;    // Length of payload.
-    uint8_t seq;    // Sequence of packet.
-    uint8_t sysid;  // ID of message sender system/aircraft.
-    uint8_t compid; // ID of the message sneder component.
-    uint8_t msgid;  // ID of message in payload.
+    uint8_t magic;  //!< Protocol magic marker (0xFE).
+    uint8_t len;    //!< Length of payload.
+    uint8_t seq;    //!< Sequence of packet.
+    uint8_t sysid;  //!< ID of message sender system/aircraft.
+    uint8_t compid; //!< ID of the message sneder component.
+    uint8_t msgid;  //!< ID of message in payload.
 };
 
 
+/** Magic byte for MAVLink packet version 2.0. 
+ *
+ *  Value is `0xFD`.
+ *
+ *  \ingroup mavlink
+ **/
 #define MAVLINK_PACKET_VERSION2_MAGIC_BYTE MAVLINK_STX // 0xFD
 
-// header = 10 bytes, payload = 255 bytes (max), checksum = 2 bytes, optional
-// signature = 13 bytes
-#define MAVLINK_PACKET_VERSION2_MAX_LENGTH = 280
+/** Maximum length (in bytes) of v2.0 packets.
+ *
+ *  * header = 10 bytes
+ *  * payload = 255 bytes (max)
+ *  * checksum = 2 bytes
+ *  * optional signature = 13 bytes
+ *
+ *  \ingroup mavlink
+ */
+#define MAVLINK_PACKET_VERSION2_MAX_LENGTH 280
 
+/** MAVLink packet v2.0 header.
+ *
+ *  \ingroup mavlink
+ */
 struct PACKED mavlink_packet_version2_header
 {
-    uint8_t magic;          // Protocol magic marker (0xFD).
-    uint8_t len;            // Length of pauload.
-    uint8_t incompat_flags; // Flags that must be understood.
-    uint8_t compat_flags;   // Flags that can be ignored if not understood.
-    uint8_t seq;            // Sequence of packet.
-    uint8_t sysid;          // ID of message sender system/aircraft.
-    uint8_t compid;         // ID of the message sender component.
-    uint32_t msgid : 24;    // ID of message in payload (3 bytes).
+    uint8_t magic;          //,< Protocol magic marker (0xFD).
+    uint8_t len;            //!< Length of pauload.
+    uint8_t incompat_flags; //!< Flags that must be understood.
+    uint8_t compat_flags;   //!< Flags that can be ignored if not understood.
+    uint8_t seq;            //!< Sequence of packet.
+    uint8_t sysid;          //!< ID of message sender system/aircraft.
+    uint8_t compid;         //!< ID of the message sender component.
+    uint32_t msgid : 24;    //!< ID of message in payload (3 bytes).
 };
 
 
