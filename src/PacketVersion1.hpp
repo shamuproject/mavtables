@@ -23,8 +23,11 @@
 #include <vector>
 #include <memory>
 #include <cstdint>
-#include <ostream>
 
+extern "C"
+{
+#include "mavlink.h"
+}
 #include "Connection.hpp"
 #include "Packet.hpp"
 
@@ -33,20 +36,22 @@
  */
 class PacketVersion1 : public Packet
 {
+    private:
+        const struct mavlink_packet_version1_header *header_() const;
+
     public:
         /** Copy constructor.
          *
          * \param other Packet to copy.
          */
-        PacketVersion1(const Packet &other) = default;
-        PacketVersion1(std::weak_ptr<Connection>, int priority = 0);
+        PacketVersion1(const PacketVersion1 &other) = default;
+        PacketVersion1(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
+                       int priority = 0);
         virtual unsigned int version() const;
-        virtual std::string packet_type() const;
-        virtual MAVAddress source_address() const;
-        virtual MAVAddress dest_address() const;
-        bool parse_byte(uint8_t byte);
-        std::vector<uint8_t> parse_bytes(const std::vector<uint8_t> &bytes);
-        bool complete() const;
+        virtual unsigned long id() const;
+        virtual std::string name() const;
+        virtual MAVAddress source() const;
+        virtual std::optional<MAVAddress> dest() const = 0;
         /** Assignment operator.
          *
          * \param other Packet to copy.

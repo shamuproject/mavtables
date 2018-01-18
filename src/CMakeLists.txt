@@ -5,8 +5,10 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
 )
 set (HEADERS
+    "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
@@ -15,8 +17,6 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Connection.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/PacketParser.hpp"
 )
 target_sources (mavtables 
     PRIVATE

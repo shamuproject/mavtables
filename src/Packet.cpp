@@ -17,6 +17,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 #include <cstdint>
 #include <ostream>
 #include <optional>
@@ -27,11 +28,19 @@
 
 /** Construct a packet.
  *
+ *  \param data Raw packet data.
  *  \param connection Connection packet was received on.
  *  \param priority Set the priority (default is 0).
  */
-Packet::Packet(std::weak_ptr<Connection> connection, int priority = 0)
-    : connection_(connection), priority_(priority)
+Packet::Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
+               int priority)
+    : data_(std::move(data)), connection_(std::move(connection)),
+      priority_(priority)
+{
+}
+
+
+Packet::~Packet()
 {
 }
 
@@ -77,21 +86,39 @@ int Packet::priority(int priority)
  */
 const std::vector<uint8_t> &Packet::data() const
 {
-    return data_
+    return data_;
 }
 
 
-/** Test
+/** Print the packet to the given output stream.
+ *
+ *  The format is "<Message Name> (#<Message ID>) from <Source Address> to <Dest
+ *  Address> (v<packet version>)" or "<Message Name> (#<Message ID>) from
+ *  <Source Address> (v<packet version>)" if no distination address is
+ *  specified.
+ *
+ *  Some examples are:
+ *      - "HEARTBEAT (#1) from 16.8 (v1.0)"
+ *      - "PING (#4) from 128.4 to 16.8 (v2.0)"
+ *      - "DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0)"
+ *      - "ENCAPSULATED_DATA (#131) from 128.4 (v2.0)"
+ *
+ *  \relates Packet
+ *  \param os The output stream to print to.
+ *  \param packet The MAVLink packet to print.
+ *  \return The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Packet &packet)
 {
-    os << packet_type();
-    os << " from " << source_address();
+    os << packet.name() << "(#" << packet.id() << ")";
+    os << " from " << packet.source();
 
-    if (auto dest = dest_address())
+    if (auto dest = packet.dest())
     {
         os << " to " << dest.value();
     }
 
-    os << " (" << version() << ")";
+    os << " (" << ((packet.version() & 0xFF00) >> 8) << "." <<
+       (packet.version() & 0x00FF) << ")";
+    return os;
 }

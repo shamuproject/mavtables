@@ -35,12 +35,12 @@ add_subdirectory (lib)
 
 # mavtables
 add_executable (mavtables src/mavtables.cpp)
-target_link_libraries (mavtables ${Boost_LIBRARIES})
+target_link_libraries (mavtables ${Boost_LIBRARIES} MAVLink)
 install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
 add_executable (unit_tests test/CMakeLists.txt)
-target_link_libraries (unit_tests Catch FakeIt ${Boost_LIBRARIES})
+target_link_libraries (unit_tests Catch FakeIt ${Boost_LIBRARIES} MAVLink)
 add_test(NAME UnitTests COMMAND unit_tests)
 
 # add sources and evaluate test coverage

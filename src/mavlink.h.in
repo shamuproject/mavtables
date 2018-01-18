@@ -15,4 +15,51 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#ifndef MAVLINK_H_
+#define MAVLINK_H_
+
+
+#include <stdint.h>
+
+#define MAVLINK_USE_MESSAGE_INFO
 #include "@MAVLINK_INCLUDE_PATH@/mavlink.h"
+// #include "@MAVLINK_INCLUDE_PATH@/../mavlink_get_info.h"
+
+#include "macros.hpp"
+
+#define MAVLINK_PACKET_VERSION1_MAGIC_BYTE MAVLINK_STX_MAVLINK1 // 0xFE
+
+// header = 6 bytes, payload = 255 bytes (max), checksum = 2 bytes
+#define MAVLINK_PACKET_VERSION1_MAX_LENGTH = 263
+
+struct PACKED mavlink_packet_version1_header
+{
+    uint8_t magic;  // Protocol magic marker (0xFE).
+    uint8_t len;    // Length of payload.
+    uint8_t seq;    // Sequence of packet.
+    uint8_t sysid;  // ID of message sender system/aircraft.
+    uint8_t compid; // ID of the message sneder component.
+    uint8_t msgid;  // ID of message in payload.
+};
+
+
+#define MAVLINK_PACKET_VERSION2_MAGIC_BYTE MAVLINK_STX // 0xFD
+
+// header = 10 bytes, payload = 255 bytes (max), checksum = 2 bytes, optional
+// signature = 13 bytes
+#define MAVLINK_PACKET_VERSION2_MAX_LENGTH = 280
+
+struct PACKED mavlink_packet_version2_header
+{
+    uint8_t magic;          // Protocol magic marker (0xFD).
+    uint8_t len;            // Length of pauload.
+    uint8_t incompat_flags; // Flags that must be understood.
+    uint8_t compat_flags;   // Flags that can be ignored if not understood.
+    uint8_t seq;            // Sequence of packet.
+    uint8_t sysid;          // ID of message sender system/aircraft.
+    uint8_t compid;         // ID of the message sender component.
+    uint32_t msgid : 24;    // ID of message in payload (3 bytes).
+};
+
+
+#endif // MAVLINK_H_

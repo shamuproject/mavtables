@@ -26,6 +26,7 @@
 #include <ostream>
 #include <optional>
 
+#include "MAVAddress.hpp"
 #include "Connection.hpp"
 
 
@@ -38,11 +39,9 @@
 class Packet
 {
     private:
+        std::vector<uint8_t> data_;
         std::weak_ptr<Connection> connection_;
         int priority_;
-
-    protected:
-        std::vector<uint8_t> data_;
 
     public:
         /** Copy constructor.
@@ -50,13 +49,42 @@ class Packet
          * \param other Packet to copy.
          */
         Packet(const Packet &other) = default;
-        Packet(std::weak_ptr<Connection> connection, int priority = 0);
-        virtual ~Packet() = default;
+        Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
+               int priority = 0);
+        virtual ~Packet();
         std::weak_ptr<Connection> connection() const;
+        /** Return packet version.
+         *
+         *  \returns Two byte Packet version with major version in MSB and minor
+         *  version in LSB.
+         */
         virtual unsigned int version() const = 0;
-        virtual std::string packet_type() const = 0;
-        virtual MAVAddress source_address() const = 0;
-        virtual std::optional<MAVAddress> dest_address() const = 0;
+        /** Return MAVLink message ID.
+         *
+         *  \returns The numeric message ID of the MAVLink packet (0 to 255).
+         */
+        virtual unsigned long id() const = 0;
+        /** Return MAVLink message name.
+         *
+         *  \returns The message name of the MAVLink packet.
+         */
+        virtual std::string name() const = 0;
+        /** Return source address.
+         *
+         *  Where the packet came from.
+         *
+         *  \returns The source MAVLink address of the packet.
+         */
+        virtual MAVAddress source() const = 0;
+        /** Return destination address.
+         *
+         *  Where the packet is sent to.  This is optional because not all
+         *  packets have a destination.
+         *
+         *  \returns The destination MAVLink address of the packet if not a
+         *  broadcast packet.
+         */
+        virtual std::optional<MAVAddress> dest() const = 0;
         int priority() const;
         int priority(int priority);
         const std::vector<uint8_t> &data() const;
