@@ -69,7 +69,10 @@ int Packet::priority() const
 
 /** Set the priority of the packet.
  *
- *  A higher priority packet will be routed before a lower priority packet.
+ *  A higher priority packet will be routed before a lower priority packet.  Any
+ *  valid int is a valid priority.  Therefore, the guaranteed range is -32,768
+ *  to 32,767 but on some systems priorities outside this range may still be
+ *  valid.
  *
  *  \return The new priority of the packet.
  */
@@ -91,16 +94,17 @@ const std::vector<uint8_t> &Packet::data() const
 
 /** Print the packet to the given output stream.
  *
- *  The format is "<Message Name> (#<Message ID>) from <Source Address> to <Dest
- *  Address> (v<packet version>)" or "<Message Name> (#<Message ID>) from
- *  <Source Address> (v<packet version>)" if no distination address is
- *  specified.
+ *  The format is "<Message Name> (#<Message ID>) from <Source Address> to
+ *  <Destination Address> with priority <Priority> (v<Packet Version>)".
+ *  However, both "to <Destination Address>" and "with priority <Priority>" are
+ *  optional.  The former is not printed if it is a broadcast packet while the
+ *  latter is not printed if the priority is the default 0.
  *
  *  Some examples are:
- *      - "HEARTBEAT (#1) from 16.8 (v1.0)"
+ *      - "HEARTBEAT (#1) from 16.8 with priority 4 (v1.0)"
  *      - "PING (#4) from 128.4 to 16.8 (v2.0)"
  *      - "DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0)"
- *      - "ENCAPSULATED_DATA (#131) from 128.4 (v2.0)"
+ *      - "ENCAPSULATED_DATA (#131) from 128.4 with priority -3 (v2.0)"
  *
  *  \relates Packet
  *  \param os The output stream to print to.
@@ -109,15 +113,24 @@ const std::vector<uint8_t> &Packet::data() const
  */
 std::ostream &operator<<(std::ostream &os, const Packet &packet)
 {
-    os << packet.name() << "(#" << packet.id() << ")";
+    // ID, name, and source.
+    os << packet.name() << " (#" << packet.id() << ")";
     os << " from " << packet.source();
 
+    // Destination.
     if (auto dest = packet.dest())
     {
         os << " to " << dest.value();
     }
 
-    os << " (" << ((packet.version() & 0xFF00) >> 8) << "." <<
+    // Priority.
+    if (packet.priority() != 0)
+    {
+        os << " with priority " << packet.priority();
+    }
+
+    // Version.
+    os << " (v" << ((packet.version() & 0xFF00) >> 8) << "." <<
        (packet.version() & 0x00FF) << ")";
     return os;
 }

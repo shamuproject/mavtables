@@ -22,10 +22,10 @@
 #include <cstdint>
 #include <optional>
 
-
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
 #include "Connection.hpp"
+#include "util.hpp"
 
 
 #ifdef __clang__
@@ -50,7 +50,7 @@ class PacketTestClass : public Packet
         }
         virtual unsigned int version() const
         {
-            return 0x3E; // 3.14
+            return 0x030E; // 3.14
         }
         virtual unsigned long id() const
         {
@@ -86,3 +86,144 @@ TEST_CASE("Packet's can be constructed.", "[Packet]")
 }
 
 
+TEST_CASE("Packet's contain a weak_ptr to a connection.", "[Packet]")
+{
+    std::vector<uint8_t> data = {1, 3, 3, 7};
+    auto conn1 = std::make_shared<ConnectionTestClass>();
+    auto conn2 = std::make_shared<ConnectionTestClass>();
+    std::weak_ptr<ConnectionTestClass> empty_conn; // empty weak pointer
+    REQUIRE(PacketTestClass(data, conn1).connection().lock() == conn1);
+    REQUIRE(PacketTestClass(data, conn2).connection().lock() == conn2);
+    REQUIRE(PacketTestClass(data,
+                            empty_conn).connection().lock() == empty_conn.lock());
+    REQUIRE(PacketTestClass(data, empty_conn).connection().lock() == nullptr);
+    REQUIRE_FALSE(PacketTestClass(data, conn1).connection().lock() == nullptr);
+    REQUIRE_FALSE(PacketTestClass(data, conn2).connection().lock() == nullptr);
+    REQUIRE_FALSE(PacketTestClass(data, conn1).connection().lock() == conn2);
+    REQUIRE_FALSE(PacketTestClass(data, conn2).connection().lock() == conn1);
+    REQUIRE_FALSE(PacketTestClass(data, empty_conn).connection().lock() == conn1);
+    REQUIRE_FALSE(PacketTestClass(data, empty_conn).connection().lock() == conn2);
+}
+
+
+TEST_CASE("Packet's have a version.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    REQUIRE(PacketTestClass({}, conn).version() == 0x030E /* 3.14 */);
+}
+
+
+TEST_CASE("Packet's have an ID.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    REQUIRE(PacketTestClass({}, conn).id() == 42);
+}
+
+
+TEST_CASE("Packet's have a name.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    REQUIRE(PacketTestClass({}, conn).name() == "MISSION_CURRENT");
+}
+
+
+TEST_CASE("Packet's have a source address.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    REQUIRE(PacketTestClass({}, conn).source() == MAVAddress("3.14"));
+}
+
+
+TEST_CASE("Packet's optionally have a destination address.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    REQUIRE(PacketTestClass({}, conn).dest().value() == MAVAddress("2.71"));
+}
+
+
+TEST_CASE("Packet's have a priority.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    SECTION("Which has a default value of 0.")
+    {
+        REQUIRE(PacketTestClass({}, conn).priority() == 0);
+    }
+    SECTION("That can be set during construction.")
+    {
+        REQUIRE(PacketTestClass({}, conn, -32768).priority() == -32768);
+        REQUIRE(PacketTestClass({}, conn, -100).priority() == -100);
+        REQUIRE(PacketTestClass({}, conn, -10).priority() == -10);
+        REQUIRE(PacketTestClass({}, conn, -5).priority() == -5);
+        REQUIRE(PacketTestClass({}, conn, -1).priority() == -1);
+        REQUIRE(PacketTestClass({}, conn, 0).priority() == 0);
+        REQUIRE(PacketTestClass({}, conn, 1).priority() == 1);
+        REQUIRE(PacketTestClass({}, conn, 5).priority() == 5);
+        REQUIRE(PacketTestClass({}, conn, 10).priority() == 10);
+        REQUIRE(PacketTestClass({}, conn, 100).priority() == 100);
+        REQUIRE(PacketTestClass({}, conn, 32767).priority() == 32767);
+    }
+    SECTION("That can be set after construction.")
+    {
+        PacketTestClass packet({}, conn);
+        REQUIRE(packet.priority() == 0);
+        // -32768
+        REQUIRE(packet.priority(-32768) == -32768);
+        REQUIRE(packet.priority() == -32768);
+        // -100
+        REQUIRE(packet.priority(-100) == -100);
+        REQUIRE(packet.priority() == -100);
+        // -10
+        REQUIRE(packet.priority(-10) == -10);
+        REQUIRE(packet.priority() == -10);
+        // -5
+        REQUIRE(packet.priority(-5) == -5);
+        REQUIRE(packet.priority() == -5);
+        // -1
+        REQUIRE(packet.priority(-1) == -1);
+        REQUIRE(packet.priority() == -1);
+        // 0
+        REQUIRE(packet.priority(0) == 0);
+        REQUIRE(packet.priority() == 0);
+        // 1
+        REQUIRE(packet.priority(1) == 1);
+        REQUIRE(packet.priority() == 1);
+        // 5
+        REQUIRE(packet.priority(5) == 5);
+        REQUIRE(packet.priority() == 5);
+        // 10
+        REQUIRE(packet.priority(10) == 10);
+        REQUIRE(packet.priority() == 10);
+        // 100
+        REQUIRE(packet.priority(100) == 100);
+        REQUIRE(packet.priority() == 100);
+        // 32767
+        REQUIRE(packet.priority(32767) == 32767);
+        REQUIRE(packet.priority() == 32767);
+    }
+}
+
+
+TEST_CASE("Packet's contain raw packet data and make it accessible.",
+          "[Packet]")
+{
+    std::vector<uint8_t> data = {1, 3, 3, 7};
+    auto conn = std::make_shared<ConnectionTestClass>();
+    REQUIRE(PacketTestClass(data, conn).data() == std::vector<uint8_t>({1, 3, 3, 7}));
+    REQUIRE_FALSE(PacketTestClass(data, conn).data() == std::vector<uint8_t>({1, 0, 5, 3}));
+}
+
+
+TEST_CASE("Packet's are printable.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    REQUIRE(str(PacketTestClass({}, conn)) ==
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
+    REQUIRE(str(PacketTestClass({}, conn,
+                                0)) == "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
+    REQUIRE(str(PacketTestClass({}, conn,
+                                -32768)) ==
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 with priority -32768 (v3.14)");
+    REQUIRE(str(PacketTestClass({}, conn,
+                                32767)) ==
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 with priority 32767 (v3.14)");
+}
