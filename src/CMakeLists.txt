@@ -4,6 +4,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Connection.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"

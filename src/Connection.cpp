@@ -15,15 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef CONNECTION_HPP_
-#define CONNECTION_HPP_
+#include "Connection.hpp"
 
 
-class Connection
+Connection::~Connection()
 {
-    public:
-        virtual ~Connection();
-};
-
-
-#endif // CONNECTION_HPP_
+}
