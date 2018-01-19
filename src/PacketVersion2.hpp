@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,6 +25,10 @@
 #include <cstdint>
 #include <ostream>
 
+extern "C"
+{
+#include "mavlink.h"
+}
 #include "Connection.hpp"
 #include "Packet.hpp"
 
@@ -33,20 +37,22 @@
  */
 class PacketVersion2 : public Packet
 {
+    private:
+        const struct mavlink_packet_version2_header *header_() const;
+
     public:
         /** Copy constructor.
          *
          * \param other Packet to copy.
          */
-        PacketVersion2(const Packet &other) = default;
-        PacketVersion2(std::weak_ptr<Connection>, int priority = 0);
+        PacketVersion2(const PacketVersion2 &other) = default;
+        PacketVersion2(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
+                       int priority = 0);
         virtual unsigned int version() const;
-        virtual std::string packet_type() const;
-        virtual MAVAddress source_address() const;
-        virtual MAVAddress dest_address() const;
-        bool parse_byte(uint8_t byte);
-        std::vector<uint8_t> parse_bytes(const std::vector<uint8_t> &bytes);
-        bool complete() const;
+        virtual unsigned long id() const;
+        virtual std::string name() const;
+        virtual MAVAddress source() const;
+        virtual std::optional<MAVAddress> dest() const = 0;
         /** Assignment operator.
          *
          * \param other Packet to copy.

@@ -28,24 +28,24 @@ extern "C"
 #include "mavlink.h"
 }
 #include "Connection.hpp"
-#include "PacketVersion1.hpp"
+#include "PacketVersion2.hpp"
 
 
 /** \copydoc Packet::Packet(std::vector<uint8_t>,std::weak_ptr<Connection>,int)
  *
  *  \throws std::invalid_argument If packet data does not start with magic byte
- *      (0xFE).
+ *      (0xFD).
  *  \throws std::length_error If packet data is not of correct length.
  */
-PacketVersion1::PacketVersion1(std::vector<uint8_t> data,
+PacketVersion2::PacketVersion2(std::vector<uint8_t> data,
                                std::weak_ptr<Connection> connection, int priority)
     : Packet(std::move(data), std::move(connection), priority)
 {
     // Check that a complete header was given (including magic number).
-    if (this->data().size() >= (MAVLINK_CORE_HEADER_MAVLINK1_LEN + 1))
+    if (this->data().size() >= MAVLINK_NUM_NON_PAYLOAD_BYTES)
     {
         // Verify the magic number.
-        if (header_()->magic != MAVLINK_STX_MAVLINK1)
+        if (header_()->magic != MAVLINK_STX)
         {
             std::stringstream ss;
             ss << "Invlaid packet starting byte (0x" << std::hex << header_()->magic <<
@@ -54,8 +54,12 @@ PacketVersion1::PacketVersion1(std::vector<uint8_t> data,
         }
 
         // Ensure a complete packet was given.
-        size_t expected_packet_length = header_()->len +
-                                        MAVLINK_CORE_HEADER_MAVLINK1_LEN + MAVLINK_NUM_CHECKSUM_BYTES;
+        size_t expected_packet_length = header_()->len + MAVLINK_NUM_NON_PAYLOAD_BYTES;
+
+        if (header_()->incompat_flags & MAVLINK_IFLAG_SIGNED)
+        {
+            expected_packet_length += MAVLINK_SIGNATURE_BLOCK_LEN;
+        }
 
         if (this->data().size() == expected_packet_length)
         {
@@ -68,25 +72,25 @@ PacketVersion1::PacketVersion1(std::vector<uint8_t> data,
 
 
 // Return pointer to the header structure.
-const struct mavlink_packet_version1_header *PacketVersion1::header_() const
+const struct mavlink_packet_version2_header *PacketVersion2::header_() const
 {
-    return reinterpret_cast<const struct mavlink_packet_version1_header *>(&
+    return reinterpret_cast<const struct mavlink_packet_version2_header *>(&
             (data()[0]));
 }
 
 
 /** \copydoc Packet::version()
  *
- *  \returns 0x0100 (v1.0)
+ *  \returns 0x0200 (v2.0)
  */
-unsigned int PacketVersion1::version() const
+unsigned int PacketVersion2::version() const
 {
-    return 0x0100;
+    return 0x0200;
 }
 
 
 //! \copydoc Packet::id()
-unsigned long PacketVersion1::id() const
+unsigned long PacketVersion2::id() const
 {
     return header_()->msgid;
 }
@@ -96,7 +100,7 @@ unsigned long PacketVersion1::id() const
  *
  *  \throws std::runtime_error If the packet data has an invalid ID.
  */
-std::string PacketVersion1::name() const
+std::string PacketVersion2::name() const
 {
     if (const mavlink_message_info_t *msg_info = mavlink_get_message_info_by_id(
                 header_()->msgid))
@@ -109,7 +113,7 @@ std::string PacketVersion1::name() const
 
 
 //! \copydoc Packet::source()
-MAVAddress PacketVersion1::source() const
+MAVAddress PacketVersion2::source() const
 {
     return MAVAddress(header_()->sysid, header_()->compid);
 }
@@ -120,10 +124,8 @@ MAVAddress PacketVersion1::source() const
  *  Thanks to the
  *  [mavlink-router](https://github.com/intel/mavlink-router) project
  *  for an example of how to extract the destination address.
- *
- *  \throws std::runtime_error If the packet data has an invalid ID.
  */
-std::optional<MAVAddress> PacketVersion1::dest() const
+std::optional<MAVAddress> PacketVersion2::dest() const
 {
     if (const mavlink_msg_entry_t *msg_entry = mavlink_get_msg_entry(
                 header_()->msgid))
@@ -134,13 +136,33 @@ std::optional<MAVAddress> PacketVersion1::dest() const
         // Extract destination system.
         if (msg_entry->flags & MAV_MSG_ENTRY_FLAG_HAVE_TARGET_SYSTEM)
         {
-            dest_system = data()[msg_entry->target_system_ofs];
+            // Must check to make sure the target system offset is within the
+            // packet payload because it can be striped out in v2.0 packets if
+            // it is 0.
+            if (msg_entry->target_system_ofs < header_()->len)
+            {
+                dest_system = data()[msg_entry->target_system_ofs];
+            }
+            else
+            {
+                dest_system = 0;
+            }
         }
 
         // Extract destination component.
         if (msg_entry->flags & MAV_MSG_ENTRY_FLAG_HAVE_TARGET_COMPONENT)
         {
-            dest_component = data()[msg_entry->target_component_ofs];
+            // Must check to make sure the target component offset is within the
+            // packet payload because it can be striped out in v2.0 packets if
+            // it is 0.
+            if (msg_entry->target_component_ofs < header_()->len)
+            {
+                dest_component = data()[msg_entry->target_component_ofs];
+            }
+            else
+            {
+                dest_component = 0;
+            }
         }
 
         // Construct MAVLink address.

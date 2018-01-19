@@ -6,6 +6,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"
 )
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
@@ -17,6 +18,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Connection.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
 )
 target_sources (mavtables 
     PRIVATE

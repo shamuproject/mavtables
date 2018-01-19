@@ -19,6 +19,14 @@
 #define MAVLINK_H_
 
 
+#include <stdint.h>
+
+#define MAVLINK_USE_MESSAGE_INFO
+#include "@MAVLINK_INCLUDE_PATH@/mavlink.h"
+
+#include "macros.hpp"
+
+
 /** \defgroup mavlink MAVLink Library and Helpers
  *
  *  MAVLink utility macros, defines, types and functions.
@@ -29,31 +37,6 @@
  *  desired `mavlink.h` file to override this.
  */
 
-#include <stdint.h>
-
-#define MAVLINK_USE_MESSAGE_INFO
-#include "@MAVLINK_INCLUDE_PATH@/mavlink.h"
-// #include "@MAVLINK_INCLUDE_PATH@/../mavlink_get_info.h"
-
-#include "macros.hpp"
-
-/** Magic byte for MAVLink packet version 1.0. 
- *
- *  Value is `0xFE`.
- *
- *  \ingroup mavlink
- **/
-#define MAVLINK_PACKET_VERSION1_MAGIC_BYTE MAVLINK_STX_MAVLINK1 // 0xFE
-
-/** Maximum length (in bytes) of v1.0 packets.
- *
- *  * header = 6 bytes
- *  * payload = 255 bytes (max)
- *  * checksum = 2 bytes
- *
- *  \ingroup mavlink
- */
-#define MAVLINK_PACKET_VERSION1_MAX_LENGTH 263
 
 /** MAVLink packet v1.0 header.
  *
@@ -69,25 +52,6 @@ struct PACKED mavlink_packet_version1_header
     uint8_t msgid;  //!< ID of message in payload.
 };
 
-
-/** Magic byte for MAVLink packet version 2.0. 
- *
- *  Value is `0xFD`.
- *
- *  \ingroup mavlink
- **/
-#define MAVLINK_PACKET_VERSION2_MAGIC_BYTE MAVLINK_STX // 0xFD
-
-/** Maximum length (in bytes) of v2.0 packets.
- *
- *  * header = 10 bytes
- *  * payload = 255 bytes (max)
- *  * checksum = 2 bytes
- *  * optional signature = 13 bytes
- *
- *  \ingroup mavlink
- */
-#define MAVLINK_PACKET_VERSION2_MAX_LENGTH 280
 
 /** MAVLink packet v2.0 header.
  *

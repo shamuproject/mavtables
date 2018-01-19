@@ -20,7 +20,6 @@
 #include <utility>
 #include <cstdint>
 #include <ostream>
-#include <optional>
 
 #include "Connection.hpp"
 #include "Packet.hpp"
