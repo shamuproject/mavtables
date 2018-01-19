@@ -9,7 +9,8 @@ addressed and can be filtered based on source system/component and message type.
 
 ## Links
 
-* [Documentation](https://shamuproject.github.io/mavtables)
+* [HTML Documentation](https://shamuproject.github.io/mavtables)
+* [PDF Documentation](https://shamuproject.github.io/mavtables/mavtables.pdf)
 * [Download](https://github.com/shamuproject/mavtables/archive/master.zip)
 * [GitHub](https://github.com/shamuproject/mavtables)
 
