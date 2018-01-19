@@ -48,16 +48,23 @@ backed up with a `.orig` extension.  [Artistic
 Style](http://astyle.sourceforge.net/) is required to use this target.
 
 
-## doc
+## html
 
 Generate html documentation with
 [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and place it at
 `build/doc/html/index.html`.
 
 
+## doc
+
+Generate html and pdf documentation with
+[Doxygen](http://www.stack.nl/~dimitri/doxygen/) and place it at
+`build/doc/html/index.html` and `build/doc/html/mavtables.pdf` respectively.
+
+
 ## gh-pages
 
-Generate html documentation and publish to
+Generate html and pdf documentation and publish to
 [https://shamuproject.github.io/mavtables](https://shamuproject.github.io/mavtables).
 
 

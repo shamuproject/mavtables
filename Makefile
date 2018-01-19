@@ -39,10 +39,14 @@ coverage: test
 style:
 	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
 
-doc:
+html:
 	mkdir -p build
 	cd build && $(CMAKE) ..
 	$(MAKE) -j8 -C build doc
+
+doc: html
+	$(MAKE) -C build/doc/latex
+	cp build/doc/latex/refman.pdf build/doc/html/mavtables.pdf
 
 gh-pages: doc
 	mkdir -p build
