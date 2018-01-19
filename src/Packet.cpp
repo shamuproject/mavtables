@@ -47,6 +47,7 @@ Packet::~Packet()
 /** Return reference to receiving connection.
  *
  *  \return The connection the packet was received on.
+ *  \complexity \f$O(1)\f$
  */
 std::weak_ptr<Connection> Packet::connection() const
 {
@@ -60,6 +61,7 @@ std::weak_ptr<Connection> Packet::connection() const
  *  lower priority packet.
  *
  *  \return The priority of the packet.
+ *  \complexity \f$O(1)\f$
  */
 int Packet::priority() const
 {
@@ -75,6 +77,7 @@ int Packet::priority() const
  *  valid.
  *
  *  \return The new priority of the packet.
+ *  \complexity \f$O(1)\f$
  */
 int Packet::priority(int priority)
 {
@@ -101,10 +104,10 @@ const std::vector<uint8_t> &Packet::data() const
  *  latter is not printed if the priority is the default 0.
  *
  *  Some examples are:
- *      - "HEARTBEAT (#1) from 16.8 with priority 4 (v1.0)"
- *      - "PING (#4) from 128.4 to 16.8 (v2.0)"
- *      - "DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0)"
- *      - "ENCAPSULATED_DATA (#131) from 128.4 with priority -3 (v2.0)"
+ *      - `"HEARTBEAT (#1) from 16.8 with priority 4 (v1.0)"`
+ *      - `"PING (#4) from 128.4 to 16.8 (v2.0)"`
+ *      - `"DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0)"`
+ *      - `"ENCAPSULATED_DATA (#131) from 128.4 with priority -3 (v2.0)"`
  *
  *  \relates Packet
  *  \param os The output stream to print to.

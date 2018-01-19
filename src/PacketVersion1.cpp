@@ -77,7 +77,8 @@ const struct mavlink_packet_version1_header *PacketVersion1::header_() const
 
 /** \copydoc Packet::version()
  *
- *  \returns 0x0100 (v1.0)
+ *  \returns 0x0200 (v2.0)
+ *  \complexity \f$O(1)\f$
  */
 unsigned int PacketVersion1::version() const
 {
@@ -85,7 +86,10 @@ unsigned int PacketVersion1::version() const
 }
 
 
-//! \copydoc Packet::id()
+/** \copydoc Packet::id()
+ *
+ *  \complexity \f$O(1)\f$
+*/
 unsigned long PacketVersion1::id() const
 {
     return header_()->msgid;
@@ -94,6 +98,8 @@ unsigned long PacketVersion1::id() const
 
 /** \copydoc Packet::name()
  *
+ *  \complexity \f$O(log(n))\f$ where \f$n\f$ is the total number of MAVLink
+ *      messages.
  *  \throws std::runtime_error If the packet data has an invalid ID.
  */
 std::string PacketVersion1::name() const
@@ -108,7 +114,10 @@ std::string PacketVersion1::name() const
 }
 
 
-//! \copydoc Packet::source()
+/** \copydoc Packet::source()
+ *
+ *  \complexity \f$O(1)\f$
+ */
 MAVAddress PacketVersion1::source() const
 {
     return MAVAddress(header_()->sysid, header_()->compid);
@@ -117,9 +126,9 @@ MAVAddress PacketVersion1::source() const
 
 /** \copydoc Packet::dest()
  *
- *  Thanks to the
- *  [mavlink-router](https://github.com/intel/mavlink-router) project
- *  for an example of how to extract the destination address.
+ *  \complexity \f$O(1)\f$
+ *  \thanks The [mavlink-router](https://github.com/intel/mavlink-router)
+ *      project for an example of how to extract the destination address.
  *
  *  \throws std::runtime_error If the packet data has an invalid ID.
  */
