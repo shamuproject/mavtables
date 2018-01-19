@@ -34,7 +34,7 @@ coverage: COVERAGE = On
 coverage: test
 	$(MAKE) -j8 -C build lcov-geninfo
 	$(MAKE) -j8 -C build lcov-genhtml
-	gcovr -r . -e '.*catch.hpp' -e '.*fakeit.hpp'
+	gcovr -r . -e 'lib.*'
 
 style:
 	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
