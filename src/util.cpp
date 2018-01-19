@@ -20,7 +20,7 @@
 #include "util.hpp"
 
 
-/** \defgroup utility
+/** \defgroup utility Utility Function
  *
  *  Utility functions that don't warrant their own file.
  */

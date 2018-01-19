@@ -19,7 +19,7 @@
 #define MAVLINK_H_
 
 
-/** \defgroup mavlink
+/** \defgroup mavlink MAVLink Library and Helpers
  *
  *  MAVLink utility macros, defines, types and functions.
  *
