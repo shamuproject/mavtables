@@ -95,7 +95,7 @@ struct PACKED mavlink_packet_version1_header
  */
 struct PACKED mavlink_packet_version2_header
 {
-    uint8_t magic;          //,< Protocol magic marker (0xFD).
+    uint8_t magic;          //!< Protocol magic marker (0xFD).
     uint8_t len;            //!< Length of pauload.
     uint8_t incompat_flags; //!< Flags that must be understood.
     uint8_t compat_flags;   //!< Flags that can be ignored if not understood.
