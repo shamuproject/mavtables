@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -37,41 +36,58 @@ extern "C"
  *      (0xFE).
  *  \throws std::length_error If packet data is not of correct length.
  */
-PacketVersion1::PacketVersion1(std::vector<uint8_t> data,
-                               std::weak_ptr<Connection> connection, int priority)
+PacketVersion1::PacketVersion1(
+    std::vector<uint8_t> data,
+    std::weak_ptr<Connection> connection, int priority)
     : Packet(std::move(data), std::move(connection), priority)
 {
     // Check that a complete header was given (including magic number).
-    if (this->data().size() >= (MAVLINK_CORE_HEADER_MAVLINK1_LEN + 1))
+    if (this->data().size() < (MAVLINK_CORE_HEADER_MAVLINK1_LEN + 1))
     {
-        // Verify the magic number.
-        if (header_()->magic != MAVLINK_STX_MAVLINK1)
-        {
-            std::stringstream ss;
-            ss << "Invlaid packet starting byte (0x" << std::hex << header_()->magic <<
-               ").";
-            throw std::invalid_argument(ss.str());
-        }
-
-        // Ensure a complete packet was given.
-        size_t expected_packet_length = header_()->len +
-                                        MAVLINK_CORE_HEADER_MAVLINK1_LEN + MAVLINK_NUM_CHECKSUM_BYTES;
-
-        if (this->data().size() == expected_packet_length)
-        {
-            return;
-        }
+        throw std::length_error(
+            "Packet (" + std::to_string(this->data().size()) +
+            " bytes) is shorter than a v1.0 header (" +
+            std::to_string(MAVLINK_CORE_HEADER_MAVLINK1_LEN + 1) + " bytes).");
     }
 
-    throw std::length_error("Packet data does not have correct length.");
+    // Verify the magic number.
+    if (header_()->magic != MAVLINK_STX_MAVLINK1)
+    {
+        std::stringstream ss;
+        ss << "Invalid packet starting byte (0x"
+           << std::uppercase << std::hex
+           << static_cast<unsigned int>(header_()->magic)
+           << std::nouppercase << "), v1.0 packets should start with 0xFE.";
+        throw std::invalid_argument(ss.str());
+    }
+
+    // Verify the message ID.
+    if (mavlink_get_message_info_by_id(header_()->msgid) == nullptr)
+    {
+        throw std::runtime_error("Invalid packet ID (#" +
+                                 std::to_string(header_()->msgid) + ").");
+    }
+
+    // Ensure a complete packet was given.
+    size_t expected_packet_length = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN +
+                                    header_()->len + MAVLINK_NUM_CHECKSUM_BYTES;
+
+    if (this->data().size() != expected_packet_length)
+    {
+        // throw std::length_error("Packet data does not have correct length.");
+        throw std::length_error(
+            "Packet is " + std::to_string(this->data().size()) +
+            " bytes, should be " +
+            std::to_string(expected_packet_length) + " bytes.");
+    }
 }
 
 
 // Return pointer to the header structure.
 const struct mavlink_packet_version1_header *PacketVersion1::header_() const
 {
-    return reinterpret_cast<const struct mavlink_packet_version1_header *>(&
-            (data()[0]));
+    return reinterpret_cast<const struct mavlink_packet_version1_header *>
+           (&(data()[0]));
 }
 
 
@@ -104,13 +120,17 @@ unsigned long PacketVersion1::id() const
  */
 std::string PacketVersion1::name() const
 {
-    if (const mavlink_message_info_t *msg_info = mavlink_get_message_info_by_id(
-                header_()->msgid))
+    if (const mavlink_message_info_t *msg_info =
+                mavlink_get_message_info_by_id(header_()->msgid))
     {
         return std::string(msg_info->name);
     }
 
-    throw std::runtime_error("Invalid packet ID.");
+    // There should never be any way to reach this point since the message ID
+    // was checked in the constructor.  It is here just in case the MAVLink C
+    // library has an error in it.
+    throw std::runtime_error("Invalid packet ID (#" +
+                             std::to_string(header_()->msgid) + ").");
 }
 
 
@@ -138,18 +158,24 @@ std::optional<MAVAddress> PacketVersion1::dest() const
                 header_()->msgid))
     {
         int dest_system = -1;
-        int dest_component = -1;
+        int dest_component = 0;
 
         // Extract destination system.
         if (msg_entry->flags & MAV_MSG_ENTRY_FLAG_HAVE_TARGET_SYSTEM)
         {
-            dest_system = data()[msg_entry->target_system_ofs];
+            // target_system_ofs is offset from start of payload
+            size_t offset = msg_entry->target_system_ofs + sizeof(
+                                mavlink_packet_version1_header);
+            dest_system = data()[offset];
         }
 
         // Extract destination component.
         if (msg_entry->flags & MAV_MSG_ENTRY_FLAG_HAVE_TARGET_COMPONENT)
         {
-            dest_component = data()[msg_entry->target_component_ofs];
+            // target_compoent_ofs is offset from start of payload
+            size_t offset = msg_entry->target_component_ofs + sizeof(
+                                mavlink_packet_version1_header);
+            dest_component = data()[offset];
         }
 
         // Construct MAVLink address.
@@ -163,5 +189,9 @@ std::optional<MAVAddress> PacketVersion1::dest() const
         return {};
     }
 
-    throw std::runtime_error("Invalid packet ID.");
+    // There should never be any way to reach this point since the message ID
+    // was checked in the constructor.  It is here just in case the MAVLink C
+    // library has an error in it.
+    throw std::runtime_error("Invalid packet ID (#" +
+                             std::to_string(header_()->msgid) + ").");
 }

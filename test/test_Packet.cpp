@@ -116,7 +116,69 @@ TEST_CASE("Packet's contain a weak_ptr to a connection.", "[Packet]")
 }
 
 
-TEST_CASE("Packets's are copyable.", "[Packet]")
+TEST_CASE("Packet's have a priority.", "[Packet]")
+{
+    std::weak_ptr<ConnectionTestClass> conn;
+    SECTION("Which has a default value of 0.")
+    {
+        REQUIRE(PacketTestClass({}, conn).priority() == 0);
+    }
+    SECTION("That can be set during construction.")
+    {
+        REQUIRE(PacketTestClass({}, conn, -32768).priority() == -32768);
+        REQUIRE(PacketTestClass({}, conn, -100).priority() == -100);
+        REQUIRE(PacketTestClass({}, conn, -10).priority() == -10);
+        REQUIRE(PacketTestClass({}, conn, -5).priority() == -5);
+        REQUIRE(PacketTestClass({}, conn, -1).priority() == -1);
+        REQUIRE(PacketTestClass({}, conn, 0).priority() == 0);
+        REQUIRE(PacketTestClass({}, conn, 1).priority() == 1);
+        REQUIRE(PacketTestClass({}, conn, 5).priority() == 5);
+        REQUIRE(PacketTestClass({}, conn, 10).priority() == 10);
+        REQUIRE(PacketTestClass({}, conn, 100).priority() == 100);
+        REQUIRE(PacketTestClass({}, conn, 32767).priority() == 32767);
+    }
+    SECTION("That can be set after construction.")
+    {
+        PacketTestClass packet({}, conn);
+        REQUIRE(packet.priority() == 0);
+        // -32768
+        REQUIRE(packet.priority(-32768) == -32768);
+        REQUIRE(packet.priority() == -32768);
+        // -100
+        REQUIRE(packet.priority(-100) == -100);
+        REQUIRE(packet.priority() == -100);
+        // -10
+        REQUIRE(packet.priority(-10) == -10);
+        REQUIRE(packet.priority() == -10);
+        // -5
+        REQUIRE(packet.priority(-5) == -5);
+        REQUIRE(packet.priority() == -5);
+        // -1
+        REQUIRE(packet.priority(-1) == -1);
+        REQUIRE(packet.priority() == -1);
+        // 0
+        REQUIRE(packet.priority(0) == 0);
+        REQUIRE(packet.priority() == 0);
+        // 1
+        REQUIRE(packet.priority(1) == 1);
+        REQUIRE(packet.priority() == 1);
+        // 5
+        REQUIRE(packet.priority(5) == 5);
+        REQUIRE(packet.priority() == 5);
+        // 10
+        REQUIRE(packet.priority(10) == 10);
+        REQUIRE(packet.priority() == 10);
+        // 100
+        REQUIRE(packet.priority(100) == 100);
+        REQUIRE(packet.priority() == 100);
+        // 32767
+        REQUIRE(packet.priority(32767) == 32767);
+        REQUIRE(packet.priority() == 32767);
+    }
+}
+
+
+TEST_CASE("Packet's are copyable.", "[Packet]")
 {
     std::vector<uint8_t> data1 = {1, 3, 3, 7};
     std::vector<uint8_t> data2 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -184,68 +246,6 @@ TEST_CASE("Packet's optionally have a destination address.", "[Packet]")
 {
     std::weak_ptr<ConnectionTestClass> conn;
     REQUIRE(PacketTestClass({}, conn).dest().value() == MAVAddress("2.71"));
-}
-
-
-TEST_CASE("Packet's have a priority.", "[Packet]")
-{
-    std::weak_ptr<ConnectionTestClass> conn;
-    SECTION("Which has a default value of 0.")
-    {
-        REQUIRE(PacketTestClass({}, conn).priority() == 0);
-    }
-    SECTION("That can be set during construction.")
-    {
-        REQUIRE(PacketTestClass({}, conn, -32768).priority() == -32768);
-        REQUIRE(PacketTestClass({}, conn, -100).priority() == -100);
-        REQUIRE(PacketTestClass({}, conn, -10).priority() == -10);
-        REQUIRE(PacketTestClass({}, conn, -5).priority() == -5);
-        REQUIRE(PacketTestClass({}, conn, -1).priority() == -1);
-        REQUIRE(PacketTestClass({}, conn, 0).priority() == 0);
-        REQUIRE(PacketTestClass({}, conn, 1).priority() == 1);
-        REQUIRE(PacketTestClass({}, conn, 5).priority() == 5);
-        REQUIRE(PacketTestClass({}, conn, 10).priority() == 10);
-        REQUIRE(PacketTestClass({}, conn, 100).priority() == 100);
-        REQUIRE(PacketTestClass({}, conn, 32767).priority() == 32767);
-    }
-    SECTION("That can be set after construction.")
-    {
-        PacketTestClass packet({}, conn);
-        REQUIRE(packet.priority() == 0);
-        // -32768
-        REQUIRE(packet.priority(-32768) == -32768);
-        REQUIRE(packet.priority() == -32768);
-        // -100
-        REQUIRE(packet.priority(-100) == -100);
-        REQUIRE(packet.priority() == -100);
-        // -10
-        REQUIRE(packet.priority(-10) == -10);
-        REQUIRE(packet.priority() == -10);
-        // -5
-        REQUIRE(packet.priority(-5) == -5);
-        REQUIRE(packet.priority() == -5);
-        // -1
-        REQUIRE(packet.priority(-1) == -1);
-        REQUIRE(packet.priority() == -1);
-        // 0
-        REQUIRE(packet.priority(0) == 0);
-        REQUIRE(packet.priority() == 0);
-        // 1
-        REQUIRE(packet.priority(1) == 1);
-        REQUIRE(packet.priority() == 1);
-        // 5
-        REQUIRE(packet.priority(5) == 5);
-        REQUIRE(packet.priority() == 5);
-        // 10
-        REQUIRE(packet.priority(10) == 10);
-        REQUIRE(packet.priority() == 10);
-        // 100
-        REQUIRE(packet.priority(100) == 100);
-        REQUIRE(packet.priority() == 100);
-        // 32767
-        REQUIRE(packet.priority(32767) == 32767);
-        REQUIRE(packet.priority() == 32767);
-    }
 }
 
 

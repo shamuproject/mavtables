@@ -51,7 +51,7 @@ class PacketVersion1 : public Packet
         virtual unsigned long id() const;
         virtual std::string name() const;
         virtual MAVAddress source() const;
-        virtual std::optional<MAVAddress> dest() const = 0;
+        virtual std::optional<MAVAddress> dest() const;
         /** Assignment operator.
          *
          * \param other Packet to copy.
