@@ -33,7 +33,7 @@
     #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
-// Subclass of Packet use for testing the abstract class Connection.
+// Subclass of Packet used for testing the abstract class Connection.
 class ConnectionTestClass : public Connection
 {
 };
