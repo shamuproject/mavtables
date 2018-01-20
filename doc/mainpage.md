@@ -28,6 +28,7 @@ In order to compile you will need the following packages:
 
 * GCC 7+ or Clang 5+ (needed for C++17 support)
 * [CMake](https://cmake.org/)
+* [Boost](https://www.boost.org/)
 
 `mavtables` can be easily installed using the standard procedure of
 ```
