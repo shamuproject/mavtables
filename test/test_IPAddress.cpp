@@ -16,7 +16,8 @@
 
 
 #include <catch.hpp>
-#include <sstream>
+
+#include "util.hpp"
 #include "IPAddress.hpp"
 
 
@@ -40,8 +41,10 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
         REQUIRE(IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFF, 65535));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) == IPAddress(0x00000000, 1));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) == IPAddress(0x00000001, 0));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFF, 65534));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFE, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFF, 65534));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFE, 65535));
     }
     SECTION("with !=")
     {
@@ -51,7 +54,8 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
         REQUIRE(IPAddress(0xFFFFFFFF, 65535) != IPAddress(0xFFFFFFFE, 65535));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) != IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x88888888, 8) != IPAddress(0x88888888, 8));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) != IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) != IPAddress(0xFFFFFFFF, 65535));
     }
     SECTION("with <")
     {
@@ -64,11 +68,14 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
         REQUIRE_FALSE(IPAddress(0x00000000, 1) < IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x00000001, 0) < IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x00000001, 0) < IPAddress(0x00000000, 1));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) < IPAddress(0xFFFFFFFF, 65534));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) < IPAddress(0xFFFFFFFE, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) < IPAddress(0xFFFFFFFF, 65534));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) < IPAddress(0xFFFFFFFE, 65535));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) < IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x88888888, 8) < IPAddress(0x88888888, 8));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) < IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) < IPAddress(0xFFFFFFFF, 65535));
         REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) < IPAddress(0x00000000, 0));
     }
     SECTION("with >")
@@ -82,11 +89,14 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
         REQUIRE_FALSE(IPAddress(0x00000000, 0) > IPAddress(0x00000000, 1));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) > IPAddress(0x00000001, 0));
         REQUIRE_FALSE(IPAddress(0x00000000, 1) > IPAddress(0x00000001, 0));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65534) > IPAddress(0xFFFFFFFF, 65535));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFE, 65535) > IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65534) > IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFE, 65535) > IPAddress(0xFFFFFFFF, 65535));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) > IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x88888888, 8) > IPAddress(0x88888888, 8));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) > IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) > IPAddress(0xFFFFFFFF, 65535));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) > IPAddress(0xFFFFFFFF, 65535));
     }
     SECTION("with <=")
@@ -103,8 +113,10 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
         REQUIRE_FALSE(IPAddress(0x00000000, 1) <= IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x00000001, 0) <= IPAddress(0x00000000, 0));
         REQUIRE_FALSE(IPAddress(0x00000001, 0) <= IPAddress(0x00000000, 1));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) <= IPAddress(0xFFFFFFFF, 65534));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) <= IPAddress(0xFFFFFFFE, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) <= IPAddress(0xFFFFFFFF, 65534));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65535) <= IPAddress(0xFFFFFFFE, 65535));
         REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65535) <= IPAddress(0x00000000, 0));
     }
     SECTION("with >=")
@@ -121,8 +133,10 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
         REQUIRE_FALSE(IPAddress(0x00000000, 0) >= IPAddress(0x00000000, 1));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) >= IPAddress(0x00000001, 0));
         REQUIRE_FALSE(IPAddress(0x00000000, 1) >= IPAddress(0x00000001, 0));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFF, 65534) >= IPAddress(0xFFFFFFFF, 65535));
-        REQUIRE_FALSE(IPAddress(0xFFFFFFFE, 65535) >= IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFF, 65534) >= IPAddress(0xFFFFFFFF, 65535));
+        REQUIRE_FALSE(
+            IPAddress(0xFFFFFFFE, 65535) >= IPAddress(0xFFFFFFFF, 65535));
         REQUIRE_FALSE(IPAddress(0x00000000, 0) >= IPAddress(0xFFFFFFFF, 65535));
     }
 }
@@ -136,10 +150,10 @@ TEST_CASE("IPAddress's can be constructed from an address and port.",
     REQUIRE(IPAddress(0xFFFFFFFF, 65535) == IPAddress(0xFFFFFFFF, 65535));
     SECTION("And ensures address and port are within range.")
     {
-        REQUIRE_THROWS_AS(IPAddress(static_cast<unsigned long>(-1), 0),
-                          std::out_of_range);
-        REQUIRE_THROWS_AS(IPAddress(0, static_cast<unsigned int>(-1)),
-                          std::out_of_range);
+        REQUIRE_THROWS_AS(
+            IPAddress(static_cast<unsigned long>(-1), 0), std::out_of_range);
+        REQUIRE_THROWS_AS(
+            IPAddress(0, static_cast<unsigned int>(-1)), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress(0x1FFFFFFFF, 65535), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress(0xFFFFFFFF, 65536), std::out_of_range);
     }
@@ -158,6 +172,7 @@ TEST_CASE("IPAddress's can be constructed from strings.", "[IPAddress]")
     }
     SECTION("And will raise std::invalid_argument if it cannot be parsed.")
     {
+        // Errors.
         REQUIRE_THROWS_AS(IPAddress("-1.2.3.4"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("1.-2.3.4"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("1.2.-3.4"), std::invalid_argument);
@@ -178,19 +193,85 @@ TEST_CASE("IPAddress's can be constructed from strings.", "[IPAddress]")
         REQUIRE_THROWS_AS(IPAddress("1.b.3.4"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("1.2.c.4"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("1.2.3.d"), std::invalid_argument);
-        REQUIRE_THROWS_AS(IPAddress("192.168.32.128.443"), std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            IPAddress("192.168.32.128.443"), std::invalid_argument);
         REQUIRE_THROWS_AS(IPAddress("192.168.128:443"), std::invalid_argument);
-        REQUIRE_THROWS_AS(IPAddress("192:168:32:128:443"), std::invalid_argument);
-        REQUIRE_THROWS_AS(IPAddress("192.1b8.32.128:443"), std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            IPAddress("192:168:32:128:443"), std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            IPAddress("192.1b8.32.128:443"), std::invalid_argument);
+        // Check error string.
+        REQUIRE_THROWS_WITH(
+            IPAddress("-1.2.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.-2.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.-3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3.-4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("+1.2.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.+2.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.+3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3.+4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3.4."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3.4.5"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("a.2.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.b.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.c.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3.d"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("192.168.32.128.443"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("192.168.128:443"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("192:168:32:128:443"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(
+            IPAddress("192.1b8.32.128:443"), "Invalid IP address string.");
     }
     SECTION("And ensures address and port are within range.")
     {
+        // Errors
         REQUIRE_THROWS_AS(IPAddress("1.2.3.4:-1"), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress("1.2.3.4:65536"), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress("256.2.3.4"), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress("1.256.3.4"), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress("1.2.256.4"), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress("1.2.3.256"), std::out_of_range);
+        // Check error string.
+        REQUIRE_THROWS_WITH(
+            IPAddress("256.2.3.4"),
+            "Address octet (256) is outside of the allowed range (0 - 255).");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.256.3.4"),
+            "Address octet (256) is outside of the allowed range (0 - 255).");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.256.4"),
+            "Address octet (256) is outside of the allowed range (0 - 255).");
+        REQUIRE_THROWS_WITH(
+            IPAddress("1.2.3.256"),
+            "Address octet (256) is outside of the allowed range (0 - 255).");
     }
 }
 
@@ -225,10 +306,10 @@ TEST_CASE("The port of an IP address can be changed during a copy.",
     REQUIRE(b_copy.port() == 0);
     SECTION("And ensures port number is within range.")
     {
-        REQUIRE_THROWS_AS(IPAddress(a, static_cast<unsigned int>(-1)),
-                          std::out_of_range);
-        REQUIRE_THROWS_AS(IPAddress(b, static_cast<unsigned int>(-1)),
-                          std::out_of_range);
+        REQUIRE_THROWS_AS(
+            IPAddress(a, static_cast<unsigned int>(-1)), std::out_of_range);
+        REQUIRE_THROWS_AS(
+            IPAddress(b, static_cast<unsigned int>(-1)), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress(a, 65536), std::out_of_range);
         REQUIRE_THROWS_AS(IPAddress(b, 65536), std::out_of_range);
     }
@@ -246,16 +327,13 @@ TEST_CASE("IPAddress's are assignable.", "[IPAddress]")
 
 TEST_CASE("IPAddress's are printable", "[IPAddress]")
 {
-    std::ostringstream oss;
     SECTION("Without a port number.")
     {
-        oss << IPAddress("192.168.32.128");
-        REQUIRE(oss.str() == "192.168.32.128");
+        REQUIRE(str(IPAddress("192.168.32.128")) == "192.168.32.128");
     }
     SECTION("With a port number.")
     {
-        oss << IPAddress("192.168.32.128:443");
-        REQUIRE(oss.str() == "192.168.32.128:443");
+        REQUIRE(str(IPAddress("192.168.32.128:443")) == "192.168.32.128:443");
     }
 }
 

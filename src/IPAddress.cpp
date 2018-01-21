@@ -49,15 +49,17 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
     if (address > 0xFFFFFFFF)
     {
         std::stringstream ss;
-        ss << "address (0x" << std::hex << address <<
-           ") is outside of the allowed range (0x00000000 - 0xffffffff).";
+        ss << "Address (0x"
+           << std::uppercase << std::hex << address << std::nouppercase
+           << ") is outside of the allowed range (0x00000000 - 0xFFFFFFFF).";
         throw std::out_of_range(ss.str());
     }
 
     if (port > 65535)
     {
-        throw std::out_of_range("port number (" + std::to_string(port) +
-                                ") is outside of the allowed range (0 - 65535).");
+        throw std::out_of_range(
+            "port number (" + std::to_string(port) +
+            ") is outside of the allowed range (0 - 65535).");
     }
 
     address_ = address;
@@ -170,8 +172,9 @@ IPAddress::IPAddress(std::string address)
     for (auto i : octets)
         if (i > 255)
         {
-            throw std::out_of_range("address octet (" + std::to_string(i) +
-                                    ") is outside of the allowed range (0 - 255).");
+            throw std::out_of_range(
+                "Address octet (" + std::to_string(i) +
+                ") is outside of the allowed range (0 - 255).");
         }
 
     {
@@ -371,15 +374,15 @@ static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
         throw DNSLookupError(url);
     }
 
-    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)> result(result_ptr,
-            freeaddrinfo);
+    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)>
+    result(result_ptr, freeaddrinfo);
     result_ptr = nullptr;
 
     for (result_ptr = result.get(); result_ptr != nullptr;
             result_ptr = result_ptr->ai_next)
     {
-        struct sockaddr_in *address_ptr = reinterpret_cast<struct sockaddr_in *>
-                                              (result_ptr->ai_addr);
+        struct sockaddr_in *address_ptr =
+                reinterpret_cast<struct sockaddr_in *>(result_ptr->ai_addr);
         unsigned long address = ntohl(address_ptr->sin_addr.s_addr);
         addresses.insert(IPAddress(address, port));
     }

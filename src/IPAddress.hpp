@@ -51,8 +51,8 @@ class IPAddress
          */
         IPAddress &operator=(const IPAddress &other) = default;
 
-        friend std::ostream &operator<<(std::ostream &os,
-                                        const IPAddress &ipaddress);
+        friend std::ostream &operator<<(
+            std::ostream &os, const IPAddress &ipaddress);
 };
 
 
