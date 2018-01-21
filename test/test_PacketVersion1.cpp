@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <iostream>
-
 #include <catch.hpp>
 #include <string>
 #include <vector>
@@ -33,146 +31,117 @@
 #include "util.hpp"
 
 
+namespace
+{
+
 #ifdef __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
-// Subclass of Packet used for testing the abstract class Connection.
-class ConnectionTestClass : public Connection
-{
-};
+    // Subclass of Packet used for testing the abstract class Connection.
+    class ConnectionTestClass : public Connection
+    {
+    };
 
 #ifdef __clang__
     #pragma clang diagnostic pop
 #endif
 
 
-// HEARTBEAT structure for testing.
-struct PACKED Heartbeat
-{
-    struct PACKED payload
+    // HEARTBEAT structure for testing packets without target system/component.
+    struct PACKED Heartbeat
     {
-        uint8_t type = 1;
-        uint8_t autopilot = 2;
-        uint8_t base_mode = 3;
-        uint32_t custom_mode = 4;
-        uint8_t system_status = 5;
-        uint8_t mavlink_version = 6;
+        struct PACKED payload
+        {
+            uint8_t type = 1;
+            uint8_t autopilot = 2;
+            uint8_t base_mode = 3;
+            uint32_t custom_mode = 4;
+            uint8_t system_status = 5;
+            uint8_t mavlink_version = 6;
+        };
+        uint8_t magic = 0xFE;
+        uint8_t len = sizeof(payload);
+        uint8_t seq = 0;
+        uint8_t sysid = 1;
+        uint8_t compid = 0;
+        uint8_t msgid = 0;
+        payload payload;
+        uint16_t checksum = 0xFACE;
     };
-    uint8_t magic = 0xFE;
-    uint8_t len = sizeof(payload);
-    uint8_t seq = 0;
-    uint8_t sysid = 1;
-    uint8_t compid = 0;
-    uint8_t msgid = 0;
-    payload payload;
-    uint16_t checksum = 0xFACE;
-};
 
 
-// PING structure for testing.
-struct PACKED Ping
-{
-    struct PACKED payload
+    // PING structure for testing target system/compoent.
+    struct PACKED Ping
     {
-        uint64_t time_usec = 295128000000000;
-        uint32_t seq = 0xBA5EBA11;
-        uint8_t target_system = 255;
-        uint8_t target_component = 23;
+        struct PACKED payload
+        {
+            uint64_t time_usec = 295128000000000;
+            uint32_t seq = 0xBA5EBA11;
+            uint8_t target_system = 255;
+            uint8_t target_component = 23;
+        };
+        uint8_t magic = 0xFE;
+        uint8_t len = sizeof(payload);
+        uint8_t seq = 0;
+        uint8_t sysid = 60;
+        uint8_t compid = 40;
+        uint8_t msgid = 4;
+        payload payload;
+        uint16_t checksum = 0xFACE;
     };
-    uint8_t magic = 0xFE;
-    uint8_t len = sizeof(payload);
-    uint8_t seq = 0;
-    uint8_t sysid = 60;
-    uint8_t compid = 40;
-    uint8_t msgid = 4;
-    payload payload;
-    uint16_t checksum = 0xFACE;
-};
 
 
-// SET_MODE structure for testing.
-struct PACKED SetMode
-{
-    struct PACKED payload
+    // SET_MODE structure for testing target system only.
+    struct PACKED SetMode
     {
-        uint32_t custom_mode = 2;
-        uint8_t target_system = 123;
-        uint8_t base_mode = 1;
+        struct PACKED payload
+        {
+            uint32_t custom_mode = 2;
+            uint8_t target_system = 123;
+            uint8_t base_mode = 1;
+        };
+        uint8_t magic = 0xFE;
+        uint8_t len = sizeof(payload);
+        uint8_t seq = 0;
+        uint8_t sysid = 70;
+        uint8_t compid = 30;
+        uint8_t msgid = 11;
+        payload payload;
+        uint16_t checksum = 0xFACE;
     };
-    uint8_t magic = 0xFE;
-    uint8_t len = sizeof(payload);
-    uint8_t seq = 0;
-    uint8_t sysid = 70;
-    uint8_t compid = 30;
-    uint8_t msgid = 11;
-    payload payload;
-    uint16_t checksum = 0xFACE;
-};
 
 
-// ENCAPSULATED_DATA structure for testing.
-struct PACKED EncapsulatedData
-{
-    struct PACKED payload
+    // ENCAPSULATED_DATA structure for testing maximum length packets.
+    struct PACKED EncapsulatedData
     {
-        uint16_t seqnr = 0;
-        uint8_t data[253];
+        struct PACKED payload
+        {
+            uint16_t seqnr = 0;
+            uint8_t data[253];
+        };
+        uint8_t magic = 0xFE;
+        uint8_t len = 255;
+        uint8_t seq = 0;
+        uint8_t sysid = 255;
+        uint8_t compid = 1;
+        uint8_t msgid = 131;
+        payload payload;
+        uint16_t checksum = 0xFACE;
     };
-    uint8_t magic = 0xFE;
-    uint8_t len = 255;
-    uint8_t seq = 0;
-    uint8_t sysid = 255;
-    uint8_t compid = 1;
-    uint8_t msgid = 131;
-    payload payload;
-    uint16_t checksum = 0xFACE;
-};
 
 
-// Convert a Heartbeat structure to a vector of bytes.
-static std::vector<uint8_t> to_vector(Heartbeat heartbeat);
-static std::vector<uint8_t> to_vector(Heartbeat heartbeat)
-{
-    std::vector<uint8_t> data;
-    data.assign(reinterpret_cast<uint8_t *>(&heartbeat),
-                reinterpret_cast<uint8_t *>(&heartbeat) + sizeof(heartbeat));
-    return data;
-}
+    // Convert a MAVLink packet structure to a vector of bytes.
+    template <class T>
+    static std::vector<uint8_t> to_vector(T packet)
+    {
+        std::vector<uint8_t> data;
+        data.assign(reinterpret_cast<uint8_t *>(&packet),
+                    reinterpret_cast<uint8_t *>(&packet) + sizeof(packet));
+        return data;
+    }
 
-
-// Convert a Ping structure to a vector of bytes.
-static std::vector<uint8_t> to_vector(Ping ping);
-static std::vector<uint8_t> to_vector(Ping ping)
-{
-    std::vector<uint8_t> data;
-    data.assign(reinterpret_cast<uint8_t *>(&ping),
-                reinterpret_cast<uint8_t *>(&ping) + sizeof(ping));
-    return data;
-}
-
-
-// Convert a SetMode structure to a vector of bytes.
-static std::vector<uint8_t> to_vector(SetMode set_mode);
-static std::vector<uint8_t> to_vector(SetMode set_mode)
-{
-    std::vector<uint8_t> data;
-    data.assign(reinterpret_cast<uint8_t *>(&set_mode),
-                reinterpret_cast<uint8_t *>(&set_mode) + sizeof(set_mode));
-    return data;
-}
-
-
-// Convert a EncapsulatedData structure to a vector of bytes.
-static std::vector<uint8_t> to_vector(EncapsulatedData encapsulated_data);
-static std::vector<uint8_t> to_vector(EncapsulatedData encapsulated_data)
-{
-    std::vector<uint8_t> data;
-    data.assign(reinterpret_cast<uint8_t *>(&encapsulated_data),
-                reinterpret_cast<uint8_t *>(&encapsulated_data) +
-                sizeof(encapsulated_data));
-    return data;
 }
 
 
@@ -185,15 +154,19 @@ TEST_CASE("PacketVersion1's can be constructed.", "[PacketVersion1]")
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("With proper arguments.")
     {
+        // HEARTBEAT
         REQUIRE_NOTHROW(PacketVersion1(to_vector(heartbeat), conn));
         REQUIRE_NOTHROW(PacketVersion1(to_vector(heartbeat), conn, -10));
         REQUIRE_NOTHROW(PacketVersion1(to_vector(heartbeat), conn, +10));
+        // PING
         REQUIRE_NOTHROW(PacketVersion1(to_vector(ping), conn));
         REQUIRE_NOTHROW(PacketVersion1(to_vector(ping), conn, -10));
         REQUIRE_NOTHROW(PacketVersion1(to_vector(ping), conn, +10));
+        // SET_MODE
         REQUIRE_NOTHROW(PacketVersion1(to_vector(set_mode), conn));
         REQUIRE_NOTHROW(PacketVersion1(to_vector(set_mode), conn, -10));
         REQUIRE_NOTHROW(PacketVersion1(to_vector(set_mode), conn, +10));
+        // ENCAPSULATED_DATA
         REQUIRE_NOTHROW(PacketVersion1(to_vector(encapsulated_data), conn));
         REQUIRE_NOTHROW(
             PacketVersion1(to_vector(encapsulated_data), conn, -10));
@@ -239,23 +212,37 @@ TEST_CASE("PacketVersion1's can be constructed.", "[PacketVersion1]")
     }
     SECTION("And ensures the packet is the correct length.")
     {
+        // HEARTBEAT
         auto heartbeat_data = to_vector(heartbeat);
         heartbeat_data.pop_back();
-        REQUIRE_THROWS_AS(PacketVersion1(heartbeat_data, conn),
-                          std::length_error);
-        REQUIRE_THROWS_WITH(PacketVersion1(heartbeat_data, conn),
-                            "Packet is 16 bytes, should be 17 bytes.");
+        REQUIRE_THROWS_AS(
+            PacketVersion1(heartbeat_data, conn), std::length_error);
+        REQUIRE_THROWS_WITH(
+            PacketVersion1(heartbeat_data, conn),
+            "Packet is 16 bytes, should be 17 bytes.");
+        // PING
         auto ping_data = to_vector(ping);
         ping_data.push_back(0x00);
         REQUIRE_THROWS_AS(PacketVersion1(ping_data, conn), std::length_error);
-        REQUIRE_THROWS_WITH(PacketVersion1(ping_data, conn),
-                            "Packet is 23 bytes, should be 22 bytes.");
+        REQUIRE_THROWS_WITH(
+            PacketVersion1(ping_data, conn),
+            "Packet is 23 bytes, should be 22 bytes.");
+        // SET_MODE
+        auto set_mode_data = to_vector(set_mode);
+        set_mode_data.pop_back();
+        REQUIRE_THROWS_AS(
+            PacketVersion1(set_mode_data, conn), std::length_error);
+        REQUIRE_THROWS_WITH(
+            PacketVersion1(set_mode_data, conn),
+            "Packet is 13 bytes, should be 14 bytes.");
+        // ENCAPSULATED_DATA
         auto encapsulated_data_data = to_vector(encapsulated_data);
         encapsulated_data_data.push_back(0x00);
-        REQUIRE_THROWS_AS(PacketVersion1(encapsulated_data_data, conn),
-                          std::length_error);
-        REQUIRE_THROWS_WITH(PacketVersion1(encapsulated_data_data, conn),
-                            "Packet is 264 bytes, should be 263 bytes.");
+        REQUIRE_THROWS_AS(
+            PacketVersion1(encapsulated_data_data, conn), std::length_error);
+        REQUIRE_THROWS_WITH(
+            PacketVersion1(encapsulated_data_data, conn),
+            "Packet is 264 bytes, should be 263 bytes.");
     }
 }
 

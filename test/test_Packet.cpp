@@ -28,52 +28,57 @@
 #include "util.hpp"
 
 
+namespace
+{
+
 #ifdef __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
-// Subclass of Packet used for testing the abstract class Connection.
-class ConnectionTestClass : public Connection
-{
-};
+    // Subclass of Packet used for testing the abstract class Connection.
+    class ConnectionTestClass : public Connection
+    {
+    };
 
-// Subclass of Packet used for testing the abstract class Packet.
-class PacketTestClass : public Packet
-{
-    public:
-        PacketTestClass(const PacketTestClass &other) = default;
-        PacketTestClass(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
-                        int priority = 0)
-            : Packet(std::move(data), std::move(connection), priority)
-        {
-        }
-        virtual unsigned int version() const
-        {
-            return 0x030E; // 3.14
-        }
-        virtual unsigned long id() const
-        {
-            return 42;
-        }
-        virtual std::string name() const
-        {
-            return "MISSION_CURRENT";
-        }
-        virtual MAVAddress source() const
-        {
-            return MAVAddress("3.14");
-        }
-        virtual std::optional<MAVAddress> dest() const
-        {
-            return MAVAddress("2.71");
-        }
-        PacketTestClass &operator=(const PacketTestClass &other) = default;
-};
+    // Subclass of Packet used for testing the abstract class Packet.
+    class PacketTestClass : public Packet
+    {
+        public:
+            PacketTestClass(const PacketTestClass &other) = default;
+            PacketTestClass(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
+                            int priority = 0)
+                : Packet(std::move(data), std::move(connection), priority)
+            {
+            }
+            virtual unsigned int version() const
+            {
+                return 0x030E; // 3.14
+            }
+            virtual unsigned long id() const
+            {
+                return 42;
+            }
+            virtual std::string name() const
+            {
+                return "MISSION_CURRENT";
+            }
+            virtual MAVAddress source() const
+            {
+                return MAVAddress("3.14");
+            }
+            virtual std::optional<MAVAddress> dest() const
+            {
+                return MAVAddress("2.71");
+            }
+            PacketTestClass &operator=(const PacketTestClass &other) = default;
+    };
 
 #ifdef __clang__
     #pragma clang diagnostic pop
 #endif
+
+}
 
 
 TEST_CASE("Packet's can be constructed.", "[Packet]")
