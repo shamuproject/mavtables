@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#include <iostream>
-
 #include <catch.hpp>
 #include <string>
 #include <vector>
@@ -353,16 +350,16 @@ TEST_CASE("PacketVersion2's can be constructed.", "[PacketVersion2]")
     {
         ping.msgid = 255; // ID 255 is not currently valid.
         REQUIRE_THROWS_AS(
-                PacketVersion2(to_vector(ping), conn), std::runtime_error);
+            PacketVersion2(to_vector(ping), conn), std::runtime_error);
         REQUIRE_THROWS_WITH(
-                PacketVersion2(to_vector(ping), conn),
-                "Invalid packet ID (#255).");
+            PacketVersion2(to_vector(ping), conn),
+            "Invalid packet ID (#255).");
         ping.msgid = 5000; // ID 5000 is not currently valid.
         REQUIRE_THROWS_AS(
-                PacketVersion2(to_vector(ping), conn), std::runtime_error);
+            PacketVersion2(to_vector(ping), conn), std::runtime_error);
         REQUIRE_THROWS_WITH(
-                PacketVersion2(to_vector(ping), conn),
-                "Invalid packet ID (#5000).");
+            PacketVersion2(to_vector(ping), conn),
+            "Invalid packet ID (#5000).");
     }
     SECTION("And ensures the packet is the correct length (without signature).")
     {
@@ -528,6 +525,7 @@ TEST_CASE("PacketVersion2's have a priority.", "[PacketVersion2]")
         REQUIRE(PacketVersion2(ping, conn, -32768).priority() == -32768);
         REQUIRE(PacketVersion2(ping, conn, 0).priority() == 0);
         REQUIRE(PacketVersion2(ping, conn, 32767).priority() == 32767);
+
         // Loop over every 1000 priority values.
         for (auto i : boost::irange(-32768, 32768, 1000))
         {
@@ -547,6 +545,7 @@ TEST_CASE("PacketVersion2's have a priority.", "[PacketVersion2]")
         // 32767
         REQUIRE(packet.priority(32767) == 32767);
         REQUIRE(packet.priority() == 32767);
+
         // Loop over every 1000 priority values.
         for (auto i : boost::irange(-32768, 32768, 1000))
         {

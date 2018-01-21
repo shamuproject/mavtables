@@ -45,8 +45,10 @@ class PacketVersion1 : public Packet
          * \param other Packet to copy.
          */
         PacketVersion1(const PacketVersion1 &other) = default;
-        PacketVersion1(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
-                       int priority = 0);
+        PacketVersion1(
+            std::vector<uint8_t> data,
+            std::weak_ptr<Connection> connection,
+            int priority = 0);
         virtual unsigned int version() const;
         virtual unsigned long id() const;
         virtual std::string name() const;

@@ -46,8 +46,10 @@ namespace
     {
         public:
             PacketTestClass(const PacketTestClass &other) = default;
-            PacketTestClass(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
-                            int priority = 0)
+            PacketTestClass(
+                std::vector<uint8_t> data,
+                std::weak_ptr<Connection> connection,
+                int priority = 0)
                 : Packet(std::move(data), std::move(connection), priority)
             {
             }
@@ -96,8 +98,10 @@ TEST_CASE("Packet's contain raw packet data and make it accessible.",
 {
     std::vector<uint8_t> data = {1, 3, 3, 7};
     auto conn = std::make_shared<ConnectionTestClass>();
-    REQUIRE(PacketTestClass(data, conn).data() == std::vector<uint8_t>({1, 3, 3, 7}));
-    REQUIRE_FALSE(PacketTestClass(data, conn).data() == std::vector<uint8_t>({1, 0, 5, 3}));
+    REQUIRE(PacketTestClass(data, conn).data() ==
+            std::vector<uint8_t>({1, 3, 3, 7}));
+    REQUIRE_FALSE(PacketTestClass(data, conn).data() ==
+                  std::vector<uint8_t>({1, 0, 5, 3}));
 }
 
 
@@ -109,15 +113,17 @@ TEST_CASE("Packet's contain a weak_ptr to a connection.", "[Packet]")
     std::weak_ptr<ConnectionTestClass> empty_conn; // empty weak pointer
     REQUIRE(PacketTestClass(data, conn1).connection().lock() == conn1);
     REQUIRE(PacketTestClass(data, conn2).connection().lock() == conn2);
-    REQUIRE(PacketTestClass(data,
-                            empty_conn).connection().lock() == empty_conn.lock());
+    REQUIRE(PacketTestClass(data, empty_conn).connection().lock() ==
+            empty_conn.lock());
     REQUIRE(PacketTestClass(data, empty_conn).connection().lock() == nullptr);
     REQUIRE_FALSE(PacketTestClass(data, conn1).connection().lock() == nullptr);
     REQUIRE_FALSE(PacketTestClass(data, conn2).connection().lock() == nullptr);
     REQUIRE_FALSE(PacketTestClass(data, conn1).connection().lock() == conn2);
     REQUIRE_FALSE(PacketTestClass(data, conn2).connection().lock() == conn1);
-    REQUIRE_FALSE(PacketTestClass(data, empty_conn).connection().lock() == conn1);
-    REQUIRE_FALSE(PacketTestClass(data, empty_conn).connection().lock() == conn2);
+    REQUIRE_FALSE(
+        PacketTestClass(data, empty_conn).connection().lock() == conn1);
+    REQUIRE_FALSE(
+        PacketTestClass(data, empty_conn).connection().lock() == conn2);
 }
 
 
@@ -131,16 +137,14 @@ TEST_CASE("Packet's have a priority.", "[Packet]")
     SECTION("That can be set during construction.")
     {
         REQUIRE(PacketTestClass({}, conn, -32768).priority() == -32768);
-        REQUIRE(PacketTestClass({}, conn, -100).priority() == -100);
-        REQUIRE(PacketTestClass({}, conn, -10).priority() == -10);
-        REQUIRE(PacketTestClass({}, conn, -5).priority() == -5);
-        REQUIRE(PacketTestClass({}, conn, -1).priority() == -1);
         REQUIRE(PacketTestClass({}, conn, 0).priority() == 0);
-        REQUIRE(PacketTestClass({}, conn, 1).priority() == 1);
-        REQUIRE(PacketTestClass({}, conn, 5).priority() == 5);
-        REQUIRE(PacketTestClass({}, conn, 10).priority() == 10);
-        REQUIRE(PacketTestClass({}, conn, 100).priority() == 100);
         REQUIRE(PacketTestClass({}, conn, 32767).priority() == 32767);
+
+        // Loop over every 1000 priority values.
+        for (auto i : boost::irange(-32768, 32768, 1000))
+        {
+            REQUIRE(PacketTestClass({}, conn, i).priority() == i);
+        }
     }
     SECTION("That can be set after construction.")
     {
@@ -149,36 +153,19 @@ TEST_CASE("Packet's have a priority.", "[Packet]")
         // -32768
         REQUIRE(packet.priority(-32768) == -32768);
         REQUIRE(packet.priority() == -32768);
-        // -100
-        REQUIRE(packet.priority(-100) == -100);
-        REQUIRE(packet.priority() == -100);
-        // -10
-        REQUIRE(packet.priority(-10) == -10);
-        REQUIRE(packet.priority() == -10);
-        // -5
-        REQUIRE(packet.priority(-5) == -5);
-        REQUIRE(packet.priority() == -5);
-        // -1
-        REQUIRE(packet.priority(-1) == -1);
-        REQUIRE(packet.priority() == -1);
         // 0
         REQUIRE(packet.priority(0) == 0);
         REQUIRE(packet.priority() == 0);
-        // 1
-        REQUIRE(packet.priority(1) == 1);
-        REQUIRE(packet.priority() == 1);
-        // 5
-        REQUIRE(packet.priority(5) == 5);
-        REQUIRE(packet.priority() == 5);
-        // 10
-        REQUIRE(packet.priority(10) == 10);
-        REQUIRE(packet.priority() == 10);
-        // 100
-        REQUIRE(packet.priority(100) == 100);
-        REQUIRE(packet.priority() == 100);
         // 32767
         REQUIRE(packet.priority(32767) == 32767);
         REQUIRE(packet.priority() == 32767);
+
+        // Loop over every 1000 priority values.
+        for (auto i : boost::irange(-32768, 32768, 1000))
+        {
+            REQUIRE(packet.priority(i) == i);
+            REQUIRE(packet.priority() == i);
+        }
     }
 }
 
@@ -259,12 +246,12 @@ TEST_CASE("Packet's are printable.", "[Packet]")
     std::weak_ptr<ConnectionTestClass> conn;
     REQUIRE(str(PacketTestClass({}, conn)) ==
             "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
-    REQUIRE(str(PacketTestClass({}, conn,
-                                0)) == "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
-    REQUIRE(str(PacketTestClass({}, conn,
-                                -32768)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 with priority -32768 (v3.14)");
-    REQUIRE(str(PacketTestClass({}, conn,
-                                32767)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 with priority 32767 (v3.14)");
+    REQUIRE(str(PacketTestClass({}, conn, 0)) ==
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
+    REQUIRE(str(PacketTestClass({}, conn, -32768)) ==
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 "
+            "with priority -32768 (v3.14)");
+    REQUIRE(str(PacketTestClass({}, conn, 32767)) ==
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 "
+            "with priority 32767 (v3.14)");
 }

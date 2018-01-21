@@ -205,14 +205,14 @@ TEST_CASE("PacketVersion1's can be constructed.", "[PacketVersion1]")
     SECTION("And ensures the message ID is valid.")
     {
         ping.msgid = 255; // ID 255 is not currently valid.
-        REQUIRE_THROWS_AS(PacketVersion1(to_vector(ping), conn),
-                          std::runtime_error);
-        REQUIRE_THROWS_WITH(PacketVersion1(to_vector(ping), conn),
-                            "Invalid packet ID (#255).");
+        REQUIRE_THROWS_AS(
+            PacketVersion1(to_vector(ping), conn), std::runtime_error);
+        REQUIRE_THROWS_WITH(
+            PacketVersion1(to_vector(ping), conn), "Invalid packet ID (#255).");
     }
     SECTION("And ensures the packet is the correct length.")
     {
-        // HEARTBEAT
+        // HEARTBEAT (no target system/component).
         auto heartbeat_data = to_vector(heartbeat);
         heartbeat_data.pop_back();
         REQUIRE_THROWS_AS(
@@ -220,14 +220,14 @@ TEST_CASE("PacketVersion1's can be constructed.", "[PacketVersion1]")
         REQUIRE_THROWS_WITH(
             PacketVersion1(heartbeat_data, conn),
             "Packet is 16 bytes, should be 17 bytes.");
-        // PING
+        // PING (with target system/component).
         auto ping_data = to_vector(ping);
         ping_data.push_back(0x00);
         REQUIRE_THROWS_AS(PacketVersion1(ping_data, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             PacketVersion1(ping_data, conn),
             "Packet is 23 bytes, should be 22 bytes.");
-        // SET_MODE
+        // SET_MODE (target system only, no target component).
         auto set_mode_data = to_vector(set_mode);
         set_mode_data.pop_back();
         REQUIRE_THROWS_AS(
@@ -235,7 +235,7 @@ TEST_CASE("PacketVersion1's can be constructed.", "[PacketVersion1]")
         REQUIRE_THROWS_WITH(
             PacketVersion1(set_mode_data, conn),
             "Packet is 13 bytes, should be 14 bytes.");
-        // ENCAPSULATED_DATA
+        // ENCAPSULATED_DATA (longest packet).
         auto encapsulated_data_data = to_vector(encapsulated_data);
         encapsulated_data_data.push_back(0x00);
         REQUIRE_THROWS_AS(
@@ -272,17 +272,17 @@ TEST_CASE("PacketVersion1's contain a weak_ptr to a connection.",
     std::weak_ptr<ConnectionTestClass> empty_conn; // empty weak pointer
     REQUIRE(PacketVersion1(ping, conn1).connection().lock() == conn1);
     REQUIRE(PacketVersion1(ping, conn2).connection().lock() == conn2);
-    REQUIRE(PacketVersion1(
-                ping, empty_conn).connection().lock() == empty_conn.lock());
+    REQUIRE(PacketVersion1(ping, empty_conn).connection().lock() ==
+            empty_conn.lock());
     REQUIRE(PacketVersion1(ping, empty_conn).connection().lock() == nullptr);
     REQUIRE_FALSE(PacketVersion1(ping, conn1).connection().lock() == nullptr);
     REQUIRE_FALSE(PacketVersion1(ping, conn2).connection().lock() == nullptr);
     REQUIRE_FALSE(PacketVersion1(ping, conn1).connection().lock() == conn2);
     REQUIRE_FALSE(PacketVersion1(ping, conn2).connection().lock() == conn1);
-    REQUIRE_FALSE(PacketVersion1(
-                      ping, empty_conn).connection().lock() == conn1);
-    REQUIRE_FALSE(PacketVersion1(
-                      ping, empty_conn).connection().lock() == conn2);
+    REQUIRE_FALSE(
+        PacketVersion1(ping, empty_conn).connection().lock() == conn1);
+    REQUIRE_FALSE(
+        PacketVersion1(ping, empty_conn).connection().lock() == conn2);
 }
 
 
@@ -297,16 +297,14 @@ TEST_CASE("PacketVersion1's have a priority.", "[PacketVersion1]")
     SECTION("That can be set during construction.")
     {
         REQUIRE(PacketVersion1(ping, conn, -32768).priority() == -32768);
-        REQUIRE(PacketVersion1(ping, conn, -100).priority() == -100);
-        REQUIRE(PacketVersion1(ping, conn, -10).priority() == -10);
-        REQUIRE(PacketVersion1(ping, conn, -5).priority() == -5);
-        REQUIRE(PacketVersion1(ping, conn, -1).priority() == -1);
         REQUIRE(PacketVersion1(ping, conn, 0).priority() == 0);
-        REQUIRE(PacketVersion1(ping, conn, 1).priority() == 1);
-        REQUIRE(PacketVersion1(ping, conn, 5).priority() == 5);
-        REQUIRE(PacketVersion1(ping, conn, 10).priority() == 10);
-        REQUIRE(PacketVersion1(ping, conn, 100).priority() == 100);
         REQUIRE(PacketVersion1(ping, conn, 32767).priority() == 32767);
+
+        // Loop over every 1000 priority values.
+        for (auto i : boost::irange(-32768, 32768, 1000))
+        {
+            REQUIRE(PacketVersion1(ping, conn, i).priority() == i);
+        }
     }
     SECTION("That can be set after construction.")
     {
@@ -315,36 +313,19 @@ TEST_CASE("PacketVersion1's have a priority.", "[PacketVersion1]")
         // -32768
         REQUIRE(packet.priority(-32768) == -32768);
         REQUIRE(packet.priority() == -32768);
-        // -100
-        REQUIRE(packet.priority(-100) == -100);
-        REQUIRE(packet.priority() == -100);
-        // -10
-        REQUIRE(packet.priority(-10) == -10);
-        REQUIRE(packet.priority() == -10);
-        // -5
-        REQUIRE(packet.priority(-5) == -5);
-        REQUIRE(packet.priority() == -5);
-        // -1
-        REQUIRE(packet.priority(-1) == -1);
-        REQUIRE(packet.priority() == -1);
         // 0
         REQUIRE(packet.priority(0) == 0);
         REQUIRE(packet.priority() == 0);
-        // 1
-        REQUIRE(packet.priority(1) == 1);
-        REQUIRE(packet.priority() == 1);
-        // 5
-        REQUIRE(packet.priority(5) == 5);
-        REQUIRE(packet.priority() == 5);
-        // 10
-        REQUIRE(packet.priority(10) == 10);
-        REQUIRE(packet.priority() == 10);
-        // 100
-        REQUIRE(packet.priority(100) == 100);
-        REQUIRE(packet.priority() == 100);
         // 32767
         REQUIRE(packet.priority(32767) == 32767);
         REQUIRE(packet.priority() == 32767);
+
+        // Loop over every 1000 priority values.
+        for (auto i : boost::irange(-32768, 32768, 1000))
+        {
+            REQUIRE(packet.priority(i) == i);
+            REQUIRE(packet.priority() == i);
+        }
     }
 }
 
@@ -453,13 +434,15 @@ TEST_CASE("PacketVersion1's optionally have a destination address.",
     auto set_mode = to_vector(SetMode());
     auto encapsulated_data = to_vector(EncapsulatedData());
     auto conn = std::make_shared<ConnectionTestClass>();
-    REQUIRE_THROWS_AS(PacketVersion1(heartbeat, conn).dest().value(),
-                      std::bad_optional_access);
+    REQUIRE_THROWS_AS(
+        PacketVersion1(heartbeat, conn).dest().value(),
+        std::bad_optional_access);
     REQUIRE(PacketVersion1(ping, conn).dest().value() == MAVAddress("255.23"));
     REQUIRE(PacketVersion1(set_mode, conn).dest().value() ==
             MAVAddress("123.0"));
-    REQUIRE_THROWS_AS(PacketVersion1(encapsulated_data, conn).dest().value(),
-                      std::bad_optional_access);
+    REQUIRE_THROWS_AS(
+        PacketVersion1(encapsulated_data, conn).dest().value(),
+        std::bad_optional_access);
 }
 
 

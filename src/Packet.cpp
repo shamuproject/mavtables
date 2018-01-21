@@ -31,9 +31,12 @@
  *  \param connection Connection packet was received on.
  *  \param priority Set the priority (default is 0).
  */
-Packet::Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
-               int priority)
-    : data_(std::move(data)), connection_(std::move(connection)),
+Packet::Packet(
+    std::vector<uint8_t> data,
+    std::weak_ptr<Connection> connection,
+    int priority)
+    : data_(std::move(data)),
+      connection_(std::move(connection)),
       priority_(priority)
 {
 }

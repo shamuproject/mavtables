@@ -39,7 +39,8 @@ extern "C"
  */
 PacketVersion1::PacketVersion1(
     std::vector<uint8_t> data,
-    std::weak_ptr<Connection> connection, int priority)
+    std::weak_ptr<Connection> connection,
+    int priority)
     : Packet(std::move(data), std::move(connection), priority)
 {
     // Check that a complete header was given (including magic number).
@@ -67,8 +68,8 @@ PacketVersion1::PacketVersion1(
     // Verify the message ID.
     if (mavlink_get_message_info_by_id(header_()->msgid) == nullptr)
     {
-        throw std::runtime_error("Invalid packet ID (#" +
-                                 std::to_string(header_()->msgid) + ").");
+        throw std::runtime_error(
+            "Invalid packet ID (#" + std::to_string(header_()->msgid) + ").");
     }
 
     // Ensure a complete packet was given.
@@ -79,8 +80,7 @@ PacketVersion1::PacketVersion1(
     {
         throw std::length_error(
             "Packet is " + std::to_string(this->data().size()) +
-            " bytes, should be " +
-            std::to_string(expected_length) + " bytes.");
+            " bytes, should be " + std::to_string(expected_length) + " bytes.");
     }
 }
 
@@ -131,8 +131,8 @@ std::string PacketVersion1::name() const
     // There should never be any way to reach this point since the message ID
     // was checked in the constructor.  It is here just in case the MAVLink C
     // library has an error in it.
-    throw std::runtime_error("Invalid packet ID (#" +
-                             std::to_string(header_()->msgid) + ").");
+    throw std::runtime_error(
+        "Invalid packet ID (#" + std::to_string(header_()->msgid) + ").");
 }
 
 
@@ -194,6 +194,6 @@ std::optional<MAVAddress> PacketVersion1::dest() const
     // There should never be any way to reach this point since the message ID
     // was checked in the constructor.  It is here just in case the MAVLink C
     // library has an error in it.
-    throw std::runtime_error("Invalid packet ID (#" +
-                             std::to_string(header_()->msgid) + ").");
+    throw std::runtime_error(
+        "Invalid packet ID (#" + std::to_string(header_()->msgid) + ").");
 }
