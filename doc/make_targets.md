@@ -41,11 +41,17 @@ line, report generated with [lcov](http://ltp.sourceforge.net/coverage/lcov.php)
 at `build/lcov/html/selected_targets/index.html`.
 
 
+## linecheck
+
+Prints all lines exceeding 80 characters.
+
+
 ## style
 
 Fix the style of C++ source code and header files.  The original files are
 backed up with a `.orig` extension.  [Artistic
-Style](http://astyle.sourceforge.net/) is required to use this target.
+Style](http://astyle.sourceforge.net/) is required to use this target.  This
+will also call the linecheck target.
 
 
 ## html
