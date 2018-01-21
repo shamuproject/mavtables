@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -57,7 +58,9 @@ PacketVersion1::PacketVersion1(
         ss << "Invalid packet starting byte (0x"
            << std::uppercase << std::hex
            << static_cast<unsigned int>(header_()->magic)
-           << std::nouppercase << "), v1.0 packets should start with 0xFE.";
+           << std::nouppercase << "), v1.0 packets should start with 0x"
+           << std::uppercase << std::hex << MAVLINK_STX_MAVLINK1
+           << std::nouppercase << ".";
         throw std::invalid_argument(ss.str());
     }
 
@@ -69,16 +72,15 @@ PacketVersion1::PacketVersion1(
     }
 
     // Ensure a complete packet was given.
-    size_t expected_packet_length = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN +
-                                    header_()->len + MAVLINK_NUM_CHECKSUM_BYTES;
+    size_t expected_length = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN +
+                             header_()->len + MAVLINK_NUM_CHECKSUM_BYTES;
 
-    if (this->data().size() != expected_packet_length)
+    if (this->data().size() != expected_length)
     {
-        // throw std::length_error("Packet data does not have correct length.");
         throw std::length_error(
             "Packet is " + std::to_string(this->data().size()) +
             " bytes, should be " +
-            std::to_string(expected_packet_length) + " bytes.");
+            std::to_string(expected_length) + " bytes.");
     }
 }
 
@@ -93,7 +95,7 @@ const struct mavlink_packet_version1_header *PacketVersion1::header_() const
 
 /** \copydoc Packet::version()
  *
- *  \returns 0x0200 (v2.0)
+ *  \returns 0x0100 (v1.0)
  *  \complexity \f$O(1)\f$
  */
 unsigned int PacketVersion1::version() const
