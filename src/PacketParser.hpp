@@ -1,0 +1,50 @@
+// MAVLink router and firewall.
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+#ifndef PACKETPARSER_HPP_
+#define PACKETPARSER_HPP_
+
+#include <memory>
+
+#include "Packet.hpp"
+#include "PacketVersion1.hpp"
+#include "PacketVersion2.hpp"
+
+
+/** A MAVLink packet parser.
+ *
+ *  Parses wire protocol bytes into a MAVLink \ref Packet.
+ */
+class PacketParser
+{
+    private:
+        std::vector<uint8_t> buffer_;
+        std::weak_ptr<Connection> connection_;
+        int priority_;
+
+    public:
+        PacketParser(const PacketParser &other) = delete;
+        PacketParser(PacketParser &&other) = delete;
+        PacketParser(
+            std::weak_ptr<Connection> connection, int priority = 0);
+        std::unique_ptr<Packet> parse_byte(uint8_t byte);
+        PacketParser &operator=(const PacketParser &other) = delete;
+        PacketParser &operator=(PacketParser &&other) = delete;
+};
+
+
+#endif // PACKETPARSER_HPP_
