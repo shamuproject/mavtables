@@ -15,10 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <catch.hpp>
-#include <sstream>
+#include <utility>
 #include <stdexcept>
 
+#include <catch.hpp>
+
+#include "util.hpp"
 #include "MAVAddress.hpp"
 
 
@@ -169,6 +171,7 @@ TEST_CASE("MAVAddress's can be constructed from System and Component ID's.",
     REQUIRE(MAVAddress(255, 255) == MAVAddress(0xFFFF));
     SECTION("And ensures System and Component ID's are within range.")
     {
+        // Errors
         REQUIRE_THROWS_AS(MAVAddress(static_cast<unsigned int>(-1), 0),
                           std::out_of_range);
         REQUIRE_THROWS_AS(MAVAddress(0, static_cast<unsigned int>(-1)),
@@ -176,6 +179,15 @@ TEST_CASE("MAVAddress's can be constructed from System and Component ID's.",
         REQUIRE_THROWS_AS(MAVAddress(256, 255), std::out_of_range);
         REQUIRE_THROWS_AS(MAVAddress(255, 256), std::out_of_range);
         REQUIRE_THROWS_AS(MAVAddress(256, 256), std::out_of_range);
+        // Error messages.
+        REQUIRE_THROWS_WITH(
+            MAVAddress(256, 255),
+            "System ID (256) is outside of the allowed range (0 - 255).");
+        REQUIRE_THROWS_WITH(
+            MAVAddress(255, 256),
+            "Component ID (256) is outside of the allowed range (0 - 255).");
+        // NOTE: MAVAddress(256, 256) is not checked because the order of
+        //       checking the inputs is not defined.
     }
 }
 
@@ -194,6 +206,7 @@ TEST_CASE("MAVAddress's can be constructed from strings.", "[MAVAddress]")
     REQUIRE(MAVAddress("192.168") == MAVAddress(192, 168));
     SECTION("And ensures the address string is valid.")
     {
+        // Errors
         REQUIRE_THROWS_AS(MAVAddress("1"), std::invalid_argument);
         REQUIRE_THROWS_AS(MAVAddress("1."), std::invalid_argument);
         REQUIRE_THROWS_AS(MAVAddress("1.2."), std::invalid_argument);
@@ -205,12 +218,45 @@ TEST_CASE("MAVAddress's can be constructed from strings.", "[MAVAddress]")
         REQUIRE_THROWS_AS(MAVAddress("0.+1"), std::invalid_argument);
         REQUIRE_THROWS_AS(MAVAddress("-1.0"), std::invalid_argument);
         REQUIRE_THROWS_AS(MAVAddress("0.-1"), std::invalid_argument);
+        // Error message.
+        REQUIRE_THROWS_WITH(
+            MAVAddress("1"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("1."), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("1.2."), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("1.2.3"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("a.2.3"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("1.b.3"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("1.2.c"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("+1.0"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("0.+1"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("-1.0"), "Invalid MAVLink address string.");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("0.-1"), "Invalid MAVLink address string.");
     }
     SECTION("And ensures System and Component ID's are within range.")
     {
+        // Errors
         REQUIRE_THROWS_AS(MAVAddress("256.255"), std::out_of_range);
         REQUIRE_THROWS_AS(MAVAddress("255.256"), std::out_of_range);
         REQUIRE_THROWS_AS(MAVAddress("256.256"), std::out_of_range);
+        // Error messages.
+        REQUIRE_THROWS_WITH(
+            MAVAddress("256.255"),
+            "System ID (256) is outside of the allowed range (0 - 255).");
+        REQUIRE_THROWS_WITH(
+            MAVAddress("255.256"),
+            "Component ID (256) is outside of the allowed range (0 - 255).");
+        // NOTE: MAVAddress("256.256") is not checked because the order of
+        //       checking the inputs is not defined.
     }
 }
 
@@ -228,26 +274,45 @@ TEST_CASE("MAVAddress's are copyable.", "[MAVAddress]")
 }
 
 
+TEST_CASE("MAVAddress's are movable.", "[MAVAddress]")
+{
+    MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
+    MAVAddress a_moved = std::move(a);
+    MAVAddress b_moved(std::move(b));
+    REQUIRE(a_moved == MAVAddress(0, 0));
+    REQUIRE(b_moved == MAVAddress(255, 255));
+}
+
+
 TEST_CASE("MAVAddress's are assignable.", "[MAVAddress]")
 {
     MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
     REQUIRE(a == MAVAddress(0, 0));
-    a = MAVAddress(255, 255);
+    a = b;
+    REQUIRE(a == MAVAddress(255, 255));
+}
+
+
+TEST_CASE("MAVAddress's are assignable (by move semantics).", "[MAVAddress]")
+{
+    MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
+    REQUIRE(a == MAVAddress(0, 0));
+    a = std::move(b);
     REQUIRE(a == MAVAddress(255, 255));
 }
 
 
 TEST_CASE("MAVAddress's are printable", "[MAVAddress]")
 {
-    std::ostringstream oss;
     SECTION("192.168")
     {
-        oss << MAVAddress(192, 168);
-        REQUIRE(oss.str() == "192.168");
+        REQUIRE(str(MAVAddress(192, 168)) == "192.168");
     }
     SECTION("32.128")
     {
-        oss << MAVAddress(32, 128);
-        REQUIRE(oss.str() == "32.128");
+        REQUIRE(str(MAVAddress(32, 128)) == "32.128");
     }
 }

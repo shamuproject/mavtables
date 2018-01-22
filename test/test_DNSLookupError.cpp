@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,9 @@
 
 #include <string>
 #include <exception>
+
 #include <catch.hpp>
+
 #include "DNSLookupError.hpp"
 
 
@@ -27,24 +29,25 @@
 }
 
 
-TEST_CASE("DNSLookupError's can be thrown", "[error]")
+TEST_CASE("DNSLookupError's can be thrown.", "[DNSLookupError]")
 {
-    SECTION("can be caught")
+    SECTION("And can be caught.")
     {
         REQUIRE_THROWS(throw_lookup_error("example.com"));
     }
-    SECTION("can be caught as GNSLookupError")
+    SECTION("And can be caught as DNSLookupError.")
     {
         REQUIRE_THROWS_AS(throw_lookup_error("example.com"), DNSLookupError);
     }
-    SECTION("can be caught as std::exception")
+    SECTION("And can be caught as std::exception.")
     {
         REQUIRE_THROWS_AS(throw_lookup_error("example.com"), std::exception);
     }
 }
 
 
-TEST_CASE("'what' method gives unresolved hostname", "[error]")
+TEST_CASE("The 'what' method gives the unresolved hostname.",
+          "[DNSLookupError]")
 {
     REQUIRE(std::string(DNSLookupError("example.com").what()) ==
             "DNSLookupError: Could not find an IP address for \"example.com\"");

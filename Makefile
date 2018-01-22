@@ -41,8 +41,8 @@ coverage: test
 	gcovr -r . -e 'lib.*'
 
 linecheck:
-	grep -rIn --color '.\{81\}' src # limit to 80 columns
-	grep -rIn --color '.\{81\}' test # limit to 80 columns
+	-grep -rIn --color '.\{81\}' src # limit to 80 columns
+	-grep -rIn --color '.\{81\}' test # limit to 80 columns
 
 style:
 	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"

@@ -41,8 +41,9 @@ MAVAddress::MAVAddress(unsigned int address)
 {
     if (address > 65535)
     {
-        throw std::out_of_range("address (" + std::to_string(address) +
-                                ") is outside of the allowed range (0 - 65535).");
+        throw std::out_of_range(
+            "Address (" + std::to_string(address) +
+            ") is outside of the allowed range (0 - 65535).");
     }
 
     address_ = address;
@@ -54,14 +55,16 @@ void MAVAddress::construct_(unsigned int system, unsigned int component)
 {
     if (system > 255)
     {
-        throw std::out_of_range("system id (" + std::to_string(system) +
-                                ") is outside of the allowed range (0 - 255).");
+        throw std::out_of_range(
+            "System ID (" + std::to_string(system) +
+            ") is outside of the allowed range (0 - 255).");
     }
 
     if (component > 255)
     {
-        throw std::out_of_range("component id (" + std::to_string(system) +
-                                ") is outside of the allowed range (0 - 255).");
+        throw std::out_of_range(
+            "Component ID (" + std::to_string(component) +
+            ") is outside of the allowed range (0 - 255).");
     }
 
     address_ = ((system << 8) & 0xFF00) | (component & 0x00FF);
@@ -136,6 +139,7 @@ MAVAddress::MAVAddress(std::string address)
  *
  *  \return The MAVLink address as a two byte number with the System ID encoded
  *      in the MSB and the Component ID in the LSB.
+ *  \complexity \f$O(1)\f$
  */
 unsigned int MAVAddress::address() const
 {
@@ -146,6 +150,7 @@ unsigned int MAVAddress::address() const
 /** Return the System ID.
  *
  *  \return The System ID (0 - 255).
+ *  \complexity \f$O(1)\f$
  */
 unsigned int MAVAddress::system() const
 {
@@ -156,6 +161,7 @@ unsigned int MAVAddress::system() const
 /** Return the Component ID.
  *
  *  \return The Component ID (0 - 255).
+ *  \complexity \f$O(1)\f$
  */
 unsigned int MAVAddress::component() const
 {
@@ -171,6 +177,7 @@ unsigned int MAVAddress::component() const
  *  \retval true if \p lhs and \p rhs have the same system and component ID's.
  *  \retval false if \p lhs and \p rhs do not have the same system and component
  *      ID's.
+ *  \complexity \f$O(1)\f$
  */
 bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -186,6 +193,7 @@ bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \retval true if \p lhs and \p rhs do not have the same system and component
  *      ID's
  *  \retval false if \p lhs and \p rhs have the same system and component ID's.
+ *  \complexity \f$O(1)\f$
  */
 bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -202,6 +210,7 @@ bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side MAVLink address.
  *  \retval true if \p lhs is less than \p rhs.
  *  \retval false if \p lhs is not less than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator<(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -218,6 +227,7 @@ bool operator<(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than \p rhs.
  *  \retval false if \p lhs is not greater than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator>(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -234,6 +244,7 @@ bool operator>(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than or eqaul to \p rhs.
  *  \retval false if \p lhs is greater than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -250,6 +261,7 @@ bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than or equal to \p rhs.
  *  \retval false if \p lhs is less than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs)
 {

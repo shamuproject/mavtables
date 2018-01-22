@@ -49,15 +49,17 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
     if (address > 0xFFFFFFFF)
     {
         std::stringstream ss;
-        ss << "address (0x" << std::hex << address <<
-           ") is outside of the allowed range (0x00000000 - 0xffffffff).";
+        ss << "Address (0x"
+           << std::uppercase << std::hex << address << std::nouppercase
+           << ") is outside of the allowed range (0x00000000 - 0xFFFFFFFF).";
         throw std::out_of_range(ss.str());
     }
 
     if (port > 65535)
     {
-        throw std::out_of_range("port number (" + std::to_string(port) +
-                                ") is outside of the allowed range (0 - 65535).");
+        throw std::out_of_range(
+            "port number (" + std::to_string(port) +
+            ") is outside of the allowed range (0 - 65535).");
     }
 
     address_ = address;
@@ -170,8 +172,9 @@ IPAddress::IPAddress(std::string address)
     for (auto i : octets)
         if (i > 255)
         {
-            throw std::out_of_range("address octet (" + std::to_string(i) +
-                                    ") is outside of the allowed range (0 - 255).");
+            throw std::out_of_range(
+                "Address octet (" + std::to_string(i) +
+                ") is outside of the allowed range (0 - 255).");
         }
 
     {
@@ -186,6 +189,7 @@ IPAddress::IPAddress(std::string address)
  *
  *  \return The 32-bit IP address (in system byte order) as an integer
  *      (0x00000000 - 0xFFFFFFFF).
+ *  \complexity \f$O(1)\f$
  */
 unsigned long IPAddress::address() const
 {
@@ -196,6 +200,7 @@ unsigned long IPAddress::address() const
 /** Return the port.
  *
  *  \return The port number (0 - 65535).
+ *  \complexity \f$O(1)\f$
  */
 unsigned int IPAddress::port() const
 {
@@ -210,6 +215,7 @@ unsigned int IPAddress::port() const
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs have the same address and port.
  *  \retval false if \p lhs and \p rhs do not have the same address and port.
+ *  \complexity \f$O(1)\f$
  */
 bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -224,6 +230,7 @@ bool operator==(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs do not have the same address and port.
  *  \retval false if \p lhs and \p rhs have the same address and port.
+ *  \complexity \f$O(1)\f$
  */
 bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -240,6 +247,7 @@ bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than \p rhs.
  *  \retval false if \p lhs is not less than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator<(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -257,6 +265,7 @@ bool operator<(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than \p rhs.
  *  \retval false if \p lhs is not greater than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator>(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -274,6 +283,7 @@ bool operator>(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than or eqaul to \p rhs.
  *  \retval false if \p lhs is greater than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -290,6 +300,7 @@ bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than or equal to \p rhs.
  *  \retval false if \p lhs is less than \p rhs.
+ *  \complexity \f$O(1)\f$
  */
 bool operator>=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -371,15 +382,15 @@ static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
         throw DNSLookupError(url);
     }
 
-    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)> result(result_ptr,
-            freeaddrinfo);
+    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)>
+    result(result_ptr, freeaddrinfo);
     result_ptr = nullptr;
 
     for (result_ptr = result.get(); result_ptr != nullptr;
             result_ptr = result_ptr->ai_next)
     {
-        struct sockaddr_in *address_ptr = reinterpret_cast<struct sockaddr_in *>
-                                              (result_ptr->ai_addr);
+        struct sockaddr_in *address_ptr =
+                reinterpret_cast<struct sockaddr_in *>(result_ptr->ai_addr);
         unsigned long address = ntohl(address_ptr->sin_addr.s_addr);
         addresses.insert(IPAddress(address, port));
     }

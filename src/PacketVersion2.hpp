@@ -42,9 +42,14 @@ class PacketVersion2 : public Packet
     public:
         /** Copy constructor.
          *
-         * \param other PacketVersion2 to copy.
+         *  \param other PacketVersion2 to copy.
          */
         PacketVersion2(const PacketVersion2 &other) = default;
+        /** Move constructor.
+         *
+         *  \param other PacketVersion2 to move from.
+         */
+        PacketVersion2(PacketVersion2 &&other) = default;
         PacketVersion2(
             std::vector<uint8_t> data,
             std::weak_ptr<Connection> connection,
@@ -56,9 +61,14 @@ class PacketVersion2 : public Packet
         virtual std::optional<MAVAddress> dest() const;
         /** Assignment operator.
          *
-         * \param other PacketVersion2 to copy.
+         *  \param other PacketVersion2 to copy.
          */
         PacketVersion2 &operator=(const PacketVersion2 &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         *  \param other PacketVersion2 to move from.
+         */
+        PacketVersion2 &operator=(PacketVersion2 &&other) = default;
 };
 
 

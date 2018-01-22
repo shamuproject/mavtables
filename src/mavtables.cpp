@@ -28,5 +28,5 @@ int main(int argc, char **argv)
               << VERSION_MAJOR << "."
               << VERSION_MINOR << "."
               << VERSION_PATCH << std::endl;
-    std::cout << capital_case("a MAVLink router and firewall.") << std::endl;
+    std::cout << "A MAVLink router and firewall." << std::endl;
 }

@@ -46,6 +46,11 @@ class MAVAddress
          * \param other MAVLink address to copy.
          */
         MAVAddress(const MAVAddress &other) = default;
+        /** Move constructor.
+         *
+         * \param other MAVLink address to move from.
+         */
+        MAVAddress(MAVAddress &&other) = default;
         MAVAddress(unsigned int address);
         MAVAddress(unsigned int system, unsigned int component);
         MAVAddress(std::string address);
@@ -57,6 +62,11 @@ class MAVAddress
          * \param other MAVLink address to copy.
          */
         MAVAddress &operator=(const MAVAddress &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other MAVLink address to move from.
+         */
+        MAVAddress &operator=(MAVAddress &&other) = default;
 };
 
 
