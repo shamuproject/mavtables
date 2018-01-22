@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 #include <cstdint>
 #include <optional>
 #include <stdexcept>
@@ -351,16 +352,54 @@ TEST_CASE("PacketVersion1's are copyable.", "[PacketVersion1]")
 }
 
 
+TEST_CASE("PacketVersion1's are movable.", "[PacketVersion1]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping());
+    auto conn1 = std::make_shared<ConnectionTestClass>();
+    auto conn2 = std::make_shared<ConnectionTestClass>();
+    PacketVersion1 a(heartbeat, conn1, 1);
+    PacketVersion1 b(ping, conn2, 2);
+    PacketVersion1 a_moved = std::move(a);
+    PacketVersion1 b_moved(std::move(b));
+    REQUIRE(a_moved.data() == heartbeat);
+    REQUIRE(a_moved.connection().lock() == conn1);
+    REQUIRE(a_moved.priority() == 1);
+    REQUIRE(b_moved.data() == ping);
+    REQUIRE(b_moved.connection().lock() == conn2);
+    REQUIRE(b_moved.priority() == 2);
+}
+
+
 TEST_CASE("PacketVersion1's are assignable.", "[PacketVersion1]")
 {
     auto heartbeat = to_vector(Heartbeat());
     auto ping = to_vector(Ping());
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketVersion1 packet(heartbeat, conn, -10);
+    PacketVersion1 packet_to_copy(ping, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == heartbeat);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);
-    packet = PacketVersion1(ping, std::weak_ptr<ConnectionTestClass>(), 10);
+    packet = packet_to_copy;
+    REQUIRE(packet.data() == ping);
+    REQUIRE(packet.connection().lock() == nullptr);
+    REQUIRE(packet.priority() == 10);
+}
+
+
+TEST_CASE("PacketVersion1's are assignable (with move semantics).",
+          "[PacketVersion1]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping());
+    auto conn = std::make_shared<ConnectionTestClass>();
+    PacketVersion1 packet(heartbeat, conn, -10);
+    PacketVersion1 packet_to_move(ping, std::weak_ptr<ConnectionTestClass>(), 10);
+    REQUIRE(packet.data() == heartbeat);
+    REQUIRE(packet.connection().lock() == conn);
+    REQUIRE(packet.priority() == -10);
+    packet = std::move(packet_to_move);
     REQUIRE(packet.data() == ping);
     REQUIRE(packet.connection().lock() == nullptr);
     REQUIRE(packet.priority() == 10);
