@@ -1,0 +1,25 @@
+<map id="test_SerialInterface.cpp" name="test_SerialInterface.cpp">
+<area shape="rect" id="node10" href="$Connection_8hpp.html" title="Connection.hpp" alt="" coords="1778,304,1891,331"/>
+<area shape="rect" id="node24" href="$Packet_8hpp.html" title="Packet.hpp" alt="" coords="1924,603,2012,629"/>
+<area shape="rect" id="node32" href="$ConnectionPool_8hpp.html" title="ConnectionPool.hpp" alt="" coords="1943,229,2081,256"/>
+<area shape="rect" id="node34" href="$PacketVersion2_8hpp.html" title="PacketVersion2.hpp" alt="" coords="2801,528,2940,555"/>
+<area shape="rect" id="node38" href="$SerialInterface_8hpp.html" title="SerialInterface.hpp" alt="" coords="2245,80,2376,107"/>
+<area shape="rect" id="node42" href="$SerialPort_8hpp.html" title="SerialPort.hpp" alt="" coords="2623,453,2727,480"/>
+<area shape="rect" id="node44" href="$utility_8hpp.html" title="utility.hpp" alt="" coords="3548,453,3625,480"/>
+<area shape="rect" id="node48" href="$common_8hpp.html" title="common.hpp" alt="" coords="3221,453,3318,480"/>
+<area shape="rect" id="node50" href="$common__Packet_8hpp.html" title="common_Packet.hpp" alt="" coords="4030,528,4175,555"/>
+<area shape="rect" id="node13" href="$AddressPool_8hpp.html" title="AddressPool.hpp" alt="" coords="1850,453,1971,480"/>
+<area shape="rect" id="node17" href="$MAVAddress_8hpp.html" title="MAVAddress.hpp" alt="" coords="415,677,537,704"/>
+<area shape="rect" id="node19" href="$Filter_8hpp.html" title="Filter.hpp" alt="" coords="919,379,993,405"/>
+<area shape="rect" id="node27" href="$PacketQueue_8hpp.html" title="PacketQueue.hpp" alt="" coords="1513,453,1639,480"/>
+<area shape="rect" id="node21" href="$Action_8hpp.html" title="Action.hpp" alt="" coords="195,603,279,629"/>
+<area shape="rect" id="node23" href="$Chain_8hpp.html" title="Chain.hpp" alt="" coords="473,453,554,480"/>
+<area shape="rect" id="node25" href="$RecursionGuard_8hpp.html" title="RecursionGuard.hpp" alt="" coords="601,528,743,555"/>
+<area shape="rect" id="node26" href="$Rule_8hpp.html" title="Rule.hpp" alt="" coords="351,528,425,555"/>
+<area shape="rect" id="node31" href="$QueuedPacket_8hpp.html" title="QueuedPacket.hpp" alt="" coords="1127,528,1260,555"/>
+<area shape="rect" id="node35" href="$mavlink_8hpp.html" title="mavlink.hpp" alt="" coords="3295,603,3387,629"/>
+<area shape="rect" id="node37" href="$macros_8hpp.html" title="macros.hpp" alt="" coords="3808,677,3899,704"/>
+<area shape="rect" id="node39" href="$Interface_8hpp.html" title="Interface.hpp" alt="" coords="2167,155,2265,181"/>
+<area shape="rect" id="node40" href="$PacketParser_8hpp.html" title="PacketParser.hpp" alt="" coords="2473,453,2599,480"/>
+<area shape="rect" id="node41" href="$PacketVersion1_8hpp.html" title="PacketVersion1.hpp" alt="" coords="2537,528,2676,555"/>
+</map>

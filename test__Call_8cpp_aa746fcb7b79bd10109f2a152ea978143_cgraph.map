@@ -1,0 +1,9 @@
+<map id="TEST_CASE" name="TEST_CASE">
+<area shape="rect" id="node2" href="$classAction.html#a1eebddc5d4d440bf1882003dcb6b9085" title="Action::make_accept" alt="" coords="158,5,303,32"/>
+<area shape="rect" id="node5" href="$classAction.html#a60b70f4fb03bd621485bae0f19e22842" title="Action::make_continue" alt="" coords="153,56,308,83"/>
+<area shape="rect" id="node6" href="$classAction.html#ab881f608c60196a1940a88f659847861" title="Action::make_default" alt="" coords="158,107,303,133"/>
+<area shape="rect" id="node7" href="$classAction.html#a1bbd34686f8a0b530383addf273f57fe" title="Action::make_reject" alt="" coords="161,157,300,184"/>
+<area shape="rect" id="node8" href="$common_8hpp.html#aac2310151efaeec4699d33e51189636e" title="mock_shared" alt="" coords="181,208,281,235"/>
+<area shape="rect" id="node3" href="$classAction.html#a2c4ed9b9638a5372aa2368dcd479879c" title="Action::Action" alt="" coords="357,81,461,108"/>
+<area shape="rect" id="node4" href="$classAction.html#a099a0d81c2d1756b5a6ec555a1037867" title="Action::priority" alt="" coords="356,5,463,32"/>
+</map>

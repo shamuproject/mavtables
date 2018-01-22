@@ -1,0 +1,4 @@
+\form#0:$O(1)$
+\form#1:$O(log(n))$
+\form#2:$n$
+\form#3:$O(n)$

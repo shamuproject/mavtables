@@ -1,0 +1,4 @@
+<map id="Interface" name="Interface">
+<area shape="rect" id="node2" href="$classSerialInterface.html" title="{SerialInterface\n||+ SerialInterface()\l+ ~SerialInterface()\l+ send_packet()\l+ receive_packet()\l# print_()\l}" alt="" coords="5,175,140,311"/>
+<area shape="rect" id="node3" href="$classUDPInterface.html" title="{UDPInterface\n||+ UDPInterface()\l+ ~UDPInterface()\l+ send_packet()\l+ receive_packet()\l# print_()\l}" alt="" coords="165,175,295,311"/>
+</map>

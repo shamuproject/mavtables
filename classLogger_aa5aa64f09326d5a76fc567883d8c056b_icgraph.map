@@ -1,0 +1,9 @@
+<map id="Logger::level" name="Logger::level">
+<area shape="rect" id="node2" href="$classConnection.html#a1e07bc029c10c5a6779211fd23a79443" title="Connection::add_address" alt="" coords="149,5,320,32"/>
+<area shape="rect" id="node3" href="$classConnectionPool.html#a5c93a1171e8ccd64ea8c3bdc6cd3047c" title="ConnectionPool::send" alt="" coords="159,56,310,83"/>
+<area shape="rect" id="node5" href="$classLogger.html#a3801204a601da1184ab56b8076dc022a" title="Logger::log" alt="" coords="191,107,278,133"/>
+<area shape="rect" id="node6" href="$classLogger.html#a3f28e587ce1fa734be0cad7c03870169" title="Logger::level" alt="" coords="187,157,283,184"/>
+<area shape="rect" id="node7" href="$mavtables_8cpp.html#ac0f2228420376f4db7e1274f2b41667c" title="main" alt="" coords="209,208,260,235"/>
+<area shape="rect" id="node8" href="$test__Connection_8cpp.html#acdfd34f6e7a85d7c846677bd4b011f2b" title="TEST_CASE" alt="" coords="185,259,285,285"/>
+<area shape="rect" id="node4" href="$test__ConnectionPool_8cpp.html#a2e61dda676e7ff8df1c6ef66d3c6c7ca" title="TEST_CASE" alt="" coords="368,56,468,83"/>
+</map>

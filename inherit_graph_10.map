@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title="STL class. " alt="" coords="5,81,109,108"/>
+<area shape="rect" id="node2" href="$classDNSLookupError.html" title="DNSLookupError" alt="" coords="168,5,289,32"/>
+<area shape="rect" id="node3" href="$classInvalidPacketIDError.html" title="InvalidPacketIDError" alt="" coords="157,56,300,83"/>
+<area shape="rect" id="node4" href="$classPartialSendError.html" title="PartialSendError" alt="" coords="170,107,287,133"/>
+<area shape="rect" id="node5" href="$classRecursionError.html" title="RecursionError" alt="" coords="174,157,283,184"/>
+</map>

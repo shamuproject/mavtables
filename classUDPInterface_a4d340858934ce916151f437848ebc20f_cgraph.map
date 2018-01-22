@@ -1,0 +1,4 @@
+<map id="UDPInterface::receive_packet" name="UDPInterface::receive_packet">
+<area shape="rect" id="node2" href="$classPacketParser.html#a5ba9e9991397d2358d64e3be6a751bd0" title="PacketParser::clear" alt="" coords="222,5,359,32"/>
+<area shape="rect" id="node3" href="$classPacketParser.html#a1adb7579c48e8d405bb0a11bdfbfda43" title="PacketParser::parse_byte" alt="" coords="204,56,377,83"/>
+</map>

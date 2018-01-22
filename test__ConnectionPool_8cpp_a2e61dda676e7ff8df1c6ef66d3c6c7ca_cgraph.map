@@ -1,0 +1,11 @@
+<map id="TEST_CASE" name="TEST_CASE">
+<area shape="rect" id="node2" href="$classConnectionPool.html#a282b6702c7d58ae3e60dc91c67ac3aab" title="ConnectionPool::add" alt="" coords="165,5,307,32"/>
+<area shape="rect" id="node3" href="$common_8hpp.html#aac2310151efaeec4699d33e51189636e" title="mock_shared" alt="" coords="186,56,286,83"/>
+<area shape="rect" id="node4" href="$classConnectionPool.html#afadf9916d67ca64e920c287d385799ac" title="ConnectionPool::remove" alt="" coords="153,107,319,133"/>
+<area shape="rect" id="node5" href="$classConnectionPool.html#a5c93a1171e8ccd64ea8c3bdc6cd3047c" title="ConnectionPool::send" alt="" coords="161,157,311,184"/>
+<area shape="rect" id="node6" href="$classLogger.html#aa5aa64f09326d5a76fc567883d8c056b" title="Logger::level" alt="" coords="386,81,482,108"/>
+<area shape="rect" id="node7" href="$group__utility.html#ga62d901562ed7a88fb9536040cbc6b2f7" title="str" alt="" coords="415,132,453,159"/>
+<area shape="rect" id="node8" href="$classPacket.html#afe5fa44050f577412bb4740e93a6e9e4" title="Packet::connection" alt="" coords="367,183,501,209"/>
+<area shape="rect" id="node10" href="$classLogger.html#a0697a189b6921c9c22ef7f0702ae14f7" title="Logger::log" alt="" coords="391,233,477,260"/>
+<area shape="rect" id="node9" href="$classPacket.html#a6e04e16fb6c0e42e99f7e0f364abcc63" title="Packet::connection" alt="" coords="549,183,684,209"/>
+</map>
