@@ -15,6 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <utility>
+#include <stdexcept>
+
 #include <catch.hpp>
 
 #include "util.hpp"
@@ -316,11 +319,33 @@ TEST_CASE("The port of an IP address can be changed during a copy.",
 }
 
 
+TEST_CASE("IPAddress's are movable.", "[IPAddress]")
+{
+    IPAddress a(0x00000000, 0);
+    IPAddress b(0xFFFFFFFF, 65535);
+    IPAddress a_moved = std::move(a);
+    IPAddress b_moved(std::move(b));
+    REQUIRE(a_moved == IPAddress(0x00000000, 0));
+    REQUIRE(b_moved == IPAddress(0xFFFFFFFF, 65535));
+}
+
+
 TEST_CASE("IPAddress's are assignable.", "[IPAddress]")
 {
     IPAddress a(0x00000000, 0);
+    IPAddress b(0xFFFFFFFF, 65535);
     REQUIRE(a == IPAddress(0x00000000, 0));
-    a = IPAddress(0xFFFFFFFF, 65535);
+    a = b;
+    REQUIRE(a == IPAddress(0xFFFFFFFF, 65535));
+}
+
+
+TEST_CASE("IPAddress's are assignable (by move semantics).", "[IPAddress]")
+{
+    IPAddress a(0x00000000, 0);
+    IPAddress b(0xFFFFFFFF, 65535);
+    REQUIRE(a == IPAddress(0x00000000, 0));
+    a = std::move(b);
     REQUIRE(a == IPAddress(0xFFFFFFFF, 65535));
 }
 

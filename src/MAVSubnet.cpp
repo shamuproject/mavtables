@@ -31,7 +31,7 @@
  *  \param mask Two byte subnet mask, where the system mask is in the MSB and
  *      the component mask is in the LSB.
  *  \throws std::out_of_range if the mask is not between 0x0000 and 0xFFFF.
- *  \sa Check if a \ref MAVAddress is withing the subnet with \ref contains.
+ *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
     : address_(address)
@@ -61,7 +61,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
  *      within the subnet.
  *  \throws std::out_of_range if the system and component masks are not each
  *      between 0x00 and 0xFF.
- *  \sa Check if a \ref MAVAddress is withing the subnet with \ref contains.
+ *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
                      unsigned int component_mask)
@@ -148,7 +148,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  \throws std::out_of_range if either the System ID or the component ID is out
  *      of range.
  *  \throws std::out_of_range if the mask or slash bits are out of range.
- *  \sa Check if a \ref MAVAddress is withing the subnet with \ref contains.
+ *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(std::string subnet)
     : address_(0)

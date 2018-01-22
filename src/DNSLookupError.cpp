@@ -16,6 +16,7 @@
 
 
 #include <string>
+
 #include "DNSLookupError.hpp"
 
 

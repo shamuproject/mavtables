@@ -40,6 +40,11 @@ class IPAddress
          * \param other IP address to copy.
          */
         IPAddress(const IPAddress &other) = default;
+        /** Move constructor.
+         *
+         * \param other IP address to move from.
+         */
+        IPAddress(IPAddress &&other) = default;
         IPAddress(const IPAddress &other, unsigned int port);
         IPAddress(unsigned long address, unsigned int port = 0);
         IPAddress(std::string address);
@@ -50,6 +55,11 @@ class IPAddress
          * \param other IP address to copy.
          */
         IPAddress &operator=(const IPAddress &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other IP address to move from.
+         */
+        IPAddress &operator=(IPAddress &&other) = default;
 
         friend std::ostream &operator<<(
             std::ostream &os, const IPAddress &ipaddress);

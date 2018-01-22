@@ -63,8 +63,8 @@ gh-pages: doc
 	rm -R build/gh-pages/*
 	cp -R build/doc/html/* build/gh-pages/
 	cd build/gh-pages/ && git add --all
-	cd build/gh-pages/ && git commit -m "Publish documentation to GitHub Pages."
-	cd build/gh-pages/ && git push
+	cd build/gh-pages/ && git commit --amend -m "Publish documentation to GitHub Pages."
+	cd build/gh-pages/ && git push --force
 
 clean:
 	rm -rf build

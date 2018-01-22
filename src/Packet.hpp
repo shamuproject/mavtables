@@ -46,9 +46,14 @@ class Packet
     public:
         /** Copy constructor.
          *
-         * \param other Packet to copy.
+         *  \param other Packet to copy.
          */
         Packet(const Packet &other) = default;
+        /** Move constructor.
+         *
+         *  \param other Packet to move from.
+         */
+        Packet(Packet &&other) = default;
         Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
                int priority = 0);
         virtual ~Packet();
@@ -56,7 +61,7 @@ class Packet
         /** Return packet version.
          *
          *  \returns Two byte Packet version with major version in MSB and minor
-         *  version in LSB.
+         *      version in LSB.
          */
         virtual unsigned int version() const = 0;
         /** Return MAVLink message ID.
@@ -83,7 +88,7 @@ class Packet
          *  component a component ID of 0 will be used (the broadcast ID).
          *
          *  \returns The destination MAVLink address of the packet if not a
-         *  broadcast packet.
+         *      broadcast packet.
          */
         virtual std::optional<MAVAddress> dest() const = 0;
         int priority() const;
@@ -91,9 +96,14 @@ class Packet
         const std::vector<uint8_t> &data() const;
         /** Assignment operator.
          *
-         * \param other Packet to copy.
+         *  \param other Packet to copy.
          */
         Packet &operator=(const Packet &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         *  \param other Packet to move from.
+         */
+        Packet &operator=(Packet &&other) = default;
 
 };
 

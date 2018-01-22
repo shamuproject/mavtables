@@ -34,9 +34,14 @@ class MAVSubnet
     public:
         /** Copy constructor.
          *
-         * \param other MAVLink address to copy.
+         * \param other MAVLink subnet to copy.
          */
         MAVSubnet(const MAVSubnet &other) = default;
+        /** Move constructor.
+         *
+         * \param other MAVLink subnet to move from.
+         */
+        MAVSubnet(MAVSubnet &&other) = default;
         MAVSubnet(const MAVAddress &address, unsigned int mask = 0xFFFF);
         MAVSubnet(const MAVAddress &address, unsigned int system_mask,
                   unsigned int component_mask);
@@ -44,9 +49,14 @@ class MAVSubnet
         bool contains(const MAVAddress &address) const;
         /** Assignment operator.
          *
-         * \param other MAVLink address to copy.
+         * \param other MAVLink subnet to copy.
          */
         MAVSubnet &operator=(const MAVSubnet &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other MAVLink subnet to move from.
+         */
+        MAVSubnet &operator=(MAVSubnet &&other) = default;
 
         friend bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs);
         friend bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs);
