@@ -187,6 +187,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
                 throw std::invalid_argument(
                     "Invalid MAVLink subnet: \"" + subnet + "\".");
             }
+
             break;
 
         // Forward slash based subnet (bits from left).

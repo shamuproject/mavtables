@@ -86,7 +86,7 @@ TEST_CASE("MAVSubnet's can be constructed from a MAVLink address "
                       static_cast<unsigned int>(0x0000 - 1)),
             std::out_of_range);
         REQUIRE_THROWS_AS(
-                MAVSubnet(MAVAddress(0x0000), 0xFFFF + 1), std::out_of_range);
+            MAVSubnet(MAVAddress(0x0000), 0xFFFF + 1), std::out_of_range);
     }
 }
 
