@@ -24,16 +24,15 @@
 #include <boost/range/irange.hpp>
 
 
-std::string capital_case(std::string str);
-
-
 /** Convert numeric types to bytes.
  *
- * \ingroup utility
- * \tparam ByteType Numeric type to return in the array of bytes.
- * \tparam T Type of the number being converted to bytes.
- * \param number Number to convert to bytes
- * \return The array of bytes from the given number, in LSB order.
+ *  \ingroup utility
+ *  \tparam ByteType Numeric type to return in the array of bytes.
+ *  \tparam T Type of the number being converted to bytes.
+ *  \param number Number to convert to bytes
+ *  \return The array of bytes from the given number, in LSB order.
+ *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type
+ *      \ref T.
  */
 template <class ByteType = unsigned char, class T>
 std::array<ByteType, sizeof(T)> to_bytes(T number)
@@ -52,10 +51,10 @@ std::array<ByteType, sizeof(T)> to_bytes(T number)
 
 /** Convert any object supporting the output stream operator (<<) to a string.
  *
- * \ingroup utility
- * \tparam T Type of the object to convert to a string.
- * \param object The object to convert to a string.
- * \return The string representing the object.
+ *  \ingroup utility
+ *  \tparam T Type of the object to convert to a string.
+ *  \param object The object to convert to a string.
+ *  \return The string representing the object.
  */
 template <class T>
 std::string str(const T &object)

@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <cctype>
 #include "util.hpp"
 
 
@@ -24,14 +22,3 @@
  *
  *  Utility functions that don't warrant their own file.
  */
-
-
-/** \brief Capitalize first letter of a string.
- *  \ingroup utility
- *  \bug Index error if given an empty string.
- */
-std::string capital_case(std::string str)
-{
-    str[0] = static_cast<char>(toupper(str[0]));
-    return str;
-}
