@@ -41,23 +41,36 @@ line, report generated with [lcov](http://ltp.sourceforge.net/coverage/lcov.php)
 at `build/lcov/html/selected_targets/index.html`.
 
 
+## linecheck
+
+Prints all lines exceeding 80 characters.
+
+
 ## style
 
 Fix the style of C++ source code and header files.  The original files are
 backed up with a `.orig` extension.  [Artistic
-Style](http://astyle.sourceforge.net/) is required to use this target.
+Style](http://astyle.sourceforge.net/) is required to use this target.  This
+will also call the linecheck target.
 
 
-## doc
+## html
 
 Generate html documentation with
 [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and place it at
 `build/doc/html/index.html`.
 
 
+## doc
+
+Generate html and pdf documentation with
+[Doxygen](http://www.stack.nl/~dimitri/doxygen/) and place it at
+`build/doc/html/index.html` and `build/doc/html/mavtables.pdf` respectively.
+
+
 ## gh-pages
 
-Generate html documentation and publish to
+Generate html and pdf documentation and publish to
 [https://shamuproject.github.io/mavtables](https://shamuproject.github.io/mavtables).
 
 

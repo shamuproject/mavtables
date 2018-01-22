@@ -1,3 +1,4 @@
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
 CMAKE = cmake
 PREFIX ?= /usr/local
 COVERAGE = Off
@@ -5,7 +6,7 @@ COVERAGE = Off
 default: release
 
 install:
-	$(MAKE) -j8 -C build install
+	$(MAKE) -C build install
 
 release:
 	mkdir -p build
@@ -14,16 +15,19 @@ release:
 		-DENABLE_COVERAGE=$(COVERAGE) \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) ..
-	$(MAKE) -j8 -C build
+	$(MAKE) -C build
 
-debug: 
+debug: tags
 	mkdir -p build
 	cd build && $(CMAKE) \
 		-G"Unix Makefiles" \
 		-DENABLE_COVERAGE=$(COVERAGE) \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) ..
-	$(MAKE) -j8 -C build
+	$(MAKE) -C build
+
+tags:
+	ctags -R .
 
 test: unit_tests
 
@@ -32,17 +36,26 @@ unit_tests: debug
 
 coverage: COVERAGE = On
 coverage: test
-	$(MAKE) -j8 -C build lcov-geninfo
-	$(MAKE) -j8 -C build lcov-genhtml
-	gcovr -r . -e '.*catch.hpp' -e '.*fakeit.hpp'
+	$(MAKE) -C build lcov-geninfo
+	$(MAKE) -C build lcov-genhtml
+	gcovr -r . -e 'lib.*'
+
+linecheck:
+	grep -rIn --color '.\{81\}' src # limit to 80 columns
+	grep -rIn --color '.\{81\}' test # limit to 80 columns
 
 style:
 	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
+	$(MAKE) -f $(THIS_FILE) linecheck
 
-doc:
+html:
 	mkdir -p build
 	cd build && $(CMAKE) ..
-	$(MAKE) -j8 -C build doc
+	$(MAKE) -C build doc
+
+doc: html
+	$(MAKE) -C build/doc/latex
+	cp build/doc/latex/refman.pdf build/doc/html/mavtables.pdf
 
 gh-pages: doc
 	mkdir -p build

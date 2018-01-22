@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,23 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <cctype>
-#include "util.hpp"
+#ifndef CONNECTION_HPP_
+#define CONNECTION_HPP_
 
 
-/** \defgroup utility Utility Function
- *
- *  Utility functions that don't warrant their own file.
- */
-
-
-/** \brief Capitalize first letter of a string.
- *  \ingroup utility
- *  \bug Index error if given an empty string.
- */
-std::string capital_case(std::string str)
+class Connection
 {
-    str[0] = static_cast<char>(toupper(str[0]));
-    return str;
-}
+    public:
+        virtual ~Connection();
+};
+
+
+#endif // CONNECTION_HPP_

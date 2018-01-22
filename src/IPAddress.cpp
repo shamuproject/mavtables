@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -381,7 +381,6 @@ static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
         struct sockaddr_in *address_ptr = reinterpret_cast<struct sockaddr_in *>
                                               (result_ptr->ai_addr);
         unsigned long address = ntohl(address_ptr->sin_addr.s_addr);
-        // unsigned int port_ = ntohs(address_ptr->sin_port);
         addresses.insert(IPAddress(address, port));
     }
 

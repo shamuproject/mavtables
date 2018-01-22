@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
 
 #include <vector>
 #include <string>
@@ -104,28 +103,28 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  stats with the number of bits of the component ID (0 - 16) that must match
  *  from the left for an address to be in the subnet.
  *
- *  Below is a table relating the slash postfix to the subnet mask in <System
- *  mask>.<Component mask> notation.
+ *  Below is a table relating the slash postfix to the subnet mask in \<System
+ *  mask\>.\<Component mask\> notation.
  *
- *  | Mask with `/` | Mask with `\` | Postfix (#bits) |
- *  | -------------:| -------------:| ---------------:|
- *  |       255.255 |  out of range |              16 |
- *  |       255.254 |  out of range |              15 |
- *  |       255.252 |  out of range |              14 |
- *  |       255.248 |  out of range |              13 |
- *  |       255.240 |  out of range |              12 |
- *  |       255.224 |  out of range |              11 |
- *  |       255.192 |  out of range |              10 |
- *  |       255.128 |  out of range |               9 |
- *  |         255.0 |         0.255 |               8 |
- *  |         254.0 |         0.254 |               7 |
- *  |         252.0 |         0.252 |               6 |
- *  |         248.0 |         0.248 |               5 |
- *  |         240.0 |         0.240 |               4 |
- *  |         224.0 |         0.224 |               3 |
- *  |         192.0 |         0.192 |               2 |
- *  |         128.0 |         0.128 |               1 |
- *  |           0.0 |             0 |               0 |
+ *  | Mask with `/` | Mask with `\` | Postfix (\#bits) |
+ *  | -------------:| -------------:| ----------------:|
+ *  |       255.255 |  out of range |               16 |
+ *  |       255.254 |  out of range |               15 |
+ *  |       255.252 |  out of range |               14 |
+ *  |       255.248 |  out of range |               13 |
+ *  |       255.240 |  out of range |               12 |
+ *  |       255.224 |  out of range |               11 |
+ *  |       255.192 |  out of range |               10 |
+ *  |       255.128 |  out of range |                9 |
+ *  |         255.0 |         0.255 |                8 |
+ *  |         254.0 |         0.254 |                7 |
+ *  |         252.0 |         0.252 |                6 |
+ *  |         248.0 |         0.248 |                5 |
+ *  |         240.0 |         0.240 |                4 |
+ *  |         224.0 |         0.224 |                3 |
+ *  |         192.0 |         0.192 |                2 |
+ *  |         128.0 |         0.128 |                1 |
+ *  |           0.0 |             0 |                0 |
  *
  *  Some examples are:
  *
@@ -170,9 +169,9 @@ MAVSubnet::MAVSubnet(std::string subnet)
     }
 
     address_ = MAVAddress(parts[0]);
-
     // Determine format of subnet string.
     unsigned int slashmask;
+
     switch (parts[1].at(0))
     {
         case ':':

@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.3)
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 4)
+set (VERSION_PATCH 5)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -17,6 +17,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     add_compile_options (-Wno-c++98-c++11-compat-pedantic)
     add_compile_options (-Wno-disabled-macro-expansion)
     add_compile_options (-Wno-padded)
+    add_compile_options (-Wno-packed)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options ("$<$<CONFIG:DEBUG>:-Werror>")
     add_compile_options (-Wall -Wextra -Wpedantic)
@@ -35,12 +36,12 @@ add_subdirectory (lib)
 
 # mavtables
 add_executable (mavtables src/mavtables.cpp)
-target_link_libraries (mavtables ${Boost_LIBRARIES})
+target_link_libraries (mavtables ${Boost_LIBRARIES} MAVLink)
 install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
 add_executable (unit_tests test/CMakeLists.txt)
-target_link_libraries (unit_tests Catch FakeIt ${Boost_LIBRARIES})
+target_link_libraries (unit_tests Catch FakeIt ${Boost_LIBRARIES} MAVLink)
 add_test(NAME UnitTests COMMAND unit_tests)
 
 # add sources and evaluate test coverage

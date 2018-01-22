@@ -9,7 +9,8 @@ addressed and can be filtered based on source system/component and message type.
 
 ## Links
 
-* [Documentation](https://shamuproject.github.io/mavtables)
+* [HTML Documentation](https://shamuproject.github.io/mavtables)
+* [PDF Documentation](https://shamuproject.github.io/mavtables/mavtables.pdf)
 * [Download](https://github.com/shamuproject/mavtables/archive/master.zip)
 * [GitHub](https://github.com/shamuproject/mavtables)
 
@@ -20,9 +21,11 @@ In order to compile you will need the following packages:
 
 * GCC 7+ or Clang 5+ (needed for C++17 support)
 * [CMake](https://cmake.org/)
+* [Boost](https://www.boost.org/)
 
 __Clang is recommended when contributing to mavtables as it's warnings are
-more comprehensive.__
+more comprehensive.  However, GCC must be used when generating code coverage
+reports.__
 
 The following packages are only needed for development work:
 
@@ -42,6 +45,9 @@ The installation prefix is `/usr/local` by default but can be changed with
 $ make
 # make PREFIX=/desired/install/path install
 ```
+The makefile will download and use the default MAVLink implementation.  This can
+be overridden by setting the `MAVLINK_INCLUDE_PATH` environment variable to the
+directory containing a `mavlink.h` header file.
 
 
 ## Running
