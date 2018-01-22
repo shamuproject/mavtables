@@ -49,6 +49,11 @@ class Packet
          * \param other Packet to copy.
          */
         Packet(const Packet &other) = default;
+        /** Move constructor.
+         *
+         * \param other Packet to move from.
+         */
+        Packet(Packet &&other) = default;
         Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
                int priority = 0);
         virtual ~Packet();
@@ -94,6 +99,11 @@ class Packet
          * \param other Packet to copy.
          */
         Packet &operator=(const Packet &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other Packet to move from.
+         */
+        Packet &operator=(Packet &&other) = default;
 
 };
 

@@ -15,17 +15,19 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <catch.hpp>
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 #include <cstdint>
 #include <optional>
 
-#include "Packet.hpp"
+#include <catch.hpp>
+
+#include "util.hpp"
 #include "MAVAddress.hpp"
 #include "Connection.hpp"
-#include "util.hpp"
+#include "Packet.hpp"
 
 
 namespace
@@ -46,6 +48,7 @@ namespace
     {
         public:
             PacketTestClass(const PacketTestClass &other) = default;
+            PacketTestClass(PacketTestClass &&other) = default;
             PacketTestClass(
                 std::vector<uint8_t> data,
                 std::weak_ptr<Connection> connection,
@@ -74,6 +77,7 @@ namespace
                 return MAVAddress("2.71");
             }
             PacketTestClass &operator=(const PacketTestClass &other) = default;
+            PacketTestClass &operator=(PacketTestClass &&other) = default;
     };
 
 #ifdef __clang__
@@ -191,15 +195,51 @@ TEST_CASE("Packet's are copyable.", "[Packet]")
 }
 
 
+TEST_CASE("Packet's are movable.", "[Packet]")
+{
+    std::vector<uint8_t> data1 = {1, 3, 3, 7};
+    std::vector<uint8_t> data2 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    auto conn1 = std::make_shared<ConnectionTestClass>();
+    auto conn2 = std::make_shared<ConnectionTestClass>();
+    PacketTestClass a(data1, conn1, 1);
+    PacketTestClass b(data2, conn2, 2);
+    PacketTestClass a_moved = std::move(a);
+    PacketTestClass b_moved(std::move(b));
+    REQUIRE(a_moved.data() == data1);
+    REQUIRE(a_moved.connection().lock() == conn1);
+    REQUIRE(a_moved.priority() == 1);
+    REQUIRE(b_moved.data() == data2);
+    REQUIRE(b_moved.connection().lock() == conn2);
+    REQUIRE(b_moved.priority() == 2);
+}
+
+
 TEST_CASE("Packet's are assignable.", "[Packet]")
 {
     std::vector<uint8_t> data = {1, 3, 3, 7};
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketTestClass packet(data, conn, -10);
+    PacketTestClass packet_to_copy({}, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == data);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);
-    packet = PacketTestClass({}, std::weak_ptr<ConnectionTestClass>(), 10);
+    packet = packet_to_copy;
+    REQUIRE(packet.data() == std::vector<uint8_t>());
+    REQUIRE(packet.connection().lock() == nullptr);
+    REQUIRE(packet.priority() == 10);
+}
+
+
+TEST_CASE("Packet's are assignable (by move semantics).", "[Packet]")
+{
+    std::vector<uint8_t> data = {1, 3, 3, 7};
+    auto conn = std::make_shared<ConnectionTestClass>();
+    PacketTestClass packet(data, conn, -10);
+    PacketTestClass packet_to_move({}, std::weak_ptr<ConnectionTestClass>(), 10);
+    REQUIRE(packet.data() == data);
+    REQUIRE(packet.connection().lock() == conn);
+    REQUIRE(packet.priority() == -10);
+    packet = std::move(packet_to_move);
     REQUIRE(packet.data() == std::vector<uint8_t>());
     REQUIRE(packet.connection().lock() == nullptr);
     REQUIRE(packet.priority() == 10);
