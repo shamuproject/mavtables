@@ -31,7 +31,7 @@
  *  \param mask Two byte subnet mask, where the system mask is in the MSB and
  *      the component mask is in the LSB.
  *  \throws std::out_of_range if the mask is not between 0x0000 and 0xFFFF.
- * \sa TEMP \ref contains
+ *  \sa Check if a \ref MAVAddress is withing the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
     : address_(address)
@@ -40,8 +40,9 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
     if (mask > 0xFFFF)
     {
         std::ostringstream ss;
-        ss << "mask (0x" << std::hex << mask <<
-           ") is outside of the allowed range (0x0000 - 0xffff).";
+        ss << "mask (0x"
+           << std::uppercase << std::hex << mask << std::nouppercase
+           << ") is outside of the allowed range (0x0000 - 0xFFFF).";
         throw std::out_of_range(ss.str());
     }
 
@@ -51,16 +52,16 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
 
 /** Construct MAVLink subnet from an address, system mask, and component mask.
  *
- * \param address MAVLink address of subnet.
- * \param system_mask One byte subnet system mask with the bits set that must
+ *  \param address MAVLink address of subnet.
+ *  \param system_mask One byte subnet system mask with the bits set that must
  *      match the subnet address for a MAVLink address to be contained within
  *      the subnet.
- * \param component_mask One byte subnet component mask with the bits set that must
- *      match the subnet address for a MAVLink address to be contained within
- *      the subnet.
+ *  \param component_mask One byte subnet component mask with the bits set that
+ *      must match the subnet address for a MAVLink address to be contained
+ *      within the subnet.
  *  \throws std::out_of_range if the system and component masks are not each
  *      between 0x00 and 0xFF.
- * \sa TEMP \ref contains
+ *  \sa Check if a \ref MAVAddress is withing the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
                      unsigned int component_mask)
@@ -70,8 +71,9 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
     if (system_mask > 0xFF)
     {
         std::ostringstream ss;
-        ss << "system mask (0x" << std::hex << system_mask <<
-           ") is outside of the allowed range (0x00 - 0xff).";
+        ss << "System mask (0x"
+           << std::uppercase << std::hex << system_mask << std::nouppercase
+           << ") is outside of the allowed range (0x00 - 0xFF).";
         throw std::out_of_range(ss.str());
     }
 
@@ -79,8 +81,8 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
     if (component_mask > 0xFF)
     {
         std::ostringstream ss;
-        ss << "component mask (0x" << std::hex << component_mask <<
-           ") is outside of the allowed range (0x00 - 0xff).";
+        ss << "Component mask (0x" << std::hex << component_mask <<
+           ") is outside of the allowed range (0x00 - 0xFF).";
         throw std::out_of_range(ss.str());
     }
 
@@ -146,7 +148,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  \throws std::out_of_range if either the System ID or the component ID is out
  *      of range.
  *  \throws std::out_of_range if the mask or slash bits are out of range.
- *  \sa TEMP \ref contains
+ *  \sa Check if a \ref MAVAddress is withing the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(std::string subnet)
     : address_(0)
@@ -156,7 +158,6 @@ MAVSubnet::MAVSubnet(std::string subnet)
     boost::char_separator<char> sep("", ":/\\");
     boost::tokenizer<boost::char_separator<char>> tokens(subnet, sep);
 
-    // std::cout << "subnet:" << subnet << std::endl;
     for (auto i : tokens)
     {
         parts.push_back(i);
@@ -165,7 +166,8 @@ MAVSubnet::MAVSubnet(std::string subnet)
     // Ensure proper format.
     if (parts.size() != 3)
     {
-        throw std::invalid_argument("Invalid MAVLink subnet: \"" + subnet + "\"");
+        throw std::invalid_argument(
+            "Invalid MAVLink subnet: \"" + subnet + "\".");
     }
 
     address_ = MAVAddress(parts[0]);
@@ -174,32 +176,41 @@ MAVSubnet::MAVSubnet(std::string subnet)
 
     switch (parts[1].at(0))
     {
+        // Mask based subnet.
         case ':':
-            mask_ = MAVAddress(parts[2]).address();
+            try
+            {
+                mask_ = MAVAddress(parts[2]).address();
+            }
+            catch (std::invalid_argument)
+            {
+                throw std::invalid_argument(
+                    "Invalid MAVLink subnet: \"" + subnet + "\".");
+            }
             break;
 
+        // Forward slash based subnet (bits from left).
         case '/':
             std::istringstream(parts.at(2)) >> slashmask;
 
             if (slashmask > 16)
             {
                 throw std::out_of_range(
-                    "forward slash mask ("
-                    + std::to_string(slashmask)
+                    "Forward slash mask (" + std::to_string(slashmask)
                     + ") is outside of allowed range (0 - 16).");
             }
 
             mask_ = (0xFFFF << (16 - slashmask)) & 0xFFFF;
             break;
 
+        // Backward slash based subnet (bits from left of component).
         case '\\':
             std::istringstream(parts.at(2)) >> slashmask;
 
             if (slashmask > 8)
             {
                 throw std::out_of_range(
-                    "backslash mask ("
-                    + std::to_string(slashmask)
+                    "Backslash mask (" + std::to_string(slashmask)
                     + ") is outside of allowed range (0 - 8).");
             }
 
@@ -213,6 +224,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
  *
  *  \param address The MAVLink address to test.
  *  \retval true if \p address is part of the subnet.
+ *  \complexity \f$O(1)\f$
  */
 bool MAVSubnet::contains(const MAVAddress &address) const
 {
@@ -227,6 +239,7 @@ bool MAVSubnet::contains(const MAVAddress &address) const
  *  \param rhs The right hand side MAVLink subnet.
  *  \retval true if \p lhs and \p rhs are the same.
  *  \retval false if \p lhs and \p rhs are not the same.
+ *  \complexity \f$O(1)\f$
  */
 bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs)
 {
@@ -241,6 +254,7 @@ bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs)
  *  \param rhs The right hand side MAVLink subnet.
  *  \retval true if \p lhs and \p rhs are not the same.
  *  \retval false if \p lhs and \p rhs are the same.
+ *  \complexity \f$O(1)\f$
  */
 bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs)
 {
@@ -268,7 +282,6 @@ bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs)
  */
 std::ostream &operator<<(std::ostream &os, const MAVSubnet &mavsubnet)
 {
-    // std::cout << mavsubnet.address_ << " :---: " << std::hex << mavsubnet.mask_ << std::dec << std::endl;
     os << mavsubnet.address_;
 
     switch (mavsubnet.mask_)
