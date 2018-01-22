@@ -23,10 +23,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-extern "C"
-{
 #include "mavlink.h"
-}
 #include "Connection.hpp"
 #include "PacketVersion1.hpp"
 

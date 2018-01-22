@@ -24,10 +24,7 @@
 #include <memory>
 #include <cstdint>
 
-extern "C"
-{
 #include "mavlink.h"
-}
 #include "Connection.hpp"
 #include "Packet.hpp"
 
