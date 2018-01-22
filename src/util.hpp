@@ -31,8 +31,7 @@
  *  \tparam T Type of the number being converted to bytes.
  *  \param number Number to convert to bytes
  *  \return The array of bytes from the given number, in LSB order.
- *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type
- *      \ref T.
+ *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type \p T.
  */
 template <class ByteType = unsigned char, class T>
 std::array<ByteType, sizeof(T)> to_bytes(T number)

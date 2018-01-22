@@ -18,7 +18,7 @@
 #include "util.hpp"
 
 
-/** \defgroup utility Utility Function
+/** \defgroup utility Utility Functions
  *
  *  Utility functions that don't warrant their own file.
  */
