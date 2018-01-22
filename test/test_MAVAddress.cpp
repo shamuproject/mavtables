@@ -15,8 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <catch.hpp>
+#include <utility>
 #include <stdexcept>
+
+#include <catch.hpp>
 
 #include "util.hpp"
 #include "MAVAddress.hpp"
@@ -272,11 +274,33 @@ TEST_CASE("MAVAddress's are copyable.", "[MAVAddress]")
 }
 
 
+TEST_CASE("MAVAddress's are movable.", "[MAVAddress]")
+{
+    MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
+    MAVAddress a_moved = std::move(a);
+    MAVAddress b_moved(std::move(b));
+    REQUIRE(a_moved == MAVAddress(0, 0));
+    REQUIRE(b_moved == MAVAddress(255, 255));
+}
+
+
 TEST_CASE("MAVAddress's are assignable.", "[MAVAddress]")
 {
     MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
     REQUIRE(a == MAVAddress(0, 0));
-    a = MAVAddress(255, 255);
+    a = b;
+    REQUIRE(a == MAVAddress(255, 255));
+}
+
+
+TEST_CASE("MAVAddress's are assignable (by move semantics).", "[MAVAddress]")
+{
+    MAVAddress a(0, 0);
+    MAVAddress b(255, 255);
+    REQUIRE(a == MAVAddress(0, 0));
+    a = std::move(b);
     REQUIRE(a == MAVAddress(255, 255));
 }
 

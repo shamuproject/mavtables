@@ -15,6 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <utility>
+#include <stdexcept>
+
 #include <catch.hpp>
 
 #include "util.hpp"
