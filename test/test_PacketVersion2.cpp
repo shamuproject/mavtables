@@ -14,14 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <catch.hpp>
+
 #include <string>
 #include <vector>
 #include <memory>
 #include <cstdint>
+#include <utility>
 #include <optional>
 #include <stdexcept>
 
+#include <catch.hpp>
 #include <boost/range/irange.hpp>
 
 #include "PacketVersion2.hpp"
@@ -30,6 +32,7 @@
 #include "mavlink.h"
 #include "macros.hpp"
 #include "util.hpp"
+
 
 namespace
 {
@@ -577,16 +580,56 @@ TEST_CASE("PacketVersion2's are copyable.", "[PacketVersion2]")
 }
 
 
+TEST_CASE("PacketVersion2's are movable.", "[PacketVersion2]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping());
+    auto conn1 = std::make_shared<ConnectionTestClass>();
+    auto conn2 = std::make_shared<ConnectionTestClass>();
+    PacketVersion2 a(heartbeat, conn1, 1);
+    PacketVersion2 b(ping, conn2, 2);
+    PacketVersion2 a_moved = std::move(a);
+    PacketVersion2 b_moved(std::move(b));
+    REQUIRE(a_moved.data() == heartbeat);
+    REQUIRE(a_moved.connection().lock() == conn1);
+    REQUIRE(a_moved.priority() == 1);
+    REQUIRE(b_moved.data() == ping);
+    REQUIRE(b_moved.connection().lock() == conn2);
+    REQUIRE(b_moved.priority() == 2);
+}
+
+
 TEST_CASE("PacketVersion2's are assignable.", "[PacketVersion2]")
 {
     auto heartbeat = to_vector(Heartbeat());
     auto ping = to_vector(Ping(), true);
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketVersion2 packet(heartbeat, conn, -10);
+    PacketVersion2 packet_to_copy(
+        ping, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == heartbeat);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);
-    packet = PacketVersion2(ping, std::weak_ptr<ConnectionTestClass>(), 10);
+    packet = packet_to_copy;
+    REQUIRE(packet.data() == ping);
+    REQUIRE(packet.connection().lock() == nullptr);
+    REQUIRE(packet.priority() == 10);
+}
+
+
+TEST_CASE("PacketVersion2's are assignable (with move semantics).",
+          "[PacketVersion2]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping(), true);
+    auto conn = std::make_shared<ConnectionTestClass>();
+    PacketVersion2 packet(heartbeat, conn, -10);
+    PacketVersion2 packet_to_move(
+        ping, std::weak_ptr<ConnectionTestClass>(), 10);
+    REQUIRE(packet.data() == heartbeat);
+    REQUIRE(packet.connection().lock() == conn);
+    REQUIRE(packet.priority() == -10);
+    packet = std::move(packet_to_move);
     REQUIRE(packet.data() == ping);
     REQUIRE(packet.connection().lock() == nullptr);
     REQUIRE(packet.priority() == 10);
