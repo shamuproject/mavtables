@@ -219,7 +219,8 @@ TEST_CASE("Packet's are assignable.", "[Packet]")
     std::vector<uint8_t> data = {1, 3, 3, 7};
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketTestClass packet(data, conn, -10);
-    PacketTestClass packet_to_copy({}, std::weak_ptr<ConnectionTestClass>(), 10);
+    PacketTestClass packet_to_copy(
+        {}, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == data);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);
@@ -235,7 +236,8 @@ TEST_CASE("Packet's are assignable (by move semantics).", "[Packet]")
     std::vector<uint8_t> data = {1, 3, 3, 7};
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketTestClass packet(data, conn, -10);
-    PacketTestClass packet_to_move({}, std::weak_ptr<ConnectionTestClass>(), 10);
+    PacketTestClass packet_to_move(
+        {}, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == data);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);

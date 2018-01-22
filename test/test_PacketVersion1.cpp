@@ -377,7 +377,8 @@ TEST_CASE("PacketVersion1's are assignable.", "[PacketVersion1]")
     auto ping = to_vector(Ping());
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketVersion1 packet(heartbeat, conn, -10);
-    PacketVersion1 packet_to_copy(ping, std::weak_ptr<ConnectionTestClass>(), 10);
+    PacketVersion1 packet_to_copy(
+        ping, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == heartbeat);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);
@@ -395,7 +396,8 @@ TEST_CASE("PacketVersion1's are assignable (with move semantics).",
     auto ping = to_vector(Ping());
     auto conn = std::make_shared<ConnectionTestClass>();
     PacketVersion1 packet(heartbeat, conn, -10);
-    PacketVersion1 packet_to_move(ping, std::weak_ptr<ConnectionTestClass>(), 10);
+    PacketVersion1 packet_to_move(
+        ping, std::weak_ptr<ConnectionTestClass>(), 10);
     REQUIRE(packet.data() == heartbeat);
     REQUIRE(packet.connection().lock() == conn);
     REQUIRE(packet.priority() == -10);
