@@ -32,7 +32,7 @@ extern "C"
 #include "Packet.hpp"
 
 
-/** A MAVLink packet with the version 2 wire protocol.
+/** A MAVLink packet with the version 1 wire protocol.
  */
 class PacketVersion1 : public Packet
 {
