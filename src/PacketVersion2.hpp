@@ -42,7 +42,7 @@ class PacketVersion2 : public Packet
     public:
         /** Copy constructor.
          *
-         * \param other Packet to copy.
+         * \param other PacketVersion2 to copy.
          */
         PacketVersion2(const PacketVersion2 &other) = default;
         PacketVersion2(
@@ -56,7 +56,7 @@ class PacketVersion2 : public Packet
         virtual std::optional<MAVAddress> dest() const;
         /** Assignment operator.
          *
-         * \param other Packet to copy.
+         * \param other PacketVersion2 to copy.
          */
         PacketVersion2 &operator=(const PacketVersion2 &other) = default;
 };

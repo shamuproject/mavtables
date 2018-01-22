@@ -32,7 +32,7 @@ extern "C"
 #include "Packet.hpp"
 
 
-/** A MAVLink packet with the version 2 wire protocol.
+/** A MAVLink packet with the version 1 wire protocol.
  */
 class PacketVersion1 : public Packet
 {
@@ -42,7 +42,7 @@ class PacketVersion1 : public Packet
     public:
         /** Copy constructor.
          *
-         * \param other Packet to copy.
+         * \param other PacketVersion1 to copy.
          */
         PacketVersion1(const PacketVersion1 &other) = default;
         PacketVersion1(
@@ -56,7 +56,7 @@ class PacketVersion1 : public Packet
         virtual std::optional<MAVAddress> dest() const;
         /** Assignment operator.
          *
-         * \param other Packet to copy.
+         * \param other PacketVersion1 to copy.
          */
         PacketVersion1 &operator=(const PacketVersion1 &other) = default;
 };
