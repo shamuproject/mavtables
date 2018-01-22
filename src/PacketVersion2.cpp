@@ -119,9 +119,9 @@ unsigned long PacketVersion2::id() const
 
 /** \copydoc Packet::name()
  *
+ *  \throws std::runtime_error If the packet data has an invalid ID.
  *  \complexity \f$O(log(n))\f$ where \f$n\f$ is the total number of MAVLink
  *      messages.
- *  \throws std::runtime_error If the packet data has an invalid ID.
  */
 std::string PacketVersion2::name() const
 {
@@ -151,11 +151,11 @@ MAVAddress PacketVersion2::source() const
 
 /** \copydoc Packet::dest()
  *
+ *  \throws std::runtime_error If the packet data has an invalid ID.
  *  \complexity \f$O(1)\f$
  *  \thanks The [mavlink-router](https://github.com/intel/mavlink-router)
  *      project for an example of how to extract the destination address.
  *
- *  \throws std::runtime_error If the packet data has an invalid ID.
  */
 std::optional<MAVAddress> PacketVersion2::dest() const
 {

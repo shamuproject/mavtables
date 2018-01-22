@@ -116,9 +116,9 @@ unsigned long PacketVersion1::id() const
 
 /** \copydoc Packet::name()
  *
+ *  \throws std::runtime_error If the packet data has an invalid ID.
  *  \complexity \f$O(log(n))\f$ where \f$n\f$ is the total number of MAVLink
  *      messages.
- *  \throws std::runtime_error If the packet data has an invalid ID.
  */
 std::string PacketVersion1::name() const
 {
