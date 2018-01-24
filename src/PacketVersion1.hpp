@@ -36,9 +36,6 @@ namespace packet_v1
      */
     class Packet : public ::Packet
     {
-        private:
-            const struct mavlink_packet_version1_header *header_() const;
-
         public:
             /** Copy constructor.
              *
@@ -71,6 +68,14 @@ namespace packet_v1
             Packet &operator=(Packet &&other) = default;
     };
 
+
+    bool is_magic(uint8_t byte);
+    bool header_complete(const std::vector<uint8_t> &data);
+    bool packet_complete(const std::vector<uint8_t> &data);
+    const struct mavlink_packet_version1_header *header(
+        const std::vector<uint8_t> &data);
+
 }
+
 
 #endif // PACKETVERSION1_HPP_

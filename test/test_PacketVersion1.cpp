@@ -179,11 +179,11 @@ TEST_CASE("packet_v1::Packet's can be constructed.", "[packet_v1::Packet]")
         REQUIRE_THROWS_AS(packet_v1::Packet({}, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v1::Packet({}, conn),
-            "Packet (0 bytes) is shorter than a v1.0 header (6 bytes).");
-        REQUIRE_THROWS_AS(packet_v1::Packet({1, 2, 3, 4, 5}, conn),
+            "Packet is empty.");
+        REQUIRE_THROWS_AS(packet_v1::Packet({0xFE, 2, 3, 4, 5}, conn),
                           std::length_error);
         REQUIRE_THROWS_WITH(
-            packet_v1::Packet({1, 2, 3, 4, 5}, conn),
+            packet_v1::Packet({0xFE, 2, 3, 4, 5}, conn),
             "Packet (5 bytes) is shorter than a v1.0 header (6 bytes).");
     }
     SECTION("And ensures packets begins with the magic byte (0xFE).")
