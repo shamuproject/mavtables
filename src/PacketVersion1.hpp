@@ -29,44 +29,48 @@
 #include "Packet.hpp"
 
 
-/** A MAVLink packet with the version 1 wire protocol.
- */
-class PacketVersion1 : public Packet
+namespace packet_v1
 {
-    private:
-        const struct mavlink_packet_version1_header *header_() const;
 
-    public:
-        /** Copy constructor.
-         *
-         *  \param other PacketVersion1 to copy.
-         */
-        PacketVersion1(const PacketVersion1 &other) = default;
-        /** Move constructor.
-         *
-         *  \param other PacketVersion1 to move from.
-         */
-        PacketVersion1(PacketVersion1 &&other) = default;
-        PacketVersion1(
-            std::vector<uint8_t> data,
-            std::weak_ptr<Connection> connection,
-            int priority = 0);
-        virtual unsigned int version() const;
-        virtual unsigned long id() const;
-        virtual std::string name() const;
-        virtual MAVAddress source() const;
-        virtual std::optional<MAVAddress> dest() const;
-        /** Assignment operator.
-         *
-         *  \param other PacketVersion1 to copy.
-         */
-        PacketVersion1 &operator=(const PacketVersion1 &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         *  \param other PacketVersion1 to move from.
-         */
-        PacketVersion1 &operator=(PacketVersion1 &&other) = default;
-};
+    /** A MAVLink packet with the version 1 wire protocol.
+     */
+    class Packet : public ::Packet
+    {
+        private:
+            const struct mavlink_packet_version1_header *header_() const;
 
+        public:
+            /** Copy constructor.
+             *
+             *  \param other Packet to copy.
+             */
+            Packet(const Packet &other) = default;
+            /** Move constructor.
+             *
+             *  \param other Packet to move from.
+             */
+            Packet(Packet &&other) = default;
+            Packet(
+                std::vector<uint8_t> data,
+                std::weak_ptr<Connection> connection,
+                int priority = 0);
+            virtual unsigned int version() const;
+            virtual unsigned long id() const;
+            virtual std::string name() const;
+            virtual MAVAddress source() const;
+            virtual std::optional<MAVAddress> dest() const;
+            /** Assignment operator.
+             *
+             *  \param other Packet to copy.
+             */
+            Packet &operator=(const Packet &other) = default;
+            /** Assignment operator (by move semantics).
+             *
+             *  \param other Packet to move from.
+             */
+            Packet &operator=(Packet &&other) = default;
+    };
+
+}
 
 #endif // PACKETVERSION1_HPP_

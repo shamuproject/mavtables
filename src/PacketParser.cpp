@@ -31,7 +31,7 @@
  *  \param priority Set the default packet priority (default is 0).
  */
 PacketParser::PacketParser(
-        std::weak_ptr<Connection> connection, int priority)
+    std::weak_ptr<Connection> connection, int priority)
     : connection_(std::move(connection)), priority_(priority)
 {
     buffer_.reserve(MAVLINK_MAX_PACKET_LEN);
@@ -45,14 +45,17 @@ PacketParser::PacketParser(
  *
  *  \param byte A byte from the MAVLink wire protocol.
  *  \returns A complete v1.0 or v2.0 packet.  If the parser has not yet parsed a
- *      complete packet \ref nullptr is returned.
+ *      complete packet, nullptr is returned.
  */
 std::unique_ptr<Packet>  PacketParser::parse_byte(uint8_t byte)
 {
     (void)byte;
-    if (priority_){
+
+    if (priority_)
+    {
         return nullptr;
-    } else
+    }
+    else
     {
         return nullptr;
     }
