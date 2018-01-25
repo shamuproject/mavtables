@@ -309,37 +309,22 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(
                 to_vector(param_ext_request_list, true), conn, +10));
     }
-    SECTION("And ensures a complete header is given (without signature).")
+    SECTION("And ensures a complete header is given.")
     {
         // 0 length packet.
         REQUIRE_THROWS_AS(packet_v2::Packet({}, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet({}, conn),
-            "Packet (0 bytes) is shorter than a v2.0 header (10 bytes).");
+            "Packet is empty.");
         // Packet short 1 byte.
         REQUIRE_THROWS_AS(
-            packet_v2::Packet({1, 2, 3, 4, 5, 6, 7, 8, 9}, conn),
+            packet_v2::Packet({0xFD, 2, 3, 4, 5, 6, 7, 8, 9}, conn),
             std::length_error);
         REQUIRE_THROWS_WITH(
-            packet_v2::Packet({1, 2, 3, 4, 5, 6, 7, 8, 9}, conn),
+            packet_v2::Packet({0xFD, 2, 3, 4, 5, 6, 7, 8, 9}, conn),
             "Packet (9 bytes) is shorter than a v2.0 header (10 bytes).");
     }
-    SECTION("And ensures a complete header is given (with signature).")
-    {
-        // 0 length packet.
-        REQUIRE_THROWS_AS(packet_v2::Packet({}, conn), std::length_error);
-        REQUIRE_THROWS_WITH(
-            packet_v2::Packet({}, conn),
-            "Packet (0 bytes) is shorter than a v2.0 header (10 bytes).");
-        // Packet short 1 byte.
-        REQUIRE_THROWS_AS(
-            packet_v2::Packet({1, 2, 3, 4, 5, 6, 7, 8, 9}, conn, true),
-            std::length_error);
-        REQUIRE_THROWS_WITH(
-            packet_v2::Packet({1, 2, 3, 4, 5, 6, 7, 8, 9}, conn, true),
-            "Packet (9 bytes) is shorter than a v2.0 header (10 bytes).");
-    }
-    SECTION("And ensures packets begins with the magic byte (0xFE).")
+    SECTION("And ensures packets begins with the magic byte (0xFD).")
     {
         heartbeat.magic = 0xBC;
         REQUIRE_THROWS_AS(
@@ -425,7 +410,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(param_ext_request_list_data, conn),
             "Packet is 13 bytes, should be 14 bytes.");
     }
-    SECTION("And ensures the packet is the correct length (wit signature).")
+    SECTION("And ensures the packet is the correct length (with signature).")
     {
         // HEARTBEAT (no target system/component).
         auto heartbeat_data = to_vector(heartbeat, true);
@@ -434,7 +419,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(heartbeat_data, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(heartbeat_data, conn),
-            "Packet is 35 bytes, should be 34 bytes.");
+            "Signed packet is 35 bytes, should be 34 bytes.");
         // PING (with target system/component).
         auto ping_data = to_vector(ping, true);
         ping_data.pop_back();
@@ -442,7 +427,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(ping_data, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(ping_data, conn),
-            "Packet is 38 bytes, should be 39 bytes.");
+            "Signed packet is 38 bytes, should be 39 bytes.");
         // SET_MODE (target system only, no target component).
         auto set_mode_data = to_vector(set_mode, true);
         set_mode_data.push_back(0x00);
@@ -450,7 +435,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(set_mode_data, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(set_mode_data, conn),
-            "Packet is 32 bytes, should be 31 bytes.");
+            "Signed packet is 32 bytes, should be 31 bytes.");
         // PARAM_REQUEST_READ (trimmed out, 0.0, system/component).
         auto mission_set_current_data = to_vector(mission_set_current, true);
         mission_set_current_data.pop_back();
@@ -459,7 +444,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(mission_set_current_data, conn),
-            "Packet is 26 bytes, should be 27 bytes.");
+            "Signed packet is 26 bytes, should be 27 bytes.");
         // ENCAPSULATED_DATA (longest packet).
         auto encapsulated_data_data = to_vector(encapsulated_data, true);
         encapsulated_data_data.push_back(0x00);
@@ -467,7 +452,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(encapsulated_data_data, conn), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(encapsulated_data_data, conn),
-            "Packet is 281 bytes, should be 280 bytes.");
+            "Signed packet is 281 bytes, should be 280 bytes.");
         // PARAM_EXT_REQUEST_LIST (message ID beyond 255).
         auto param_ext_request_list_data =
             to_vector(param_ext_request_list, true);
@@ -477,7 +462,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(param_ext_request_list_data, conn),
-            "Packet is 26 bytes, should be 27 bytes.");
+            "Signed packet is 26 bytes, should be 27 bytes.");
     }
 }
 

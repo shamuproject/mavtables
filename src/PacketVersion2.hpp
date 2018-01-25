@@ -71,6 +71,13 @@ namespace packet_v2
             Packet &operator=(Packet &&other) = default;
     };
 
+    bool is_magic(uint8_t byte);
+    bool is_signed(const std::vector<uint8_t> &data);
+    bool header_complete(const std::vector<uint8_t> &data);
+    bool packet_complete(const std::vector<uint8_t> &data);
+    const struct mavlink_packet_version2_header *header(
+        const std::vector<uint8_t> &data);
+
 }
 
 
