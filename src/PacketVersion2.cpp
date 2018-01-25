@@ -53,27 +53,30 @@ namespace packet_v2
             throw std::length_error("Packet is empty.");
         }
 
-        // Verify the magic number.
-        if (!is_magic(header(packet_data)->magic))
-        {
-            std::stringstream ss;
-            ss << "Invalid packet starting byte (0x"
-               << std::uppercase << std::hex
-               << static_cast<unsigned int>(header(packet_data)->magic)
-               << std::nouppercase << "), v2.0 packets should start with 0x"
-               << std::uppercase << std::hex << MAVLINK_STX
-               << std::nouppercase << ".";
-            throw std::invalid_argument(ss.str());
-        }
-
         // Check that a complete header was given (including magic number).
         if (!header_complete(packet_data))
         {
-            throw std::length_error(
-                "Packet (" + std::to_string(packet_data.size()) +
-                " bytes) is shorter than a v2.0 header (" +
-                std::to_string(MAVLINK_NUM_HEADER_BYTES) +
-                " bytes).");
+            // Could be the magic number.
+            if (!is_magic(packet_data.front()))
+            {
+                std::stringstream ss;
+                ss << "Invalid packet starting byte (0x"
+                   << std::uppercase << std::hex
+                   << static_cast<unsigned int>(packet_data.front())
+                   << std::nouppercase << "), v2.0 packets should start with 0x"
+                   << std::uppercase << std::hex << MAVLINK_STX
+                   << std::nouppercase << ".";
+                throw std::invalid_argument(ss.str());
+            }
+            // Otherwise the packet is not long enough.
+            else
+            {
+                throw std::length_error(
+                    "Packet (" + std::to_string(packet_data.size()) +
+                    " bytes) is shorter than a v2.0 header (" +
+                    std::to_string(MAVLINK_NUM_HEADER_BYTES) +
+                    " bytes).");
+            }
         }
 
         // Verify the message ID.
@@ -244,16 +247,18 @@ namespace packet_v2
     }
 
 
+    /** Determine if a MAVLink v2.0 packet is signed or not.
+     *
+     *  \relates
+     *  \throws std::invalid_argument Header is not complete or is invalid.
+     *  \throws std::length_error If packet data is not of correct length.
+     */
     bool is_signed(const std::vector<uint8_t> &data)
     {
         // Check that a complete header was given (including magic number).
         if (!header_complete(data))
         {
-            throw std::length_error(
-                "Packet (" + std::to_string(data.size()) +
-                " bytes) is shorter than a v2.0 header (" +
-                std::to_string(MAVLINK_NUM_HEADER_BYTES) +
-                " bytes).");
+            throw std::invalid_argument("Header is incomplete or invalid.");
         }
 
         return (header(data)->incompat_flags & MAVLINK_IFLAG_SIGNED);
@@ -271,7 +276,7 @@ namespace packet_v2
     bool header_complete(const std::vector<uint8_t> &data)
     {
         return (data.size() >= MAVLINK_NUM_HEADER_BYTES) &&
-               (is_magic(header(data)->magic));
+               (is_magic(data.front()));
     }
 
 
@@ -303,12 +308,17 @@ namespace packet_v2
     /** Cast data as a v2.0 packet header structure pointer.
      *
      *  \return A pointer to the given data, cast to a v2.0 header structure.
+     *      If an incomplete header is given a nullptr will be returned.
      */
     const struct mavlink_packet_version2_header *header(
         const std::vector<uint8_t> &data)
     {
-        return reinterpret_cast<const struct mavlink_packet_version2_header *>
-               (&(data[0]));
+        if (header_complete(data))
+        {
+            return reinterpret_cast<
+                const struct mavlink_packet_version2_header *>(&(data[0]));
+        }
+        return nullptr;
     }
 
 }

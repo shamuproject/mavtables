@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <catch.hpp>
 #include <string>
 #include <vector>
 #include <memory>
@@ -23,6 +22,9 @@
 #include <cstdint>
 #include <optional>
 #include <stdexcept>
+
+#include <catch.hpp>
+#include <boost/range/irange.hpp>
 
 #include "PacketVersion1.hpp"
 #include "MAVAddress.hpp"
@@ -143,6 +145,184 @@ namespace
         return data;
     }
 
+}
+
+
+TEST_CASE("'packet_v1::is_magic' determines if a byte is the v1.0 packet "
+          "magic byte.", "[packet_v1]")
+{
+    REQUIRE_FALSE(packet_v1::is_magic(0xAD));
+    REQUIRE_FALSE(packet_v1::is_magic(0xBC));
+    REQUIRE(packet_v1::is_magic(0xFE));
+    REQUIRE_FALSE(packet_v1::is_magic(0xFD));
+}
+
+
+TEST_CASE("'packet_v1::header_complete' determines whether the given bytes "
+          "at least represent a complete header.", "[packet_v1]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode());
+    auto encapsulated_data = to_vector(EncapsulatedData());
+    SECTION("Returns true when at least a complete header is given.")
+    {
+        heartbeat.resize(6);
+        ping.resize(10);
+        set_mode.resize(15);
+        REQUIRE(packet_v1::header_complete(heartbeat));
+        REQUIRE(packet_v1::header_complete(ping));
+        REQUIRE(packet_v1::header_complete(set_mode));
+        REQUIRE(packet_v1::header_complete(encapsulated_data));
+    }
+    SECTION("Returns false when an incomplete header is given.")
+    {
+        heartbeat.resize(5);
+        ping.resize(4);
+        set_mode.resize(3);
+        encapsulated_data.resize(0);
+        REQUIRE_FALSE(packet_v1::header_complete(heartbeat));
+        REQUIRE_FALSE(packet_v1::header_complete(ping));
+        REQUIRE_FALSE(packet_v1::header_complete(set_mode));
+        REQUIRE_FALSE(packet_v1::header_complete(encapsulated_data));
+    }
+    SECTION("Returns false when the magic byte is wrong.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFD;
+        encapsulated_data.front() = 0xFD;
+        REQUIRE_FALSE(packet_v1::header_complete(heartbeat));
+        REQUIRE_FALSE(packet_v1::header_complete(ping));
+        REQUIRE_FALSE(packet_v1::header_complete(set_mode));
+        REQUIRE_FALSE(packet_v1::header_complete(encapsulated_data));
+    }
+}
+
+
+TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
+          "header data.", "[packet_v1]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode());
+    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto conn = std::make_shared<ConnectionTestClass>();
+    SECTION("Header contains a magic value.")
+    {
+        REQUIRE(packet_v1::header(heartbeat)->magic == 0xFE);
+        REQUIRE(packet_v1::header(ping)->magic == 0xFE);
+        REQUIRE(packet_v1::header(set_mode)->magic == 0xFE);
+        REQUIRE(packet_v1::header(encapsulated_data)->magic == 0xFE);
+    }
+    SECTION("Header stores the payload length.")
+    {
+        REQUIRE(packet_v1::header(heartbeat)->len == 9);
+        REQUIRE(packet_v1::header(ping)->len == 14);
+        REQUIRE(packet_v1::header(set_mode)->len == 6);
+        REQUIRE(packet_v1::header(encapsulated_data)->len == 255);
+    }
+    SECTION("Header has a sequence number.")
+    {
+        REQUIRE(packet_v1::header(heartbeat)->seq == 0);
+        REQUIRE(packet_v1::header(ping)->seq == 0);
+        REQUIRE(packet_v1::header(set_mode)->seq == 0);
+        REQUIRE(packet_v1::header(encapsulated_data)->seq == 0);
+    }
+    SECTION("Header has a system ID.")
+    {
+        REQUIRE(packet_v1::header(heartbeat)->sysid == 1);
+        REQUIRE(packet_v1::header(ping)->sysid == 60);
+        REQUIRE(packet_v1::header(set_mode)->sysid == 70);
+        REQUIRE(packet_v1::header(encapsulated_data)->sysid == 255);
+    }
+    SECTION("Header has a component ID.")
+    {
+        REQUIRE(packet_v1::header(heartbeat)->compid == 0);
+        REQUIRE(packet_v1::header(ping)->compid == 40);
+        REQUIRE(packet_v1::header(set_mode)->compid == 30);
+        REQUIRE(packet_v1::header(encapsulated_data)->compid == 1);
+    }
+    SECTION("Header has a message ID.")
+    {
+        REQUIRE(packet_v1::header(heartbeat)->msgid == 0);
+        REQUIRE(packet_v1::header(ping)->msgid == 4);
+        REQUIRE(packet_v1::header(set_mode)->msgid == 11);
+        REQUIRE(packet_v1::header(encapsulated_data)->msgid == 131);
+    }
+    SECTION("Returns false when an incomplete header is given.")
+    {
+        heartbeat.resize(5);
+        ping.resize(4);
+        set_mode.resize(3);
+        encapsulated_data.resize(0);
+        REQUIRE(packet_v1::header(heartbeat) == nullptr);
+        REQUIRE(packet_v1::header(ping) == nullptr);
+        REQUIRE(packet_v1::header(set_mode) == nullptr);
+        REQUIRE(packet_v1::header(encapsulated_data) == nullptr);
+    }
+    SECTION("Returns false when the magic byte is wrong.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFD;
+        encapsulated_data.front() = 0xFD;
+        REQUIRE(packet_v1::header(heartbeat) == nullptr);
+        REQUIRE(packet_v1::header(ping) == nullptr);
+        REQUIRE(packet_v1::header(set_mode) == nullptr);
+        REQUIRE(packet_v1::header(encapsulated_data) == nullptr);
+    }
+}
+
+
+TEST_CASE("'packet_v1::packet_complete' determines whether the given bytes "
+          "represent a complete packet.", "[packet_v1]")
+{
+    auto heartbeat = to_vector(Heartbeat());
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode());
+    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto conn = std::make_shared<ConnectionTestClass>();
+    SECTION("Returns true when a complete packet is given.")
+    {
+        REQUIRE(packet_v1::packet_complete(heartbeat));
+        REQUIRE(packet_v1::packet_complete(ping));
+        REQUIRE(packet_v1::packet_complete(set_mode));
+        REQUIRE(packet_v1::packet_complete(encapsulated_data));
+    }
+    SECTION("Returns false when the magic byte is wrong.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFD;
+        encapsulated_data.front() = 0xFD;
+        REQUIRE_FALSE(packet_v1::packet_complete(heartbeat));
+        REQUIRE_FALSE(packet_v1::packet_complete(ping));
+        REQUIRE_FALSE(packet_v1::packet_complete(set_mode));
+        REQUIRE_FALSE(packet_v1::packet_complete(encapsulated_data));
+    }
+    SECTION("Returns false when the packet is too short.")
+    {
+        heartbeat.pop_back();
+        ping.pop_back();
+        set_mode.pop_back();
+        encapsulated_data.pop_back();
+        REQUIRE_FALSE(packet_v1::packet_complete(heartbeat));
+        REQUIRE_FALSE(packet_v1::packet_complete(ping));
+        REQUIRE_FALSE(packet_v1::packet_complete(set_mode));
+        REQUIRE_FALSE(packet_v1::packet_complete(encapsulated_data));
+    }
+    SECTION("Returns false when the packet is too long.")
+    {
+        heartbeat.push_back(0x00);
+        ping.push_back(0x00);
+        set_mode.push_back(0x00);
+        encapsulated_data.push_back(0x00);
+        REQUIRE_FALSE(packet_v1::packet_complete(heartbeat));
+        REQUIRE_FALSE(packet_v1::packet_complete(ping));
+        REQUIRE_FALSE(packet_v1::packet_complete(set_mode));
+        REQUIRE_FALSE(packet_v1::packet_complete(encapsulated_data));
+    }
 }
 
 
@@ -507,183 +687,4 @@ TEST_CASE("packet_v1::Packet's are printable.", "[packet_v1::Packet]")
             "SET_MODE (#11) from 70.30 to 123.0 (v1.0)");
     REQUIRE(str(packet_v1::Packet(encapsulated_data, conn)) ==
             "ENCAPSULATED_DATA (#131) from 255.1 (v1.0)");
-}
-
-
-TEST_CASE("'is_magic' determines if a byte is the v1.0 packet magic byte.",
-        "[packet_v1]")
-{
-    REQUIRE_FALSE(packet_v1::is_magic(0xAD));
-    REQUIRE_FALSE(packet_v1::is_magic(0xBC));
-    REQUIRE(packet_v1::is_magic(0xFE));
-    REQUIRE_FALSE(packet_v1::is_magic(0xFD));
-}
-
-
-TEST_CASE("'header_complete' determines wheather the given bytes "
-          "at least represent a complete header.", "[packet_v1]")
-{
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
-    auto conn = std::make_shared<ConnectionTestClass>();
-    SECTION("Returns true when at least a complete header is given.")
-    {
-        heartbeat.resize(6);
-        ping.resize(10);
-        set_mode.resize(15);
-        REQUIRE(packet_v1::header_complete(heartbeat));
-        REQUIRE(packet_v1::header_complete(ping));
-        REQUIRE(packet_v1::header_complete(set_mode));
-        REQUIRE(packet_v1::header_complete(encapsulated_data));
-    }
-    SECTION("Returns false when an incomplete header is given.")
-    {
-        heartbeat.resize(5);
-        ping.resize(4);
-        set_mode.resize(3);
-        encapsulated_data.resize(0);
-        REQUIRE_FALSE(packet_v1::header_complete(heartbeat));
-        REQUIRE_FALSE(packet_v1::header_complete(ping));
-        REQUIRE_FALSE(packet_v1::header_complete(set_mode));
-        REQUIRE_FALSE(packet_v1::header_complete(encapsulated_data));
-    }
-    SECTION("Returns false when the magic byte is wrong.")
-    {
-        heartbeat.front() = 0xAD;
-        ping.front() = 0xBC;
-        set_mode.front() = 0xFD;
-        encapsulated_data.front() = 0xFD;
-        REQUIRE_FALSE(packet_v1::header_complete(heartbeat));
-        REQUIRE_FALSE(packet_v1::header_complete(ping));
-        REQUIRE_FALSE(packet_v1::header_complete(set_mode));
-        REQUIRE_FALSE(packet_v1::header_complete(encapsulated_data));
-    }
-}
-
-
-TEST_CASE("'packet_complete' determines wheather the given bytes represent a "
-          "complete packet.", "[packet_v1]")
-{
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
-    auto conn = std::make_shared<ConnectionTestClass>();
-    SECTION("Returns true when a complete packet is given.")
-    {
-        REQUIRE(packet_v1::packet_complete(heartbeat));
-        REQUIRE(packet_v1::packet_complete(ping));
-        REQUIRE(packet_v1::packet_complete(set_mode));
-        REQUIRE(packet_v1::packet_complete(encapsulated_data));
-    }
-    SECTION("Returns false when the magic byte is wrong.")
-    {
-        heartbeat.front() = 0xAD;
-        ping.front() = 0xBC;
-        set_mode.front() = 0xFD;
-        encapsulated_data.front() = 0xFD;
-        REQUIRE_FALSE(packet_v1::packet_complete(heartbeat));
-        REQUIRE_FALSE(packet_v1::packet_complete(ping));
-        REQUIRE_FALSE(packet_v1::packet_complete(set_mode));
-        REQUIRE_FALSE(packet_v1::packet_complete(encapsulated_data));
-    }
-    SECTION("Returns false when the packet is too short.")
-    {
-        heartbeat.pop_back();
-        ping.pop_back();
-        set_mode.pop_back();
-        encapsulated_data.pop_back();
-        REQUIRE_FALSE(packet_v1::packet_complete(heartbeat));
-        REQUIRE_FALSE(packet_v1::packet_complete(ping));
-        REQUIRE_FALSE(packet_v1::packet_complete(set_mode));
-        REQUIRE_FALSE(packet_v1::packet_complete(encapsulated_data));
-    }
-    SECTION("Returns false when the packet is too long.")
-    {
-        heartbeat.push_back(0x00);
-        ping.push_back(0x00);
-        set_mode.push_back(0x00);
-        encapsulated_data.push_back(0x00);
-        REQUIRE_FALSE(packet_v1::packet_complete(heartbeat));
-        REQUIRE_FALSE(packet_v1::packet_complete(ping));
-        REQUIRE_FALSE(packet_v1::packet_complete(set_mode));
-        REQUIRE_FALSE(packet_v1::packet_complete(encapsulated_data));
-    }
-}
-
-
-TEST_CASE("'header' returns a structure pointer to the given header data."
-          "[packet_v1]")
-{
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
-    auto conn = std::make_shared<ConnectionTestClass>();
-    SECTION("Header contains a magic value.")
-    {
-        REQUIRE(packet_v1::header(heartbeat)->magic == 0xFE);
-        REQUIRE(packet_v1::header(ping)->magic == 0xFE);
-        REQUIRE(packet_v1::header(set_mode)->magic == 0xFE);
-        REQUIRE(packet_v1::header(encapsulated_data)->magic == 0xFE);
-    }
-    SECTION("Header stores the packet length.")
-    {
-        REQUIRE(packet_v1::header(heartbeat)->len == 9);
-        REQUIRE(packet_v1::header(ping)->len == 14);
-        REQUIRE(packet_v1::header(set_mode)->len == 6);
-        REQUIRE(packet_v1::header(encapsulated_data)->len == 255);
-    }
-    SECTION("Header has a sequence number.")
-    {
-        REQUIRE(packet_v1::header(heartbeat)->seq == 0);
-        REQUIRE(packet_v1::header(ping)->seq == 0);
-        REQUIRE(packet_v1::header(set_mode)->seq == 0);
-        REQUIRE(packet_v1::header(encapsulated_data)->seq == 0);
-    }
-    SECTION("Header has a system ID.")
-    {
-        REQUIRE(packet_v1::header(heartbeat)->sysid == 1);
-        REQUIRE(packet_v1::header(ping)->sysid == 60);
-        REQUIRE(packet_v1::header(set_mode)->sysid == 70);
-        REQUIRE(packet_v1::header(encapsulated_data)->sysid == 255);
-    }
-    SECTION("Header has a component ID.")
-    {
-        REQUIRE(packet_v1::header(heartbeat)->compid == 0);
-        REQUIRE(packet_v1::header(ping)->compid == 40);
-        REQUIRE(packet_v1::header(set_mode)->compid == 30);
-        REQUIRE(packet_v1::header(encapsulated_data)->compid == 1);
-    }
-    SECTION("Header has a message ID.")
-    {
-        REQUIRE(packet_v1::header(heartbeat)->msgid == 0);
-        REQUIRE(packet_v1::header(ping)->msgid == 4);
-        REQUIRE(packet_v1::header(set_mode)->msgid == 11);
-        REQUIRE(packet_v1::header(encapsulated_data)->msgid == 131);
-    }
-    SECTION("Returns false when an incomplete header is given.")
-    {
-        heartbeat.resize(5);
-        ping.resize(4);
-        set_mode.resize(3);
-        encapsulated_data.resize(0);
-        REQUIRE(packet_v1::header(heartbeat) == nullptr);
-        REQUIRE(packet_v1::header(ping) == nullptr);
-        REQUIRE(packet_v1::header(set_mode) == nullptr);
-        REQUIRE(packet_v1::header(encapsulated_data) == nullptr);
-    }
-    SECTION("Returns false when the magic byte is wrong.")
-    {
-        heartbeat.front() = 0xAD;
-        ping.front() = 0xBC;
-        set_mode.front() = 0xFD;
-        encapsulated_data.front() = 0xFD;
-        REQUIRE(packet_v1::header(heartbeat) == nullptr);
-        REQUIRE(packet_v1::header(ping) == nullptr);
-        REQUIRE(packet_v1::header(set_mode) == nullptr);
-        REQUIRE(packet_v1::header(encapsulated_data) == nullptr);
-    }
 }

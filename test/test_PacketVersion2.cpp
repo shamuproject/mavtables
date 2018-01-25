@@ -18,8 +18,8 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <cstdint>
 #include <utility>
+#include <cstdint>
 #include <optional>
 #include <stdexcept>
 
@@ -220,6 +220,326 @@ namespace
         return data;
     }
 
+}
+
+
+TEST_CASE("'packet_v2::is_magic' determines if a byte is the v2.0 packet "
+          "magic byte.", "[packet_v2]")
+{
+    REQUIRE_FALSE(packet_v2::is_magic(0xAD));
+    REQUIRE_FALSE(packet_v2::is_magic(0xBC));
+    REQUIRE_FALSE(packet_v2::is_magic(0xFE));
+    REQUIRE(packet_v2::is_magic(0xFD));
+}
+
+
+TEST_CASE("'packet_v2::header_complete' determines whether the given bytes "
+          "at least represent a complete header.", "[packet_v2]")
+{
+    auto heartbeat = to_vector(Heartbeat(), true);
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode(), true);
+    auto mission_set_current = to_vector(MissionSetCurrent());
+    auto encapsulated_data = to_vector(EncapsulatedData(), true);
+    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    SECTION("Returns true when at least a complete header is given.")
+    {
+        heartbeat.resize(10);
+        ping.resize(15);
+        set_mode.resize(20);
+        mission_set_current.resize(25);
+        encapsulated_data.resize(30);
+        REQUIRE(packet_v2::header_complete(heartbeat));
+        REQUIRE(packet_v2::header_complete(ping));
+        REQUIRE(packet_v2::header_complete(set_mode));
+        REQUIRE(packet_v2::header_complete(mission_set_current));
+        REQUIRE(packet_v2::header_complete(encapsulated_data));
+        REQUIRE(packet_v2::header_complete(param_ext_request_list));
+    }
+    SECTION("Returns false when an incomplete header is given.")
+    {
+        heartbeat.resize(5);
+        ping.resize(4);
+        set_mode.resize(3);
+        mission_set_current.resize(2);
+        encapsulated_data.resize(1);
+        param_ext_request_list.resize(0);
+        REQUIRE_FALSE(packet_v2::header_complete(heartbeat));
+        REQUIRE_FALSE(packet_v2::header_complete(ping));
+        REQUIRE_FALSE(packet_v2::header_complete(set_mode));
+        REQUIRE_FALSE(packet_v2::header_complete(mission_set_current));
+        REQUIRE_FALSE(packet_v2::header_complete(encapsulated_data));
+        REQUIRE_FALSE(packet_v2::header_complete(param_ext_request_list));
+    }
+    SECTION("Returns false when the magic byte is wrong.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFE;
+        mission_set_current.front() = 0xFE;
+        encapsulated_data.front() = 0xFE;
+        param_ext_request_list.front() = 0xFE;
+        REQUIRE_FALSE(packet_v2::header_complete(heartbeat));
+        REQUIRE_FALSE(packet_v2::header_complete(ping));
+        REQUIRE_FALSE(packet_v2::header_complete(set_mode));
+        REQUIRE_FALSE(packet_v2::header_complete(mission_set_current));
+        REQUIRE_FALSE(packet_v2::header_complete(encapsulated_data));
+        REQUIRE_FALSE(packet_v2::header_complete(param_ext_request_list));
+    }
+}
+
+
+TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
+          "header data.", "[packet_v2]")
+{
+    auto heartbeat = to_vector(Heartbeat(), true);
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode(), true);
+    auto mission_set_current = to_vector(MissionSetCurrent());
+    auto encapsulated_data = to_vector(EncapsulatedData(), true);
+    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    SECTION("Header contains a magic value.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->magic == 0xFD);
+        REQUIRE(packet_v2::header(ping)->magic == 0xFD);
+        REQUIRE(packet_v2::header(set_mode)->magic == 0xFD);
+        REQUIRE(packet_v2::header(mission_set_current)->magic == 0xFD);
+        REQUIRE(packet_v2::header(encapsulated_data)->magic == 0xFD);
+        REQUIRE(packet_v2::header(param_ext_request_list)->magic == 0xFD);
+    }
+    SECTION("Header stores the packet length.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->len == 9);
+        REQUIRE(packet_v2::header(ping)->len == 14);
+        REQUIRE(packet_v2::header(set_mode)->len == 6);
+        REQUIRE(packet_v2::header(mission_set_current)->len == 2);
+        REQUIRE(packet_v2::header(encapsulated_data)->len == 255);
+        REQUIRE(packet_v2::header(param_ext_request_list)->len == 2);
+    }
+    SECTION("Header has incompatibility flags.")
+    {
+        REQUIRE((packet_v2::header(heartbeat)->incompat_flags &
+                    MAVLINK_IFLAG_SIGNED) == true);
+        REQUIRE((packet_v2::header(ping)->incompat_flags &
+                    MAVLINK_IFLAG_SIGNED) == false);
+        REQUIRE((packet_v2::header(set_mode)->incompat_flags &
+                    MAVLINK_IFLAG_SIGNED) == true);
+        REQUIRE((packet_v2::header(mission_set_current)->incompat_flags &
+                    MAVLINK_IFLAG_SIGNED) == false);
+        REQUIRE((packet_v2::header(encapsulated_data)->incompat_flags &
+                    MAVLINK_IFLAG_SIGNED) == true);
+        REQUIRE((packet_v2::header(param_ext_request_list)->incompat_flags &
+                    MAVLINK_IFLAG_SIGNED) == false);
+    }
+    SECTION("Header has compatibility flags.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->compat_flags == 0);
+        REQUIRE(packet_v2::header(ping)->compat_flags == 0);
+        REQUIRE(packet_v2::header(set_mode)->compat_flags == 0);
+        REQUIRE(packet_v2::header(mission_set_current)->compat_flags == 0);
+        REQUIRE(packet_v2::header(encapsulated_data)->compat_flags == 0);
+        REQUIRE(packet_v2::header(param_ext_request_list)->compat_flags == 0);
+    }
+    SECTION("Header has a sequence number.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->seq == 0);
+        REQUIRE(packet_v2::header(ping)->seq == 0);
+        REQUIRE(packet_v2::header(set_mode)->seq == 0);
+        REQUIRE(packet_v2::header(mission_set_current)->seq == 0);
+        REQUIRE(packet_v2::header(encapsulated_data)->seq == 0);
+        REQUIRE(packet_v2::header(param_ext_request_list)->seq == 0);
+    }
+    SECTION("Header has a system ID.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->sysid == 1);
+        REQUIRE(packet_v2::header(ping)->sysid == 60);
+        REQUIRE(packet_v2::header(set_mode)->sysid == 70);
+        REQUIRE(packet_v2::header(mission_set_current)->sysid == 80);
+        REQUIRE(packet_v2::header(encapsulated_data)->sysid == 255);
+        REQUIRE(packet_v2::header(param_ext_request_list)->sysid == 1);
+    }
+    SECTION("Header has a component ID.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->compid == 0);
+        REQUIRE(packet_v2::header(ping)->compid == 40);
+        REQUIRE(packet_v2::header(set_mode)->compid == 30);
+        REQUIRE(packet_v2::header(mission_set_current)->compid == 20);
+        REQUIRE(packet_v2::header(encapsulated_data)->compid == 1);
+        REQUIRE(packet_v2::header(param_ext_request_list)->compid == 255);
+    }
+    SECTION("Header has a message ID.")
+    {
+        REQUIRE(packet_v2::header(heartbeat)->msgid == 0);
+        REQUIRE(packet_v2::header(ping)->msgid == 4);
+        REQUIRE(packet_v2::header(set_mode)->msgid == 11);
+        REQUIRE(packet_v2::header(mission_set_current)->msgid == 41);
+        REQUIRE(packet_v2::header(encapsulated_data)->msgid == 131);
+        REQUIRE(packet_v2::header(param_ext_request_list)->msgid == 321);
+    }
+    SECTION("Returns false when an incomplete header is given.")
+    {
+        heartbeat.resize(5);
+        ping.resize(4);
+        set_mode.resize(3);
+        mission_set_current.resize(2);
+        encapsulated_data.resize(1);
+        param_ext_request_list.resize(0);
+        REQUIRE(packet_v2::header(heartbeat) == nullptr);
+        REQUIRE(packet_v2::header(ping) == nullptr);
+        REQUIRE(packet_v2::header(set_mode) == nullptr);
+        REQUIRE(packet_v2::header(mission_set_current) == nullptr);
+        REQUIRE(packet_v2::header(encapsulated_data) == nullptr);
+        REQUIRE(packet_v2::header(param_ext_request_list) == nullptr);
+    }
+    SECTION("Returns false when the magic byte is wrong.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFE;
+        mission_set_current.front() = 0xFE;
+        encapsulated_data.front() = 0xFE;
+        param_ext_request_list.front() = 0xFE;
+        REQUIRE(packet_v2::header(heartbeat) == nullptr);
+        REQUIRE(packet_v2::header(ping) == nullptr);
+        REQUIRE(packet_v2::header(set_mode) == nullptr);
+        REQUIRE(packet_v2::header(mission_set_current) == nullptr);
+        REQUIRE(packet_v2::header(encapsulated_data) == nullptr);
+        REQUIRE(packet_v2::header(param_ext_request_list) == nullptr);
+    }
+}
+
+
+TEST_CASE("'packet_v2::packet_complete' determines whether the given bytes "
+          "represent a complete packet.", "[packet_v2]")
+{
+    auto heartbeat = to_vector(Heartbeat(), true);
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode(), true);
+    auto mission_set_current = to_vector(MissionSetCurrent());
+    auto encapsulated_data = to_vector(EncapsulatedData(), true);
+    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    SECTION("Returns true when a complete packet is given.")
+    {
+        REQUIRE(packet_v2::packet_complete(heartbeat));
+        REQUIRE(packet_v2::packet_complete(ping));
+        REQUIRE(packet_v2::packet_complete(set_mode));
+        REQUIRE(packet_v2::packet_complete(mission_set_current));
+        REQUIRE(packet_v2::packet_complete(encapsulated_data));
+        REQUIRE(packet_v2::packet_complete(param_ext_request_list));
+    }
+    SECTION("Returns false when the magic byte is wrong.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFE;
+        mission_set_current.front() = 0xFE;
+        encapsulated_data.front() = 0xFE;
+        param_ext_request_list.front() = 0xFE;
+        REQUIRE_FALSE(packet_v2::packet_complete(heartbeat));
+        REQUIRE_FALSE(packet_v2::packet_complete(ping));
+        REQUIRE_FALSE(packet_v2::packet_complete(set_mode));
+        REQUIRE_FALSE(packet_v2::packet_complete(mission_set_current));
+        REQUIRE_FALSE(packet_v2::packet_complete(encapsulated_data));
+        REQUIRE_FALSE(packet_v2::packet_complete(param_ext_request_list));
+    }
+    SECTION("Returns false when the packet is too short.")
+    {
+        heartbeat.pop_back();
+        ping.pop_back();
+        set_mode.pop_back();
+        mission_set_current.pop_back();
+        encapsulated_data.pop_back();
+        param_ext_request_list.pop_back();
+        REQUIRE_FALSE(packet_v2::packet_complete(heartbeat));
+        REQUIRE_FALSE(packet_v2::packet_complete(ping));
+        REQUIRE_FALSE(packet_v2::packet_complete(set_mode));
+        REQUIRE_FALSE(packet_v2::packet_complete(mission_set_current));
+        REQUIRE_FALSE(packet_v2::packet_complete(encapsulated_data));
+        REQUIRE_FALSE(packet_v2::packet_complete(param_ext_request_list));
+    }
+    SECTION("Returns false when the packet is too long.")
+    {
+        heartbeat.push_back(0x00);
+        ping.push_back(0x00);
+        set_mode.push_back(0x00);
+        mission_set_current.push_back(0x00);
+        encapsulated_data.push_back(0x00);
+        param_ext_request_list.push_back(0x00);
+        REQUIRE_FALSE(packet_v2::packet_complete(heartbeat));
+        REQUIRE_FALSE(packet_v2::packet_complete(ping));
+        REQUIRE_FALSE(packet_v2::packet_complete(set_mode));
+        REQUIRE_FALSE(packet_v2::packet_complete(encapsulated_data));
+        REQUIRE_FALSE(packet_v2::packet_complete(encapsulated_data));
+        REQUIRE_FALSE(packet_v2::packet_complete(param_ext_request_list));
+    }
+}
+
+
+TEST_CASE("'packet_v2::is_signed' determines whether the given bytes "
+          "represent a signed packet.", "[packet_v2]")
+{
+    auto heartbeat = to_vector(Heartbeat(), true);
+    auto ping = to_vector(Ping());
+    auto set_mode = to_vector(SetMode(), true);
+    auto mission_set_current = to_vector(MissionSetCurrent());
+    auto encapsulated_data = to_vector(EncapsulatedData(), true);
+    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    SECTION("Returns true when the packet is signed.")
+    {
+        REQUIRE(packet_v2::is_signed(heartbeat));
+        REQUIRE(packet_v2::is_signed(set_mode));
+        REQUIRE(packet_v2::is_signed(encapsulated_data));
+    }
+    SECTION("Returns false when the packet is not signed.")
+    {
+        REQUIRE_FALSE(packet_v2::is_signed(ping));
+        REQUIRE_FALSE(packet_v2::is_signed(mission_set_current));
+        REQUIRE_FALSE(packet_v2::is_signed(param_ext_request_list));
+    }
+    SECTION("Throws and error when the header is invalid.")
+    {
+        heartbeat.front() = 0xAD;
+        ping.front() = 0xBC;
+        set_mode.front() = 0xFE;
+        mission_set_current.resize(2);
+        encapsulated_data.resize(1);
+        param_ext_request_list.resize(0);
+        // Errors
+        REQUIRE_THROWS_AS(
+            packet_v2::is_signed(heartbeat), std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            packet_v2::is_signed(ping), std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            packet_v2::is_signed(set_mode), std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            packet_v2::is_signed(mission_set_current),
+            std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            packet_v2::is_signed(encapsulated_data),
+            std::invalid_argument);
+        REQUIRE_THROWS_AS(
+            packet_v2::is_signed(param_ext_request_list),
+            std::invalid_argument);
+        // Error messages.
+        REQUIRE_THROWS_WITH(
+            packet_v2::is_signed(heartbeat),
+            "Header is incomplete or invalid.");
+        REQUIRE_THROWS_WITH(
+            packet_v2::is_signed(ping),
+            "Header is incomplete or invalid.");
+        REQUIRE_THROWS_WITH(
+            packet_v2::is_signed(set_mode),
+            "Header is incomplete or invalid.");
+        REQUIRE_THROWS_WITH(
+            packet_v2::is_signed(mission_set_current),
+            "Header is incomplete or invalid.");
+        REQUIRE_THROWS_WITH(
+            packet_v2::is_signed(encapsulated_data),
+            "Header is incomplete or invalid.");
+        REQUIRE_THROWS_WITH(
+            packet_v2::is_signed(param_ext_request_list),
+            "Header is incomplete or invalid.");
+    }
 }
 
 

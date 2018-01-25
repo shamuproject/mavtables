@@ -70,9 +70,9 @@ namespace packet_v1
                    << std::nouppercase << ".";
                 throw std::invalid_argument(ss.str());
             }
+            // Otherwise the packet is not long enough.
             else
             {
-                // Otherwise the packet is not long enough.
                 throw std::length_error(
                     "Packet (" + std::to_string(packet_data.size()) +
                     " bytes) is shorter than a v1.0 header (" +
