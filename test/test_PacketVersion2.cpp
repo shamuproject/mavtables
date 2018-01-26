@@ -15,11 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <vector>
 #include <memory>
 #include <utility>
-#include <cstdint>
 #include <optional>
 #include <stdexcept>
 
@@ -28,210 +25,21 @@
 
 #include "PacketVersion2.hpp"
 #include "MAVAddress.hpp"
-#include "Connection.hpp"
 #include "mavlink.h"
-#include "macros.hpp"
 #include "util.hpp"
 
-
-namespace
-{
-
-#ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
-
-    // Subclass of Packet used for testing the abstract class Connection.
-    class ConnectionTestClass : public Connection
-    {
-    };
-
-#ifdef __clang__
-    #pragma clang diagnostic pop
-#endif
-
-
-    // HEARTBEAT structure for testing packets without target system/component.
-    struct PACKED Heartbeat
-    {
-        struct PACKED payload
-        {
-            uint8_t type = 1;
-            uint8_t autopilot = 2;
-            uint8_t base_mode = 3;
-            uint32_t custom_mode = 4;
-            uint8_t system_status = 5;
-            uint8_t mavlink_version = 6;
-        };
-        uint8_t magic = 0xFD;
-        uint8_t len = sizeof(payload);
-        uint8_t incompat_flags = 0;
-        uint8_t compat_flags = 0;
-        uint8_t seq = 0;
-        uint8_t sysid = 1;
-        uint8_t compid = 0;
-        uint32_t msgid : 24;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-        Heartbeat() : msgid(0) {}
-    };
-
-
-    // PING structure for testing target system/component.
-    struct PACKED Ping
-    {
-        struct PACKED payload
-        {
-            uint64_t time_usec = 295128000000000;
-            uint32_t seq = 0xBA5EBA11;
-            uint8_t target_system = 255;
-            uint8_t target_component = 23;
-        };
-        uint8_t magic = 0xFD;
-        uint8_t len = sizeof(payload);
-        uint8_t incompat_flags = 0;
-        uint8_t compat_flags = 0;
-        uint8_t seq = 0;
-        uint8_t sysid = 60;
-        uint8_t compid = 40;
-        uint32_t msgid : 24;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-        Ping() : msgid(4) {}
-    };
-
-
-    // SET_MODE structure for testing target system only.
-    struct PACKED SetMode
-    {
-        struct PACKED payload
-        {
-            uint32_t custom_mode = 2;
-            uint8_t target_system = 123;
-            uint8_t base_mode = 1;
-        };
-        uint8_t magic = 0xFD;
-        uint8_t len = sizeof(payload);
-        uint8_t incompat_flags = 0;
-        uint8_t compat_flags = 0;
-        uint8_t seq = 0;
-        uint8_t sysid = 70;
-        uint8_t compid = 30;
-        uint32_t msgid : 24;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-        SetMode() : msgid(11) {}
-    };
-
-
-    // MISSION_SET_CURRENT for testing trimmed out target system and components.
-    struct PACKED MissionSetCurrent
-    {
-        struct PACKED payload
-        {
-            uint16_t seq = 12;
-            // uint8_t target_system = 0;
-            // uint8_t target_component = 0;
-        };
-        uint8_t magic = 0xFD;
-        uint8_t len = sizeof(payload);
-        uint8_t incompat_flags = 0;
-        uint8_t compat_flags = 0;
-        uint8_t seq = 0;
-        uint8_t sysid = 80;
-        uint8_t compid = 20;
-        uint32_t msgid : 24;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-        MissionSetCurrent() : msgid(41) {}
-    };
-
-
-    // ENCAPSULATED_DATA structure for testing maximum length packets.
-    struct PACKED EncapsulatedData
-    {
-        struct PACKED payload
-        {
-            uint16_t seqnr = 0;
-            uint8_t data[253];
-        };
-        uint8_t magic = 0xFD;
-        uint8_t len = sizeof(payload);
-        uint8_t incompat_flags = 0;
-        uint8_t compat_flags = 0;
-        uint8_t seq = 0;
-        uint8_t sysid = 255;
-        uint8_t compid = 1;
-        uint32_t msgid : 24;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-        EncapsulatedData() : msgid(131) {}
-    };
-
-
-    // PARAM_EXT_REQUEST_LIST structure for testing message ID's beyond 255.
-    struct PACKED ParamExtRequestList
-    {
-        struct PACKED payload
-        {
-            uint8_t target_system = 32;
-            uint8_t target_component = 64;
-        };
-        uint8_t magic = 0xFD;
-        uint8_t len = sizeof(payload);
-        uint8_t incompat_flags = 0;
-        uint8_t compat_flags = 0;
-        uint8_t seq = 0;
-        uint8_t sysid = 1;
-        uint8_t compid = 255;
-        uint32_t msgid : 24;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-        ParamExtRequestList() : msgid(321) {}
-    };
-
-
-    // Convert a MAVLink packet structure to a vector of bytes.
-    template <class T>
-    static std::vector<uint8_t> to_vector(T packet, bool signature = false)
-    {
-        std::vector<uint8_t> data;
-
-        // Set signature flag.
-        if (signature)
-        {
-            packet.incompat_flags |= MAVLINK_IFLAG_SIGNED;
-        }
-
-        data.assign(reinterpret_cast<uint8_t *>(&packet),
-                    reinterpret_cast<uint8_t *>(&packet) + sizeof(packet));
-
-        // Insert a dummy signature.
-        if (signature)
-        {
-            std::vector<uint8_t> sig =
-            {
-                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
-            };
-            data.insert(std::end(data), std::begin(sig), std::end(sig));
-        }
-
-        return data;
-    }
-
-}
+#include "common_Packet.hpp"
 
 
 TEST_CASE("'packet_v2::header_complete' determines whether the given bytes "
           "at least represent a complete header.", "[packet_v2]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     SECTION("Returns true when at least a complete header is given.")
     {
         heartbeat.resize(10);
@@ -282,12 +90,12 @@ TEST_CASE("'packet_v2::header_complete' determines whether the given bytes "
 TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
           "header data.", "[packet_v2]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     SECTION("Header contains a magic value.")
     {
         REQUIRE(packet_v2::header(heartbeat)->magic == 0xFD);
@@ -402,12 +210,12 @@ TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
 TEST_CASE("'packet_v2::packet_complete' determines whether the given bytes "
           "represent a complete packet.", "[packet_v2]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     SECTION("Returns true when a complete packet is given.")
     {
         REQUIRE(packet_v2::packet_complete(heartbeat));
@@ -468,12 +276,12 @@ TEST_CASE("'packet_v2::packet_complete' determines whether the given bytes "
 TEST_CASE("'packet_v2::is_signed' determines whether the given bytes "
           "represent a signed packet.", "[packet_v2]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     SECTION("Returns true when the packet is signed.")
     {
         REQUIRE(packet_v2::is_signed(heartbeat));
@@ -535,12 +343,12 @@ TEST_CASE("'packet_v2::is_signed' determines whether the given bytes "
 
 TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
 {
-    Heartbeat heartbeat;
-    Ping ping;
-    SetMode set_mode;
-    MissionSetCurrent mission_set_current;
-    EncapsulatedData encapsulated_data;
-    ParamExtRequestList param_ext_request_list;
+    HeartbeatV2 heartbeat;
+    PingV2 ping;
+    SetModeV2 set_mode;
+    MissionSetCurrentV2 mission_set_current;
+    EncapsulatedDataV2 encapsulated_data;
+    ParamExtRequestListV2 param_ext_request_list;
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("With proper arguments and no signature.")
     {
@@ -580,52 +388,55 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
     SECTION("With proper arguments and a signature.")
     {
         // HEARTBEAT
-        REQUIRE_NOTHROW(packet_v2::Packet(to_vector(heartbeat, true), conn));
+        REQUIRE_NOTHROW(packet_v2::Packet(to_vector_with_sig(heartbeat), conn));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(heartbeat, true), conn, -10));
+            packet_v2::Packet(to_vector_with_sig(heartbeat), conn, -10));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(heartbeat, true), conn, +10));
+            packet_v2::Packet(to_vector_with_sig(heartbeat), conn, +10));
         // PING
-        REQUIRE_NOTHROW(packet_v2::Packet(to_vector(ping, true), conn));
-        REQUIRE_NOTHROW(packet_v2::Packet(to_vector(ping, true), conn, -10));
-        REQUIRE_NOTHROW(packet_v2::Packet(to_vector(ping, true), conn, +10));
+        REQUIRE_NOTHROW(packet_v2::Packet(to_vector_with_sig(ping), conn));
+        REQUIRE_NOTHROW(packet_v2::Packet(to_vector_with_sig(ping), conn, -10));
+        REQUIRE_NOTHROW(packet_v2::Packet(to_vector_with_sig(ping), conn, +10));
         // SET_MODE
-        REQUIRE_NOTHROW(packet_v2::Packet(to_vector(set_mode, true), conn));
+        REQUIRE_NOTHROW(packet_v2::Packet(to_vector_with_sig(set_mode), conn));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(set_mode, true), conn, -10));
+            packet_v2::Packet(to_vector_with_sig(set_mode), conn, -10));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(set_mode, true), conn, +10));
+            packet_v2::Packet(to_vector_with_sig(set_mode), conn, +10));
         // PARAM_REQUEST_READ
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(mission_set_current, true), conn));
+            packet_v2::Packet(to_vector_with_sig(mission_set_current), conn));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(mission_set_current, true), conn, -10));
+            packet_v2::Packet(
+                to_vector_with_sig(mission_set_current), conn, -10));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(mission_set_current, true), conn, +10));
+            packet_v2::Packet(
+                to_vector_with_sig(mission_set_current), conn, +10));
         // ENCAPSULATED_DATA
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(encapsulated_data, true), conn));
+            packet_v2::Packet(to_vector_with_sig(encapsulated_data), conn));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(encapsulated_data, true), conn, -10));
+            packet_v2::Packet(
+                to_vector_with_sig(encapsulated_data), conn, -10));
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(encapsulated_data, true), conn, +10));
+            packet_v2::Packet(
+                to_vector_with_sig(encapsulated_data), conn, +10));
         // PARAM_EXT_REQUEST_READ
         REQUIRE_NOTHROW(
-            packet_v2::Packet(to_vector(param_ext_request_list, true), conn));
+            packet_v2::Packet(
+                to_vector_with_sig(param_ext_request_list), conn));
         REQUIRE_NOTHROW(
             packet_v2::Packet(
-                to_vector(param_ext_request_list, true), conn, -10));
+                to_vector_with_sig(param_ext_request_list), conn, -10));
         REQUIRE_NOTHROW(
             packet_v2::Packet(
-                to_vector(param_ext_request_list, true), conn, +10));
+                to_vector_with_sig(param_ext_request_list), conn, +10));
     }
     SECTION("And ensures a complete header is given.")
     {
         // 0 length packet.
         REQUIRE_THROWS_AS(packet_v2::Packet({}, conn), std::length_error);
-        REQUIRE_THROWS_WITH(
-            packet_v2::Packet({}, conn),
-            "Packet is empty.");
+        REQUIRE_THROWS_WITH(packet_v2::Packet({}, conn), "Packet is empty.");
         // Packet short 1 byte.
         REQUIRE_THROWS_AS(
             packet_v2::Packet({0xFD, 2, 3, 4, 5, 6, 7, 8, 9}, conn),
@@ -634,7 +445,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet({0xFD, 2, 3, 4, 5, 6, 7, 8, 9}, conn),
             "Packet (9 bytes) is shorter than a v2.0 header (10 bytes).");
     }
-    SECTION("And ensures packets begins with the magic byte (0xFD).")
+    SECTION("And ensures packets begin with the magic byte (0xFD).")
     {
         heartbeat.magic = 0xBC;
         REQUIRE_THROWS_AS(
@@ -723,7 +534,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
     SECTION("And ensures the packet is the correct length (with signature).")
     {
         // HEARTBEAT (no target system/component).
-        auto heartbeat_data = to_vector(heartbeat, true);
+        auto heartbeat_data = to_vector_with_sig(heartbeat);
         heartbeat_data.push_back(0x00);
         REQUIRE_THROWS_AS(
             packet_v2::Packet(heartbeat_data, conn), std::length_error);
@@ -731,7 +542,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(heartbeat_data, conn),
             "Signed packet is 35 bytes, should be 34 bytes.");
         // PING (with target system/component).
-        auto ping_data = to_vector(ping, true);
+        auto ping_data = to_vector_with_sig(ping);
         ping_data.pop_back();
         REQUIRE_THROWS_AS(
             packet_v2::Packet(ping_data, conn), std::length_error);
@@ -739,7 +550,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(ping_data, conn),
             "Signed packet is 38 bytes, should be 39 bytes.");
         // SET_MODE (target system only, no target component).
-        auto set_mode_data = to_vector(set_mode, true);
+        auto set_mode_data = to_vector_with_sig(set_mode);
         set_mode_data.push_back(0x00);
         REQUIRE_THROWS_AS(
             packet_v2::Packet(set_mode_data, conn), std::length_error);
@@ -747,7 +558,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(set_mode_data, conn),
             "Signed packet is 32 bytes, should be 31 bytes.");
         // PARAM_REQUEST_READ (trimmed out, 0.0, system/component).
-        auto mission_set_current_data = to_vector(mission_set_current, true);
+        auto mission_set_current_data = to_vector_with_sig(mission_set_current);
         mission_set_current_data.pop_back();
         REQUIRE_THROWS_AS(
             packet_v2::Packet(mission_set_current_data, conn),
@@ -756,7 +567,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             packet_v2::Packet(mission_set_current_data, conn),
             "Signed packet is 26 bytes, should be 27 bytes.");
         // ENCAPSULATED_DATA (longest packet).
-        auto encapsulated_data_data = to_vector(encapsulated_data, true);
+        auto encapsulated_data_data = to_vector_with_sig(encapsulated_data);
         encapsulated_data_data.push_back(0x00);
         REQUIRE_THROWS_AS(
             packet_v2::Packet(encapsulated_data_data, conn), std::length_error);
@@ -765,7 +576,7 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
             "Signed packet is 281 bytes, should be 280 bytes.");
         // PARAM_EXT_REQUEST_LIST (message ID beyond 255).
         auto param_ext_request_list_data =
-            to_vector(param_ext_request_list, true);
+            to_vector_with_sig(param_ext_request_list);
         param_ext_request_list_data.pop_back();
         REQUIRE_THROWS_AS(
             packet_v2::Packet(param_ext_request_list_data, conn),
@@ -780,12 +591,12 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
 TEST_CASE("packet_v2::Packet's contain raw packet data and make it accessible.",
           "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector_with_sig(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v2::Packet(heartbeat, conn).data() == heartbeat);
     REQUIRE(packet_v2::Packet(ping, conn).data() == ping);
@@ -802,7 +613,7 @@ TEST_CASE("packet_v2::Packet's contain raw packet data and make it accessible.",
 TEST_CASE("packet_v2::Packet's contain a weak_ptr to a connection.",
           "[packet_v2::Packet]")
 {
-    auto ping = to_vector(Ping());
+    auto ping = to_vector(PingV2());
     auto conn1 = std::make_shared<ConnectionTestClass>();
     auto conn2 = std::make_shared<ConnectionTestClass>();
     std::weak_ptr<ConnectionTestClass> empty_conn; // empty weak pointer
@@ -826,7 +637,7 @@ TEST_CASE("packet_v2::Packet's contain a weak_ptr to a connection.",
 
 TEST_CASE("packet_v2::Packet's have a priority.", "[packet_v2::Packet]")
 {
-    auto ping = to_vector(Ping());
+    auto ping = to_vector(PingV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("Which has a default value of 0.")
     {
@@ -870,8 +681,8 @@ TEST_CASE("packet_v2::Packet's have a priority.", "[packet_v2::Packet]")
 
 TEST_CASE("packet_v2::Packet's are copyable.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
+    auto heartbeat = to_vector(HeartbeatV2());
+    auto ping = to_vector_with_sig(PingV2());
     auto conn1 = std::make_shared<ConnectionTestClass>();
     auto conn2 = std::make_shared<ConnectionTestClass>();
     packet_v2::Packet a(heartbeat, conn1, 1);
@@ -891,8 +702,8 @@ TEST_CASE("packet_v2::Packet's are copyable.", "[packet_v2::Packet]")
 
 TEST_CASE("packet_v2::Packet's are movable.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
+    auto heartbeat = to_vector(HeartbeatV2());
+    auto ping = to_vector_with_sig(PingV2());
     auto conn1 = std::make_shared<ConnectionTestClass>();
     auto conn2 = std::make_shared<ConnectionTestClass>();
     packet_v2::Packet a(heartbeat, conn1, 1);
@@ -910,8 +721,8 @@ TEST_CASE("packet_v2::Packet's are movable.", "[packet_v2::Packet]")
 
 TEST_CASE("packet_v2::Packet's are assignable.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping(), true);
+    auto heartbeat = to_vector(HeartbeatV2());
+    auto ping = to_vector_with_sig(PingV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     packet_v2::Packet packet(heartbeat, conn, -10);
     packet_v2::Packet packet_to_copy(
@@ -929,8 +740,8 @@ TEST_CASE("packet_v2::Packet's are assignable.", "[packet_v2::Packet]")
 TEST_CASE("packet_v2::Packet's are assignable (with move semantics).",
           "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping(), true);
+    auto heartbeat = to_vector(HeartbeatV2());
+    auto ping = to_vector_with_sig(PingV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     packet_v2::Packet packet(heartbeat, conn, -10);
     packet_v2::Packet packet_to_move(
@@ -947,32 +758,31 @@ TEST_CASE("packet_v2::Packet's are assignable (with move semantics).",
 
 TEST_CASE("packet_v2::Packet's have a version.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
-    // All should read 0x0200 for v2.0.
-    REQUIRE(packet_v2::Packet(heartbeat, conn).version() == 0x0200);
-    REQUIRE(packet_v2::Packet(ping, conn).version() == 0x0200);
-    REQUIRE(packet_v2::Packet(set_mode, conn).version() == 0x0200);
-    REQUIRE(packet_v2::Packet(mission_set_current, conn).version() == 0x0200);
-    REQUIRE(packet_v2::Packet(encapsulated_data, conn).version() == 0x0200);
-    REQUIRE(packet_v2::Packet(param_ext_request_list, conn).version() ==
-            0x0200);
+    // All should read Packet::V2 (0x0200) for v2.0.
+    REQUIRE(packet_v2::Packet(heartbeat, conn).version() == Packet::V2);
+    REQUIRE(packet_v2::Packet(ping, conn).version() == Packet::V2);
+    REQUIRE(packet_v2::Packet(set_mode, conn).version() == Packet::V2);
+    REQUIRE(packet_v2::Packet(mission_set_current, conn).version() == 0x200);
+    REQUIRE(packet_v2::Packet(encapsulated_data, conn).version() == 0x200);
+    REQUIRE(packet_v2::Packet(param_ext_request_list, conn).version() == 0x200);
 }
 
 
 TEST_CASE("packet_v2::Packet's have an ID.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v2::Packet(heartbeat, conn).id() == 0);
     REQUIRE(packet_v2::Packet(ping, conn).id() == 4);
@@ -985,12 +795,12 @@ TEST_CASE("packet_v2::Packet's have an ID.", "[packet_v2::Packet]")
 
 TEST_CASE("packet_v2::Packet's have a name.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v2::Packet(heartbeat, conn).name() == "HEARTBEAT");
     REQUIRE(packet_v2::Packet(ping, conn).name() == "PING");
@@ -1006,12 +816,12 @@ TEST_CASE("packet_v2::Packet's have a name.", "[packet_v2::Packet]")
 
 TEST_CASE("packet_v2::Packet's have a source address.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v2::Packet(heartbeat, conn).source() == MAVAddress("1.0"));
     REQUIRE(packet_v2::Packet(ping, conn).source() == MAVAddress("60.40"));
@@ -1028,12 +838,12 @@ TEST_CASE("packet_v2::Packet's have a source address.", "[packet_v2::Packet]")
 TEST_CASE("packet_v2::Packet's optionally have a destination address.",
           "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE_THROWS_AS(
         packet_v2::Packet(heartbeat, conn).dest().value(),
@@ -1054,12 +864,12 @@ TEST_CASE("packet_v2::Packet's optionally have a destination address.",
 
 TEST_CASE("packet_v2::Packet's are printable.", "[packet_v2::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat(), true);
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode(), true);
-    auto mission_set_current = to_vector(MissionSetCurrent());
-    auto encapsulated_data = to_vector(EncapsulatedData(), true);
-    auto param_ext_request_list = to_vector(ParamExtRequestList());
+    auto heartbeat = to_vector_with_sig(HeartbeatV2());
+    auto ping = to_vector(PingV2());
+    auto set_mode = to_vector_with_sig(SetModeV2());
+    auto mission_set_current = to_vector(MissionSetCurrentV2());
+    auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
+    auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(str(packet_v2::Packet(heartbeat, conn)) ==
             "HEARTBEAT (#0) from 1.0 (v2.0)");

@@ -15,11 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <vector>
 #include <memory>
 #include <utility>
-#include <cstdint>
 #include <optional>
 #include <stdexcept>
 
@@ -28,133 +25,19 @@
 
 #include "PacketVersion1.hpp"
 #include "MAVAddress.hpp"
-#include "Connection.hpp"
 #include "mavlink.h"
-#include "macros.hpp"
 #include "util.hpp"
 
-
-namespace
-{
-
-#ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
-
-    // Subclass of Packet used for testing the abstract class Connection.
-    class ConnectionTestClass : public Connection
-    {
-    };
-
-#ifdef __clang__
-    #pragma clang diagnostic pop
-#endif
-
-
-    // HEARTBEAT structure for testing packets without target system/component.
-    struct PACKED Heartbeat
-    {
-        struct PACKED payload
-        {
-            uint8_t type = 1;
-            uint8_t autopilot = 2;
-            uint8_t base_mode = 3;
-            uint32_t custom_mode = 4;
-            uint8_t system_status = 5;
-            uint8_t mavlink_version = 6;
-        };
-        uint8_t magic = 0xFE;
-        uint8_t len = sizeof(payload);
-        uint8_t seq = 0;
-        uint8_t sysid = 1;
-        uint8_t compid = 0;
-        uint8_t msgid = 0;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-    };
-
-
-    // PING structure for testing target system/compoent.
-    struct PACKED Ping
-    {
-        struct PACKED payload
-        {
-            uint64_t time_usec = 295128000000000;
-            uint32_t seq = 0xBA5EBA11;
-            uint8_t target_system = 255;
-            uint8_t target_component = 23;
-        };
-        uint8_t magic = 0xFE;
-        uint8_t len = sizeof(payload);
-        uint8_t seq = 0;
-        uint8_t sysid = 60;
-        uint8_t compid = 40;
-        uint8_t msgid = 4;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-    };
-
-
-    // SET_MODE structure for testing target system only.
-    struct PACKED SetMode
-    {
-        struct PACKED payload
-        {
-            uint32_t custom_mode = 2;
-            uint8_t target_system = 123;
-            uint8_t base_mode = 1;
-        };
-        uint8_t magic = 0xFE;
-        uint8_t len = sizeof(payload);
-        uint8_t seq = 0;
-        uint8_t sysid = 70;
-        uint8_t compid = 30;
-        uint8_t msgid = 11;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-    };
-
-
-    // ENCAPSULATED_DATA structure for testing maximum length packets.
-    struct PACKED EncapsulatedData
-    {
-        struct PACKED payload
-        {
-            uint16_t seqnr = 0;
-            uint8_t data[253];
-        };
-        uint8_t magic = 0xFE;
-        uint8_t len = 255;
-        uint8_t seq = 0;
-        uint8_t sysid = 255;
-        uint8_t compid = 1;
-        uint8_t msgid = 131;
-        payload payload;
-        uint16_t checksum = 0xFACE;
-    };
-
-
-    // Convert a MAVLink packet structure to a vector of bytes.
-    template <class T>
-    static std::vector<uint8_t> to_vector(T packet)
-    {
-        std::vector<uint8_t> data;
-        data.assign(reinterpret_cast<uint8_t *>(&packet),
-                    reinterpret_cast<uint8_t *>(&packet) + sizeof(packet));
-        return data;
-    }
-
-}
+#include "common_Packet.hpp"
 
 
 TEST_CASE("'packet_v1::header_complete' determines whether the given bytes "
           "at least represent a complete header.", "[packet_v1]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     SECTION("Returns true when at least a complete header is given.")
     {
         heartbeat.resize(6);
@@ -193,10 +76,10 @@ TEST_CASE("'packet_v1::header_complete' determines whether the given bytes "
 TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
           "header data.", "[packet_v1]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("Header contains a magic value.")
     {
@@ -268,10 +151,10 @@ TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
 TEST_CASE("'packet_v1::packet_complete' determines whether the given bytes "
           "represent a complete packet.", "[packet_v1]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("Returns true when a complete packet is given.")
     {
@@ -318,10 +201,10 @@ TEST_CASE("'packet_v1::packet_complete' determines whether the given bytes "
 
 TEST_CASE("packet_v1::Packet's can be constructed.", "[packet_v1::Packet]")
 {
-    Heartbeat heartbeat;
-    Ping ping;
-    SetMode set_mode;
-    EncapsulatedData encapsulated_data;
+    HeartbeatV1 heartbeat;
+    PingV1 ping;
+    SetModeV1 set_mode;
+    EncapsulatedDataV1 encapsulated_data;
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("With proper arguments.")
     {
@@ -423,10 +306,10 @@ TEST_CASE("packet_v1::Packet's can be constructed.", "[packet_v1::Packet]")
 TEST_CASE("packet_v1::Packet's contain raw packet data and make it accessible.",
           "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v1::Packet(heartbeat, conn).data() == heartbeat);
     REQUIRE(packet_v1::Packet(ping, conn).data() == ping);
@@ -439,7 +322,7 @@ TEST_CASE("packet_v1::Packet's contain raw packet data and make it accessible.",
 TEST_CASE("packet_v1::Packet's contain a weak_ptr to a connection.",
           "[packet_v1::Packet]")
 {
-    auto ping = to_vector(Ping());
+    auto ping = to_vector(PingV1());
     auto conn1 = std::make_shared<ConnectionTestClass>();
     auto conn2 = std::make_shared<ConnectionTestClass>();
     std::weak_ptr<ConnectionTestClass> empty_conn; // empty weak pointer
@@ -463,7 +346,7 @@ TEST_CASE("packet_v1::Packet's contain a weak_ptr to a connection.",
 
 TEST_CASE("packet_v1::Packet's have a priority.", "[packet_v1::Packet]")
 {
-    auto ping = to_vector(Ping());
+    auto ping = to_vector(PingV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     SECTION("Which has a default value of 0.")
     {
@@ -507,8 +390,8 @@ TEST_CASE("packet_v1::Packet's have a priority.", "[packet_v1::Packet]")
 
 TEST_CASE("packet_v1::Packet's are copyable.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
     auto conn1 = std::make_shared<ConnectionTestClass>();
     auto conn2 = std::make_shared<ConnectionTestClass>();
     packet_v1::Packet a(heartbeat, conn1, 1);
@@ -528,8 +411,8 @@ TEST_CASE("packet_v1::Packet's are copyable.", "[packet_v1::Packet]")
 
 TEST_CASE("packet_v1::Packet's are movable.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
     auto conn1 = std::make_shared<ConnectionTestClass>();
     auto conn2 = std::make_shared<ConnectionTestClass>();
     packet_v1::Packet a(heartbeat, conn1, 1);
@@ -547,8 +430,8 @@ TEST_CASE("packet_v1::Packet's are movable.", "[packet_v1::Packet]")
 
 TEST_CASE("packet_v1::Packet's are assignable.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     packet_v1::Packet packet(heartbeat, conn, -10);
     packet_v1::Packet packet_to_copy(
@@ -566,8 +449,8 @@ TEST_CASE("packet_v1::Packet's are assignable.", "[packet_v1::Packet]")
 TEST_CASE("packet_v1::Packet's are assignable (with move semantics).",
           "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     packet_v1::Packet packet(heartbeat, conn, -10);
     packet_v1::Packet packet_to_move(
@@ -584,25 +467,25 @@ TEST_CASE("packet_v1::Packet's are assignable (with move semantics).",
 
 TEST_CASE("packet_v1::Packet's have a version.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     // All should read 0x0100 for v1.0.
-    REQUIRE(packet_v1::Packet(heartbeat, conn).version() == 0x0100);
-    REQUIRE(packet_v1::Packet(ping, conn).version() == 0x0100);
-    REQUIRE(packet_v1::Packet(set_mode, conn).version() == 0x0100);
-    REQUIRE(packet_v1::Packet(encapsulated_data, conn).version() == 0x0100);
+    REQUIRE(packet_v1::Packet(heartbeat, conn).version() == Packet::V1);
+    REQUIRE(packet_v1::Packet(ping, conn).version() == Packet::V1);
+    REQUIRE(packet_v1::Packet(set_mode, conn).version() == 0x100);
+    REQUIRE(packet_v1::Packet(encapsulated_data, conn).version() == 0x100);
 }
 
 
 TEST_CASE("packet_v1::Packet's have an ID.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v1::Packet(heartbeat, conn).id() == 0);
     REQUIRE(packet_v1::Packet(ping, conn).id() == 4);
@@ -613,10 +496,10 @@ TEST_CASE("packet_v1::Packet's have an ID.", "[packet_v1::Packet]")
 
 TEST_CASE("packet_v1::Packet's have a name.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v1::Packet(heartbeat, conn).name() == "HEARTBEAT");
     REQUIRE(packet_v1::Packet(ping, conn).name() == "PING");
@@ -628,10 +511,10 @@ TEST_CASE("packet_v1::Packet's have a name.", "[packet_v1::Packet]")
 
 TEST_CASE("packet_v1::Packet's have a source address.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(packet_v1::Packet(heartbeat, conn).source() == MAVAddress("1.0"));
     REQUIRE(packet_v1::Packet(ping, conn).source() == MAVAddress("60.40"));
@@ -644,10 +527,10 @@ TEST_CASE("packet_v1::Packet's have a source address.", "[packet_v1::Packet]")
 TEST_CASE("packet_v1::Packet's optionally have a destination address.",
           "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE_THROWS_AS(
         packet_v1::Packet(heartbeat, conn).dest().value(),
@@ -664,10 +547,10 @@ TEST_CASE("packet_v1::Packet's optionally have a destination address.",
 
 TEST_CASE("packet_v1::Packet's are printable.", "[packet_v1::Packet]")
 {
-    auto heartbeat = to_vector(Heartbeat());
-    auto ping = to_vector(Ping());
-    auto set_mode = to_vector(SetMode());
-    auto encapsulated_data = to_vector(EncapsulatedData());
+    auto heartbeat = to_vector(HeartbeatV1());
+    auto ping = to_vector(PingV1());
+    auto set_mode = to_vector(SetModeV1());
+    auto encapsulated_data = to_vector(EncapsulatedDataV1());
     auto conn = std::make_shared<ConnectionTestClass>();
     REQUIRE(str(packet_v1::Packet(heartbeat, conn)) ==
             "HEARTBEAT (#0) from 1.0 (v1.0)");
