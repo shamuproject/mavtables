@@ -32,6 +32,21 @@
 namespace packet_v2
 {
 
+    /** MAVLink v2.0 header length (10 bytes).
+     */
+    const size_t HEADER_LENGTH = MAVLINK_NUM_HEADER_BYTES;
+
+
+    /** MAVLink v2.0 start byte (0xFD).
+     */
+    const uint8_t START_BYTE = MAVLINK_STX;
+
+
+    /** MAVLink v2.0 version..
+     */
+    const unsigned int VERSION = 0x0200;
+
+
     /** A MAVLink packet with the version 2 wire protocol.
      */
     class Packet : public ::Packet
@@ -71,7 +86,6 @@ namespace packet_v2
             Packet &operator=(Packet &&other) = default;
     };
 
-    bool is_magic(uint8_t byte);
     bool is_signed(const std::vector<uint8_t> &data);
     bool header_complete(const std::vector<uint8_t> &data);
     bool packet_complete(const std::vector<uint8_t> &data);

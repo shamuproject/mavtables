@@ -32,6 +32,21 @@
 namespace packet_v1
 {
 
+    /** MAVLink v1.0 header length (6 bytes).
+     */
+    const size_t HEADER_LENGTH = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN;
+
+
+    /** MAVLink v1.0 start byte (0xFE).
+     */
+    const uint8_t START_BYTE = MAVLINK_STX_MAVLINK1;
+
+
+    /** MAVLink v1.0 version..
+     */
+    const unsigned int VERSION = 0x0100;
+
+
     /** A MAVLink packet with the version 1 wire protocol.
      */
     class Packet : public ::Packet
@@ -69,7 +84,6 @@ namespace packet_v1
     };
 
 
-    bool is_magic(uint8_t byte);
     bool header_complete(const std::vector<uint8_t> &data);
     bool packet_complete(const std::vector<uint8_t> &data);
     const struct mavlink_packet_version1_header *header(

@@ -57,14 +57,15 @@ namespace packet_v2
         if (!header_complete(packet_data))
         {
             // Could be the magic number.
-            if (!is_magic(packet_data.front()))
+            if (START_BYTE !=packet_data.front())
             {
                 std::stringstream ss;
                 ss << "Invalid packet starting byte (0x"
                    << std::uppercase << std::hex
                    << static_cast<unsigned int>(packet_data.front())
                    << std::nouppercase << "), v2.0 packets should start with 0x"
-                   << std::uppercase << std::hex << MAVLINK_STX
+                   << std::uppercase << std::hex
+                   << static_cast<unsigned int>(START_BYTE)
                    << std::nouppercase << ".";
                 throw std::invalid_argument(ss.str());
             }
@@ -94,11 +95,13 @@ namespace packet_v2
             std::string prefix = "Packet";
             size_t expected_length =
                 MAVLINK_NUM_NON_PAYLOAD_BYTES + header(packet_data)->len;
+
             if (is_signed(packet_data))
             {
                 expected_length += MAVLINK_SIGNATURE_BLOCK_LEN;
                 prefix = "Signed packet";
             }
+
             throw std::length_error(
                 prefix + " is " + std::to_string(packet_data.size()) +
                 " bytes, should be " +
@@ -235,18 +238,6 @@ namespace packet_v2
     }
 
 
-    /** Determine if a byte is a MAVLink v2.0 packet starting byte.
-     *
-     *  \relates Packet
-     *  \retval true if \p byte is the MAVLink v2.0 packet starting byte (0xFD).
-     *  \retval false if \p byte is not the v2.0 starting byte.
-     */
-    bool is_magic(uint8_t byte)
-    {
-        return byte == MAVLINK_STX;
-    }
-
-
     /** Determine if a MAVLink v2.0 packet is signed or not.
      *
      *  \relates
@@ -275,8 +266,8 @@ namespace packet_v2
      */
     bool header_complete(const std::vector<uint8_t> &data)
     {
-        return (data.size() >= MAVLINK_NUM_HEADER_BYTES) &&
-               (is_magic(data.front()));
+        return (data.size() >= MAVLINK_NUM_HEADER_BYTES) && 
+               (START_BYTE == data.front());
     }
 
 
@@ -293,11 +284,13 @@ namespace packet_v2
         if (header_complete(data))
         {
             size_t expected_length = MAVLINK_NUM_NON_PAYLOAD_BYTES +
-                header(data)->len;
+                                     header(data)->len;
+
             if (header(data)->incompat_flags & MAVLINK_IFLAG_SIGNED)
             {
                 expected_length += MAVLINK_SIGNATURE_BLOCK_LEN;
             }
+
             return data.size() == expected_length;
         }
 
@@ -315,9 +308,10 @@ namespace packet_v2
     {
         if (header_complete(data))
         {
-            return reinterpret_cast<
-                const struct mavlink_packet_version2_header *>(&(data[0]));
+            return reinterpret_cast <
+                   const struct mavlink_packet_version2_header * >(&(data[0]));
         }
+
         return nullptr;
     }
 

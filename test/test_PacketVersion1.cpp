@@ -148,16 +148,6 @@ namespace
 }
 
 
-TEST_CASE("'packet_v1::is_magic' determines if a byte is the v1.0 packet "
-          "magic byte.", "[packet_v1]")
-{
-    REQUIRE_FALSE(packet_v1::is_magic(0xAD));
-    REQUIRE_FALSE(packet_v1::is_magic(0xBC));
-    REQUIRE(packet_v1::is_magic(0xFE));
-    REQUIRE_FALSE(packet_v1::is_magic(0xFD));
-}
-
-
 TEST_CASE("'packet_v1::header_complete' determines whether the given bytes "
           "at least represent a complete header.", "[packet_v1]")
 {

@@ -59,14 +59,15 @@ namespace packet_v1
         if (!header_complete(packet_data))
         {
             // Could be the magic number.
-            if (!is_magic(packet_data.front()))
+            if (START_BYTE !=packet_data.front())
             {
                 std::stringstream ss;
                 ss << "Invalid packet starting byte (0x"
                    << std::uppercase << std::hex
                    << static_cast<unsigned int>(packet_data.front())
                    << std::nouppercase << "), v1.0 packets should start with 0x"
-                   << std::uppercase << std::hex << MAVLINK_STX_MAVLINK1
+                   << std::uppercase << std::hex
+                   << static_cast<unsigned int>(START_BYTE)
                    << std::nouppercase << ".";
                 throw std::invalid_argument(ss.str());
             }
@@ -76,8 +77,7 @@ namespace packet_v1
                 throw std::length_error(
                     "Packet (" + std::to_string(packet_data.size()) +
                     " bytes) is shorter than a v1.0 header (" +
-                    std::to_string(MAVLINK_CORE_HEADER_MAVLINK1_LEN + 1) +
-                    " bytes).");
+                    std::to_string(HEADER_LENGTH) + " bytes).");
             }
         }
 
@@ -93,9 +93,8 @@ namespace packet_v1
         // Ensure a complete packet was given.
         if (!packet_complete(packet_data))
         {
-            size_t expected_length =
-                1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN +
-                header(packet_data)->len + MAVLINK_NUM_CHECKSUM_BYTES;
+            size_t expected_length = HEADER_LENGTH + header(packet_data)->len +
+                                     MAVLINK_NUM_CHECKSUM_BYTES;
             throw std::length_error(
                 "Packet is " + std::to_string(this->data().size()) +
                 " bytes, should be " +
@@ -111,7 +110,7 @@ namespace packet_v1
      */
     unsigned int Packet::version() const
     {
-        return 0x0100;
+        return VERSION;
     }
 
 
@@ -212,18 +211,6 @@ namespace packet_v1
     }
 
 
-    /** Determine if a byte is a MAVLink v1.0 packet starting byte.
-     *
-     *  \relates Packet
-     *  \retval true if \p byte is the MAVLink v1.0 packet starting byte (0xFE).
-     *  \retval false if \p byte is not the v1.0 starting byte.
-     */
-    bool is_magic(uint8_t byte)
-    {
-        return byte == MAVLINK_STX_MAVLINK1;
-    }
-
-
     /** Determine if the given data contains a complete v1.0 header.
      *
      *  \relates Packet
@@ -236,8 +223,8 @@ namespace packet_v1
     {
         // We cant use the \ref header function here because that would cause
         // infinite recursion.
-        return (data.size() >= (MAVLINK_CORE_HEADER_MAVLINK1_LEN + 1)) &&
-               (is_magic(data.front()));
+        return (data.size() >= HEADER_LENGTH) &&
+               (START_BYTE == data.front());
     }
 
 
@@ -253,9 +240,8 @@ namespace packet_v1
     {
         if (header_complete(data))
         {
-            size_t expected_length =
-                1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN +
-                header(data)->len + MAVLINK_NUM_CHECKSUM_BYTES;
+            size_t expected_length = HEADER_LENGTH + header(data)->len +
+                                     MAVLINK_NUM_CHECKSUM_BYTES;
             return data.size() == expected_length;
         }
 
@@ -273,9 +259,10 @@ namespace packet_v1
     {
         if (header_complete(data))
         {
-            return reinterpret_cast<
-                const struct mavlink_packet_version1_header *>(&(data[0]));
+            return reinterpret_cast <
+                   const struct mavlink_packet_version1_header * >(&(data[0]));
         }
+
         return nullptr;
     }
 

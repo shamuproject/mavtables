@@ -223,16 +223,6 @@ namespace
 }
 
 
-TEST_CASE("'packet_v2::is_magic' determines if a byte is the v2.0 packet "
-          "magic byte.", "[packet_v2]")
-{
-    REQUIRE_FALSE(packet_v2::is_magic(0xAD));
-    REQUIRE_FALSE(packet_v2::is_magic(0xBC));
-    REQUIRE_FALSE(packet_v2::is_magic(0xFE));
-    REQUIRE(packet_v2::is_magic(0xFD));
-}
-
-
 TEST_CASE("'packet_v2::header_complete' determines whether the given bytes "
           "at least represent a complete header.", "[packet_v2]")
 {
@@ -319,17 +309,17 @@ TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
     SECTION("Header has incompatibility flags.")
     {
         REQUIRE((packet_v2::header(heartbeat)->incompat_flags &
-                    MAVLINK_IFLAG_SIGNED) == true);
+                 MAVLINK_IFLAG_SIGNED) == true);
         REQUIRE((packet_v2::header(ping)->incompat_flags &
-                    MAVLINK_IFLAG_SIGNED) == false);
+                 MAVLINK_IFLAG_SIGNED) == false);
         REQUIRE((packet_v2::header(set_mode)->incompat_flags &
-                    MAVLINK_IFLAG_SIGNED) == true);
+                 MAVLINK_IFLAG_SIGNED) == true);
         REQUIRE((packet_v2::header(mission_set_current)->incompat_flags &
-                    MAVLINK_IFLAG_SIGNED) == false);
+                 MAVLINK_IFLAG_SIGNED) == false);
         REQUIRE((packet_v2::header(encapsulated_data)->incompat_flags &
-                    MAVLINK_IFLAG_SIGNED) == true);
+                 MAVLINK_IFLAG_SIGNED) == true);
         REQUIRE((packet_v2::header(param_ext_request_list)->incompat_flags &
-                    MAVLINK_IFLAG_SIGNED) == false);
+                 MAVLINK_IFLAG_SIGNED) == false);
     }
     SECTION("Header has compatibility flags.")
     {
