@@ -32,18 +32,39 @@
 class PacketParser
 {
     private:
+        // Types
+        enum State
+        {
+            WAITING_FOR_START_BYTE,
+            WAITING_FOR_HEADER,
+            WAITING_FOR_PACKET
+        };
+        // Variables
         std::vector<uint8_t> buffer_;
-        std::weak_ptr<Connection> connection_;
-        int priority_;
+        const std::weak_ptr<Connection> connection_;
+        const int priority_;
+        PacketParser::State state_;
+        Packet::Version version_;
+        size_t bytes_remaining_;
+        // Methods
+        void waiting_for_start_byte_(uint8_t byte);
+        void waiting_for_header_(uint8_t byte);
+        std::unique_ptr<Packet> waiting_for_packet_(uint8_t byte);
+
 
     public:
         PacketParser(const PacketParser &other) = delete;
         PacketParser(PacketParser &&other) = delete;
         PacketParser(
             std::weak_ptr<Connection> connection, int priority = 0);
+        void clear();
         std::unique_ptr<Packet> parse_byte(uint8_t byte);
         PacketParser &operator=(const PacketParser &other) = delete;
         PacketParser &operator=(PacketParser &&other) = delete;
+        int priority()
+        {
+            return priority_;
+        }
 };
 
 
