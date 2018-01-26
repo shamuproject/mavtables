@@ -44,6 +44,8 @@ class Packet
         int priority_;
 
     public:
+        enum Version {V1 = 0x0100, V2 = 0x0200};
+
         /** Copy constructor.
          *
          *  \param other Packet to copy.
@@ -63,7 +65,7 @@ class Packet
          *  \returns Two byte Packet version with major version in MSB and minor
          *      version in LSB.
          */
-        virtual unsigned int version() const = 0;
+        virtual Version version() const = 0;
         /** Return MAVLink message ID.
          *
          *  \returns The numeric message ID of the MAVLink packet (0 to 255).

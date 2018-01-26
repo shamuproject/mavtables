@@ -57,7 +57,7 @@ namespace packet_v2
         if (!header_complete(packet_data))
         {
             // Could be the magic number.
-            if (START_BYTE !=packet_data.front())
+            if (START_BYTE != packet_data.front())
             {
                 std::stringstream ss;
                 ss << "Invalid packet starting byte (0x"
@@ -112,12 +112,12 @@ namespace packet_v2
 
     /** \copydoc ::Packet::version()
      *
-     *  \returns 0x0200 (v2.0)
+     *  \returns 0x0200 (v2.0) - ::Packet::V2
      *  \complexity \f$O(1)\f$
      */
-    unsigned int Packet::version() const
+    ::Packet::Version Packet::version() const
     {
-        return 0x0200;
+        return ::Packet::V2;
     }
 
 
@@ -266,7 +266,7 @@ namespace packet_v2
      */
     bool header_complete(const std::vector<uint8_t> &data)
     {
-        return (data.size() >= MAVLINK_NUM_HEADER_BYTES) && 
+        return (data.size() >= MAVLINK_NUM_HEADER_BYTES) &&
                (START_BYTE == data.front());
     }
 

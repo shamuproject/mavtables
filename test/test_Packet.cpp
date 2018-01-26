@@ -56,9 +56,9 @@ namespace
                 : Packet(std::move(data), std::move(connection), priority)
             {
             }
-            virtual unsigned int version() const
+            virtual ::Packet::Version version() const
             {
-                return 0x030E; // 3.14
+                return ::Packet::V1;
             }
             virtual unsigned long id() const
             {
@@ -251,7 +251,7 @@ TEST_CASE("Packet's are assignable (by move semantics).", "[Packet]")
 TEST_CASE("Packet's have a version.", "[Packet]")
 {
     std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(PacketTestClass({}, conn).version() == 0x030E /* 3.14 */);
+    REQUIRE(PacketTestClass({}, conn).version() == Packet::V1);
 }
 
 
@@ -287,13 +287,13 @@ TEST_CASE("Packet's are printable.", "[Packet]")
 {
     std::weak_ptr<ConnectionTestClass> conn;
     REQUIRE(str(PacketTestClass({}, conn)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v1.0)");
     REQUIRE(str(PacketTestClass({}, conn, 0)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v3.14)");
+            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v1.0)");
     REQUIRE(str(PacketTestClass({}, conn, -32768)) ==
             "MISSION_CURRENT (#42) from 3.14 to 2.71 "
-            "with priority -32768 (v3.14)");
+            "with priority -32768 (v1.0)");
     REQUIRE(str(PacketTestClass({}, conn, 32767)) ==
             "MISSION_CURRENT (#42) from 3.14 to 2.71 "
-            "with priority 32767 (v3.14)");
+            "with priority 32767 (v1.0)");
 }

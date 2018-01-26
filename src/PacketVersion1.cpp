@@ -59,7 +59,7 @@ namespace packet_v1
         if (!header_complete(packet_data))
         {
             // Could be the magic number.
-            if (START_BYTE !=packet_data.front())
+            if (START_BYTE != packet_data.front())
             {
                 std::stringstream ss;
                 ss << "Invalid packet starting byte (0x"
@@ -105,10 +105,10 @@ namespace packet_v1
 
     /** \copydoc ::Packet::version()
      *
-     *  \returns 0x0100 (v1.0)
+     *  \returns 0x0100 (v1.0) - ::Packet::V1
      *  \complexity \f$O(1)\f$
      */
-    unsigned int Packet::version() const
+    ::Packet::Version Packet::version() const
     {
         return VERSION;
     }

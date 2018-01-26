@@ -44,7 +44,7 @@ namespace packet_v2
 
     /** MAVLink v2.0 version..
      */
-    const unsigned int VERSION = 0x0200;
+    const ::Packet::Version VERSION = ::Packet::V2;
 
 
     /** A MAVLink packet with the version 2 wire protocol.
@@ -69,7 +69,7 @@ namespace packet_v2
                 std::vector<uint8_t> data,
                 std::weak_ptr<Connection> connection,
                 int priority = 0);
-            virtual unsigned int version() const;
+            virtual ::Packet::Version version() const;
             virtual unsigned long id() const;
             virtual std::string name() const;
             virtual MAVAddress source() const;
