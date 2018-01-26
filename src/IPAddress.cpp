@@ -38,7 +38,10 @@
 
 // Private functions.
 #ifdef UNIX
-    static IPAddress unix_dnslookup(const std::string &url, unsigned int port);
+namespace
+{
+    IPAddress unix_dnslookup(const std::string &url, unsigned int port);
+}
 #elif WINDOWS
 #endif
 
@@ -361,47 +364,52 @@ IPAddress dnslookup(const std::string &url)
 
 #ifdef UNIX
 
-/* Lookup an IP address based on a hostname.
- *
- * This version is unix only and will be called by \ref dnslookup on UNIX
- * systems.
- */
-static IPAddress unix_dnslookup(const std::string &url, unsigned int port)
+namespace
 {
-    std::set<IPAddress> addresses;
-    // Setup hints.
-    struct addrinfo hints;
-    std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET; // IPv4 only (for now)
-    hints.ai_protocol = static_cast<int>(port);
-    // Get IP addresses.
-    struct addrinfo *result_ptr = nullptr;
 
-    if (getaddrinfo(url.c_str(), nullptr, &hints, &result_ptr))
+    /* Lookup an IP address based on a hostname.
+     *
+     * This version is unix only and will be called by \ref dnslookup on UNIX
+     * systems.
+     */
+    IPAddress unix_dnslookup(const std::string &url, unsigned int port)
     {
-        throw DNSLookupError(url);
+        std::set<IPAddress> addresses;
+        // Setup hints.
+        struct addrinfo hints;
+        std::memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET; // IPv4 only (for now)
+        hints.ai_protocol = static_cast<int>(port);
+        // Get IP addresses.
+        struct addrinfo *result_ptr = nullptr;
+
+        if (getaddrinfo(url.c_str(), nullptr, &hints, &result_ptr))
+        {
+            throw DNSLookupError(url);
+        }
+
+        std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)>
+        result(result_ptr, freeaddrinfo);
+        result_ptr = nullptr;
+
+        for (result_ptr = result.get(); result_ptr != nullptr;
+                result_ptr = result_ptr->ai_next)
+        {
+            struct sockaddr_in *address_ptr =
+                    reinterpret_cast<struct sockaddr_in *>(result_ptr->ai_addr);
+            unsigned long address = ntohl(address_ptr->sin_addr.s_addr);
+            addresses.insert(IPAddress(address, port));
+        }
+
+        // This should never be true but it's here just in case.
+        if (addresses.empty())
+        {
+            throw DNSLookupError(url);
+        }
+
+        return *(addresses.begin());
     }
 
-    std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)>
-    result(result_ptr, freeaddrinfo);
-    result_ptr = nullptr;
-
-    for (result_ptr = result.get(); result_ptr != nullptr;
-            result_ptr = result_ptr->ai_next)
-    {
-        struct sockaddr_in *address_ptr =
-                reinterpret_cast<struct sockaddr_in *>(result_ptr->ai_addr);
-        unsigned long address = ntohl(address_ptr->sin_addr.s_addr);
-        addresses.insert(IPAddress(address, port));
-    }
-
-    // This should never be true but it's here just in case.
-    if (addresses.empty())
-    {
-        throw DNSLookupError(url);
-    }
-
-    return *(addresses.begin());
 }
 
 #elif WINDOWS
