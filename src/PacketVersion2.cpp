@@ -75,7 +75,7 @@ namespace packet_v2
                 throw std::length_error(
                     "Packet (" + std::to_string(packet_data.size()) +
                     " bytes) is shorter than a v2.0 header (" +
-                    std::to_string(MAVLINK_NUM_HEADER_BYTES) +
+                    std::to_string(HEADER_LENGTH) +
                     " bytes).");
             }
         }
@@ -94,11 +94,11 @@ namespace packet_v2
         {
             std::string prefix = "Packet";
             size_t expected_length =
-                MAVLINK_NUM_NON_PAYLOAD_BYTES + header(packet_data)->len;
+                HEADER_LENGTH + header(packet_data)->len + CHECKSUM_LENGTH;
 
             if (is_signed(packet_data))
             {
-                expected_length += MAVLINK_SIGNATURE_BLOCK_LEN;
+                expected_length += SIGNATURE_LENGTH;
                 prefix = "Signed packet";
             }
 
@@ -240,7 +240,7 @@ namespace packet_v2
 
     /** Determine if a MAVLink v2.0 packet is signed or not.
      *
-     *  \relates
+     *  \relates Packet
      *  \throws std::invalid_argument Header is not complete or is invalid.
      *  \throws std::length_error If packet data is not of correct length.
      */
@@ -266,7 +266,7 @@ namespace packet_v2
      */
     bool header_complete(const std::vector<uint8_t> &data)
     {
-        return (data.size() >= MAVLINK_NUM_HEADER_BYTES) &&
+        return (data.size() >= HEADER_LENGTH) &&
                (START_BYTE == data.front());
     }
 
@@ -283,12 +283,12 @@ namespace packet_v2
     {
         if (header_complete(data))
         {
-            size_t expected_length = MAVLINK_NUM_NON_PAYLOAD_BYTES +
-                                     header(data)->len;
+            size_t expected_length =
+                HEADER_LENGTH + header(data)->len + CHECKSUM_LENGTH;
 
             if (header(data)->incompat_flags & MAVLINK_IFLAG_SIGNED)
             {
-                expected_length += MAVLINK_SIGNATURE_BLOCK_LEN;
+                expected_length += SIGNATURE_LENGTH;
             }
 
             return data.size() == expected_length;

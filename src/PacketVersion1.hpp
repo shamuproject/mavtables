@@ -32,17 +32,22 @@
 namespace packet_v1
 {
 
-    /** MAVLink v1.0 header length (6 bytes).
-     */
-    const size_t HEADER_LENGTH = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN;
-
-
     /** MAVLink v1.0 start byte (0xFE).
      */
     const uint8_t START_BYTE = MAVLINK_STX_MAVLINK1;
 
 
-    /** MAVLink v1.0 version..
+    /** MAVLink v1.0 header length (6 bytes).
+     */
+    const size_t HEADER_LENGTH = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN;
+
+
+    /** MAVLink v1.0 checksum length (2 bytes).
+     */
+    const size_t CHECKSUM_LENGTH = MAVLINK_NUM_CHECKSUM_BYTES;
+
+
+    /** MAVLink v1.0 version.
      */
     const ::Packet::Version VERSION = ::Packet::V1;
 

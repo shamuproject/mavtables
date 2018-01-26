@@ -93,8 +93,8 @@ namespace packet_v1
         // Ensure a complete packet was given.
         if (!packet_complete(packet_data))
         {
-            size_t expected_length = HEADER_LENGTH + header(packet_data)->len +
-                                     MAVLINK_NUM_CHECKSUM_BYTES;
+            size_t expected_length =
+                HEADER_LENGTH + header(packet_data)->len + CHECKSUM_LENGTH;
             throw std::length_error(
                 "Packet is " + std::to_string(this->data().size()) +
                 " bytes, should be " +
@@ -177,8 +177,8 @@ namespace packet_v1
             if (msg_entry->flags & MAV_MSG_ENTRY_FLAG_HAVE_TARGET_SYSTEM)
             {
                 // target_system_ofs is offset from start of payload
-                size_t offset = msg_entry->target_system_ofs + sizeof(
-                                    mavlink_packet_version1_header);
+                size_t offset = msg_entry->target_system_ofs +
+                                sizeof(mavlink_packet_version1_header);
                 dest_system = data()[offset];
             }
 
@@ -186,8 +186,8 @@ namespace packet_v1
             if (msg_entry->flags & MAV_MSG_ENTRY_FLAG_HAVE_TARGET_COMPONENT)
             {
                 // target_compoent_ofs is offset from start of payload
-                size_t offset = msg_entry->target_component_ofs + sizeof(
-                                    mavlink_packet_version1_header);
+                size_t offset = msg_entry->target_component_ofs +
+                                sizeof(mavlink_packet_version1_header);
                 dest_component = data()[offset];
             }
 
@@ -240,8 +240,8 @@ namespace packet_v1
     {
         if (header_complete(data))
         {
-            size_t expected_length = HEADER_LENGTH + header(data)->len +
-                                     MAVLINK_NUM_CHECKSUM_BYTES;
+            size_t expected_length =
+                HEADER_LENGTH + header(data)->len + CHECKSUM_LENGTH;
             return data.size() == expected_length;
         }
 

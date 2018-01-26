@@ -32,14 +32,24 @@
 namespace packet_v2
 {
 
+    /** MAVLink v2.0 start byte (0xFD).
+     */
+    const uint8_t START_BYTE = MAVLINK_STX;
+
+
     /** MAVLink v2.0 header length (10 bytes).
      */
     const size_t HEADER_LENGTH = MAVLINK_NUM_HEADER_BYTES;
 
 
-    /** MAVLink v2.0 start byte (0xFD).
+    /** MAVLink v2.0 checksum length (2 bytes).
      */
-    const uint8_t START_BYTE = MAVLINK_STX;
+    const size_t CHECKSUM_LENGTH = MAVLINK_NUM_CHECKSUM_BYTES;
+
+
+    /** MAVLink v2.0 signature length (13 bytes) if signed.
+     */
+    const size_t SIGNATURE_LENGTH = MAVLINK_SIGNATURE_BLOCK_LEN;
 
 
     /** MAVLink v2.0 version..
