@@ -140,12 +140,12 @@ TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
     }
     SECTION("Header has a sequence number.")
     {
-        REQUIRE(packet_v2::header(heartbeat)->seq == 0);
-        REQUIRE(packet_v2::header(ping)->seq == 0);
-        REQUIRE(packet_v2::header(set_mode)->seq == 0);
-        REQUIRE(packet_v2::header(mission_set_current)->seq == 0);
-        REQUIRE(packet_v2::header(encapsulated_data)->seq == 0);
-        REQUIRE(packet_v2::header(param_ext_request_list)->seq == 0);
+        REQUIRE(packet_v2::header(heartbeat)->seq == 0xFD);
+        REQUIRE(packet_v2::header(ping)->seq == 0xFD);
+        REQUIRE(packet_v2::header(set_mode)->seq == 0xFD);
+        REQUIRE(packet_v2::header(mission_set_current)->seq == 0xFD);
+        REQUIRE(packet_v2::header(encapsulated_data)->seq == 0xFD);
+        REQUIRE(packet_v2::header(param_ext_request_list)->seq == 0xFD);
     }
     SECTION("Header has a system ID.")
     {

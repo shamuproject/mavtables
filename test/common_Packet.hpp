@@ -55,7 +55,7 @@ namespace
         };
         uint8_t magic = 0xFE;
         uint8_t len = sizeof(payload);
-        uint8_t seq = 0;
+        uint8_t seq = 0xFE; // test internal magic byte
         uint8_t sysid = 1;
         uint8_t compid = 0;
         uint8_t msgid = 0;
@@ -76,7 +76,7 @@ namespace
         };
         uint8_t magic = 0xFE;
         uint8_t len = sizeof(payload);
-        uint8_t seq = 0;
+        uint8_t seq = 0xFE; // test internal magic byte
         uint8_t sysid = 60;
         uint8_t compid = 40;
         uint8_t msgid = 4;
@@ -92,11 +92,11 @@ namespace
         {
             uint32_t custom_mode = 2;
             uint8_t target_system = 123;
-            uint8_t base_mode = 1;
+            uint8_t base_mode = 0xFE; // test magic byte in payload
         };
         uint8_t magic = 0xFE;
         uint8_t len = sizeof(payload);
-        uint8_t seq = 0;
+        uint8_t seq = 0xFE; // test internal magic byte
         uint8_t sysid = 70;
         uint8_t compid = 30;
         uint8_t msgid = 11;
@@ -115,7 +115,7 @@ namespace
         };
         uint8_t magic = 0xFE;
         uint8_t len = 255;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFE; // test internal magic byte
         uint8_t sysid = 255;
         uint8_t compid = 1;
         uint8_t msgid = 131;
@@ -141,7 +141,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 1;
         uint8_t compid = 0;
         uint32_t msgid : 24;
@@ -165,7 +165,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 60;
         uint8_t compid = 40;
         uint32_t msgid : 24;
@@ -182,13 +182,13 @@ namespace
         {
             uint32_t custom_mode = 2;
             uint8_t target_system = 123;
-            uint8_t base_mode = 1;
+            uint8_t base_mode = 0xFD; // test magic byte in payload
         };
         uint8_t magic = 0xFD;
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 70;
         uint8_t compid = 30;
         uint32_t msgid : 24;
@@ -198,12 +198,13 @@ namespace
     };
 
 
-    // MISSION_SET_CURRENT v2.0 for testing trimmed out target system and components.
+    // MISSION_SET_CURRENT v2.0 for testing trimmed out target system and
+    // components.
     struct PACKED MissionSetCurrentV2
     {
         struct PACKED payload
         {
-            uint16_t seq = 12;
+            uint16_t seq = 0xFD; // test magic byte in payload
             // uint8_t target_system = 0;
             // uint8_t target_component = 0;
         };
@@ -211,7 +212,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 80;
         uint8_t compid = 20;
         uint32_t msgid : 24;
@@ -233,7 +234,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 255;
         uint8_t compid = 1;
         uint32_t msgid : 24;
@@ -256,7 +257,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
-        uint8_t seq = 0;
+        uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 1;
         uint8_t compid = 255;
         uint32_t msgid : 24;
