@@ -41,6 +41,17 @@ PacketParser::PacketParser(
 }
 
 
+/** Return the number of bytes parsed on the current packet.
+ *
+ *  \returns The number of bytes parsed on the current packet, 0 if no packet is
+ *      currently being parsed.
+ */
+size_t PacketParser::bytes_parsed() const
+{
+    return buffer_.size();
+}
+
+
 /** Reset packet parser so it can parse another packet.
  *
  *  If called while parsing a packet, that packet will be lost.
@@ -66,6 +77,8 @@ void PacketParser::clear()
  */
 std::unique_ptr<Packet> PacketParser::parse_byte(uint8_t byte)
 {
+    std::unique_ptr<Packet> packet;
+
     switch (state_)
     {
         case WAITING_FOR_START_BYTE:
@@ -77,10 +90,10 @@ std::unique_ptr<Packet> PacketParser::parse_byte(uint8_t byte)
             break;
 
         case WAITING_FOR_PACKET:
-            return waiting_for_packet_(byte);
+            packet = waiting_for_packet_(byte);
     }
 
-    return nullptr;
+    return packet;
 }
 
 
@@ -123,7 +136,7 @@ void PacketParser::waiting_for_header_(uint8_t byte)
     switch (version_)
     {
         case packet_v1::VERSION:
-            if (packet_v1::packet_complete(buffer_))
+            if (packet_v1::header_complete(buffer_))
             {
                 // Set number of expected bytes and start waiting for
                 // remainder of packet.
@@ -135,7 +148,7 @@ void PacketParser::waiting_for_header_(uint8_t byte)
             break;
 
         case packet_v2::VERSION:
-            if (packet_v2::packet_complete(buffer_))
+            if (packet_v2::header_complete(buffer_))
             {
                 // Set number of expected bytes and start waiting for
                 // remainder of packet.
@@ -168,8 +181,9 @@ void PacketParser::waiting_for_header_(uint8_t byte)
 std::unique_ptr<Packet> PacketParser::waiting_for_packet_(uint8_t byte)
 {
     buffer_.push_back(byte);
+    --bytes_remaining_;
 
-    if (--bytes_remaining_ == 0)
+    if (bytes_remaining_ == 0)
     {
         std::unique_ptr<Packet> packet;
 

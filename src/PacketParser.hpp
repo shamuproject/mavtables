@@ -57,14 +57,11 @@ class PacketParser
         PacketParser(PacketParser &&other) = delete;
         PacketParser(
             std::weak_ptr<Connection> connection, int priority = 0);
+        size_t bytes_parsed() const;
         void clear();
         std::unique_ptr<Packet> parse_byte(uint8_t byte);
         PacketParser &operator=(const PacketParser &other) = delete;
         PacketParser &operator=(PacketParser &&other) = delete;
-        int priority()
-        {
-            return priority_;
-        }
 };
 
 
