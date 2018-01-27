@@ -43,8 +43,7 @@ namespace packet_v1
      */
     Packet::Packet(
         std::vector<uint8_t> data,
-        std::weak_ptr<Connection> connection,
-        int priority)
+        std::weak_ptr<Connection> connection, int priority)
         : ::Packet(std::move(data), std::move(connection), priority)
     {
         const std::vector<uint8_t> &packet_data = this->data();
