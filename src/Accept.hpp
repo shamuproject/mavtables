@@ -15,30 +15,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#ifndef ACCEPT_HPP_
+#define ACCEPT_HPP_
+
+
 #include <ostream>
 
 #include "Action.hpp"
+#include "Packet.hpp"
+#include "MAVAddress.hpp"
 
 
-Action::~Action()
+class Accept : public Action
 {
-}
+    protected:
+        virtual std::ostream &print_(std::ostream &os) const;
+
+    public:
+        virtual bool action(
+            const Packet &packet, const MAVAddress &address);
+};
 
 
-/** Print the given action to the given output stream.
- *
- *  Some examples are:
- *      - `reject`
- *      - `accept`
- *      - `call gcs_in`
- *      - `goto autopilot_out`
- *
- *  \relates Action
- *  \param os The output stream to print to.
- *  \param action The MAVLink packet to print.
- *  \return The output stream.
- */
-std::ostream &operator<<(std::ostream &os, const Action &action)
-{
-    return action.print_(os);
-}
+#endif // ACCEPT_HPP_

@@ -17,28 +17,29 @@
 
 #include <ostream>
 
-#include "Action.hpp"
+#include "Packet.hpp"
+#include "MAVAddress.hpp"
+#include "Accept.hpp"
 
 
-Action::~Action()
+/** \copydoc Action::print_(std::ostream &os) const
+ *
+ *  Prints `"accept"`.
+ */
+std::ostream &Accept::print_(std::ostream &os) const
 {
+    os << "accept";
+    return os;
 }
 
 
-/** Print the given action to the given output stream.
+/** \copydoc Action::action(const Packet &, const MAVAddress &)
  *
- *  Some examples are:
- *      - `reject`
- *      - `accept`
- *      - `call gcs_in`
- *      - `goto autopilot_out`
- *
- *  \relates Action
- *  \param os The output stream to print to.
- *  \param action The MAVLink packet to print.
- *  \return The output stream.
+ *  The Accept class always returns true.
  */
-std::ostream &operator<<(std::ostream &os, const Action &action)
+bool Accept::action(const Packet &packet, const MAVAddress &address)
 {
-    return action.print_(os);
+    (void)packet;
+    (void)address;
+    return true;
 }

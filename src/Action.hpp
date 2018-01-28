@@ -19,7 +19,7 @@
 #define ACTION_HPP_
 
 
-#include <sstream>
+#include <ostream>
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
@@ -28,12 +28,25 @@
 class Action
 {
     protected:
+        /** Print the action to the given output stream.
+         *
+         *  \param os The output stream to print to.
+         *  \return The output stream.
+         */
         virtual std::ostream &print_(std::ostream &os) const = 0;
 
     public:
         virtual ~Action();
+        /** Determin whether packet is allowed to be sent to given address.
+         *
+         *  \param packet The packet to determine whether to allow or not.
+         *  \param address The address the \p packet will be sent out on if the
+         *      action allows it.
+         *  \retval true The packet is allowed to be sent to \p address.
+         *  \retval false The packet is not allowed to be sent to \p address.
+         */
         virtual bool action(
-                const Packet &packet, const MAVAddress &address) = 0;
+            const Packet &packet, const MAVAddress &address) = 0;
 
         friend std::ostream &operator<<(std::ostream &os, const Action &action);
 };

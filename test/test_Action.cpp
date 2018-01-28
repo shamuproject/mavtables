@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <sstream>
+#include <ostream>
 
 #include <catch.hpp>
 
@@ -46,7 +46,7 @@ namespace
             virtual bool action(const Packet &packet, const MAVAddress &address)
             {
                 return (packet.name() == "PING") &&
-                    MAVSubnet("192.0/14").contains(address);
+                       MAVSubnet("192.0/14").contains(address);
             }
     };
 
@@ -85,7 +85,7 @@ TEST_CASE("Action's determine what to do with a packet with respect to a "
 }
 
 
-TEST_CASE("Action's are printable.")
+TEST_CASE("Action's are printable.", "[Action]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
