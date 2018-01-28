@@ -18,6 +18,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <cstdint>
 #include <optional>
 #include <stdexcept>
 
@@ -31,58 +32,69 @@
 
 #include "common_Packet.hpp"
 
-
-/** Test a PacketParser instance on data.
- *
- *  Uses the REQUIRE macro from Catch C++ internally for testing.
- *
- *  \param parser The instance of the packet parser to use.
- *  \param data The data to give to the parser.
- *  \param packet_end The byte (1 indexed) that the packet is supposed to end
- *      on.
- *
- *  \returns The packet parsed from the given \p data.
- */
-std::unique_ptr<Packet> test_packet_parser(PacketParser &parser,
-        const std::vector<uint8_t> &data, size_t packet_end)
+namespace
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    std::unique_ptr<Packet> packet;
 
-    for (auto i : boost::irange(static_cast<size_t>(0), packet_end - 1))
+    // Forward defines of locatl functions.
+    std::unique_ptr<Packet> test_packet_parser(PacketParser &parser,
+            const std::vector<uint8_t> &data, size_t packet_end);
+    void add_bytes(std::vector<uint8_t> &data, size_t num_bytes);
+
+
+    /** Test a PacketParser instance on data.
+     *
+     *  Uses the REQUIRE macro from Catch C++ internally for testing.
+     *
+     *  \param parser The instance of the packet parser to use.
+     *  \param data The data to give to the parser.
+     *  \param packet_end The byte (1 indexed) that the packet is supposed to
+     *      end on.
+     *
+     *  \returns The packet parsed from the given \p data.
+     */
+    std::unique_ptr<Packet> test_packet_parser(PacketParser &parser,
+            const std::vector<uint8_t> &data, size_t packet_end)
     {
-        REQUIRE(parser.parse_byte(data[i]) == nullptr);
+        auto conn = std::make_shared<ConnectionTestClass>();
+        std::unique_ptr<Packet> packet;
+
+        for (auto i : boost::irange(static_cast<size_t>(0), packet_end - 1))
+        {
+            REQUIRE(parser.parse_byte(data[i]) == nullptr);
+        }
+
+        REQUIRE((packet = parser.parse_byte(data[packet_end - 1])) != nullptr);
+
+        for (auto i : boost::irange(packet_end, data.size()))
+        {
+            REQUIRE(parser.parse_byte(data[i]) == nullptr);
+        }
+
+        return packet;
     }
 
-    REQUIRE((packet = parser.parse_byte(data[packet_end - 1])) != nullptr);
 
-    for (auto i : boost::irange(packet_end, data.size()))
+    /** Add bytes to either side of a vector.
+     *
+     *  Used for testing.
+     *
+     *  \param data A reference to the vector to modify.
+     *  \param num_bytes Number of bytes to add on either end the \p data
+     *      vector.
+     */
+    void add_bytes(std::vector<uint8_t> &data, size_t num_bytes)
     {
-        REQUIRE(parser.parse_byte(data[i]) == nullptr);
+        for (auto i : boost::irange(static_cast<size_t>(0), num_bytes))
+        {
+            data.insert(data.begin(), static_cast<uint8_t>(i));
+        }
+
+        for (auto i : boost::irange(static_cast<size_t>(0), num_bytes))
+        {
+            data.push_back(static_cast<uint8_t>(i));
+        }
     }
 
-    return packet;
-}
-
-
-/** Add bytes to either side of a vector.
- *
- *  Used for testing.
- *
- *  \param data A reference to the vector to modify.
- *  \param num_bytes Number of bytes to add on either end the \p data vector.
- */
-void add_bytes(std::vector<uint8_t> &data, size_t num_bytes)
-{
-    for (auto i : boost::irange(static_cast<size_t>(0), num_bytes))
-    {
-        data.insert(data.begin(), i);
-    }
-
-    for (auto i : boost::irange(static_cast<size_t>(0), num_bytes))
-    {
-        data.push_back(i);
-    }
 }
 
 
