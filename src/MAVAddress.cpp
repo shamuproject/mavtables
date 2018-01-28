@@ -274,9 +274,9 @@ bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  The format is "<System ID>.<Component ID>".
  *
  *  Some examples are:
- *      - "0.0"
- *      - "16.8"
- *      - "128.4"
+ *      - `0.0`
+ *      - `16.8`
+ *      - `128.4`
  *
  *  \relates MAVAddress
  *  \param os The output stream to print to.

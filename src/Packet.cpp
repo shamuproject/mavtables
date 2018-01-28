@@ -107,10 +107,10 @@ const std::vector<uint8_t> &Packet::data() const
  *  latter is not printed if the priority is the default 0.
  *
  *  Some examples are:
- *      - `"HEARTBEAT (#1) from 16.8 with priority 4 (v1.0)"`
- *      - `"PING (#4) from 128.4 to 16.8 (v2.0)"`
- *      - `"DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0)"`
- *      - `"ENCAPSULATED_DATA (#131) from 128.4 with priority -3 (v2.0)"`
+ *      - `HEARTBEAT (#1) from 16.8 with priority 4 (v1.0)`
+ *      - `PING (#4) from 128.4 to 16.8 (v2.0)`
+ *      - `DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0)`
+ *      - `ENCAPSULATED_DATA (#131) from 128.4 with priority -3 (v2.0)`
  *
  *  \relates Packet
  *  \param os The output stream to print to.
