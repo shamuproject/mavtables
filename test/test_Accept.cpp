@@ -60,7 +60,7 @@ TEST_CASE("Accepts's 'action' metohod always returns true.", "[Accept]")
 }
 
 
-TEST_CASE("Accepts's are printable.", "[Accepts]")
+TEST_CASE("Accepts's are printable.", "[Accept]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
