@@ -124,6 +124,11 @@ namespace
     };
 
 
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wunused-member-function"
+#endif
+
     // HEARTBEAT v2.0 structure for testing packets without target
     // system/component.
     struct PACKED HeartbeatV2
@@ -266,6 +271,15 @@ namespace
         ParamExtRequestListV2() : msgid(321) {}
     };
 
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif
+
+
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wunused-template"
+#endif
 
     // Convert a MAVLink packet structure to a vector of bytes.
     template <class T>
@@ -294,5 +308,9 @@ namespace
         data.insert(std::end(data), std::begin(sig), std::end(sig));
         return data;
     }
+
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif
 
 }
