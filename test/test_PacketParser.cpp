@@ -183,7 +183,7 @@ TEST_CASE("PacketParser's can be cleared with 'clear'.", "[PacketParser]")
 }
 
 
-TEST_CASE("PacketParser's keep track of how many bytes they have parsed on "
+TEST_CASE("PacketParser's keep track of how many bytes they have parsed of "
           "the current packet.", "[PacketParser]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
@@ -205,4 +205,42 @@ TEST_CASE("PacketParser's keep track of how many bytes they have parsed on "
     REQUIRE(parser.bytes_parsed() == 0);
     parser.parse_byte(1);
     REQUIRE(parser.bytes_parsed() == 0);
+}
+
+
+TEST_CASE("PacketParser's construct packets with a given weak_ptr to a "
+          "connection.", "[PacketParser]")
+{
+    auto conn1 = std::make_shared<ConnectionTestClass>();
+    auto conn2 = std::make_shared<ConnectionTestClass>();
+    PacketParser parser1(conn1);
+    PacketParser parser2(conn2);
+    auto data = to_vector(PingV1());
+    auto packet1 = test_packet_parser(parser1, data, sizeof(PingV1));
+    auto packet2 = test_packet_parser(parser2, data, sizeof(PingV1));
+    REQUIRE(packet1->connection().lock() != nullptr);
+    REQUIRE(packet1->connection().lock() == conn1);
+    REQUIRE(packet1->connection().lock() != conn2);
+    REQUIRE(packet2->connection().lock() != nullptr);
+    REQUIRE(packet2->connection().lock() != conn1);
+    REQUIRE(packet2->connection().lock() == conn2);
+}
+
+
+TEST_CASE("PacketParser's construct packets with a priority.", "[PacketParser]")
+{
+    auto conn = std::make_shared<ConnectionTestClass>();
+    auto data = to_vector(PingV1());
+    SECTION("The priority can be given in the constructor.")
+    {
+        PacketParser parser(conn, 11);
+        auto packet = test_packet_parser(parser, data, sizeof(PingV1));
+        REQUIRE(packet->priority() == 11);
+    }
+    SECTION("The default priority is 0.")
+    {
+        PacketParser parser(conn);
+        auto packet = test_packet_parser(parser, data, sizeof(PingV1));
+        REQUIRE(packet->priority() == 0);
+    }
 }
