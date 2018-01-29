@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <ostream>
+#include <memory>
 
 #include <catch.hpp>
 
@@ -26,7 +26,9 @@
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "RecursionChecker.hpp"
+#include "Chain.hpp"
 #include "Action.hpp"
+#include "Goto.hpp"
 
 #include "common_Packet.hpp"
 
@@ -34,16 +36,10 @@
 namespace
 {
 
-    class ActionTestClass : public Action
+    class ChainTestClass : public Chain
     {
-        protected:
-            virtual std::ostream &print_(std::ostream &os) const
-            {
-                os << "test";
-                return os;
-            }
-
         public:
+            using Chain::Chain;
             virtual Action::Option action(
                 const Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
@@ -67,51 +63,51 @@ namespace
 }
 
 
-TEST_CASE("Action's can be constructed.", "[Action]")
+TEST_CASE("Goto's can be constructed.", "[Goto]")
 {
-    REQUIRE_NOTHROW(ActionTestClass());
+    REQUIRE_NOTHROW(Goto(std::make_shared<ChainTestClass>("test_chain")));
 }
 
 
-TEST_CASE("Action's determine what to do with a packet with respect to a "
-          "destination address.", "[Action]")
+TEST_CASE("Goto's 'action' method always returns Action::ACCEPT.",
+          "[Goto]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
     auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
     RecursionChecker rc;
-    ActionTestClass action;
-    REQUIRE(action.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.1"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.2"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.3"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(action.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(action.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(action.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
-    REQUIRE(action.action(hb, MAVAddress("192.0"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.1"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.2"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.3"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.4"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.5"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.6"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.7"), rc) == Action::CONTINUE);
+    Goto goto_(std::make_shared<ChainTestClass>("test_chain"));
+    REQUIRE(goto_.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.1"), rc) == Action::ACCEPT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.2"), rc) == Action::ACCEPT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.3"), rc) == Action::ACCEPT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
+    REQUIRE(goto_.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.0"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.1"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.2"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.3"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.4"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.5"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.6"), rc) == Action::DEFAULT);
+    REQUIRE(goto_.action(hb, MAVAddress("192.7"), rc) == Action::DEFAULT);
 }
 
 
-TEST_CASE("Action's are printable.", "[Action]")
+TEST_CASE("Goto's are printable.", "[Goto]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    ActionTestClass action;
-    Action &polymophic_action = action;
+    Goto goto_(std::make_shared<ChainTestClass>("test_chain"));
+    Action &action = goto_;
     SECTION("By direct type.")
     {
-        REQUIRE(str(action) == "test");
+        REQUIRE(str(goto_) == "goto test_chain");
     }
     SECTION("By polymorphic type.")
     {
-        REQUIRE(str(polymophic_action) == "test");
+        REQUIRE(str(action) == "goto test_chain");
     }
 }

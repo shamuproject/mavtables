@@ -15,28 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef REJECT_HPP_
-#define REJECT_HPP_
+#include <string>
+#include <stdexcept>
+
+#include "Chain.hpp"
 
 
-#include <ostream>
-
-#include "Action.hpp"
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
-#include "Action.hpp"
-
-
-class Reject : public Action
+Chain::Chain(std::string name_)
+    : name(std::move(name_))
 {
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
-    public:
-        virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
-};
+    if (name.find_first_of("\t\n ") != std::string::npos)
+    {
+        throw std::invalid_argument("Chain names cannot contain whitespace.");
+    }
+}
 
 
-#endif // REJECT_HPP_
+Action::Option Chain::action(
+    const Packet &packet, const MAVAddress &address,
+    RecursionChecker &recursion_checker) const
+{
+    (void)packet;
+    (void)address;
+    (void)recursion_checker;
+    return Action::CONTINUE;
+}

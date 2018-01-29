@@ -15,28 +15,44 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef REJECT_HPP_
-#define REJECT_HPP_
-
-
 #include <ostream>
 
-#include "Action.hpp"
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
 #include "Action.hpp"
+#include "Chain.hpp"
+#include "Goto.hpp"
 
 
-class Reject : public Action
+Goto::Goto(std::shared_ptr<Chain> chain)
+    : chain_(std::move(chain))
 {
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
-    public:
-        virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
-};
+}
 
 
-#endif // REJECT_HPP_
+/** \copydoc Action::print_(std::ostream &os) const
+ *
+ *  Prints `"accept"`.
+ */
+std::ostream &Goto::print_(std::ostream &os) const
+{
+    os << "goto " << chain_->name;
+    return os;
+}
+
+
+/** \copydoc ::Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+ *
+ *  The Goto class delegates the action choice to the contained \ref Chain.
+ */
+Action::Option Goto::action(
+    const Packet &packet, const MAVAddress &address,
+    RecursionChecker &recursion_checker) const
+{
+    Action::Option option = chain_->action(packet, address, recursion_checker);
+    if (option == Action::CONTINUE)
+    {
+        return Action::DEFAULT;
+    }
+    return option;
+}

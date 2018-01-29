@@ -15,28 +15,32 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef REJECT_HPP_
-#define REJECT_HPP_
+#ifndef ACCEPT_HPP_
+#define ACCEPT_HPP_
 
 
+#include <memory>
 #include <ostream>
 
 #include "Action.hpp"
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
-#include "Action.hpp"
 
 
-class Reject : public Action
+class Goto : public Action
 {
+    private:
+        std::shared_ptr<Chain> chain_;
+
     protected:
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
+        Goto(std::shared_ptr<Chain> chain);
         virtual Action::Option action(
             const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
+            RecursionChecker &recursion_checker) const;
 };
 
 
-#endif // REJECT_HPP_
+#endif // ACCEPT_HPP_

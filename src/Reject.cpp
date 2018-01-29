@@ -19,6 +19,7 @@
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Action.hpp"
 #include "Reject.hpp"
 
 
@@ -33,13 +34,16 @@ std::ostream &Reject::print_(std::ostream &os) const
 }
 
 
-/** \copydoc Action::action(const Packet &, const MAVAddress &)
+/** \copydoc ::Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Reject class always returns false.
+ *  The Reject class always returns \ref Action::REJECT.
  */
-bool Reject::action(const Packet &packet, const MAVAddress &address)
+Action::Option Reject::action(
+    const Packet &packet, const MAVAddress &address,
+    RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
-    return false;
+    (void)recursion_checker;
+    return Action::REJECT;
 }

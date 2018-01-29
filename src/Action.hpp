@@ -23,6 +23,7 @@
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "RecursionChecker.hpp"
 
 
 class Action
@@ -36,17 +37,31 @@ class Action
         virtual std::ostream &print_(std::ostream &os) const = 0;
 
     public:
+        /** Filter rule actions.
+         */
+        enum Option
+        {
+            ACCEPT,     //!< Accept the packet.
+            REJECT,     //!< Reject the packet.
+            CONTINUE,   //!< Continue to next rule (no match).
+            DEFAULT     //!< Fall back on global default action.
+        };
         virtual ~Action();
-        /** Determin whether packet is allowed to be sent to given address.
+        /** Determine what action to take with the given packet.
+         *
+         *  This is with respect to a given destination address.
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
          *      action allows it.
+         *  \param recursion_checker A recursion checker used to ensure infinite
+         *      recursion does not occur.
          *  \retval true The packet is allowed to be sent to \p address.
          *  \retval false The packet is not allowed to be sent to \p address.
          */
-        virtual bool action(
-            const Packet &packet, const MAVAddress &address) = 0;
+        virtual Action::Option action(
+            const Packet &packet, const MAVAddress &address,
+            RecursionChecker &recursion_checker) const = 0;
 
         friend std::ostream &operator<<(std::ostream &os, const Action &action);
 };

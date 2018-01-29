@@ -15,28 +15,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef REJECT_HPP_
-#define REJECT_HPP_
+#ifndef CHAIN_HPP_
+#define CHAIN_HPP_
 
 
-#include <ostream>
+#include <string>
 
-#include "Action.hpp"
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
 #include "Action.hpp"
 
 
-class Reject : public Action
+class Chain
 {
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
     public:
+        const std::string name;
+        Chain(std::string name_);
+        virtual ~Chain() = default;
         virtual Action::Option action(
             const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
+            RecursionChecker &recursion_checker) const;
+
 };
 
 
-#endif // REJECT_HPP_
+#endif // CHAIN_HPP_

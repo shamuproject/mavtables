@@ -32,8 +32,9 @@ class Accept : public Action
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        virtual bool action(
-            const Packet &packet, const MAVAddress &address);
+        virtual Action::Option action(
+            const Packet &packet, const MAVAddress &address,
+            RecursionChecker &recusion_checker) const;
 };
 
 

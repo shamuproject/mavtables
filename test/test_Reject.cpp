@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <ostream>
-
 #include <catch.hpp>
 
 #include "util.hpp"
@@ -24,43 +22,46 @@
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
 #include "MAVAddress.hpp"
+#include "RecursionChecker.hpp"
+#include "Action.hpp"
 #include "Reject.hpp"
 
 #include "common_Packet.hpp"
 
 
-TEST_CASE("Rejects's can be constructed.", "[Reject]")
+TEST_CASE("Reject's can be constructed.", "[Reject]")
 {
     REQUIRE_NOTHROW(Reject());
 }
 
 
-TEST_CASE("Rejects's 'action' metohod always returns true.", "[Reject]")
+TEST_CASE("Reject's 'action' method always returns Action::REJECT.", "[Reject]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    Reject action;
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.0")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.1")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.2")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.3")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.4")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.5")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.6")));
-    REQUIRE_FALSE(action.action(ping, MAVAddress("192.7")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.0")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.1")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.2")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.3")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.4")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.5")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.6")));
-    REQUIRE_FALSE(action.action(heartbeat, MAVAddress("192.7")));
+    auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
+    RecursionChecker rc;
+    Reject reject;
+    REQUIRE(reject.action(ping, MAVAddress("192.0"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.1"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.2"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.3"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
+    REQUIRE(reject.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.0"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.1"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.2"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.3"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.4"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.5"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.6"), rc) == Action::REJECT);
+    REQUIRE(reject.action(hb, MAVAddress("192.7"), rc) == Action::REJECT);
 }
 
 
-TEST_CASE("Rejects's are printable.", "[Reject]")
+TEST_CASE("Reject's are printable.", "[Reject]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
