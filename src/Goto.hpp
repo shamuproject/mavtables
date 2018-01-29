@@ -27,9 +27,17 @@
 #include "MAVAddress.hpp"
 
 
+// Forward declaration of the chain class.
 class Chain;
 
 
+/** Delegate decision on a packet to another \ref Chain.
+ *
+ *  Action to delegate the decision on what to do with a packet to a filter \ref
+ *  Chain.  In particular, final decision is given to this \ref Chain.  If the
+ *  \ref Chain cannot decide what to do with the \ref Packet the global default
+ *  action should be taken.
+ */
 class Goto : public Action
 {
     private:

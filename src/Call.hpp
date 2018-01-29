@@ -27,9 +27,17 @@
 #include "MAVAddress.hpp"
 
 
+// Forward declaration of the chain class.
 class Chain;
 
 
+/** Delegate decision on a packet to another \ref Chain.
+ *
+ *  Action to delegate the decision on what to do with a packet to a filter \ref
+ *  Chain.  If this chain cannot make a determination (\ref Action::CONTINUE
+ *  returned), \ref Rule evaluation should resume after the rule containing this
+ *  action.
+ */
 class Call : public Action
 {
     private:

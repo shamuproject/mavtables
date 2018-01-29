@@ -69,8 +69,8 @@ TEST_CASE("Goto's can be constructed.", "[Goto]")
 }
 
 
-TEST_CASE("Goto's 'action' method always returns Action::ACCEPT.",
-          "[Goto]")
+TEST_CASE("Goto's 'action' method delegates the decision to the Chain it "
+          "contains.", "[Goto]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);

@@ -24,6 +24,11 @@
 #include "Call.hpp"
 
 
+/** Construct a call action given a chain to delegate to.
+ *
+ *  \param chain The chain to delegate decisions of whether to accept or reject
+ *      a packet to.
+ */
 Call::Call(std::shared_ptr<Chain> chain)
     : chain_(std::move(chain))
 {
@@ -43,7 +48,9 @@ std::ostream &Call::print_(std::ostream &os) const
 
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Call class delegates the action choice to the contained \ref Chain.
+ *  The Call class delegates the action choice to the contained \ref Chain.  If
+ *  that action is \ref Action::CONTINUE then \ref Rule evaluation should
+ *  continue on the next \ref Rule in the current \ref Chain.
  */
 Action::Option Call::action(
     const Packet &packet, const MAVAddress &address,

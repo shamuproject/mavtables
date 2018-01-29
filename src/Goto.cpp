@@ -24,6 +24,11 @@
 #include "Goto.hpp"
 
 
+/** Construct a goto action given a chain to delegate to.
+ *
+ *  \param chain The chain to delegate decisions of whether to accept or reject
+ *      a packet to.
+ */
 Goto::Goto(std::shared_ptr<Chain> chain)
     : chain_(std::move(chain))
 {
@@ -43,7 +48,12 @@ std::ostream &Goto::print_(std::ostream &os) const
 
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Goto class delegates the action choice to the contained \ref Chain.
+ *  The Goto class delegates the action choice to the contained \ref Chain.  If
+ *  the \ref Chain decides on the \ref Action::CONTINUE action this method will
+ *  return \ref Action::DEFAULT instead since final decision for a \ref Goto
+ *  should be with the contained \ref Chain or with the default action.  In
+ *  other words, once a rule with a \ref Goto matches, no further rule in the
+ *  chain should ever be ran.
  */
 Action::Option Goto::action(
     const Packet &packet, const MAVAddress &address,
