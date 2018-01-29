@@ -47,14 +47,14 @@ class Action
         enum Option
         {
             ACCEPT,     //!< The packet has been accepted and should be
-                        //!< delivered to the given \p address.
+            //!< delivered to the given \p address.
             REJECT,     //!< The packet has been rejected and should not be
-                        //!< delivered to the given \p address.
+            //!< delivered to the given \p address.
             CONTINUE,   //!< Whether the packet will be accepted or rejected
-                        //!< has not yet been decided and rule checking should
-                        //!< continue.
+            //!< has not yet been decided and rule checking should
+            //!< continue.
             DEFAULT     //!< Whether the packet will be accepted or rejected
-                        //!< should be decided by the global default action.
+            //!< should be decided by the global default action.
         };
         virtual ~Action();
         /** Decide what to do with a \ref Packet.

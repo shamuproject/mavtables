@@ -60,9 +60,11 @@ Action::Option GoTo::action(
     RecursionChecker &recursion_checker) const
 {
     Action::Option option = chain_->action(packet, address, recursion_checker);
+
     if (option == Action::CONTINUE)
     {
         return Action::DEFAULT;
     }
+
     return option;
 }
