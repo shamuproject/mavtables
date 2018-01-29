@@ -32,7 +32,7 @@ Goto::Goto(std::shared_ptr<Chain> chain)
 
 /** \copydoc Action::print_(std::ostream &os) const
  *
- *  Prints `"accept"`.
+ *  Prints `"goto <Chain Name>"`.
  */
 std::ostream &Goto::print_(std::ostream &os) const
 {
@@ -41,7 +41,7 @@ std::ostream &Goto::print_(std::ostream &os) const
 }
 
 
-/** \copydoc ::Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Goto class delegates the action choice to the contained \ref Chain.
  */

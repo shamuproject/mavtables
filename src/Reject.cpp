@@ -34,7 +34,7 @@ std::ostream &Reject::print_(std::ostream &os) const
 }
 
 
-/** \copydoc ::Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Reject class always returns \ref Action::REJECT.
  */

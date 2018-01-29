@@ -34,7 +34,7 @@ std::ostream &Accept::print_(std::ostream &os) const
 }
 
 
-/** \copydoc ::Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Accept class always returns \ref Action::ACCEPT.
  */

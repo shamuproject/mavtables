@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef ACCEPT_HPP_
-#define ACCEPT_HPP_
+#ifndef GOTO_HPP_
+#define GOTO_HPP_
 
 
 #include <memory>
@@ -25,6 +25,9 @@
 #include "Action.hpp"
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
+
+
+class Chain;
 
 
 class Goto : public Action
@@ -43,4 +46,4 @@ class Goto : public Action
 };
 
 
-#endif // ACCEPT_HPP_
+#endif // GOTO_HPP_
