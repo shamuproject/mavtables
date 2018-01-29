@@ -28,7 +28,7 @@
 #include "RecursionChecker.hpp"
 #include "Chain.hpp"
 #include "Action.hpp"
-#include "Goto.hpp"
+#include "GoTo.hpp"
 
 #include "common_Packet.hpp"
 
@@ -63,20 +63,20 @@ namespace
 }
 
 
-TEST_CASE("Goto's can be constructed.", "[Goto]")
+TEST_CASE("GoTo's can be constructed.", "[GoTo]")
 {
-    REQUIRE_NOTHROW(Goto(std::make_shared<ChainTestClass>("test_chain")));
+    REQUIRE_NOTHROW(GoTo(std::make_shared<ChainTestClass>("test_chain")));
 }
 
 
-TEST_CASE("Goto's 'action' method delegates the decision to the Chain it "
-          "contains.", "[Goto]")
+TEST_CASE("GoTo's 'action' method delegates the decision to the Chain it "
+          "contains.", "[GoTo]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
     auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
     RecursionChecker rc;
-    Goto goto_(std::make_shared<ChainTestClass>("test_chain"));
+    GoTo goto_(std::make_shared<ChainTestClass>("test_chain"));
     REQUIRE(goto_.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
     REQUIRE(goto_.action(ping, MAVAddress("192.1"), rc) == Action::ACCEPT);
     REQUIRE(goto_.action(ping, MAVAddress("192.2"), rc) == Action::ACCEPT);
@@ -96,11 +96,11 @@ TEST_CASE("Goto's 'action' method delegates the decision to the Chain it "
 }
 
 
-TEST_CASE("Goto's are printable.", "[Goto]")
+TEST_CASE("GoTo's are printable.", "[GoTo]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    Goto goto_(std::make_shared<ChainTestClass>("test_chain"));
+    GoTo goto_(std::make_shared<ChainTestClass>("test_chain"));
     Action &action = goto_;
     SECTION("By direct type.")
     {

@@ -38,7 +38,7 @@ class Chain;
  *  \ref Chain cannot decide what to do with the \ref Packet the global default
  *  action should be taken.
  */
-class Goto : public Action
+class GoTo : public Action
 {
     private:
         std::shared_ptr<Chain> chain_;
@@ -47,7 +47,7 @@ class Goto : public Action
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        Goto(std::shared_ptr<Chain> chain);
+        GoTo(std::shared_ptr<Chain> chain);
         virtual Action::Option action(
             const Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
