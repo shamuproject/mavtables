@@ -28,8 +28,8 @@ Action::~Action()
 /** Print the given action to the given output stream.
  *
  *  Some examples are:
- *      - `reject`
  *      - `accept`
+ *      - `reject`
  *      - `call gcs_in`
  *      - `goto autopilot_out`
  *

@@ -27,6 +27,8 @@
 #include "Action.hpp"
 
 
+/** Action to reject a packet.
+ */
 class Reject : public Action
 {
     protected:

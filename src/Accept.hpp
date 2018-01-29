@@ -26,6 +26,8 @@
 #include "MAVAddress.hpp"
 
 
+/** Action to accept a packet.
+ */
 class Accept : public Action
 {
     protected:

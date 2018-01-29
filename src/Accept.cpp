@@ -36,7 +36,8 @@ std::ostream &Accept::print_(std::ostream &os) const
 
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Accept class always returns \ref Action::ACCEPT.
+ *  The Accept class always returns \ref Action::ACCEPT, therefore it always
+ *  indicates that the \p packet should be sent to the given \p address.
  */
 Action::Option Accept::action(
     const Packet &packet, const MAVAddress &address,
