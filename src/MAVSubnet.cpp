@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
 
 #include <vector>
 #include <string>
 #include <sstream>
+#include <exception>
+#include <stdexcept>
 
 #include <boost/tokenizer.hpp>
 
@@ -165,11 +166,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
         mask_ = 0xFFFF;
         return;
     }
-    catch (std::invalid_argument)
-    {
-        // Continue on parsing normally.
-    }
-    catch (std::out_of_range)
+    catch (std::exception)
     {
         // Continue on parsing normally.
     }
@@ -183,13 +180,6 @@ MAVSubnet::MAVSubnet(std::string subnet)
     {
         parts.push_back(i);
     }
-
-    for (auto s : parts)
-    {
-        std::cout << s << std::endl;
-    }
-
-    std::cout << std::endl;
 
     // Ensure proper format.
     if (parts.size() != 3)
