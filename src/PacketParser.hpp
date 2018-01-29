@@ -33,11 +33,13 @@ class PacketParser
 {
     private:
         // Types
+        /** Packet parser states.
+         */
         enum State
         {
-            WAITING_FOR_START_BYTE,
-            WAITING_FOR_HEADER,
-            WAITING_FOR_PACKET
+            WAITING_FOR_START_BYTE, //!< Waiting for a magic start byte.
+            WAITING_FOR_HEADER,     //!< Waiting for complete header.
+            WAITING_FOR_PACKET      //!< Waitinf for complete packet.
         };
         // Variables
         std::vector<uint8_t> buffer_;

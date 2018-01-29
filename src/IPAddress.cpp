@@ -317,9 +317,9 @@ bool operator>=(const IPAddress &lhs, const IPAddress &rhs)
  *  number is nonzero an "<IP Address>" if the port is 0.
  *
  *  Some examples are:
- *      - "127.0.0.1"
- *      - "127.0.0.1:8888"
- *      - "183.125.120.42:443"
+ *      - `127.0.0.1`
+ *      - `127.0.0.1:8888`
+ *      - `183.125.120.42:443`
  *
  *  \param os The output stream to print to.
  *  \param ipaddress The IP address to print.

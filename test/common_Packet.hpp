@@ -20,6 +20,7 @@
 
 #include "Connection.hpp"
 #include "macros.hpp"
+#include "mavlink.h"
 
 
 namespace
