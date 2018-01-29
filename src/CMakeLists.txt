@@ -8,6 +8,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/GoTo.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/mavlink.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.cpp"
@@ -28,6 +29,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/mavlink.hpp.in"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.hpp"
@@ -63,6 +65,6 @@ configure_file (
     "${PROJECT_BINARY_DIR}/config.hpp"
 )
 configure_file (
-    "${PROJECT_SOURCE_DIR}/src/mavlink.h.in"
-    "${PROJECT_BINARY_DIR}/mavlink.h"
+    "${PROJECT_SOURCE_DIR}/src/mavlink.hpp.in"
+    "${PROJECT_BINARY_DIR}/mavlink.hpp"
 )
