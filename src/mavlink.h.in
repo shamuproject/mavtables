@@ -18,6 +18,8 @@
 #ifndef MAVLINK_H_
 #define MAVLINK_H_
 
+extern "C"
+{
 
 #include <stdint.h>
 
@@ -69,5 +71,7 @@ struct PACKED mavlink_packet_version2_header
     uint32_t msgid : 24;    //!< ID of message in payload (3 bytes).
 };
 
+
+}
 
 #endif // MAVLINK_H_

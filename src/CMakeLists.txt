@@ -8,6 +8,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketParser.cpp"
 )
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
@@ -20,6 +21,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketParser.hpp"
 )
 target_sources (mavtables 
     PRIVATE

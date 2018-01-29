@@ -24,52 +24,85 @@
 #include <memory>
 #include <cstdint>
 
-extern "C"
-{
 #include "mavlink.h"
-}
 #include "Connection.hpp"
 #include "Packet.hpp"
 
 
-/** A MAVLink packet with the version 2 wire protocol.
- */
-class PacketVersion2 : public Packet
+namespace packet_v2
 {
-    private:
-        const struct mavlink_packet_version2_header *header_() const;
 
-    public:
-        /** Copy constructor.
-         *
-         *  \param other PacketVersion2 to copy.
-         */
-        PacketVersion2(const PacketVersion2 &other) = default;
-        /** Move constructor.
-         *
-         *  \param other PacketVersion2 to move from.
-         */
-        PacketVersion2(PacketVersion2 &&other) = default;
-        PacketVersion2(
-            std::vector<uint8_t> data,
-            std::weak_ptr<Connection> connection,
-            int priority = 0);
-        virtual unsigned int version() const;
-        virtual unsigned long id() const;
-        virtual std::string name() const;
-        virtual MAVAddress source() const;
-        virtual std::optional<MAVAddress> dest() const;
-        /** Assignment operator.
-         *
-         *  \param other PacketVersion2 to copy.
-         */
-        PacketVersion2 &operator=(const PacketVersion2 &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         *  \param other PacketVersion2 to move from.
-         */
-        PacketVersion2 &operator=(PacketVersion2 &&other) = default;
-};
+    /** MAVLink v2.0 start byte (0xFD).
+     */
+    const uint8_t START_BYTE = MAVLINK_STX;
+
+
+    /** MAVLink v2.0 header length (10 bytes).
+     */
+    const size_t HEADER_LENGTH = MAVLINK_NUM_HEADER_BYTES;
+
+
+    /** MAVLink v2.0 checksum length (2 bytes).
+     */
+    const size_t CHECKSUM_LENGTH = MAVLINK_NUM_CHECKSUM_BYTES;
+
+
+    /** MAVLink v2.0 signature length (13 bytes) if signed.
+     */
+    const size_t SIGNATURE_LENGTH = MAVLINK_SIGNATURE_BLOCK_LEN;
+
+
+    /** MAVLink v2.0 version..
+     */
+    const ::Packet::Version VERSION = ::Packet::V2;
+
+
+    /** A MAVLink packet with the version 2 wire protocol.
+     */
+    class Packet : public ::Packet
+    {
+        private:
+            const struct mavlink_packet_version2_header *header_() const;
+
+        public:
+            /** Copy constructor.
+             *
+             *  \param other Packet to copy.
+             */
+            Packet(const Packet &other) = default;
+            /** Move constructor.
+             *
+             *  \param other Packet to move from.
+             */
+            Packet(Packet &&other) = default;
+            Packet(
+                std::vector<uint8_t> data,
+                std::weak_ptr<Connection> connection,
+                int priority = 0);
+            virtual ::Packet::Version version() const;
+            virtual unsigned long id() const;
+            virtual std::string name() const;
+            virtual MAVAddress source() const;
+            virtual std::optional<MAVAddress> dest() const;
+            /** Assignment operator.
+             *
+             *  \param other Packet to copy.
+             */
+            Packet &operator=(const Packet &other) = default;
+            /** Assignment operator (by move semantics).
+             *
+             *  \param other Packet to move from.
+             */
+            Packet &operator=(Packet &&other) = default;
+    };
+
+    bool is_signed(const std::vector<uint8_t> &data);
+    bool header_complete(const std::vector<uint8_t> &data);
+    bool packet_complete(const std::vector<uint8_t> &data);
+    const struct mavlink_packet_version2_header *header(
+        const std::vector<uint8_t> &data);
+
+}
 
 
 #endif // PACKETVERSION2_HPP_

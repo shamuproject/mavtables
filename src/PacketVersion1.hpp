@@ -24,52 +24,77 @@
 #include <memory>
 #include <cstdint>
 
-extern "C"
-{
 #include "mavlink.h"
-}
 #include "Connection.hpp"
 #include "Packet.hpp"
 
 
-/** A MAVLink packet with the version 1 wire protocol.
- */
-class PacketVersion1 : public Packet
+namespace packet_v1
 {
-    private:
-        const struct mavlink_packet_version1_header *header_() const;
 
-    public:
-        /** Copy constructor.
-         *
-         *  \param other PacketVersion1 to copy.
-         */
-        PacketVersion1(const PacketVersion1 &other) = default;
-        /** Move constructor.
-         *
-         *  \param other PacketVersion1 to move from.
-         */
-        PacketVersion1(PacketVersion1 &&other) = default;
-        PacketVersion1(
-            std::vector<uint8_t> data,
-            std::weak_ptr<Connection> connection,
-            int priority = 0);
-        virtual unsigned int version() const;
-        virtual unsigned long id() const;
-        virtual std::string name() const;
-        virtual MAVAddress source() const;
-        virtual std::optional<MAVAddress> dest() const;
-        /** Assignment operator.
-         *
-         *  \param other PacketVersion1 to copy.
-         */
-        PacketVersion1 &operator=(const PacketVersion1 &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         *  \param other PacketVersion1 to move from.
-         */
-        PacketVersion1 &operator=(PacketVersion1 &&other) = default;
-};
+    /** MAVLink v1.0 start byte (0xFE).
+     */
+    const uint8_t START_BYTE = MAVLINK_STX_MAVLINK1;
+
+
+    /** MAVLink v1.0 header length (6 bytes).
+     */
+    const size_t HEADER_LENGTH = 1 + MAVLINK_CORE_HEADER_MAVLINK1_LEN;
+
+
+    /** MAVLink v1.0 checksum length (2 bytes).
+     */
+    const size_t CHECKSUM_LENGTH = MAVLINK_NUM_CHECKSUM_BYTES;
+
+
+    /** MAVLink v1.0 version.
+     */
+    const ::Packet::Version VERSION = ::Packet::V1;
+
+
+    /** A MAVLink packet with the version 1 wire protocol.
+     */
+    class Packet : public ::Packet
+    {
+        public:
+            /** Copy constructor.
+             *
+             *  \param other Packet to copy.
+             */
+            Packet(const Packet &other) = default;
+            /** Move constructor.
+             *
+             *  \param other Packet to move from.
+             */
+            Packet(Packet &&other) = default;
+            Packet(
+                std::vector<uint8_t> data,
+                std::weak_ptr<Connection> connection,
+                int priority = 0);
+            virtual ::Packet::Version version() const;
+            virtual unsigned long id() const;
+            virtual std::string name() const;
+            virtual MAVAddress source() const;
+            virtual std::optional<MAVAddress> dest() const;
+            /** Assignment operator.
+             *
+             *  \param other Packet to copy.
+             */
+            Packet &operator=(const Packet &other) = default;
+            /** Assignment operator (by move semantics).
+             *
+             *  \param other Packet to move from.
+             */
+            Packet &operator=(Packet &&other) = default;
+    };
+
+
+    bool header_complete(const std::vector<uint8_t> &data);
+    bool packet_complete(const std::vector<uint8_t> &data);
+    const struct mavlink_packet_version1_header *header(
+        const std::vector<uint8_t> &data);
+
+}
 
 
 #endif // PACKETVERSION1_HPP_
