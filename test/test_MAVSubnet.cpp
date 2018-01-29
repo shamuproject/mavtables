@@ -143,6 +143,10 @@ TEST_CASE("MAVSubnet's can be constructed from a MAVLink address, "
 TEST_CASE("MAVSubnet's can be constructed from strings.", "[MAVSubnet]")
 {
     auto addr = MAVAddress(255, 16);
+    SECTION("Using no mask (exact address).")
+    {
+        REQUIRE(MAVSubnet("255.16") == MAVSubnet(addr, 255, 255));
+    }
     SECTION("Using long notation.")
     {
         REQUIRE(MAVSubnet("255.16:123.234") == MAVSubnet(addr, 123, 234));
@@ -343,7 +347,7 @@ TEST_CASE("MAVSubnet's are printable", "[MAVSubnet]")
     REQUIRE(str(MAVSubnet(addr, 0b1111111111111000)) == "255.16/13");
     REQUIRE(str(MAVSubnet(addr, 0b1111111111111100)) == "255.16/14");
     REQUIRE(str(MAVSubnet(addr, 0b1111111111111110)) == "255.16/15");
-    REQUIRE(str(MAVSubnet(addr, 0b1111111111111111)) == "255.16/16");
+    REQUIRE(str(MAVSubnet(addr, 0b1111111111111111)) == "255.16");
     REQUIRE(str(MAVSubnet(addr, 0b0000000010000000)) == "255.16\\1");
     REQUIRE(str(MAVSubnet(addr, 0b0000000011000000)) == "255.16\\2");
     REQUIRE(str(MAVSubnet(addr, 0b0000000011100000)) == "255.16\\3");
