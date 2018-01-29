@@ -26,6 +26,11 @@
 #include "RecursionChecker.hpp"
 
 
+/** Base class of all rule actions.
+ *
+ *  These are used as the actions of a \ref Rule to determine what to do with a
+ *  \ref Packet if it matches the \ref Rule.
+ */
 class Action
 {
     protected:
@@ -41,15 +46,22 @@ class Action
          */
         enum Option
         {
-            ACCEPT,     //!< Accept the packet.
-            REJECT,     //!< Reject the packet.
-            CONTINUE,   //!< Continue to next rule (no match).
-            DEFAULT     //!< Fall back on global default action.
+            ACCEPT,     //!< The packet has been accepted and should be
+                        //!< delivered to the given \p address.
+            REJECT,     //!< The packet has been rejected and should not be
+                        //!< delivered to the given \p address.
+            CONTINUE,   //!< Whether the packet will be accepted or rejected
+                        //!< has not yet been decided and rule checking should
+                        //!< continue.
+            DEFAULT     //!< Whether the packet will be accepted or rejected
+                        //!< should be decided by the global default action.
         };
         virtual ~Action();
-        /** Determine what action to take with the given packet.
+        /** Decide what to do with a \ref Packet.
          *
-         *  This is with respect to a given destination address.
+         *  Determine what action to take with the given \p packet sent to the
+         *  given \p address.  The possible actions are documented in the \ref
+         *  Option enum.
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
