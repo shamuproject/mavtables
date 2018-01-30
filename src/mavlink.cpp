@@ -27,7 +27,7 @@ namespace mavlink
     /** Get message name from numeric ID.
      *
      *  \ingroup mavlink
-     *  \param message_id The ID of the MAVLink message to get the name of.
+     *  \param id The ID of the MAVLink message to get the name of.
      *  \returns The name of the message.
      *  \throws std::invalid_argument if the given ID is not valid.
      */
@@ -48,8 +48,7 @@ namespace mavlink
     /** Get message ID from numeric ID.
      *
      *  \ingroup mavlink
-     *  \param message_name The name of the MAVLink message to get the numeric
-     *      ID of.
+     *  \param name The name of the MAVLink message to get the numeric ID of.
      *  \returns The numeric ID of the message.
      *  \throws std::invalid_argument if the given ID is not valid.
      */
