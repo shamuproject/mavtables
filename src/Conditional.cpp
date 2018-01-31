@@ -208,6 +208,7 @@ std::ostream &operator<<(std::ostream &os, const Conditional &conditional)
 {
     // Handle the match any conditional.
     os << "if";
+
     if (!conditional.id_ && !conditional.source_ && !conditional.dest_)
     {
         os << " any";

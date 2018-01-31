@@ -65,7 +65,7 @@ TEST_CASE("Conditional's are constructable.", "[Conditional]")
 }
 
 
-TEST_CASE("Conditional's 'check' method determines if a packet and destination" 
+TEST_CASE("Conditional's 'check' method determines if a packet and destination"
           "address matches the conditional.", "[Conditional]")
 {
     Mock<Packet> mock;
@@ -73,19 +73,16 @@ TEST_CASE("Conditional's 'check' method determines if a packet and destination"
     When(Method(mock, source)).AlwaysReturn(MAVAddress("192.168"));
     Packet &packet = mock.get();
     MAVAddress address("172.16");
-
     SECTION("Default all matching case.")
     {
         REQUIRE(Conditional().check(packet, address));
     }
-
     SECTION("Based on packet ID only.")
     {
         REQUIRE_FALSE(Conditional(1).check(packet, address));
         REQUIRE(Conditional(4).check(packet, address));
         REQUIRE_FALSE(Conditional(321).check(packet, address));
     }
-
     SECTION("Based on source subnet only.")
     {
         REQUIRE(Conditional({}, MAVSubnet("192.168")).check(packet, address));
@@ -95,7 +92,6 @@ TEST_CASE("Conditional's 'check' method determines if a packet and destination"
         REQUIRE_FALSE(
             Conditional({}, MAVSubnet("193.0/8")).check(packet, address));
     }
-
     SECTION("Based on destination subnet only.")
     {
         REQUIRE(
@@ -107,7 +103,6 @@ TEST_CASE("Conditional's 'check' method determines if a packet and destination"
         REQUIRE_FALSE(
             Conditional({}, {}, MAVSubnet("171.16/8")).check(packet, address));
     }
-
     SECTION("Based on packet ID and source subnet only.")
     {
         REQUIRE(Conditional(4, MAVSubnet("192.168")).check(packet, address));
@@ -125,56 +120,51 @@ TEST_CASE("Conditional's 'check' method determines if a packet and destination"
         REQUIRE_FALSE(
             Conditional(11, MAVSubnet("193.0/8")).check(packet, address));
     }
-
     SECTION("Based on packet ID and destination subnet only.")
     {
         REQUIRE(
             Conditional(4, {}, MAVSubnet("172.16")).check(packet, address));
         REQUIRE_FALSE(
             Conditional(11, {}, MAVSubnet("172.16")).check(packet, address));
-
         REQUIRE_FALSE(
             Conditional(4, {}, MAVSubnet("171.16")).check(packet, address));
         REQUIRE_FALSE(
             Conditional(11, {}, MAVSubnet("171.16")).check(packet, address));
-
         REQUIRE(
             Conditional(4, {}, MAVSubnet("172.16/8")).check(packet, address));
         REQUIRE_FALSE(
             Conditional(11, {}, MAVSubnet("172.16/8")).check(packet, address));
-
         REQUIRE_FALSE(
             Conditional(4, {}, MAVSubnet("171.16/8")).check(packet, address));
         REQUIRE_FALSE(
             Conditional(11, {}, MAVSubnet("171.16/8")).check(packet, address));
     }
-
     SECTION("Based on packet ID, source subnet, and destination subnet.")
     {
-        REQUIRE(Conditional(
-            4, MAVSubnet("192.168"), MAVSubnet("172.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            11, MAVSubnet("192.168"), MAVSubnet("172.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            4, MAVSubnet("193.168"), MAVSubnet("172.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            11, MAVSubnet("193.168"), MAVSubnet("172.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            4, MAVSubnet("192.168"), MAVSubnet("171.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            11, MAVSubnet("192.168"), MAVSubnet("171.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            4, MAVSubnet("193.168"), MAVSubnet("171.16")).check(
-            packet, address));
-        REQUIRE_FALSE(Conditional(
-            11, MAVSubnet("193.168"), MAVSubnet("171.16")).check(
-            packet, address));
+        REQUIRE(
+            Conditional(4, MAVSubnet("192.168"), MAVSubnet("172.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(11, MAVSubnet("192.168"), MAVSubnet("172.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(4, MAVSubnet("193.168"), MAVSubnet("172.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(11, MAVSubnet("193.168"), MAVSubnet("172.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(4, MAVSubnet("192.168"), MAVSubnet("171.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(11, MAVSubnet("192.168"), MAVSubnet("171.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(4, MAVSubnet("193.168"), MAVSubnet("171.16")).check(
+                packet, address));
+        REQUIRE_FALSE(
+            Conditional(11, MAVSubnet("193.168"), MAVSubnet("171.16")).check(
+                packet, address));
     }
 }
 
@@ -187,14 +177,12 @@ TEST_CASE("Conditional's 'type' method sets the packet ID for matching.",
     When(Method(mock, source)).AlwaysReturn(MAVAddress("192.168"));
     Packet &packet = mock.get();
     MAVAddress address("172.16");
-
     SECTION("When given a numeric ID.")
     {
         REQUIRE_FALSE(Conditional().type(0).check(packet, address));
         REQUIRE(Conditional().type(4).check(packet, address));
         REQUIRE_FALSE(Conditional().type(11).check(packet, address));
     }
-
     SECTION("And ensures the numeric ID is valid.")
     {
         // Note: ID's 255 and 5000 are not currently valid.
@@ -205,14 +193,12 @@ TEST_CASE("Conditional's 'type' method sets the packet ID for matching.",
         REQUIRE_THROWS_WITH(
             Conditional().type(5000), "Invalid packet ID (#5000).");
     }
-
     SECTION("When given a packet name.")
     {
         REQUIRE_FALSE(Conditional().type("HEARTBEAT").check(packet, address));
         REQUIRE(Conditional().type("PING").check(packet, address));
         REQUIRE_FALSE(Conditional().type("SET_MODE").check(packet, address));
     }
-
     SECTION("And ensures the packet name is valid.")
     {
         REQUIRE_THROWS_AS(
@@ -232,7 +218,6 @@ TEST_CASE("Conditional's 'from' method sets the source subnet to match.",
     When(Method(mock, source)).AlwaysReturn(MAVAddress("192.168"));
     Packet &packet = mock.get();
     MAVAddress address("172.16");
-
     SECTION("When a MAVSubnet object is given.")
     {
         REQUIRE(
@@ -244,7 +229,6 @@ TEST_CASE("Conditional's 'from' method sets the source subnet to match.",
         REQUIRE_FALSE(
             Conditional().from(MAVSubnet("193.0/8")).check(packet, address));
     }
-
     SECTION("When a string is given.")
     {
         REQUIRE(Conditional().from("192.168").check(packet, address));
@@ -263,7 +247,6 @@ TEST_CASE("Conditional's 'to' method sets the source subnet to match.",
     When(Method(mock, source)).AlwaysReturn(MAVAddress("192.168"));
     Packet &packet = mock.get();
     MAVAddress address("172.16");
-
     SECTION("When a MAVSubnet object is given.")
     {
         REQUIRE(
@@ -275,7 +258,6 @@ TEST_CASE("Conditional's 'to' method sets the source subnet to match.",
         REQUIRE_FALSE(
             Conditional().to(MAVSubnet("171.16/8")).check(packet, address));
     }
-
     SECTION("When a string is given.")
     {
         REQUIRE(Conditional().to("172.16").check(packet, address));

@@ -57,10 +57,12 @@ namespace mavlink
     {
         const mavlink_message_info_t *info =
             mavlink_get_message_info_by_name(name.c_str());
+
         if (info)
         {
             return info->msgid;
         }
+
         throw std::invalid_argument("Invalid packet name (\"" + name + "\").");
     }
 
