@@ -16,7 +16,6 @@
 
 
 #include <string>
-#include <memory>
 #include <utility>
 #include <optional>
 #include <stdexcept>
@@ -55,9 +54,10 @@ Conditional::Conditional()
  *  \param id The packet ID to match.  If {} or std::nullopt then any packet ID
  *      will match.
  *  \param source The subnet a source address must be in to match.  If {} or
- *      nullopt then any source address will match.
+ *      nullopt then any source address will match.  The default is {}.
  *  \param dest The subnet a destination address must be in to match.  If {} or
- *      std::nullopt then any destination address will match.
+ *      std::nullopt then any destination address will match.  The default is
+ *      {}.
  *  \throws std::invalid_argument if the given \p id is not valid.
  */
 Conditional::Conditional(
@@ -155,7 +155,7 @@ Conditional &Conditional::to(MAVSubnet subnet)
  */
 Conditional &Conditional::to(const std::string &subnet)
 {
-    source_ = MAVSubnet(subnet);
+    dest_ = MAVSubnet(subnet);
     return *this;
 }
 

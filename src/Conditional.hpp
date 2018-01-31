@@ -20,7 +20,6 @@
 
 
 #include <string>
-#include <memory>
 #include <optional>
 
 #include "Packet.hpp"
@@ -45,8 +44,8 @@ class Conditional
         Conditional();
         Conditional(
             std::optional<unsigned long> id,
-            std::optional<MAVSubnet> source,
-            std::optional<MAVSubnet> dest);
+            std::optional<MAVSubnet> source = {},
+            std::optional<MAVSubnet> dest = {});
         Conditional &type(unsigned long id);
         Conditional &type(const std::string &name);
         Conditional &from(MAVSubnet subnet);
