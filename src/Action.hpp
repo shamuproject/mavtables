@@ -61,7 +61,7 @@ class Action
          *
          *  Determine what action to take with the given \p packet sent to the
          *  given \p address.  The possible actions are documented in the \ref
-         *  Option enum.
+         *  Action::Option enum.
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the

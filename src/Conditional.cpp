@@ -31,11 +31,10 @@
  *  The default conditional is initialized to match any packet type with and
  *  source and destination addresses.  Use \ref type, \ref to, and \ref from to
  *  restrict the matching.  Some examples are:
- *
- *  - `auto cond = Conditional().type("PING").from("1.0/8").to("255.0");`
- *  - `auto cond = Conditional().type("HEARTBEAT").from("255.0/8");`
- *  - `auto cond = Conditional().type("SET_MODE").to("255.0/8");`
- *  - `auto cond = Conditional().from("255.0/8");`
+ *      - `auto cond = Conditional().type("PING").from("1.0/8").to("255.0");`
+ *      - `auto cond = Conditional().type("HEARTBEAT").from("255.0/8");`
+ *      - `auto cond = Conditional().type("SET_MODE").to("255.0/8");`
+ *      - `auto cond = Conditional().from("255.0/8");`
  */
 Conditional::Conditional()
 {
@@ -199,10 +198,10 @@ bool Conditional::check(const Packet &packet, const MAVAddress &address) const
 /** Print the conditional to the given output stream.
  *
  *  Some examples are:
- *      - `if PING from 1.0/8 to 255.0`
- *      - `if HEARTBEAT from 255.0/8`
- *      - `if SET_MODE to 255.0`
- *      - `if from 255.0/8`
+ *  - `if PING from 1.0/8 to 255.0`
+ *  - `if HEARTBEAT from 255.0/8`
+ *  - `if SET_MODE to 255.0`
+ *  - `if from 255.0/8`
  */
 std::ostream &operator<<(std::ostream &os, const Conditional &conditional)
 {
