@@ -28,10 +28,15 @@
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
  *      a packet to.
+ *  \throws std::invalid_argument if the given pointer is nullptr.
  */
 Call::Call(std::shared_ptr<Chain> chain)
     : chain_(std::move(chain))
 {
+    if (chain_ == nullptr)
+    {
+        throw std::invalid_argument("Given Chain pointer is null.");
+    }
 }
 
 

@@ -68,8 +68,15 @@ class Action
          *      action allows it.
          *  \param recursion_checker A recursion checker used to ensure infinite
          *      recursion does not occur.
-         *  \retval true The packet is allowed to be sent to \p address.
-         *  \retval false The packet is not allowed to be sent to \p address.
+         *  \retval Action::ACCEPT The packet is allowed to be sent to \p
+         *      address.
+         *  \retval Action::REJECT The packet is not allowed to be sent to \p
+         *      address.
+         *  \retval Action::CONTINUE The action to take on packet is not decided
+         *      yet.
+         *  \retval Action::DEFAULT Use the global default action.
+         *
+         *  The packet is not allowed to be sent to \p address.
          */
         virtual Action::Option action(
             const Packet &packet, const MAVAddress &address,

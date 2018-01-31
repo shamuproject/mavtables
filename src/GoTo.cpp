@@ -16,6 +16,7 @@
 
 
 #include <ostream>
+#include <stdexcept>
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
@@ -27,11 +28,16 @@
 /** Construct a goto action given a chain to delegate to.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet to.
+ *      a packet to.  A nullptr is not a valid input.
+ *  \throws std::invalid_argument if the given pointer is nullptr.
  */
 GoTo::GoTo(std::shared_ptr<Chain> chain)
     : chain_(std::move(chain))
 {
+    if (chain_ == nullptr)
+    {
+        throw std::invalid_argument("Given Chain pointer is null.");
+    }
 }
 
 

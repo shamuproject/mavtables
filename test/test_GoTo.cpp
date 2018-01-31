@@ -16,6 +16,7 @@
 
 
 #include <memory>
+#include <stdexcept>
 
 #include <catch.hpp>
 
@@ -66,6 +67,11 @@ namespace
 TEST_CASE("GoTo's can be constructed.", "[GoTo]")
 {
     REQUIRE_NOTHROW(GoTo(std::make_shared<ChainTestClass>("test_chain")));
+    SECTION("Ensures the shared pointer is not null.")
+    {
+        REQUIRE_THROWS_AS(GoTo(nullptr), std::invalid_argument);
+        REQUIRE_THROWS_WITH(GoTo(nullptr), "Given Chain pointer is null.");
+    }
 }
 
 

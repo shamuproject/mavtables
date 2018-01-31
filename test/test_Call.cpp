@@ -66,6 +66,11 @@ namespace
 TEST_CASE("Call's can be constructed.", "[Call]")
 {
     REQUIRE_NOTHROW(Call(std::make_shared<ChainTestClass>("test_chain")));
+    SECTION("Ensures the shared pointer is not null.")
+    {
+        REQUIRE_THROWS_AS(Call(nullptr), std::invalid_argument);
+        REQUIRE_THROWS_WITH(Call(nullptr), "Given Chain pointer is null.");
+    }
 }
 
 

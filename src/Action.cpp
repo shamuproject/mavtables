@@ -39,7 +39,7 @@ Action::~Action()
  *
  *  \relates Action
  *  \param os The output stream to print to.
- *  \param action The MAVLink packet to print.
+ *  \param action The action (or any child of Action) to print.
  *  \return The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Action &action)
