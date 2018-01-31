@@ -52,3 +52,12 @@ TEST_CASE("The 'what' method gives the unresolved hostname.",
     REQUIRE(std::string(DNSLookupError("example.com").what()) ==
             "DNSLookupError: Could not find an IP address for \"example.com\"");
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (DNSLookupError).", "[DNSLookupError]")
+{
+    DNSLookupError *dns = nullptr;
+    REQUIRE_NOTHROW(dns = new DNSLookupError("erro"));
+    REQUIRE_NOTHROW(delete dns);
+}

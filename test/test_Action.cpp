@@ -120,7 +120,7 @@ TEST_CASE("Action's are printable.", "[Action]")
 // Required for complete function coverage.
 TEST_CASE("Run dynamic destructors (Action).", "[Action]")
 {
-    ActionTestClass *action_test = nullptr;
-    REQUIRE_NOTHROW(action_test = new ActionTestClass());
-    REQUIRE_NOTHROW(delete action_test);
+    ActionTestClass *action = nullptr;
+    REQUIRE_NOTHROW(action = new ActionTestClass());
+    REQUIRE_NOTHROW(delete action);
 }

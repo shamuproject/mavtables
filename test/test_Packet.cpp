@@ -299,10 +299,10 @@ TEST_CASE("Packet's are printable.", "[Packet]")
 TEST_CASE("Run dynamic destructors (Packet).", "[Packet]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
-    PacketTestClass *packet_test = nullptr;
-    REQUIRE_NOTHROW(packet_test = new PacketTestClass({}, conn));
-    REQUIRE_NOTHROW(delete packet_test);
-    ConnectionTestClass *connection_test = nullptr;
-    REQUIRE_NOTHROW(connection_test = new ConnectionTestClass());
-    REQUIRE_NOTHROW(delete connection_test);
+    PacketTestClass *packet = nullptr;
+    REQUIRE_NOTHROW(packet = new PacketTestClass({}, conn));
+    REQUIRE_NOTHROW(delete packet);
+    ConnectionTestClass *connection = nullptr;
+    REQUIRE_NOTHROW(connection = new ConnectionTestClass());
+    REQUIRE_NOTHROW(delete connection);
 }

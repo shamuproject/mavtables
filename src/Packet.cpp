@@ -42,9 +42,13 @@ Packet::Packet(
 }
 
 
+// GCC generates a seemingly uncallable destructor for pure virtual classes.
+// Therefore, it must be excluded from test coverage.
+// LCOV_EXCL_START
 Packet::~Packet()
 {
 }
+// LCOV_EXCL_STOP
 
 
 /** Return reference to receiving connection.

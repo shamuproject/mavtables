@@ -76,3 +76,12 @@ TEST_CASE("Accept's are printable.", "[Accept]")
         REQUIRE(str(action) == "accept");
     }
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (Accept).", "[Accept]")
+{
+    Accept *accept = nullptr;
+    REQUIRE_NOTHROW(accept = new Accept());
+    REQUIRE_NOTHROW(delete accept);
+}

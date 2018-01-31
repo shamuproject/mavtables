@@ -76,3 +76,12 @@ TEST_CASE("Reject's are printable.", "[Reject]")
         REQUIRE(str(reject) == "reject");
     }
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (Reject).", "[Reject]")
+{
+    Reject *reject = nullptr;
+    REQUIRE_NOTHROW(reject = new Reject());
+    REQUIRE_NOTHROW(delete reject);
+}
