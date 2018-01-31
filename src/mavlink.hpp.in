@@ -77,8 +77,8 @@ namespace mavlink
     };
 
 
-    std::string name(uint32_t id);
-    uint32_t id(std::string name);
+    std::string name(unsigned long id);
+    unsigned long id(std::string name);
 
 }
 

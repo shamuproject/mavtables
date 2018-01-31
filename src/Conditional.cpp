@@ -18,9 +18,32 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <optional>
+#include <stdexcept>
 
+#include "mavlink.hpp"
+#include "Packet.hpp"
 #include "MAVSubnet.hpp"
 #include "Conditional.hpp"
+
+
+/** Construct a default condition.
+ *
+ *  The default conditional is initialized to match any packet type with and
+ *  source and destination addresses.  Use \ref type, \ref to, and \ref from to
+ *  restrict the matching.  Some examples are:
+ *
+ *  - `auto cond = Conditional().type("PING").from("1.0/8").to("255.0");`
+ *  - `auto cond = Conditional().type("HEARTBEAT").from("255.0/8");`
+ *  - `auto cond = Conditional().type("SET_MODE").to("255.0/8");`
+ *  - `auto cond = Conditional().from("255.0/8");`
+ */
+Conditional::Conditional()
+{
+    // The default constructors for all data members give the desired empty
+    // option.
+}
+
 
 
 /** Construct a conditional.
@@ -29,40 +52,54 @@
  *  This is so the \ref type, \ref from, and \ref to methods can be used to
  *  construct a packet with the form shown above.
  *
- *  \param packet_type The type of packet to match, use "*" to match any packet.
- *      The default value is "*".
- *  \param source The subnet a souce address must be in to match.
- *  \param dest The subnet a destination address must be in to match.
+ *  \param id The packet ID to match.  If {} or std::nullopt then any packet ID
+ *      will match.
+ *  \param source The subnet a source address must be in to match.  If {} or
+ *      nullopt then any source address will match.
+ *  \param dest The subnet a destination address must be in to match.  If {} or
+ *      std::nullopt then any destination address will match.
+ *  \throws std::invalid_argument if the given \p id is not valid.
  */
 Conditional::Conditional(
-    std::string packet_type,
-    std::unique_ptr<MAVSubnet> source,
-    std::unique_ptr<MAVSubnet> dest)
-    : packet_type_(std::move(packet_type)),
-      source_(std::move(source)), dest_(std::move(dest))
+    std::optional<unsigned long> id,
+    std::optional<MAVSubnet> source,
+    std::optional<MAVSubnet> dest)
+    : source_(std::move(source)), dest_(std::move(dest))
 {
+    if (id)
+    {
+        type(id.value());
+    }
 }
 
 
-/** Set the packet type to match by ID.
+/** Set the packet type to match, by ID.
  *
  *  \param id The packet ID to match.
  *  \returns A reference to itself.
+ *  \throws std::invalid_argument if the given \p id is not valid.
  *  \sa type(const std::string &name)
  */
-Conditional &Conditional::type(uint32_t id)
+Conditional &Conditional::type(unsigned long id)
 {
+    // Check packet ID, throws error if invalid.
+    mavlink::name(id);
+    id_ = id;
+    return *this;
 }
 
 
-/** Set the packet type to match by name.
+/** Set the packet type to match, by name.
  *
  *  \param name The packet name to match.
  *  \returns A reference to itself.
- *  \sa type(std::string id)
+ *  \throws std::invalid_argument if the given message \p name is not valid.
+ *  \sa type(unsigned long id)
  */
 Conditional &Conditional::type(const std::string &name)
 {
+    id_ = mavlink::id(name);
+    return *this;
 }
 
 
@@ -72,22 +109,25 @@ Conditional &Conditional::type(const std::string &name)
  *  \returns A reference to itself.
  *  \sa from(const std::string &subnet)
  */
-Conditional &Conditional::from(std::unique_ptr<MAVSubnet> subnet)
+Conditional &Conditional::from(MAVSubnet subnet)
 {
+    source_ = std::move(subnet);
+    return *this;
 }
-
 
 /** Set subnet for source address matching by string.
  *
  *  See \ref MAVSubnet::MAVSubnet(std::string address) for the acceptable
- *  formats.
+ *  formats and passible errors.
  *
  *  \param subnet The subnet used for source address matching.
  *  \returns A reference to itself.
- *  \sa from(std::unique_ptr<MAVSubnet> subnet)
+ *  \sa from(MAVSubnet subnet)
  */
 Conditional &Conditional::from(const std::string &subnet)
 {
+    source_ = MAVSubnet(subnet);
+    return *this;
 }
 
 
@@ -97,22 +137,26 @@ Conditional &Conditional::from(const std::string &subnet)
  *  \returns A reference to itself.
  *  \sa to(const std::string &subnet)
  */
-Conditional &Conditional::to(std::unique_ptr<MAVSubnet> subnet)
+Conditional &Conditional::to(MAVSubnet subnet)
 {
+    dest_ = std::move(subnet);
+    return *this;
 }
 
 
 /** Set subnet for destination address matching by string.
  *
  *  See \ref MAVSubnet::MAVSubnet(std::string address) for the acceptable
- *  formats.
+ *  formats and possible errors.
  *
  *  \param subnet The subnet used for destination address matching.
  *  \returns A reference to itself.
- *  \sa to(std::unique_ptr<MAVSubnet> subnet)
+ *  \sa to(MAVSubnet subnet)
  */
 Conditional &Conditional::to(const std::string &subnet)
 {
+    source_ = MAVSubnet(subnet);
+    return *this;
 }
 
 
@@ -128,9 +172,65 @@ Conditional &Conditional::to(const std::string &subnet)
  */
 bool Conditional::check(const Packet &packet, const MAVAddress &address)
 {
+    bool result = true;
+
+    // Check packet ID.
+    if (id_)
+    {
+        result &= packet.id() == id_;
+    }
+
+    // Check source address.
+    if (source_)
+    {
+        result &= source_->contains(packet.source());
+    }
+
+    // Check destination address.
+    if (dest_)
+    {
+        result &= dest_->contains(address);
+    }
+
+    return result;
 }
 
 
+/** Print the conditional to the given output stream.
+ *
+ *  Some examples are:
+ *      - `if PING from 1.0/8 to 255.0`
+ *      - `if HEARTBEAT from 255.0/8`
+ *      - `if SET_MODE to 255.0`
+ *      - `if from 255.0/8`
+ */
 std::ostream &operator<<(std::ostream &os, const Conditional &conditional)
 {
+    // Handle the match any conditional.
+    os << "if";
+    if (!conditional.id_ && !conditional.source_ && !conditional.dest_)
+    {
+        os << " any";
+        return os;
+    }
+
+    // Print packet name.
+    if (conditional.id_)
+    {
+        os << " " << mavlink::name(conditional.id_.value());
+    }
+
+    // Print source subnet.
+    if (conditional.source_)
+    {
+        os << " from " << conditional.source_.value();
+    }
+
+    // Print destination subnet.
+    if (conditional.dest_)
+    {
+        os << " to " << conditional.dest_.value();
+    }
+
+    return os;
 }

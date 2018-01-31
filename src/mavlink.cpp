@@ -29,11 +29,12 @@ namespace mavlink
      *  \ingroup mavlink
      *  \param id The ID of the MAVLink message to get the name of.
      *  \returns The name of the message.
-     *  \throws std::invalid_argument if the given ID is not valid.
+     *  \throws std::invalid_argument if the given \p id is not valid.
      */
-    std::string name(uint32_t id)
+    std::string name(unsigned long id)
     {
-        const mavlink_message_info_t *info = mavlink_get_message_info_by_id(id);
+        const mavlink_message_info_t *info =
+            mavlink_get_message_info_by_id(static_cast<uint32_t>(id));
 
         if (info)
         {
@@ -45,14 +46,14 @@ namespace mavlink
     }
 
 
-    /** Get message ID from numeric ID.
+    /** Get message ID from message name.
      *
      *  \ingroup mavlink
      *  \param name The name of the MAVLink message to get the numeric ID of.
      *  \returns The numeric ID of the message.
-     *  \throws std::invalid_argument if the given ID is not valid.
+     *  \throws std::invalid_argument if the given message \p name is not valid.
      */
-    uint32_t id(std::string name)
+    unsigned long id(std::string name)
     {
         const mavlink_message_info_t *info =
             mavlink_get_message_info_by_name(name.c_str());

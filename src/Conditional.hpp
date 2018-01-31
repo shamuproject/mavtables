@@ -21,7 +21,9 @@
 
 #include <string>
 #include <memory>
+#include <optional>
 
+#include "Packet.hpp"
 #include "MAVSubnet.hpp"
 #include "MAVAddress.hpp"
 
@@ -31,38 +33,25 @@
  *  This uses the type, source, and destination of a packet to determine if it
  *  matches a \ref Rule.
  *
- *  While a typical constructor is provided a shorthand method is provided which
- *  allows construction of a Conditional much as it is represented in the
- *  configuration file.  Some examples are:
- *
- *  - `Conditional cond.type("PING").from("1.0/8").to("255.0");`
- *  - `Conditional cond.type("HEARTBEAT").from("255.0/8");`
- *  - `Conditional cond.type("SET_MODE").to("255.0/8");`
- *  - `Conditional cond.from("255.0/8");`
  */
 class Conditional
 {
     private:
-        std::string packet_type_;
-        std::unique_ptr<MAVSubnet> source_;
-        std::unique_ptr<MAVSubnet> dest_;
+        std::optional<unsigned long> id_;
+        std::optional<MAVSubnet> source_;
+        std::optional<MAVSubnet> dest_;
 
     public:
-        // Conditional(
-        //     std::string packet_type = "*",
-        //     std::unique_ptr<MAVSubnet> source =
-        //         std::make_unique<MAVSubnet>(MAVAddress(0), 0),
-        //     std::unique_ptr<MAVSubnet> dest =
-        //         std::make_unique<MAVSubnet>(MAVAddress(0), 0));
+        Conditional();
         Conditional(
-            std::string packet_type,
-            std::unique_ptr<MAVSubnet> source,
-            std::unique_ptr<MAVSubnet> dest);
-        Conditional &type(uint32_t id);
+            std::optional<unsigned long> id,
+            std::optional<MAVSubnet> source,
+            std::optional<MAVSubnet> dest);
+        Conditional &type(unsigned long id);
         Conditional &type(const std::string &name);
-        Conditional &from(std::unique_ptr<MAVSubnet> subnet);
+        Conditional &from(MAVSubnet subnet);
         Conditional &from(const std::string &subnet);
-        Conditional &to(std::unique_ptr<MAVSubnet> subnet);
+        Conditional &to(MAVSubnet subnet);
         Conditional &to(const std::string &subnet);
         bool check(const Packet &packet, const MAVAddress &address);
 
