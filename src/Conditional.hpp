@@ -52,7 +52,7 @@ class Conditional
         Conditional &from(const std::string &subnet);
         Conditional &to(MAVSubnet subnet);
         Conditional &to(const std::string &subnet);
-        bool check(const Packet &packet, const MAVAddress &address);
+        bool check(const Packet &packet, const MAVAddress &address) const;
 
         friend std::ostream &operator<<(
             std::ostream &os, const Conditional &conditional);

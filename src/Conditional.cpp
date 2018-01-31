@@ -170,7 +170,7 @@ Conditional &Conditional::to(const std::string &subnet)
  *  \retval false If any of the packet type, source subnet, or destination
  *      subnet does not match.
  */
-bool Conditional::check(const Packet &packet, const MAVAddress &address)
+bool Conditional::check(const Packet &packet, const MAVAddress &address) const
 {
     bool result = true;
 
