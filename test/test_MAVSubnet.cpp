@@ -326,7 +326,7 @@ TEST_CASE("MAVSubnet's are assignable (by move semantics).", "[MAVSubnet]")
 }
 
 
-TEST_CASE("MAVSubnet's are printable", "[MAVSubnet]")
+TEST_CASE("MAVSubnet's are printable.", "[MAVSubnet]")
 {
     auto addr = MAVAddress(255, 16);
     REQUIRE(str(MAVSubnet(addr, 123, 234)) == "255.16:123.234");
