@@ -36,6 +36,7 @@ unit_tests: debug
 
 coverage: COVERAGE = On
 coverage: test
+	./build/mavtables --version
 	$(MAKE) -C build lcov-geninfo
 	$(MAKE) -C build lcov-genhtml
 	gcovr -r . -e 'lib.*'
