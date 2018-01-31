@@ -111,3 +111,12 @@ TEST_CASE("GoTo's are printable.", "[GoTo]")
         REQUIRE(str(action) == "goto test_chain");
     }
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (GoTo).", "[GoTo]")
+{
+    ChainTestClass *chain_test = nullptr;
+    REQUIRE_NOTHROW(chain_test = new ChainTestClass("test_chain"));
+    REQUIRE_NOTHROW(delete chain_test);
+}
