@@ -78,6 +78,16 @@ TEST_CASE("Accept's are printable.", "[Accept]")
 }
 
 
+TEST_CASE("Accept's 'clone' method returns a polymorphic copy.", "[Accept]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    Accept accept;
+    Action &action = accept;
+    std::unique_ptr<Action> polymorphic_copy = action.clone();
+    REQUIRE(str(accept) == str(*polymorphic_copy));
+}
+
+
 // Required for complete function coverage.
 TEST_CASE("Run dynamic destructors (Accept).", "[Accept]")
 {

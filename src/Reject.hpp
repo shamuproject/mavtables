@@ -19,6 +19,7 @@
 #define REJECT_HPP_
 
 
+#include <memory>
 #include <ostream>
 
 #include "Action.hpp"
@@ -35,6 +36,7 @@ class Reject : public Action
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
+        virtual std::unique_ptr<Action> clone() const;
         virtual Action::Option action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recusion_checker) const;

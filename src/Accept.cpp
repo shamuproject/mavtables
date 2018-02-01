@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
 #include <ostream>
 
 #include "Packet.hpp"
@@ -31,6 +32,13 @@ std::ostream &Accept::print_(std::ostream &os) const
 {
     os << "accept";
     return os;
+}
+
+
+//! \copydoc Action::clone() const
+std::unique_ptr<Action> Accept::clone() const
+{
+    return std::make_unique<Accept>();
 }
 
 

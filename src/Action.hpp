@@ -19,6 +19,7 @@
 #define ACTION_HPP_
 
 
+#include <memory>
 #include <ostream>
 
 #include "Packet.hpp"
@@ -57,6 +58,14 @@ class Action
             //!< should be decided by the global default action.
         };
         virtual ~Action();  // Clang does not like pure virtual destructors.
+        /** Return a copy of the Action polymorphically.
+         *
+         *  This allows Action's to be copied without knowing the derived type.
+         *
+         *  \returns A pointer to a new object with base type \ref Action which
+         *      is an exact copy of this one.
+         */
+        virtual std::unique_ptr<Action> clone() const = 0;
         /** Decide what to do with a \ref Packet.
          *
          *  Determine what action to take with the given \p packet sent to the

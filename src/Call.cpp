@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
 #include <ostream>
 
 #include "Packet.hpp"
@@ -48,6 +49,13 @@ std::ostream &Call::print_(std::ostream &os) const
 {
     os << "call " << chain_->name;
     return os;
+}
+
+
+//! \copydoc Action::clone() const
+std::unique_ptr<Action> Call::clone() const
+{
+    return std::make_unique<Call>(chain_);
 }
 
 

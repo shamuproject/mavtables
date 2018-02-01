@@ -90,6 +90,16 @@ TEST_CASE("GoTo's are printable.", "[GoTo]")
 }
 
 
+TEST_CASE("GoTo's 'clone' method returns a polymorphic copy.", "[GoTo]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    GoTo goto_(std::make_shared<ChainTestClass>("test_chain"));
+    Action &action = goto_;
+    std::unique_ptr<Action> polymorphic_copy = action.clone();
+    REQUIRE(str(goto_) == str(*polymorphic_copy));
+}
+
+
 // Required for complete function coverage.
 TEST_CASE("Run dynamic destructors (GoTo).", "[GoTo]")
 {

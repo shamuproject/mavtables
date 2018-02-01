@@ -44,6 +44,10 @@ namespace
             }
 
         public:
+            virtual std::unique_ptr<Action> clone() const
+            {
+                return std::make_unique<ActionTestClass>();
+            }
             virtual Action::Option action(
                 Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
@@ -105,15 +109,25 @@ TEST_CASE("Action's are printable.", "[Action]")
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
     ActionTestClass action;
-    Action &polymophic_action = action;
+    Action &polymorphic = action;
     SECTION("By direct type.")
     {
         REQUIRE(str(action) == "test");
     }
     SECTION("By polymorphic type.")
     {
-        REQUIRE(str(polymophic_action) == "test");
+        REQUIRE(str(polymorphic) == "test");
     }
+}
+
+
+TEST_CASE("Action's 'clone' method returns a polymorphic copy.", "[Action]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    ActionTestClass action;
+    Action &polymorphic = action;
+    std::unique_ptr<Action> polymorphic_copy = polymorphic.clone();
+    REQUIRE(str(action) == str(*polymorphic_copy));
 }
 
 

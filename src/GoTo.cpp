@@ -52,6 +52,13 @@ std::ostream &GoTo::print_(std::ostream &os) const
 }
 
 
+//! \copydoc Action::clone() const
+std::unique_ptr<Action> GoTo::clone() const
+{
+    return std::make_unique<GoTo>(chain_);
+}
+
+
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The GoTo class delegates the action choice to the contained \ref Chain.  If

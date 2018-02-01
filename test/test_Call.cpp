@@ -16,6 +16,7 @@
 
 
 #include <memory>
+#include <stdexcept>
 
 #include <catch.hpp>
 
@@ -74,8 +75,6 @@ TEST_CASE("Call's 'action' method delegates the decision to the Chain it "
 
 TEST_CASE("Call's are printable.", "[Call]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
     Call call(std::make_shared<ChainTestClass>("test_chain"));
     Action &action = call;
     SECTION("By direct type.")
@@ -86,6 +85,16 @@ TEST_CASE("Call's are printable.", "[Call]")
     {
         REQUIRE(str(action) == "call test_chain");
     }
+}
+
+
+TEST_CASE("Call's 'clone' method returns a polymorphic copy.", "[Call]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    Call call(std::make_shared<ChainTestClass>("test_chain"));
+    Action &action = call;
+    std::unique_ptr<Action> polymorphic_copy = action.clone();
+    REQUIRE(str(call) == str(*polymorphic_copy));
 }
 
 
