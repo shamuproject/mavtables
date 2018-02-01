@@ -111,3 +111,16 @@ TEST_CASE("GoTo's are printable.", "[GoTo]")
         REQUIRE(str(action) == "goto test_chain");
     }
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (GoTo).", "[GoTo]")
+{
+    ChainTestClass *chain = nullptr;
+    REQUIRE_NOTHROW(chain = new ChainTestClass("test_chain"));
+    REQUIRE_NOTHROW(delete chain);
+    GoTo *goto_ = nullptr;
+    REQUIRE_NOTHROW(
+        goto_ = new GoTo(std::make_shared<ChainTestClass>("test_chain")));
+    REQUIRE_NOTHROW(delete goto_);
+}

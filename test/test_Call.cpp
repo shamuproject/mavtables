@@ -111,3 +111,16 @@ TEST_CASE("Call's are printable.", "[Call]")
         REQUIRE(str(action) == "call test_chain");
     }
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (Call).", "[Call]")
+{
+    ChainTestClass *chain = nullptr;
+    REQUIRE_NOTHROW(chain = new ChainTestClass("test_chain"));
+    REQUIRE_NOTHROW(delete chain);
+    Call *call = nullptr;
+    REQUIRE_NOTHROW(
+        call = new Call(std::make_shared<ChainTestClass>("test_chain")));
+    REQUIRE_NOTHROW(delete call);
+}

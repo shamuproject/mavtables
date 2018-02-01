@@ -56,7 +56,7 @@ class Action
             DEFAULT     //!< Whether the packet will be accepted or rejected
             //!< should be decided by the global default action.
         };
-        virtual ~Action();
+        virtual ~Action();  // Clang does not like pure virtual destructors.
         /** Decide what to do with a \ref Packet.
          *
          *  Determine what action to take with the given \p packet sent to the

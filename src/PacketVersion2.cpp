@@ -149,9 +149,11 @@ namespace packet_v2
         // There should never be any way to reach this point since the message
         // ID was checked in the constructor.  It is here just in case the
         // MAVLink C library has an error in it.
+        // LCOV_EXCL_START
         throw std::runtime_error(
             "Invalid packet ID (#" +
             std::to_string(header(data())->msgid) + ").");
+        // LCOV_EXCL_STOP
     }
 
 
@@ -233,9 +235,11 @@ namespace packet_v2
         // There should never be any way to reach this point since the message
         // ID was checked in the constructor.  It is here just in case the
         // MAVLink C library has an error in it.
+        // LCOV_EXCL_START
         throw std::runtime_error(
             "Invalid packet ID (#" +
             std::to_string(header(data())->msgid) + ").");
+        // LCOV_EXCL_STOP
     }
 
 

@@ -29,6 +29,7 @@
 #include "Connection.hpp"
 #include "Packet.hpp"
 
+#include "common_Packet.hpp"
 
 namespace
 {
@@ -37,11 +38,6 @@ namespace
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
-
-    // Subclass of Packet used for testing the abstract class Connection.
-    class ConnectionTestClass : public Connection
-    {
-    };
 
     // Subclass of Packet used for testing the abstract class Packet.
     class PacketTestClass : public Packet
@@ -296,4 +292,17 @@ TEST_CASE("Packet's are printable.", "[Packet]")
     REQUIRE(str(PacketTestClass({}, conn, 32767)) ==
             "MISSION_CURRENT (#42) from 3.14 to 2.71 "
             "with priority 32767 (v1.0)");
+}
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (Packet).", "[Packet]")
+{
+    auto conn = std::make_shared<ConnectionTestClass>();
+    PacketTestClass *packet = nullptr;
+    REQUIRE_NOTHROW(packet = new PacketTestClass({}, conn));
+    REQUIRE_NOTHROW(delete packet);
+    ConnectionTestClass *connection = nullptr;
+    REQUIRE_NOTHROW(connection = new ConnectionTestClass());
+    REQUIRE_NOTHROW(delete connection);
 }

@@ -404,7 +404,9 @@ namespace
         // This should never be true but it's here just in case.
         if (addresses.empty())
         {
+            // LCOV_EXCL_START
             throw DNSLookupError(url);
+            // LCOV_EXCL_STOP
         }
 
         return *(addresses.begin());

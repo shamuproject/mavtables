@@ -115,3 +115,12 @@ TEST_CASE("Action's are printable.", "[Action]")
         REQUIRE(str(polymophic_action) == "test");
     }
 }
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (Action).", "[Action]")
+{
+    ActionTestClass *action = nullptr;
+    REQUIRE_NOTHROW(action = new ActionTestClass());
+    REQUIRE_NOTHROW(delete action);
+}

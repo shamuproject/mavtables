@@ -58,7 +58,7 @@ class Packet
         Packet(Packet &&other) = default;
         Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
                int priority = 0);
-        virtual ~Packet();
+        virtual ~Packet();  // Clang does not like pure virtual destructors.
         std::weak_ptr<Connection> connection() const;
         /** Return packet version.
          *

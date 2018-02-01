@@ -20,9 +20,13 @@
 #include "Action.hpp"
 
 
+// GCC generates a seemingly uncallable destructor for pure virtual classes.
+// Therefore, it must be excluded from test coverage.
+// LCOV_EXCL_START
 Action::~Action()
 {
 }
+// LCOV_EXCL_STOP
 
 
 /** Print the given action to the given output stream.
