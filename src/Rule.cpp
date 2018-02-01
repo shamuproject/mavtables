@@ -73,7 +73,7 @@ Rule::Rule(std::unique_ptr<Action> action, std::optional<Conditional> condition)
 {
     if (action_ == nullptr)
     {
-        throw std::invalid_argument("Given action pointer is null.");
+        throw std::invalid_argument("Given Action pointer is null.");
     }
 }
 
@@ -139,7 +139,6 @@ Rule &Rule::goto_(std::shared_ptr<Chain> chain)
 Rule &Rule::with_priority(int priority)
 {
     priority_ = priority;
-    apply_priority_ = true;
     return *this;
 }
 
@@ -147,7 +146,8 @@ Rule &Rule::with_priority(int priority)
 /** Set the conditional to the default (match everything).
  *
  *  This is used to add a conditional and return a reference to it so the packet
- *  type, from subnet, and to subnet can be set.
+ *  type, from subnet, and to subnet can be set.  If the rule has a conditional
+ *  this will replace it.
  *
  *  \returns A reference to the \ref Rule's internal conditional.
  *  \sa Conditional::type
@@ -163,6 +163,9 @@ Conditional &Rule::if_()
 
 /** \copydoc Action::action(const Packet &,const MAVAddress &,RecursionChecker &) const
  *
+ *  If the rule matches then the priority set on the rule (if any) will be
+ *  applied to the \p packet.
+ *
  *  \note If the packet and destination address combination does not match the
  *      \ref Rule's condition (see \ref Conditional::check) then \ref
  *      Action::CONTINUE will be returned.
@@ -176,13 +179,22 @@ Conditional &Rule::if_()
  *  \sa Conditional::check
  */
 Action::Option Rule::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
-    if (action_ && condition_ && condition_->check(packet, address))
+    if (action_)
     {
-        return action_->action(packet, address, recursion_checker);
+        if (!condition_ || (condition_ && condition_->check(packet, address)))
+        {
+            if (priority_)
+            {
+                packet.priority(priority_.value());
+            }
+
+            return action_->action(packet, address, recursion_checker);
+        }
     }
+
     return Action::CONTINUE;
 }
 
@@ -207,10 +219,12 @@ std::ostream &operator<<(std::ostream &os, const Rule &rule)
     if (rule.action_)
     {
         os << *(rule.action_);
+
         if (rule.condition_)
         {
-            os << rule.condition_.value();
+            os << " " << rule.condition_.value();
         }
     }
+
     return os;
 }

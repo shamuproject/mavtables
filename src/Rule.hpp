@@ -24,8 +24,8 @@
 
 #include "Action.hpp"
 #include "Chain.hpp"
-#include "Packet.hpp"
 #include "Conditional.hpp"
+#include "Packet.hpp"
 
 
 /** A rule used in filter \ref Chains.
@@ -39,8 +39,7 @@ class Rule
     private:
         std::unique_ptr<Action> action_;
         std::optional<Conditional> condition_;
-        bool apply_priority_ = false;
-        int priority_;
+        std::optional<int> priority_;
 
     public:
         Rule();
@@ -53,7 +52,7 @@ class Rule
         Rule &with_priority(int priority);
         Conditional &if_();
         Action::Option action(
-            const Packet &packet, const MAVAddress &address,
+            Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
 
         friend std::ostream &operator<<(std::ostream &os, const Rule &rule);

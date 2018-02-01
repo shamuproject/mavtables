@@ -62,7 +62,7 @@ std::ostream &GoTo::print_(std::ostream &os) const
  *  chain should ever be ran.
  */
 Action::Option GoTo::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     Action::Option option = chain_->action(packet, address, recursion_checker);

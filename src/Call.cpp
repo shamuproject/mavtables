@@ -58,7 +58,7 @@ std::ostream &Call::print_(std::ostream &os) const
  *  continue on the next \ref Rule in the current \ref Chain.
  */
 Action::Option Call::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     return chain_->action(packet, address, recursion_checker);

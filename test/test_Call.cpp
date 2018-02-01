@@ -30,37 +30,8 @@
 #include "Action.hpp"
 #include "Call.hpp"
 
+#include "ChainTestClass.hpp"
 #include "common_Packet.hpp"
-
-
-namespace
-{
-
-    class ChainTestClass : public Chain
-    {
-        public:
-            using Chain::Chain;
-            virtual Action::Option action(
-                const Packet &packet, const MAVAddress &address,
-                RecursionChecker &recursion_checker) const
-            {
-                (void)recursion_checker;
-
-                if (packet.name() == "PING")
-                {
-                    if (MAVSubnet("192.0/14").contains(address))
-                    {
-                        return Action::ACCEPT;
-                    }
-
-                    return Action::REJECT;
-                }
-
-                return Action::CONTINUE;
-            }
-    };
-
-}
 
 
 TEST_CASE("Call's can be constructed.", "[Call]")

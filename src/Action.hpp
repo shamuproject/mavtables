@@ -79,7 +79,7 @@ class Action
          *  The packet is not allowed to be sent to \p address.
          */
         virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
+            Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const = 0;
 
         friend std::ostream &operator<<(std::ostream &os, const Action &action);

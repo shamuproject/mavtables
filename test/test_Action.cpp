@@ -45,7 +45,7 @@ namespace
 
         public:
             virtual Action::Option action(
-                const Packet &packet, const MAVAddress &address,
+                Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
             {
                 (void)recursion_checker;

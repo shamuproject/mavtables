@@ -32,7 +32,7 @@ Chain::Chain(std::string name_)
 
 
 Action::Option Chain::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;

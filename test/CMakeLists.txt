@@ -14,6 +14,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion2.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Reject.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Rule.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_util.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/unit_tests.cpp"
 )

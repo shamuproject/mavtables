@@ -15,36 +15,37 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <ostream>
-
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
 #include "Action.hpp"
-#include "Accept.hpp"
+#include "Chain.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
+#include "RecursionChecker.hpp"
 
-
-/** \copydoc Action::print_(std::ostream &os) const
- *
- *  Prints `"accept"`.
- */
-std::ostream &Accept::print_(std::ostream &os) const
+namespace
 {
-    os << "accept";
-    return os;
-}
 
+    class ChainTestClass : public Chain
+    {
+        public:
+            using Chain::Chain;
+            virtual Action::Option action(
+                Packet &packet, const MAVAddress &address,
+                RecursionChecker &recursion_checker) const
+            {
+                (void)recursion_checker;
 
-/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
- *
- *  The Accept class always returns \ref Action::ACCEPT, therefore it always
- *  indicates that the \p packet should be sent to the given \p address.
- */
-Action::Option Accept::action(
-    Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
-{
-    (void)packet;
-    (void)address;
-    (void)recursion_checker;
-    return Action::ACCEPT;
+                if (packet.id() == 4)
+                {
+                    if (MAVSubnet("192.0/14").contains(address))
+                    {
+                        return Action::ACCEPT;
+                    }
+
+                    return Action::REJECT;
+                }
+
+                return Action::CONTINUE;
+            }
+    };
+
 }

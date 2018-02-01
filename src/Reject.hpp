@@ -36,7 +36,7 @@ class Reject : public Action
 
     public:
         virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
+            Packet &packet, const MAVAddress &address,
             RecursionChecker &recusion_checker) const;
 };
 

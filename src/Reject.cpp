@@ -40,7 +40,7 @@ std::ostream &Reject::print_(std::ostream &os) const
  *  indicates that the \p packet should not be sent to the given \p address.
  */
 Action::Option Reject::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;

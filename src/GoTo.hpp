@@ -49,7 +49,7 @@ class GoTo : public Action
     public:
         GoTo(std::shared_ptr<Chain> chain);
         virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
+            Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
 };
 
