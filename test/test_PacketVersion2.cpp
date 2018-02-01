@@ -25,7 +25,7 @@
 
 #include "PacketVersion2.hpp"
 #include "MAVAddress.hpp"
-#include "mavlink.h"
+#include "mavlink.hpp"
 #include "util.hpp"
 
 #include "common_Packet.hpp"

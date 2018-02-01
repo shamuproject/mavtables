@@ -18,6 +18,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <exception>
+#include <stdexcept>
 
 #include <boost/tokenizer.hpp>
 
@@ -97,13 +99,15 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *    1. "<System ID>.<Component ID>:<System ID mask>.<Component ID mask>"
  *    2. "<System ID>.<Component ID>/<bits>"
  *    3. "<System ID>.<Component ID>\<bits>"
+ *    3. "<System ID>.<Component ID>"
  *
  *  The first form is self explanatory, but the 2nd and 3rd are not as simple.
  *  In the 2nd case the number of bits (0 - 16) is the number of bits from the
  *  left that must match for an address to be in the subnet.  The 3rd form is
  *  like the 2nd, but does not require the system ID (first octet) to match and
  *  stats with the number of bits of the component ID (0 - 16) that must match
- *  from the left for an address to be in the subnet.
+ *  from the left for an address to be in the subnet.  The last form is
+ *  shorthand for "<System ID>.<Component ID>/16".
  *
  *  Below is a table relating the slash postfix to the subnet mask in \<System
  *  mask\>.\<Component mask\> notation.
@@ -143,6 +147,8 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *      from 0 to 15.
  *    - "255.16:128.240" - Matches system ID's 128 or greater and component ID's
  *      from 16 to 31.
+ *    - "255.16" - Matches only the address with system ID 255 and component ID
+ *      16.
  *
  *  \param subnet String representing the MAVLink subnet.
  *  \throws std::out_of_range if either the System ID or the component ID is out
@@ -153,6 +159,18 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
 MAVSubnet::MAVSubnet(std::string subnet)
     : address_(0)
 {
+    // If only an address was given (exact match subnet).
+    try
+    {
+        address_ = MAVAddress(subnet);
+        mask_ = 0xFFFF;
+        return;
+    }
+    catch (std::exception)
+    {
+        // Continue on parsing normally.
+    }
+
     // Extract parts of subnet string.
     std::vector<std::string> parts;
     boost::char_separator<char> sep("", ":/\\");
@@ -174,6 +192,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
     // Determine format of subnet string.
     unsigned int slashmask;
 
+    // If a regular subnet was given.
     switch (parts[1].at(0))
     {
         // Mask based subnet.
@@ -270,8 +289,10 @@ bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs)
  *  1. "<System ID>.<Component ID>:<System ID mask>.<Component ID mask>"
  *  2. "<System ID>.<Component ID>/<bits>"
  *  3. "<System ID>.<Component ID>\<bits>"
+ *  4. "<System ID>.<Component ID>"
  *
- *  The slash notation is preferred.
+ *  The slash notation is preferred.  The last form is used when the mask
+ *  requires all bits of a subnet to match an address.
  *
  *  See \ref MAVSubnet::MAVSubnet(std::string address) for more information on
  *  the string format.
@@ -288,7 +309,9 @@ std::ostream &operator<<(std::ostream &os, const MAVSubnet &mavsubnet)
     switch (mavsubnet.mask_)
     {
         case 0b1111111111111111:
-            return os << "/16";
+            // return os << "/16"
+            // Represent exact masks as an address.
+            return os;
 
         case 0b1111111111111110:
             return os << "/15";

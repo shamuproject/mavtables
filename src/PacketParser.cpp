@@ -18,7 +18,7 @@
 #include <memory>
 #include <utility>
 
-#include "mavlink.h"
+#include "mavlink.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
 #include "PacketParser.hpp"

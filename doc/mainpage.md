@@ -20,6 +20,7 @@ addressed and can be filtered based on source system/component and message type.
 * [PDF Documentation](mavtables.pdf)
 * [Download](https://github.com/shamuproject/mavtables/archive/master.zip)
 * [GitHub](https://github.com/shamuproject/mavtables)
+* [Theory of MAVLink Routing](http://ardupilot.org/dev/docs/mavlink-routing-in-ardupilot.html)
 
 
 ## Install

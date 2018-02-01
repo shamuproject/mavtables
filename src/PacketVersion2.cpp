@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-#include "mavlink.h"
+#include "mavlink.hpp"
 #include "Connection.hpp"
 #include "PacketVersion2.hpp"
 
@@ -191,7 +191,7 @@ namespace packet_v2
                 {
                     // target_system_ofs is offset from start of payload
                     size_t offset = msg_entry->target_system_ofs +
-                                    sizeof(mavlink_packet_version2_header);
+                                    sizeof(mavlink::v2_header);
                     dest_system = data()[offset];
                 }
                 else
@@ -210,7 +210,7 @@ namespace packet_v2
                 {
                     // target_compoent_ofs is offset from start of payload
                     size_t offset = msg_entry->target_component_ofs +
-                                    sizeof(mavlink_packet_version2_header);
+                                    sizeof(mavlink::v2_header);
                     dest_component = data()[offset];
                 }
                 else
@@ -304,13 +304,13 @@ namespace packet_v2
      *  \return A pointer to the given data, cast to a v2.0 header structure.
      *      If an incomplete header is given a nullptr will be returned.
      */
-    const struct mavlink_packet_version2_header *header(
+    const struct mavlink::v2_header *header(
         const std::vector<uint8_t> &data)
     {
         if (header_complete(data))
         {
             return reinterpret_cast <
-                   const struct mavlink_packet_version2_header * >(&(data[0]));
+                   const struct mavlink::v2_header * >(&(data[0]));
         }
 
         return nullptr;

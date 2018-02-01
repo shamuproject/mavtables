@@ -24,7 +24,7 @@
 #include <memory>
 #include <cstdint>
 
-#include "mavlink.h"
+#include "mavlink.hpp"
 #include "Connection.hpp"
 #include "Packet.hpp"
 
@@ -99,7 +99,7 @@ namespace packet_v2
     bool is_signed(const std::vector<uint8_t> &data);
     bool header_complete(const std::vector<uint8_t> &data);
     bool packet_complete(const std::vector<uint8_t> &data);
-    const struct mavlink_packet_version2_header *header(
+    const struct mavlink::v2_header *header(
         const std::vector<uint8_t> &data);
 
 }
