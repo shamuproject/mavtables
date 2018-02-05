@@ -245,7 +245,7 @@ namespace packet_v2
 
     /** Determine if a MAVLink v2.0 packet is signed or not.
      *
-     *  \relates Packet
+     *  \relates packet_v2::Packet
      *  \throws std::invalid_argument Header is not complete or is invalid.
      *  \throws std::length_error If packet data is not of correct length.
      */
@@ -263,7 +263,7 @@ namespace packet_v2
 
     /** Determine if the given data contains a complete v2.0 header.
      *
-     *  \relates Packet
+     *  \relates packet_v2::Packet
      *  \retval true if \p data contains a complete header (starting with the
      *      magic byte).
      *  \retval false if \p data contains does not contain a complete v2.0
@@ -278,7 +278,7 @@ namespace packet_v2
 
     /** Determine if the given data contains a complete v1.0 packet.
      *
-     *  \relates Packet
+     *  \relates packet_v2::Packet
      *  \retval true if \p data contains a complete packet (starting with the
      *      magic byte).
      *  \retval false if \p data contains does not contain a complete v1.0

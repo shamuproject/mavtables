@@ -90,7 +90,7 @@ TEST_CASE("Packet's can be constructed.", "[Packet]")
 }
 
 
-TEST_CASE("Packet's are comparable", "[Packet]")
+TEST_CASE("Packet's are comparable.", "[Packet]")
 {
     SECTION("with ==")
     {
