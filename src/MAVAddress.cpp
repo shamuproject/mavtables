@@ -185,7 +185,7 @@ bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
 }
 
 
-/** Equality comparison.
+/** Inequality comparison.
  *
  *  \relates MAVAddress
  *  \param lhs The left hand side MAVLink address.
