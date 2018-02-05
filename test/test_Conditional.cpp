@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <utility>
 #include <stdexcept>
 
 #include <catch.hpp>
@@ -62,6 +63,101 @@ TEST_CASE("Conditional's are constructable.", "[Conditional]")
         REQUIRE_THROWS_AS(Conditional(5000), std::invalid_argument);
         REQUIRE_THROWS_WITH(Conditional(5000), "Invalid packet ID (#5000).");
     }
+}
+
+
+TEST_CASE("Conditional's are comparable.", "[Conditional]")
+{
+    SECTION("with ==")
+    {
+        // This also tests the default arguments.
+        REQUIRE(Conditional() == Conditional());
+        REQUIRE(Conditional({}, {}, {}) == Conditional());
+        REQUIRE(Conditional(4, {}, {}) == Conditional(4));
+        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), {}) ==
+                Conditional({}, MAVSubnet("192.0/8")));
+        REQUIRE(Conditional({}, {}, MAVSubnet("192.0/8")) ==
+                Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
+                Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE(Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
+                Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE_FALSE(Conditional(0, {}, {}) == Conditional());
+        REQUIRE_FALSE(Conditional(4, {}, {}) == Conditional(0));
+        REQUIRE_FALSE(Conditional({}, MAVSubnet("192.0/8"), {}) ==
+                      Conditional({}, MAVSubnet("192.0/7")));
+        REQUIRE_FALSE(Conditional({}, {}, MAVSubnet("191.0/8")) ==
+                      Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE_FALSE(
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.1/8")));
+        REQUIRE_FALSE(
+            Conditional(1, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
+            Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+    }
+    SECTION("with !=")
+    {
+        // This also tests the default arguments.
+        REQUIRE(Conditional(0, {}, {}) != Conditional());
+        REQUIRE(Conditional(4, {}, {}) != Conditional(0));
+        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), {}) !=
+                Conditional({}, MAVSubnet("192.0/7")));
+        REQUIRE(Conditional({}, {}, MAVSubnet("191.0/8")) !=
+                Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
+                Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.1/8")));
+        REQUIRE(Conditional(1, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
+                Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE_FALSE(Conditional() != Conditional());
+        REQUIRE_FALSE(Conditional({}, {}, {}) != Conditional());
+        REQUIRE_FALSE(Conditional(4, {}, {}) != Conditional(4));
+        REQUIRE_FALSE(Conditional({}, MAVSubnet("192.0/8"), {}) !=
+                      Conditional({}, MAVSubnet("192.0/8")));
+        REQUIRE_FALSE(Conditional({}, {}, MAVSubnet("192.0/8")) !=
+                      Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE_FALSE(
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE_FALSE(
+            Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
+            Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+    }
+}
+
+
+TEST_CASE("Conditional's are copyable.", "[Conditional]")
+{
+    Conditional original(4, MAVSubnet("192.168"), MAVSubnet("172.16"));
+    Conditional copy(original);
+    REQUIRE(copy == Conditional(4, MAVSubnet("192.168"), MAVSubnet("172.16")));
+}
+
+
+TEST_CASE("Conditional's are movable.", "[Conditional]")
+{
+    Conditional original(4, MAVSubnet("192.168"), MAVSubnet("172.16"));
+    Conditional moved(std::move(original));
+    REQUIRE(moved == Conditional(4, MAVSubnet("192.168"), MAVSubnet("172.16")));
+}
+
+
+TEST_CASE("Conditional's are assignable.", "[Conditional]")
+{
+    Conditional a(4, {}, MAVSubnet("255.255"));
+    Conditional b(11, MAVSubnet("255.255"), {});
+    REQUIRE(a == Conditional(4, {}, MAVSubnet("255.255")));
+    a = b;
+    REQUIRE(a == Conditional(11, MAVSubnet("255.255"), {}));
+}
+
+
+TEST_CASE("Conditional's are assignable (by move semantics.)", "[Conditional]")
+{
+    Conditional a(4, {}, MAVSubnet("255.255"));
+    Conditional b(11, MAVSubnet("255.255"), {});
+    REQUIRE(a == Conditional(4, {}, MAVSubnet("255.255")));
+    a = std::move(b);
+    REQUIRE(a == Conditional(11, MAVSubnet("255.255"), {}));
 }
 
 

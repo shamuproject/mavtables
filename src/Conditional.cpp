@@ -195,6 +195,38 @@ bool Conditional::check(const Packet &packet, const MAVAddress &address) const
 }
 
 
+/** Equality comparison.
+ *
+ *  \relates Conditional
+ *  \param lhs The left hand side conditional statement.
+ *  \param rhs The right hand side conditional statement.
+ *  \retval true if \p lhs and \p rhs are the same.
+ *  \retval false if \p lhs and \p rhs are not the same.
+ *  \complexity \f$O(1)\f$
+ */
+bool operator==(const Conditional &lhs, const Conditional &rhs)
+{
+    return (lhs.id_ == rhs.id_) && (lhs.source_ == rhs.source_) &&
+           (lhs.dest_ == rhs.dest_);
+}
+
+
+/** Inequality comparison.
+ *
+ *  \relates Conditional
+ *  \param lhs The left hand side conditional statement.
+ *  \param rhs The right hand side conditional statement.
+ *  \retval true if \p lhs and \p rhs are not the same.
+ *  \retval false if \p lhs and \p rhs are the same.
+ *  \complexity \f$O(1)\f$
+ */
+bool operator!=(const Conditional &lhs, const Conditional &rhs)
+{
+    return (lhs.id_ != rhs.id_) || (lhs.source_ != rhs.source_) ||
+           (lhs.dest_ != rhs.dest_);
+}
+
+
 /** Print the conditional to the given output stream.
  *
  *  Some examples are:
