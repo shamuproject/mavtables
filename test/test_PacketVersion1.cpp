@@ -122,7 +122,7 @@ TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
         REQUIRE(packet_v1::header(set_mode)->msgid == 11);
         REQUIRE(packet_v1::header(encapsulated_data)->msgid == 131);
     }
-    SECTION("Returns false when an incomplete header is given.")
+    SECTION("Returns nullptr when an incomplete header is given.")
     {
         heartbeat.resize(5);
         ping.resize(4);
@@ -133,7 +133,7 @@ TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
         REQUIRE(packet_v1::header(set_mode) == nullptr);
         REQUIRE(packet_v1::header(encapsulated_data) == nullptr);
     }
-    SECTION("Returns false when the magic byte is wrong.")
+    SECTION("Returns nullptr when the magic byte is wrong.")
     {
         heartbeat.front() = 0xAD;
         ping.front() = 0xBC;
@@ -427,12 +427,16 @@ TEST_CASE("packet_v1::Packet's are printable.", "[packet_v1::Packet]")
     auto ping = to_vector(PingV1());
     auto set_mode = to_vector(SetModeV1());
     auto encapsulated_data = to_vector(EncapsulatedDataV1());
-    REQUIRE(str(packet_v1::Packet(heartbeat)) ==
-            "HEARTBEAT (#0) from 127.0 (v1.0)");
-    REQUIRE(str(packet_v1::Packet(ping)) ==
-            "PING (#4) from 192.168 to 255.64 (v1.0)");
-    REQUIRE(str(packet_v1::Packet(set_mode)) ==
-            "SET_MODE (#11) from 172.16 to 123.0 (v1.0)");
-    REQUIRE(str(packet_v1::Packet(encapsulated_data)) ==
-            "ENCAPSULATED_DATA (#131) from 224.255 (v1.0)");
+    REQUIRE(
+        str(packet_v1::Packet(heartbeat)) ==
+        "HEARTBEAT (#0) from 127.0 (v1.0)");
+    REQUIRE(
+        str(packet_v1::Packet(ping)) ==
+        "PING (#4) from 192.168 to 255.64 (v1.0)");
+    REQUIRE(
+        str(packet_v1::Packet(set_mode)) ==
+        "SET_MODE (#11) from 172.16 to 123.0 (v1.0)");
+    REQUIRE(
+        str(packet_v1::Packet(encapsulated_data)) ==
+        "ENCAPSULATED_DATA (#131) from 224.255 (v1.0)");
 }

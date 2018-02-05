@@ -132,7 +132,7 @@ namespace
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
-        uint8_t sysid = 1;
+        uint8_t sysid = 127;
         uint8_t compid = 0;
         uint32_t msgid : 24;
         payload payload;
@@ -149,15 +149,15 @@ namespace
             uint64_t time_usec = 295128000000000;
             uint32_t seq = 0xBA5EBA11;
             uint8_t target_system = 255;
-            uint8_t target_component = 23;
+            uint8_t target_component = 64;
         };
         uint8_t magic = 0xFD;
         uint8_t len = sizeof(payload);
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
-        uint8_t sysid = 60;
-        uint8_t compid = 40;
+        uint8_t sysid = 192;
+        uint8_t compid = 168;
         uint32_t msgid : 24;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -179,8 +179,8 @@ namespace
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
-        uint8_t sysid = 70;
-        uint8_t compid = 30;
+        uint8_t sysid = 172;
+        uint8_t compid = 16;
         uint32_t msgid : 24;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -203,8 +203,8 @@ namespace
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
-        uint8_t sysid = 80;
-        uint8_t compid = 20;
+        uint8_t sysid = 255;
+        uint8_t compid = 0;
         uint32_t msgid : 24;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -225,8 +225,8 @@ namespace
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
-        uint8_t sysid = 255;
-        uint8_t compid = 1;
+        uint8_t sysid = 224;
+        uint8_t compid = 255;
         uint32_t msgid : 24;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -248,7 +248,7 @@ namespace
         uint8_t incompat_flags = 0;
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
-        uint8_t sysid = 1;
+        uint8_t sysid = 0;
         uint8_t compid = 255;
         uint32_t msgid : 24;
         payload payload;
