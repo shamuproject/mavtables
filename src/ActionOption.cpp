@@ -17,6 +17,7 @@
 
 #include <utility>
 #include <optional>
+#include <ostream>
 
 #include "ActionOption.hpp"
 
@@ -49,4 +50,47 @@ ActionOption ActionOption::make_continue()
 ActionOption ActionOption::make_default()
 {
     return ActionOption(ActionOption::DEFAULT);
+}
+
+
+bool operator==(const ActionOption &lhs, const ActionOption &rhs)
+{
+    return (lhs.choice == rhs.choice) && (lhs.priority == rhs.priority);
+}
+
+
+bool operator!=(const ActionOption &lhs, const ActionOption &rhs)
+{
+    return (lhs.choice != rhs.choice) || (lhs.priority != rhs.priority);
+}
+
+
+std::ostream &operator<<(std::ostream &os, const ActionOption &action_option)
+{
+    switch (action_option.choice)
+    {
+        case ActionOption::ACCEPT:
+            os << "accept";
+
+            if (action_option.priority)
+            {
+                os << " with priority" << action_option.priority.value();
+            }
+
+            break;
+
+        case ActionOption::REJECT:
+            os << "reject";
+            break;
+
+        case ActionOption::CONTINUE:
+            os << "continue";
+            break;
+
+        case ActionOption::DEFAULT:
+            os << "default";
+            break;
+    }
+
+    return os;
 }

@@ -20,12 +20,11 @@
 
 
 #include <optional>
+#include <ostream>
 
 
 class ActionOption
 {
-    private:
-
     public:
         enum Choice
         {
@@ -44,6 +43,11 @@ class ActionOption
         ActionOption make_default();
 
 };
+
+
+bool operator==(const ActionOption &lhs, const ActionOption &rhs);
+bool operator!=(const ActionOption &lhs, const ActionOption &rhs);
+std::ostream &operator<<(std::ostream &os, const ActionOption &action_option);
 
 
 #endif // ACTION_HPP_
