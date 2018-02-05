@@ -1,6 +1,7 @@
 set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_Accept.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Action.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Action_comparison.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Call.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Conditional.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_DNSLookupError.cpp"

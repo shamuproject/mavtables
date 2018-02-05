@@ -46,6 +46,25 @@ TEST_CASE("Call's can be constructed.", "[Call]")
 }
 
 
+TEST_CASE("Call's are comparable.", "[Call]")
+{
+    auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
+    auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
+    SECTION("with ==")
+    {
+        REQUIRE(Call(chain1) == Call(chain1));
+        REQUIRE(Call(chain2) == Call(chain2));
+        REQUIRE_FALSE(Call(chain1) == Call(chain2));
+    }
+    SECTION("with !=")
+    {
+        REQUIRE_FALSE(Call(chain1) != Call(chain1));
+        REQUIRE_FALSE(Call(chain2) != Call(chain2));
+        REQUIRE(Call(chain1) != Call(chain2));
+    }
+}
+
+
 TEST_CASE("Call's 'action' method delegates the decision to the Chain it "
           "contains.", "[Call]")
 {

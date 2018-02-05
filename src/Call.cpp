@@ -52,7 +52,6 @@ std::ostream &Call::print_(std::ostream &os) const
 }
 
 
-//! \copydoc Action::clone() const
 std::unique_ptr<Action> Call::clone() const
 {
     return std::make_unique<Call>(chain_);
@@ -70,4 +69,34 @@ Action::Option Call::action(
     RecursionChecker &recursion_checker) const
 {
     return chain_->action(packet, address, recursion_checker);
+}
+
+
+/** \copydoc Action::operator==(const Action &) const
+ *
+ *  Compares the chain associated with the call as well.
+ */
+bool Call::operator==(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const Call &other_ = static_cast<const Call &>(other);
+        return chain_ == other_.chain_;
+    }
+    return false;
+}
+
+
+/** \copydoc Action::operator!=(const Action &) const
+ *
+ *  Compares the chain associated with the call as well.
+ */
+bool Call::operator!=(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const Call &other_ = static_cast<const Call &>(other);
+        return chain_ != other_.chain_;
+    }
+    return true;
 }

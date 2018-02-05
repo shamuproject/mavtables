@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <ostream>
+#include <typeinfo>
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
@@ -35,7 +36,6 @@ std::ostream &Accept::print_(std::ostream &os) const
 }
 
 
-//! \copydoc Action::clone() const
 std::unique_ptr<Action> Accept::clone() const
 {
     return std::make_unique<Accept>();
@@ -55,4 +55,16 @@ Action::Option Accept::action(
     (void)address;
     (void)recursion_checker;
     return Action::ACCEPT;
+}
+
+
+bool Accept::operator==(const Action &other) const
+{
+    return typeid(*this) == typeid(other);
+}
+
+
+bool Accept::operator!=(const Action &other) const
+{
+    return typeid(*this) != typeid(other);
 }

@@ -66,6 +66,16 @@ namespace
 
                 return Action::CONTINUE;
             }
+            virtual bool operator==(const Action &other) const
+            {
+                (void)other;
+                return true;
+            }
+            virtual bool operator!=(const Action &other) const
+            {
+                (void)other;
+                return false;
+            }
     };
 
 }
@@ -74,6 +84,13 @@ namespace
 TEST_CASE("Action's can be constructed.", "[Action]")
 {
     REQUIRE_NOTHROW(ActionTestClass());
+}
+
+
+TEST_CASE("Action's are comparable.", "[Action]")
+{
+    REQUIRE(ActionTestClass() == ActionTestClass());
+    REQUIRE_FALSE(ActionTestClass() != ActionTestClass());
 }
 
 

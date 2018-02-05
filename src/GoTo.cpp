@@ -81,3 +81,33 @@ Action::Option GoTo::action(
 
     return option;
 }
+
+
+/** \copydoc Action::operator==(const Action &) const
+ *
+ *  Compares the chain associated with the goto as well.
+ */
+bool GoTo::operator==(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const GoTo &other_ = static_cast<const GoTo &>(other);
+        return chain_ == other_.chain_;
+    }
+    return false;
+}
+
+
+/** \copydoc Action::operator!=(const Action &) const
+ *
+ *  Compares the chain associated with the goto as well.
+ */
+bool GoTo::operator!=(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const GoTo &other_ = static_cast<const GoTo &>(other);
+        return chain_ != other_.chain_;
+    }
+    return true;
+}

@@ -35,6 +35,13 @@ TEST_CASE("Reject's can be constructed.", "[Reject]")
 }
 
 
+TEST_CASE("Reject's are comparable.", "[Reject]")
+{
+    REQUIRE(Reject() == Reject());
+    REQUIRE_FALSE(Reject() != Reject());
+}
+
+
 TEST_CASE("Reject's 'action' method always returns Action::REJECT.", "[Reject]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();

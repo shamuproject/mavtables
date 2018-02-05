@@ -90,6 +90,20 @@ class Action
         virtual Action::Option action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const = 0;
+        /** Equality comparison.
+         *
+         *  \param other The other action  to compare this to.
+         *  \retval true if this action is the same as \p other.
+         *  \retval false if this action is not the same as \p other.
+         */
+        virtual bool operator==(const Action &other) const = 0;
+        /** Inequality comparison.
+         *
+         *  \param other The other action  to compare this to.
+         *  \retval true if this action is not the same as \p other.
+         *  \retval false if this action is the same as \p other.
+         */
+        virtual bool operator!=(const Action &other) const = 0;
 
         friend std::ostream &operator<<(std::ostream &os, const Action &action);
 };

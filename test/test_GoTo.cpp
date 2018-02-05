@@ -46,6 +46,25 @@ TEST_CASE("GoTo's can be constructed.", "[GoTo]")
 }
 
 
+TEST_CASE("GoTo's are comparable.", "[GoTo]")
+{
+    auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
+    auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
+    SECTION("with ==")
+    {
+        REQUIRE(GoTo(chain1) == GoTo(chain1));
+        REQUIRE(GoTo(chain2) == GoTo(chain2));
+        REQUIRE_FALSE(GoTo(chain1) == GoTo(chain2));
+    }
+    SECTION("with !=")
+    {
+        REQUIRE_FALSE(GoTo(chain1) != GoTo(chain1));
+        REQUIRE_FALSE(GoTo(chain2) != GoTo(chain2));
+        REQUIRE(GoTo(chain1) != GoTo(chain2));
+    }
+}
+
+
 TEST_CASE("GoTo's 'action' method delegates the decision to the Chain it "
           "contains.", "[GoTo]")
 {

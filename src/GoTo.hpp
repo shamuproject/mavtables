@@ -52,6 +52,8 @@ class GoTo : public Action
         virtual Action::Option action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
+        virtual bool operator==(const Action &other) const;
+        virtual bool operator!=(const Action &other) const;
 };
 
 

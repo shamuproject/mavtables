@@ -35,7 +35,6 @@ std::ostream &Reject::print_(std::ostream &os) const
 }
 
 
-//! \copydoc Action::clone() const
 std::unique_ptr<Action> Reject::clone() const
 {
     return std::make_unique<Reject>();
@@ -55,4 +54,16 @@ Action::Option Reject::action(
     (void)address;
     (void)recursion_checker;
     return Action::REJECT;
+}
+
+
+bool Reject::operator==(const Action &other) const
+{
+    return typeid(*this) == typeid(other);
+}
+
+
+bool Reject::operator!=(const Action &other) const
+{
+    return typeid(*this) != typeid(other);
 }
