@@ -304,7 +304,6 @@ TEST_CASE("packet_v1::Packet's are copyable.", "[packet_v1::Packet]")
     packet_v1::Packet original(to_vector(PingV1()));
     packet_v1::Packet copy(original);
     REQUIRE(copy == packet_v1::Packet(to_vector(PingV1())));
-
 }
 
 

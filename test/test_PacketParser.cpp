@@ -127,7 +127,8 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto data = to_vector_with_sig(PingV2());
         add_bytes(data, 3);
         auto packet = test_packet_parser(
-              parser, data, sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
+                          parser, data,
+                          sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
         REQUIRE(*packet == packet_v2::Packet(to_vector_with_sig(PingV2())));
     }
     SECTION("Can parse multiple packets back to back.")
@@ -138,7 +139,8 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto packet1 = test_packet_parser(parser, data1, sizeof(PingV1));
         auto packet2 = test_packet_parser(parser, data2, sizeof(PingV2));
         auto packet3 = test_packet_parser(
-            parser, data3, sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH);
+                           parser, data3,
+                           sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH);
         REQUIRE(*packet1 == packet_v1::Packet(to_vector(PingV1())));
         REQUIRE(*packet2 == packet_v2::Packet(to_vector(PingV2())));
         REQUIRE(*packet3 == packet_v2::Packet(to_vector_with_sig(PingV2())));
@@ -154,7 +156,8 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto packet1 = test_packet_parser(parser, data1, sizeof(PingV1) + 3);
         auto packet2 = test_packet_parser(parser, data2, sizeof(PingV2) + 3);
         auto packet3 = test_packet_parser(
-            parser, data3, sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
+                           parser, data3,
+                           sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
         REQUIRE(*packet1 == packet_v1::Packet(to_vector(PingV1())));
         REQUIRE(*packet2 == packet_v2::Packet(to_vector(PingV2())));
         REQUIRE(*packet3 == packet_v2::Packet(to_vector_with_sig(PingV2())));

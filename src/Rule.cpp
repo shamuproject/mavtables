@@ -65,7 +65,7 @@ Rule::Rule()
  */
 Rule::Rule(const Rule &other)
     : action_(other.action_->clone()), condition_(other.condition_),
-    priority_(other.priority_)
+      priority_(other.priority_)
 {
 }
 
@@ -234,8 +234,9 @@ Rule &Rule::operator=(const Rule &other)
 bool operator==(const Rule &lhs, const Rule &rhs)
 {
     bool result = lhs.condition_ == rhs.condition_ &&
-        lhs.priority_ == rhs.priority_;
-    if (lhs.action_ && rhs.action_) 
+                  lhs.priority_ == rhs.priority_;
+
+    if (lhs.action_ && rhs.action_)
     {
         return result && (*lhs.action_ == *rhs.action_);
     }
@@ -243,6 +244,7 @@ bool operator==(const Rule &lhs, const Rule &rhs)
     {
         return result;
     }
+
     return false;
 }
 

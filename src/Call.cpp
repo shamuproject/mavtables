@@ -83,6 +83,7 @@ bool Call::operator==(const Action &other) const
         const Call &other_ = static_cast<const Call &>(other);
         return chain_ == other_.chain_;
     }
+
     return false;
 }
 
@@ -98,5 +99,6 @@ bool Call::operator!=(const Action &other) const
         const Call &other_ = static_cast<const Call &>(other);
         return chain_ != other_.chain_;
     }
+
     return true;
 }

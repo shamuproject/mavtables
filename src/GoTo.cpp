@@ -94,6 +94,7 @@ bool GoTo::operator==(const Action &other) const
         const GoTo &other_ = static_cast<const GoTo &>(other);
         return chain_ == other_.chain_;
     }
+
     return false;
 }
 
@@ -109,5 +110,6 @@ bool GoTo::operator!=(const Action &other) const
         const GoTo &other_ = static_cast<const GoTo &>(other);
         return chain_ != other_.chain_;
     }
+
     return true;
 }

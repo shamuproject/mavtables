@@ -183,12 +183,12 @@ std::unique_ptr<Packet> PacketParser::waiting_for_packet_(uint8_t byte)
         {
             case packet_v1::VERSION:
                 packet = std::make_unique<packet_v1::Packet>(
-                        std::move(buffer_));
+                             std::move(buffer_));
                 break;
 
             case packet_v2::VERSION:
                 packet = std::make_unique<packet_v2::Packet>(
-                        std::move(buffer_));
+                             std::move(buffer_));
                 break;
         }
 
