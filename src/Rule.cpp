@@ -59,6 +59,17 @@ Rule::Rule()
 }
 
 
+/** Copy constructor.
+ *
+ * \param other Rule to copy.
+ */
+Rule::Rule(const Rule &other)
+    : action_(other.action_->clone()), condition_(other.condition_),
+    priority_(other.priority_)
+{
+}
+
+
 /** Construct a rule from and action and optional condition.
  *
  *  \param action The action the rule should take if matches a given
@@ -196,6 +207,19 @@ Action::Option Rule::action(
     }
 
     return Action::CONTINUE;
+}
+
+
+/** Assignment operator.
+ *
+ * \param other Rule to copy.
+ */
+Rule &Rule::operator=(const Rule &other)
+{
+    action_ = other.action_->clone();
+    condition_ = other.condition_;
+    priority_ = other.priority_;
+    return *this;
 }
 
 

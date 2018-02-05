@@ -43,6 +43,12 @@ class Rule
 
     public:
         Rule();
+        Rule(const Rule &other);
+        /** Move constructor.
+         *
+         * \param other Rule to move from.
+         */
+        Rule(Rule &&other) = default;
         Rule(std::unique_ptr<Action> action,
              std::optional<Conditional> condition = {});
         Rule &accept();
@@ -54,6 +60,12 @@ class Rule
         Action::Option action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
+        Rule &operator=(const Rule &other);
+        /** Assignment operator (by move semantics).
+         *
+         * \param other Rule to move from.
+         */
+        Rule &operator=(Rule &&other) = default;
 
         friend bool operator==(const Rule &lhs, const Rule &rhs);
         friend bool operator!=(const Rule &lhs, const Rule &rhs);

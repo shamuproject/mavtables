@@ -16,6 +16,7 @@
 
 
 #include <memory>
+#include <utility>
 
 #include <catch.hpp>
 #include <fakeit.hpp>
@@ -73,6 +74,7 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
     SECTION("with ==")
     {
         // True
+        REQUIRE(Rule() == Rule());
         REQUIRE(Rule(std::make_unique<Accept>()) ==
                 Rule(std::make_unique<Accept>()));
         REQUIRE(Rule(std::make_unique<Accept>()).with_priority(10) ==
@@ -80,6 +82,7 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
         REQUIRE(Rule(std::make_unique<Reject>(), Conditional().type("PING")) ==
                 Rule(std::make_unique<Reject>(), Conditional().type("PING")));
         // False
+        REQUIRE_FALSE(Rule(std::make_unique<Accept>()) == Rule());
         REQUIRE_FALSE(
             Rule(std::make_unique<Accept>()) ==
             Rule(std::make_unique<Reject>()));
@@ -93,6 +96,7 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
     SECTION("with !=")
     {
         // True
+        REQUIRE(Rule(std::make_unique<Accept>()) != Rule());
         REQUIRE(
             Rule(std::make_unique<Accept>()) !=
             Rule(std::make_unique<Reject>()));
@@ -103,6 +107,7 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
             Rule(std::make_unique<Reject>(), Conditional().type("PING")) !=
             Rule(std::make_unique<Reject>(), Conditional().type("DEBUG")));
         // False
+        REQUIRE_FALSE(Rule() != Rule());
         REQUIRE_FALSE(
             Rule(std::make_unique<Accept>()) !=
             Rule(std::make_unique<Accept>()));
@@ -113,6 +118,66 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
             Rule(std::make_unique<Reject>(), Conditional().type("PING")) !=
             Rule(std::make_unique<Reject>(), Conditional().type("PING")));
     }
+}
+
+
+TEST_CASE("Rule's are copyable.", "[Rule]")
+{
+    Rule original(Rule(std::make_unique<Accept>(), Conditional().type("PING")));
+    original.with_priority(10);
+    Rule copy(original);
+    Rule rule_for_comparison(
+        std::make_unique<Accept>(), Conditional().type("PING"));
+    rule_for_comparison.with_priority(10);
+    REQUIRE(copy == rule_for_comparison);
+}
+
+
+TEST_CASE("Rule's are movable.", "[Rule]")
+{
+    Rule original(Rule(std::make_unique<Accept>(), Conditional().type("PING")));
+    original.with_priority(10);
+    Rule moved(std::move(original));
+    Rule rule_for_comparison(
+        std::make_unique<Accept>(), Conditional().type("PING"));
+    rule_for_comparison.with_priority(10);
+    REQUIRE(moved == rule_for_comparison);
+}
+
+
+TEST_CASE("Rule's are assignable.", "[Rule]")
+{
+    Rule a(std::make_unique<Accept>(), Conditional().type("PING"));
+    a.with_priority(10);
+    Rule b(std::make_unique<Reject>(), Conditional().type("DEBUG"));
+    b.with_priority(1);
+    Rule rule_for_comparison_a(
+        std::make_unique<Accept>(), Conditional().type("PING"));
+    rule_for_comparison_a.with_priority(10);
+    REQUIRE(a == rule_for_comparison_a);
+    a = b;
+    Rule rule_for_comparison_b(
+        std::make_unique<Reject>(), Conditional().type("DEBUG"));
+    rule_for_comparison_b.with_priority(1);
+    REQUIRE(a == rule_for_comparison_b);
+}
+
+
+TEST_CASE("Rule's are assignable (by move semantics).", "[Rule]")
+{
+    Rule a(std::make_unique<Accept>(), Conditional().type("PING"));
+    a.with_priority(10);
+    Rule b(std::make_unique<Reject>(), Conditional().type("DEBUG"));
+    b.with_priority(1);
+    Rule rule_for_comparison_a(
+        std::make_unique<Accept>(), Conditional().type("PING"));
+    rule_for_comparison_a.with_priority(10);
+    REQUIRE(a == rule_for_comparison_a);
+    a = std::move(b);
+    Rule rule_for_comparison_b(
+        std::make_unique<Reject>(), Conditional().type("DEBUG"));
+    rule_for_comparison_b.with_priority(1);
+    REQUIRE(a == rule_for_comparison_b);
 }
 
 
