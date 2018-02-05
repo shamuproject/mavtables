@@ -15,21 +15,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility>
 #include <cstdint>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <catch.hpp>
 
-#include "util.hpp"
-#include "MAVAddress.hpp"
 #include "Connection.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include "util.hpp"
 
 #include "common_Packet.hpp"
+
 
 namespace
 {
@@ -45,11 +46,8 @@ namespace
         public:
             PacketTestClass(const PacketTestClass &other) = default;
             PacketTestClass(PacketTestClass &&other) = default;
-            PacketTestClass(
-                std::vector<uint8_t> data,
-                std::weak_ptr<Connection> connection,
-                int priority = 0)
-                : Packet(std::move(data), std::move(connection), priority)
+            PacketTestClass(std::vector<uint8_t> data)
+                : Packet(std::move(data))
             {
             }
             virtual ::Packet::Version version() const
@@ -85,224 +83,112 @@ namespace
 
 TEST_CASE("Packet's can be constructed.", "[Packet]")
 {
-    std::vector<uint8_t> data = {1, 3, 3, 7};
-    auto conn = std::make_shared<ConnectionTestClass>();
-    REQUIRE_NOTHROW(PacketTestClass(data, conn));
-    REQUIRE_NOTHROW(PacketTestClass(data, conn, -10));
-    REQUIRE_NOTHROW(PacketTestClass(data, conn, +10));
+    std::vector<uint8_t> data = {0, 7, 7, 3, 4};
+    REQUIRE_NOTHROW(PacketTestClass({}));
+    REQUIRE_NOTHROW(PacketTestClass({1, 3, 3, 7}));
+    REQUIRE_NOTHROW(PacketTestClass(data));
 }
 
 
-TEST_CASE("Packet's contain raw packet data and make it accessible.",
-          "[Packet]")
+TEST_CASE("Packet's are comparable", "[Packet]")
 {
-    std::vector<uint8_t> data = {1, 3, 3, 7};
-    auto conn = std::make_shared<ConnectionTestClass>();
-    REQUIRE(PacketTestClass(data, conn).data() ==
-            std::vector<uint8_t>({1, 3, 3, 7}));
-    REQUIRE_FALSE(PacketTestClass(data, conn).data() ==
-                  std::vector<uint8_t>({1, 0, 5, 3}));
-}
-
-
-TEST_CASE("Packet's contain a weak_ptr to a connection.", "[Packet]")
-{
-    std::vector<uint8_t> data = {1, 3, 3, 7};
-    auto conn1 = std::make_shared<ConnectionTestClass>();
-    auto conn2 = std::make_shared<ConnectionTestClass>();
-    std::weak_ptr<ConnectionTestClass> empty_conn; // empty weak pointer
-    REQUIRE(PacketTestClass(data, conn1).connection().lock() == conn1);
-    REQUIRE(PacketTestClass(data, conn2).connection().lock() == conn2);
-    REQUIRE(PacketTestClass(data, empty_conn).connection().lock() ==
-            empty_conn.lock());
-    REQUIRE(PacketTestClass(data, empty_conn).connection().lock() == nullptr);
-    REQUIRE_FALSE(PacketTestClass(data, conn1).connection().lock() == nullptr);
-    REQUIRE_FALSE(PacketTestClass(data, conn2).connection().lock() == nullptr);
-    REQUIRE_FALSE(PacketTestClass(data, conn1).connection().lock() == conn2);
-    REQUIRE_FALSE(PacketTestClass(data, conn2).connection().lock() == conn1);
-    REQUIRE_FALSE(
-        PacketTestClass(data, empty_conn).connection().lock() == conn1);
-    REQUIRE_FALSE(
-        PacketTestClass(data, empty_conn).connection().lock() == conn2);
-}
-
-
-TEST_CASE("Packet's have a priority.", "[Packet]")
-{
-    std::weak_ptr<ConnectionTestClass> conn;
-    SECTION("Which has a default value of 0.")
+    SECTION("with ==")
     {
-        REQUIRE(PacketTestClass({}, conn).priority() == 0);
+        REQUIRE(PacketTestClass({1, 3, 3, 7}) == PacketTestClass({1, 3, 3, 7}));
+        REQUIRE_FALSE(
+            PacketTestClass({1, 3, 3, 7}) == PacketTestClass({0, 7, 7, 3, 4}));
     }
-    SECTION("That can be set during construction.")
+    SECTION("with !=")
     {
-        REQUIRE(PacketTestClass({}, conn, -32768).priority() == -32768);
-        REQUIRE(PacketTestClass({}, conn, 0).priority() == 0);
-        REQUIRE(PacketTestClass({}, conn, 32767).priority() == 32767);
-
-        // Loop over every 1000 priority values.
-        for (auto i : boost::irange(-32768, 32768, 1000))
-        {
-            REQUIRE(PacketTestClass({}, conn, i).priority() == i);
-        }
-    }
-    SECTION("That can be set after construction.")
-    {
-        PacketTestClass packet({}, conn);
-        REQUIRE(packet.priority() == 0);
-        // -32768
-        REQUIRE(packet.priority(-32768) == -32768);
-        REQUIRE(packet.priority() == -32768);
-        // 0
-        REQUIRE(packet.priority(0) == 0);
-        REQUIRE(packet.priority() == 0);
-        // 32767
-        REQUIRE(packet.priority(32767) == 32767);
-        REQUIRE(packet.priority() == 32767);
-
-        // Loop over every 1000 priority values.
-        for (auto i : boost::irange(-32768, 32768, 1000))
-        {
-            REQUIRE(packet.priority(i) == i);
-            REQUIRE(packet.priority() == i);
-        }
+        REQUIRE(
+            PacketTestClass({1, 3, 3, 7}) != PacketTestClass({0, 7, 7, 3, 4}));
+        REQUIRE_FALSE(
+            PacketTestClass({1, 3, 3, 7}) != PacketTestClass({1, 3, 3, 7}));
     }
 }
 
 
 TEST_CASE("Packet's are copyable.", "[Packet]")
 {
-    std::vector<uint8_t> data1 = {1, 3, 3, 7};
-    std::vector<uint8_t> data2 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto conn1 = std::make_shared<ConnectionTestClass>();
-    auto conn2 = std::make_shared<ConnectionTestClass>();
-    PacketTestClass a(data1, conn1, 1);
-    PacketTestClass b(data2, conn2, 2);
-    PacketTestClass a_copy = a;
-    PacketTestClass b_copy(b);
-    REQUIRE(&a != &a_copy);
-    REQUIRE(a.data() == a_copy.data());
-    REQUIRE(a.connection().lock() == a_copy.connection().lock());
-    REQUIRE(a.priority() == a_copy.priority());
-    REQUIRE(&b != &b_copy);
-    REQUIRE(b.data() == b_copy.data());
-    REQUIRE(b.connection().lock() == b_copy.connection().lock());
-    REQUIRE(b.priority() == b_copy.priority());
+    PacketTestClass original({1, 3, 3, 7});
+    PacketTestClass copy(original);
+    REQUIRE(copy == PacketTestClass({1, 3, 3, 7}));
 }
 
 
 TEST_CASE("Packet's are movable.", "[Packet]")
 {
-    std::vector<uint8_t> data1 = {1, 3, 3, 7};
-    std::vector<uint8_t> data2 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto conn1 = std::make_shared<ConnectionTestClass>();
-    auto conn2 = std::make_shared<ConnectionTestClass>();
-    PacketTestClass a(data1, conn1, 1);
-    PacketTestClass b(data2, conn2, 2);
-    PacketTestClass a_moved = std::move(a);
-    PacketTestClass b_moved(std::move(b));
-    REQUIRE(a_moved.data() == data1);
-    REQUIRE(a_moved.connection().lock() == conn1);
-    REQUIRE(a_moved.priority() == 1);
-    REQUIRE(b_moved.data() == data2);
-    REQUIRE(b_moved.connection().lock() == conn2);
-    REQUIRE(b_moved.priority() == 2);
+    PacketTestClass original({1, 3, 3, 7});
+    PacketTestClass moved(std::move(original));
+    REQUIRE(moved == PacketTestClass({1, 3, 3, 7}));
 }
 
 
 TEST_CASE("Packet's are assignable.", "[Packet]")
 {
-    std::vector<uint8_t> data = {1, 3, 3, 7};
-    auto conn = std::make_shared<ConnectionTestClass>();
-    PacketTestClass packet(data, conn, -10);
-    PacketTestClass packet_to_copy(
-        {}, std::weak_ptr<ConnectionTestClass>(), 10);
-    REQUIRE(packet.data() == data);
-    REQUIRE(packet.connection().lock() == conn);
-    REQUIRE(packet.priority() == -10);
-    packet = packet_to_copy;
-    REQUIRE(packet.data() == std::vector<uint8_t>());
-    REQUIRE(packet.connection().lock() == nullptr);
-    REQUIRE(packet.priority() == 10);
+    PacketTestClass a({1, 3, 3, 7});
+    PacketTestClass b({0, 7, 7, 3, 4});
+    REQUIRE(a == PacketTestClass({1, 3, 3, 7}));
+    a = b;
+    REQUIRE(a == PacketTestClass({0, 7, 7, 3, 4}));
 }
 
 
 TEST_CASE("Packet's are assignable (by move semantics).", "[Packet]")
 {
-    std::vector<uint8_t> data = {1, 3, 3, 7};
-    auto conn = std::make_shared<ConnectionTestClass>();
-    PacketTestClass packet(data, conn, -10);
-    PacketTestClass packet_to_move(
-        {}, std::weak_ptr<ConnectionTestClass>(), 10);
-    REQUIRE(packet.data() == data);
-    REQUIRE(packet.connection().lock() == conn);
-    REQUIRE(packet.priority() == -10);
-    packet = std::move(packet_to_move);
-    REQUIRE(packet.data() == std::vector<uint8_t>());
-    REQUIRE(packet.connection().lock() == nullptr);
-    REQUIRE(packet.priority() == 10);
+    PacketTestClass a({1, 3, 3, 7});
+    PacketTestClass b({0, 7, 7, 3, 4});
+    REQUIRE(a == PacketTestClass({1, 3, 3, 7}));
+    a = std::move(b);
+    REQUIRE(a == PacketTestClass({0, 7, 7, 3, 4}));
+}
+
+
+TEST_CASE("Packet's contain raw packet data and make it accessible.",
+          "[Packet]")
+{
+    REQUIRE(
+        PacketTestClass({1, 3, 3, 7}).data() ==
+        std::vector<uint8_t>({1, 3, 3, 7}));
+    REQUIRE_FALSE(
+        PacketTestClass({1, 3, 3, 7}).data() ==
+        std::vector<uint8_t>({1, 0, 5, 3}));
 }
 
 
 TEST_CASE("Packet's have a version.", "[Packet]")
 {
-    std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(PacketTestClass({}, conn).version() == Packet::V1);
+    REQUIRE(PacketTestClass({}).version() == Packet::V1);
 }
 
 
 TEST_CASE("Packet's have an ID.", "[Packet]")
 {
-    std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(PacketTestClass({}, conn).id() == 42);
+    REQUIRE(PacketTestClass({}).id() == 42);
 }
 
 
 TEST_CASE("Packet's have a name.", "[Packet]")
 {
-    std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(PacketTestClass({}, conn).name() == "MISSION_CURRENT");
+    REQUIRE(PacketTestClass({}).name() == "MISSION_CURRENT");
 }
 
 
 TEST_CASE("Packet's have a source address.", "[Packet]")
 {
-    std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(PacketTestClass({}, conn).source() == MAVAddress("3.14"));
+    REQUIRE(PacketTestClass({}).source() == MAVAddress("3.14"));
 }
 
 
 TEST_CASE("Packet's optionally have a destination address.", "[Packet]")
 {
-    std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(PacketTestClass({}, conn).dest().value() == MAVAddress("2.71"));
+    REQUIRE(PacketTestClass({}).dest().value() == MAVAddress("2.71"));
 }
 
 
 TEST_CASE("Packet's are printable.", "[Packet]")
 {
-    std::weak_ptr<ConnectionTestClass> conn;
-    REQUIRE(str(PacketTestClass({}, conn)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v1.0)");
-    REQUIRE(str(PacketTestClass({}, conn, 0)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 (v1.0)");
-    REQUIRE(str(PacketTestClass({}, conn, -32768)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 "
-            "with priority -32768 (v1.0)");
-    REQUIRE(str(PacketTestClass({}, conn, 32767)) ==
-            "MISSION_CURRENT (#42) from 3.14 to 2.71 "
-            "with priority 32767 (v1.0)");
-}
-
-
-// Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (Packet).", "[Packet]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    PacketTestClass *packet = nullptr;
-    REQUIRE_NOTHROW(packet = new PacketTestClass({}, conn));
-    REQUIRE_NOTHROW(delete packet);
-    ConnectionTestClass *connection = nullptr;
-    REQUIRE_NOTHROW(connection = new ConnectionTestClass());
-    REQUIRE_NOTHROW(delete connection);
+    REQUIRE(
+        str(PacketTestClass({})) ==
+        "MISSION_CURRENT (#42) from 3.14 to 2.71 (v1.0)");
 }
