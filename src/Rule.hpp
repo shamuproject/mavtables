@@ -55,11 +55,15 @@ class Rule
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
 
+        friend bool operator==(const Rule &lhs, const Rule &rhs);
+        friend bool operator!=(const Rule &lhs, const Rule &rhs);
         friend std::ostream &operator<<(std::ostream &os, const Rule &rule);
 
 };
 
 
+bool operator==(const Rule &lhs, const Rule &rhs);
+bool operator!=(const Rule &lhs, const Rule &rhs);
 std::ostream &operator<<(std::ostream &os, const Rule &rule);
 
 

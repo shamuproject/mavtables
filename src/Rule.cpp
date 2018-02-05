@@ -199,6 +199,44 @@ Action::Option Rule::action(
 }
 
 
+/** Equality comparison.
+ *
+ *  \relates Rule
+ *  \param lhs The left hand side Rule.
+ *  \param rhs The right hand side Rule.
+ *  \retval true if \p lhs and \p rhs are equivalent rules.
+ *  \retval false if \p lhs and \p rhs are not equivalent rules.
+ */
+bool operator==(const Rule &lhs, const Rule &rhs)
+{
+    bool result = lhs.condition_ == rhs.condition_ &&
+        lhs.priority_ == rhs.priority_;
+    if (lhs.action_ && rhs.action_) 
+    {
+        return result && (*lhs.action_ == *rhs.action_);
+    }
+    else if (lhs.action_ == nullptr && rhs.action_ == nullptr)
+    {
+        return result;
+    }
+    return false;
+}
+
+
+/** Inequality comparison.
+ *
+ *  \relates Rule
+ *  \param lhs The left hand side Rule.
+ *  \param rhs The right hand side Rule.
+ *  \retval true if \p lhs and \p rhs are not equivalent rules.
+ *  \retval false if \p lhs and \p rhs are are equivalent rules.
+ */
+bool operator!=(const Rule &lhs, const Rule &rhs)
+{
+    return !(lhs == rhs);
+}
+
+
 /** Print the conditional to the given output stream.
  *
  *  Some examples are:

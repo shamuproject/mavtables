@@ -66,6 +66,56 @@ TEST_CASE("Rule's are constructable.", "[Rule]")
 }
 
 
+TEST_CASE("Rule's are comparable.", "[Rule]")
+{
+    auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
+    auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
+    SECTION("with ==")
+    {
+        // True
+        REQUIRE(Rule(std::make_unique<Accept>()) ==
+                Rule(std::make_unique<Accept>()));
+        REQUIRE(Rule(std::make_unique<Accept>()).with_priority(10) ==
+                Rule(std::make_unique<Accept>()).with_priority(10));
+        REQUIRE(Rule(std::make_unique<Reject>(), Conditional().type("PING")) ==
+                Rule(std::make_unique<Reject>(), Conditional().type("PING")));
+        // False
+        REQUIRE_FALSE(
+            Rule(std::make_unique<Accept>()) ==
+            Rule(std::make_unique<Reject>()));
+        REQUIRE_FALSE(
+            Rule(std::make_unique<Accept>()).with_priority(1) ==
+            Rule(std::make_unique<Accept>()).with_priority(10));
+        REQUIRE_FALSE(
+            Rule(std::make_unique<Reject>(), Conditional().type("PING")) ==
+            Rule(std::make_unique<Reject>(), Conditional().type("DEBUG")));
+    }
+    SECTION("with !=")
+    {
+        // True
+        REQUIRE(
+            Rule(std::make_unique<Accept>()) !=
+            Rule(std::make_unique<Reject>()));
+        REQUIRE(
+            Rule(std::make_unique<Accept>()).with_priority(1) !=
+            Rule(std::make_unique<Accept>()).with_priority(10));
+        REQUIRE(
+            Rule(std::make_unique<Reject>(), Conditional().type("PING")) !=
+            Rule(std::make_unique<Reject>(), Conditional().type("DEBUG")));
+        // False
+        REQUIRE_FALSE(
+            Rule(std::make_unique<Accept>()) !=
+            Rule(std::make_unique<Accept>()));
+        REQUIRE_FALSE(
+            Rule(std::make_unique<Accept>()).with_priority(10) !=
+            Rule(std::make_unique<Accept>()).with_priority(10));
+        REQUIRE_FALSE(
+            Rule(std::make_unique<Reject>(), Conditional().type("PING")) !=
+            Rule(std::make_unique<Reject>(), Conditional().type("PING")));
+    }
+}
+
+
 TEST_CASE("Rule's 'action' method determines what to do with a packet.",
           "[Rule]")
 {
@@ -111,13 +161,13 @@ TEST_CASE("Rule's 'action' method determines what to do with a packet.",
     SECTION("Can set the priority of the packet.")
     {
         Rule(std::make_unique<Accept>()).with_priority(0).action(
-                ping, MAVAddress("192.168"), rc);
+            ping, MAVAddress("192.168"), rc);
         REQUIRE(ping.priority() == 0);
         Rule(std::make_unique<Accept>()).with_priority(-5).action(
-                ping, MAVAddress("192.168"), rc);
+            ping, MAVAddress("192.168"), rc);
         REQUIRE(ping.priority() == -5);
         Rule(std::make_unique<Accept>()).with_priority(5).action(
-                ping, MAVAddress("192.168"), rc);
+            ping, MAVAddress("192.168"), rc);
         REQUIRE(ping.priority() == 5);
     }
 }
