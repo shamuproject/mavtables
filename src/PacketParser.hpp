@@ -43,8 +43,6 @@ class PacketParser
         };
         // Variables
         std::vector<uint8_t> buffer_;
-        const std::weak_ptr<Connection> connection_;
-        const int priority_;
         PacketParser::State state_;
         Packet::Version version_;
         size_t bytes_remaining_;
@@ -55,10 +53,9 @@ class PacketParser
 
 
     public:
+        PacketParser();
         PacketParser(const PacketParser &other) = delete;
         PacketParser(PacketParser &&other) = delete;
-        PacketParser(
-            std::weak_ptr<Connection> connection, int priority = 0);
         size_t bytes_parsed() const;
         void clear();
         std::unique_ptr<Packet> parse_byte(uint8_t byte);

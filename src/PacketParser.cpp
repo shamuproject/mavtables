@@ -25,17 +25,9 @@
 
 
 /** Construct a \ref PacketParser.
- *
- *  It is constructed with a reference to the connection it is parsing as well
- *  as a default packet priority.
- *
- *  \param connection Connection the parser will receive data from.
- *  \param priority Set the default packet priority (default is 0).
  */
-PacketParser::PacketParser(
-    std::weak_ptr<Connection> connection, int priority)
-    : connection_(std::move(connection)), priority_(priority),
-      state_(WAITING_FOR_START_BYTE)
+PacketParser::PacketParser()
+    : state_(WAITING_FOR_START_BYTE)
 {
     clear();
 }
@@ -191,12 +183,12 @@ std::unique_ptr<Packet> PacketParser::waiting_for_packet_(uint8_t byte)
         {
             case packet_v1::VERSION:
                 packet = std::make_unique<packet_v1::Packet>(
-                             std::move(buffer_), connection_, priority_);
+                        std::move(buffer_));
                 break;
 
             case packet_v2::VERSION:
                 packet = std::make_unique<packet_v2::Packet>(
-                             std::move(buffer_), connection_, priority_);
+                        std::move(buffer_));
                 break;
         }
 
