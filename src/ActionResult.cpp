@@ -19,57 +19,57 @@
 #include <optional>
 #include <ostream>
 
-#include "ActionOption.hpp"
+#include "ActionResult.hpp"
 
 
-ActionOption::ActionOption(
-    ActionOption::Choice choice_, std::optional<int> priority_)
-    : choice(choice_), priority(std::move(priority_))
+ActionResult::ActionResult(
+    ActionResult::Action action_, std::optional<int> priority_)
+    : action(action_), priority(std::move(priority_))
 {
 }
 
 
-ActionOption ActionOption::make_accept(std::optional<int> priority_)
+ActionResult ActionResult::make_accept(std::optional<int> priority_)
 {
-    return ActionOption(ActionOption::ACCEPT, priority_);
+    return ActionResult(ActionResult::ACCEPT, priority_);
 }
 
 
-ActionOption ActionOption::make_reject()
+ActionResult ActionResult::make_reject()
 {
-    return ActionOption(ActionOption::REJECT);
+    return ActionResult(ActionResult::REJECT);
 }
 
 
-ActionOption ActionOption::make_continue()
+ActionResult ActionResult::make_continue()
 {
-    return ActionOption(ActionOption::CONTINUE);
+    return ActionResult(ActionResult::CONTINUE);
 }
 
 
-ActionOption ActionOption::make_default()
+ActionResult ActionResult::make_default()
 {
-    return ActionOption(ActionOption::DEFAULT);
+    return ActionResult(ActionResult::DEFAULT);
 }
 
 
-bool operator==(const ActionOption &lhs, const ActionOption &rhs)
+bool operator==(const ActionResult &lhs, const ActionResult &rhs)
 {
-    return (lhs.choice == rhs.choice) && (lhs.priority == rhs.priority);
+    return (lhs.action == rhs.action) && (lhs.priority == rhs.priority);
 }
 
 
-bool operator!=(const ActionOption &lhs, const ActionOption &rhs)
+bool operator!=(const ActionResult &lhs, const ActionResult &rhs)
 {
-    return (lhs.choice != rhs.choice) || (lhs.priority != rhs.priority);
+    return (lhs.action != rhs.action) || (lhs.priority != rhs.priority);
 }
 
 
-std::ostream &operator<<(std::ostream &os, const ActionOption &action_option)
+std::ostream &operator<<(std::ostream &os, const ActionResult &action_option)
 {
-    switch (action_option.choice)
+    switch (action_option.action)
     {
-        case ActionOption::ACCEPT:
+        case ActionResult::ACCEPT:
             os << "accept";
 
             if (action_option.priority)
@@ -79,15 +79,15 @@ std::ostream &operator<<(std::ostream &os, const ActionOption &action_option)
 
             break;
 
-        case ActionOption::REJECT:
+        case ActionResult::REJECT:
             os << "reject";
             break;
 
-        case ActionOption::CONTINUE:
+        case ActionResult::CONTINUE:
             os << "continue";
             break;
 
-        case ActionOption::DEFAULT:
+        case ActionResult::DEFAULT:
             os << "default";
             break;
     }

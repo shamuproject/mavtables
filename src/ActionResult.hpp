@@ -23,31 +23,31 @@
 #include <ostream>
 
 
-class ActionOption
+class ActionResult
 {
     public:
-        enum Choice
+        enum Action
         {
             ACCEPT,     //!< The packet has been accepted.
             REJECT,     //!< The packet has been rejected.
             CONTINUE,   //!< Continue evaluating rules.
             DEFAULT     //!< Use the default rule.
         };
-        const Choice choice;
+        const Action action;
         std::optional<int> priority;
-        ActionOption(
-            ActionOption::Choice choice, std::optional<int> priority = {});
-        ActionOption make_accept(std::optional<int> priority = {});
-        ActionOption make_reject();
-        ActionOption make_continue();
-        ActionOption make_default();
+        ActionResult(
+            ActionResult::Action action, std::optional<int> priority = {});
+        ActionResult make_accept(std::optional<int> priority = {});
+        ActionResult make_reject();
+        ActionResult make_continue();
+        ActionResult make_default();
 
 };
 
 
-bool operator==(const ActionOption &lhs, const ActionOption &rhs);
-bool operator!=(const ActionOption &lhs, const ActionOption &rhs);
-std::ostream &operator<<(std::ostream &os, const ActionOption &action_option);
+bool operator==(const ActionResult &lhs, const ActionResult &rhs);
+bool operator!=(const ActionResult &lhs, const ActionResult &rhs);
+std::ostream &operator<<(std::ostream &os, const ActionResult &action_option);
 
 
 #endif // ACTION_HPP_

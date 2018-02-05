@@ -1,7 +1,7 @@
 set (SOURCES
     # "${CMAKE_CURRENT_LIST_DIR}/Accept.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Action.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/ActionOption.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/ActionResult.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Call.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Conditional.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Connection.cpp"
@@ -24,7 +24,7 @@ set (SOURCES
 set (HEADERS
     # "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/ActionOption.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/ActionResult.hpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Call.hpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Conditional.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Connection.hpp"
