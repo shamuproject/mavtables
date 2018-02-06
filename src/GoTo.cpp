@@ -15,8 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
+#include <optional>
 #include <ostream>
 #include <stdexcept>
+#include <utility>
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
@@ -29,10 +32,12 @@
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
  *      a packet to.  A nullptr is not a valid input.
+ *  \param priority The priority to accept packets with, the default is no
+ *      priority.
  *  \throws std::invalid_argument if the given pointer is nullptr.
  */
-GoTo::GoTo(std::shared_ptr<Chain> chain)
-    : chain_(std::move(chain))
+GoTo::GoTo(std::shared_ptr<Chain> chain, std::optional<int> priority)
+    : chain_(std::move(chain)), priority_(std::move(priority))
 {
     if (chain_ == nullptr)
     {
@@ -48,6 +53,10 @@ GoTo::GoTo(std::shared_ptr<Chain> chain)
 std::ostream &GoTo::print_(std::ostream &os) const
 {
     os << "goto " << chain_->name;
+    if (priority_)
+    {
+        os << " with priority " << priority_.value();
+    }
     return os;
 }
 
@@ -62,24 +71,28 @@ std::unique_ptr<Action> GoTo::clone() const
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The GoTo class delegates the action choice to the contained \ref Chain.  If
- *  the \ref Chain decides on the \ref Action::CONTINUE action this method will
- *  return \ref Action::DEFAULT instead since final decision for a \ref GoTo
- *  should be with the contained \ref Chain or with the default action.  In
- *  other words, once a rule with a \ref GoTo matches, no further rule in the
- *  chain should ever be ran.
+ *  the \ref Chain decides on the continue action this method will return the
+ *  default instead since final decision for a \ref GoTo should be with the
+ *  contained \ref Chain or with the default action.  In other words, once a
+ *  rule with a \ref GoTo matches, no further rule in the chain should ever be
+ *  ran.
  */
-Action::Option GoTo::action(
+ActionResult GoTo::action(
     Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
-    Action::Option option = chain_->action(packet, address, recursion_checker);
+    ActionResult result = chain_->action(packet, address, recursion_checker);
 
-    if (option == Action::CONTINUE)
+    if (result.action == ActionResult::CONTINUE)
     {
-        return Action::DEFAULT;
+        return ActionResult::make_default();
     }
 
-    return option;
+    if (priority_)
+    {
+        result.priority(priority_.value());
+    }
+    return result;
 }
 
 
@@ -89,13 +102,9 @@ Action::Option GoTo::action(
  */
 bool GoTo::operator==(const Action &other) const
 {
-    if (typeid(*this) == typeid(other))
-    {
-        const GoTo &other_ = static_cast<const GoTo &>(other);
-        return chain_ == other_.chain_;
-    }
-
-    return false;
+    return typeid(*this) == typeid(other) &&
+        chain_ == static_cast<const GoTo &>(other).chain_ &&
+        priority_ == static_cast<const GoTo &>(other).priority_;
 }
 
 
@@ -105,11 +114,7 @@ bool GoTo::operator==(const Action &other) const
  */
 bool GoTo::operator!=(const Action &other) const
 {
-    if (typeid(*this) == typeid(other))
-    {
-        const GoTo &other_ = static_cast<const GoTo &>(other);
-        return chain_ != other_.chain_;
-    }
-
-    return true;
+    return typeid(*this) != typeid(other) ||
+        chain_ != static_cast<const GoTo &>(other).chain_ ||
+        priority_ != static_cast<const GoTo &>(other).priority_;
 }

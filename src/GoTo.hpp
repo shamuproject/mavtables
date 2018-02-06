@@ -20,11 +20,13 @@
 
 
 #include <memory>
+#include <optional>
 #include <ostream>
 
 #include "Action.hpp"
-#include "Packet.hpp"
+#include "ActionResult.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 
 
 // Forward declaration of the chain class.
@@ -42,14 +44,15 @@ class GoTo : public Action
 {
     private:
         std::shared_ptr<Chain> chain_;
+        std::optional<int> priority_;
 
     protected:
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        GoTo(std::shared_ptr<Chain> chain);
+        GoTo(std::shared_ptr<Chain> chain, std::optional<int> priority = {});
         virtual std::unique_ptr<Action> clone() const;
-        virtual Action::Option action(
+        virtual ActionResult action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
         virtual bool operator==(const Action &other) const;

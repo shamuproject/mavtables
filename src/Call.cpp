@@ -18,6 +18,7 @@
 #include <memory>
 #include <optional>
 #include <ostream>
+#include <stdexcept>
 #include <utility>
 
 #include "Action.hpp"
