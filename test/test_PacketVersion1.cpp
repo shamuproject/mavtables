@@ -20,7 +20,6 @@
 #include <stdexcept>
 #include <utility>
 
-#include <boost/range/irange.hpp>
 #include <catch.hpp>
 
 #include "MAVAddress.hpp"
