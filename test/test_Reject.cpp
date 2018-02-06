@@ -17,14 +17,15 @@
 
 #include <catch.hpp>
 
-#include "util.hpp"
+#include "Action.hpp"
+#include "ActionResult.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "MAVAddress.hpp"
 #include "RecursionChecker.hpp"
-#include "Action.hpp"
 #include "Reject.hpp"
+#include "util.hpp"
 
 #include "common_Packet.hpp"
 
@@ -42,36 +43,67 @@ TEST_CASE("Reject's are comparable.", "[Reject]")
 }
 
 
-TEST_CASE("Reject's 'action' method always returns Action::REJECT.", "[Reject]")
+TEST_CASE("Reject's 'action' method always returns a reject result.",
+          "[Reject]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
+    auto ping = packet_v1::Packet(to_vector(PingV1()));
+    auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));
     RecursionChecker rc;
     Reject reject;
-    REQUIRE(reject.action(ping, MAVAddress("192.0"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.1"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.2"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.3"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.0"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.1"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.2"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.3"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.7"), rc) == Action::REJECT);
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.0"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.1"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.2"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.3"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.4"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.5"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.6"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(ping, MAVAddress("192.7"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.0"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.1"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.2"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.3"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.4"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.5"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.6"), rc) ==
+        ActionResult::make_reject());
+    REQUIRE(
+        reject.action(set_mode, MAVAddress("192.7"), rc) ==
+        ActionResult::make_reject());
 }
 
 
 TEST_CASE("Reject's are printable.", "[Reject]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
     Reject reject;
     Action &action = reject;
     SECTION("By direct type.")
@@ -87,18 +119,8 @@ TEST_CASE("Reject's are printable.", "[Reject]")
 
 TEST_CASE("Reject's 'clone' method returns a polymorphic copy.", "[Reject]")
 {
-    // Note: String comparisons are used because Action's are not comparable.
     Reject reject;
     Action &action = reject;
     std::unique_ptr<Action> polymorphic_copy = action.clone();
-    REQUIRE(str(reject) == str(*polymorphic_copy));
-}
-
-
-// Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (Reject).", "[Reject]")
-{
-    Reject *reject = nullptr;
-    REQUIRE_NOTHROW(reject = new Reject());
-    REQUIRE_NOTHROW(delete reject);
+    REQUIRE(reject == *polymorphic_copy);
 }

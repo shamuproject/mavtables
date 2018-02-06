@@ -17,7 +17,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionChecker.cpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/Reject.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Reject.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Rule.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
 )
@@ -41,7 +41,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionChecker.hpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/Reject.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Reject.hpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Rule.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
 )

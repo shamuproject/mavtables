@@ -18,9 +18,10 @@
 #include <memory>
 #include <ostream>
 
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
 #include "Action.hpp"
+#include "ActionResult.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
 #include "Reject.hpp"
 
 
@@ -43,17 +44,17 @@ std::unique_ptr<Action> Reject::clone() const
 
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Reject class always returns \ref Action::REJECT, therefore it always
+ *  The Reject class always returns a reject object.  Therefore it always
  *  indicates that the \p packet should not be sent to the given \p address.
  */
-Action::Option Reject::action(
+ActionResult Reject::action(
     Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
     (void)recursion_checker;
-    return Action::REJECT;
+    return ActionResult::make_reject();
 }
 
 

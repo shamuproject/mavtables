@@ -51,7 +51,8 @@ TEST_CASE("Accept's are comparable.", "[Accept]")
 }
 
 
-TEST_CASE("Accept's 'action' method always returns Action::ACCEPT.", "[Accept]")
+TEST_CASE("Accept's 'action' method always returns an accept result.",
+          "[Accept]")
 {
     auto ping = packet_v1::Packet(to_vector(PingV1()));
     auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));

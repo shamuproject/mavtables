@@ -23,6 +23,7 @@
 #include <ostream>
 
 #include "Action.hpp"
+#include "ActionResult.hpp"
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
 #include "Action.hpp"
@@ -37,7 +38,7 @@ class Reject : public Action
 
     public:
         virtual std::unique_ptr<Action> clone() const;
-        virtual Action::Option action(
+        virtual ActionResult action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recusion_checker) const;
         virtual bool operator==(const Action &other) const;
