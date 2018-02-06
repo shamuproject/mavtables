@@ -23,8 +23,16 @@
 #include <ostream>
 
 
+/** A result to applying an action method to a packet/address combination.
+ *
+ *  This is used as a return value to determine what to do with a packet.
+ */
 class ActionResult
 {
+    private:
+        ActionResult(
+            ActionResult::Action action, std::optional<int> priority = {});
+
     public:
         enum Action
         {
@@ -33,14 +41,41 @@ class ActionResult
             CONTINUE,   //!< Continue evaluating rules.
             DEFAULT     //!< Use the default rule.
         };
-        const Action action;
+        /** The action that has been chosen.
+         */
+        const ActionResult::Action action;
+        /** The priority associated with an action.
+         *
+         *  This is only valid if the action is ActionResult::ACCEPT.
+         *
+         *  The default priority is 0.  A higher priority will result in the
+         *  packet being prioritized over other packets.
+         */
         std::optional<int> priority;
-        ActionResult(
-            ActionResult::Action action, std::optional<int> priority = {});
+        /** Copy constructor.
+         *
+         *  \param other ActionResult to copy.
+         */
+        ActionResult(const ActionResult &other) = default;
+        /** Move constructor.
+         *
+         *  \param other ActionResult to move from.
+         */
+        ActionResult(ActionResult &&other) = default;
         ActionResult make_accept(std::optional<int> priority = {});
         ActionResult make_reject();
         ActionResult make_continue();
         ActionResult make_default();
+        /** Assignment operator.
+         *
+         *  \param other ActionResult to copy.
+         */
+        ActionResult &operator=(const ActionResult &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         *  \param other ActionResult to move from.
+         */
+        ActionResult &operator=(ActionResult &&other) = default;
 
 };
 

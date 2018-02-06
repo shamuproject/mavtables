@@ -22,6 +22,12 @@
 #include "ActionResult.hpp"
 
 
+/** Construct an ActionResult.
+ *
+ *  \param action_ The action this result represents.
+ *  \param priority_ The priority, only used with ACCEPT.
+ *  \sa ActionResult::Action
+ */
 ActionResult::ActionResult(
     ActionResult::Action action_, std::optional<int> priority_)
     : action(action_), priority(std::move(priority_))
@@ -29,43 +35,84 @@ ActionResult::ActionResult(
 }
 
 
+/** Return a new action result with the ACCEPT action.
+ *
+ *  \param priority_ The priority to accept the packet with.  The default is to
+ *      not apply a priority.
+ *  \returns The new 'accept' action result
+ */
 ActionResult ActionResult::make_accept(std::optional<int> priority_)
 {
     return ActionResult(ActionResult::ACCEPT, priority_);
 }
 
 
+/** Return a new action result with the REJECT action.
+ *
+ *  \returns The new 'reject' action result
+ */
 ActionResult ActionResult::make_reject()
 {
     return ActionResult(ActionResult::REJECT);
 }
 
 
+/** Return a new action result with the CONTINUE action.
+ *
+ *  \returns The new 'continue' action result
+ */
 ActionResult ActionResult::make_continue()
 {
     return ActionResult(ActionResult::CONTINUE);
 }
 
 
+/** Return a new action result with the DEFAULT action.
+ *
+ *  \returns The new 'default' action result
+ */
 ActionResult ActionResult::make_default()
 {
     return ActionResult(ActionResult::DEFAULT);
 }
 
 
+/** Equality comparison.
+ *
+ *  \relates ActionResult
+ *  \param lhs The left hand side action result.
+ *  \param rhs The right hand side action result.
+ *  \retval true if \p lhs is the same as rhs.
+ *  \retval false if \p lhs is not the same as rhs.
+ */
 bool operator==(const ActionResult &lhs, const ActionResult &rhs)
 {
     return (lhs.action == rhs.action) && (lhs.priority == rhs.priority);
 }
 
 
+/** Inequality comparison.
+ *
+ *  \relates ActionResult
+ *  \param lhs The left hand side action result.
+ *  \param rhs The right hand side action result.
+ *  \retval true if \p lhs is not the same as rhs.
+ *  \retval false if \p lhs is the same as rhs.
+ */
 bool operator!=(const ActionResult &lhs, const ActionResult &rhs)
 {
     return (lhs.action != rhs.action) || (lhs.priority != rhs.priority);
 }
 
 
-std::ostream &operator<<(std::ostream &os, const ActionResult &action_option)
+/** Print the action. to the given output stream.
+ *
+ *  \relates ActionResult
+ *  \param os The output stream to print to.
+ *  \param action_result The action result to print.
+ *  \return The output stream.
+ */
+std::ostream &operator<<(std::ostream &os, const ActionResult &action_result)
 {
     switch (action_option.action)
     {
