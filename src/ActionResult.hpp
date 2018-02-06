@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef ACTION_HPP_
-#define ACTION_HPP_
+#ifndef ACTIONRESULT_HPP_
+#define ACTIONRESULT_HPP_
 
 
 #include <optional>
@@ -30,6 +30,8 @@
 class ActionResult
 {
     public:
+        /** Possible actions.
+         */
         enum Action
         {
             ACCEPT,     //!< The packet has been accepted.
@@ -75,4 +77,4 @@ bool operator!=(const ActionResult &lhs, const ActionResult &rhs);
 std::ostream &operator<<(std::ostream &os, const ActionResult &action_option);
 
 
-#endif // ACTION_HPP_
+#endif // ACTIONRESULT_HPP_

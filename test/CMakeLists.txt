@@ -1,6 +1,6 @@
 set (SOURCES
     # "${CMAKE_CURRENT_LIST_DIR}/test_Accept.cpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/test_Action.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Action.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/test_Action_comparison.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_ActionResult.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/test_Call.cpp"

@@ -19,9 +19,6 @@
 #define RECURSIONCHECKER_HPP_
 
 
-#include <string>
-
-
 class RecursionChecker
 {
     public:

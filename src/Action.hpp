@@ -22,8 +22,9 @@
 #include <memory>
 #include <ostream>
 
-#include "Packet.hpp"
+#include "ActionResult.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 #include "RecursionChecker.hpp"
 
 
@@ -43,20 +44,6 @@ class Action
         virtual std::ostream &print_(std::ostream &os) const = 0;
 
     public:
-        /** Filter rule actions.
-         */
-        enum Option
-        {
-            ACCEPT,     //!< The packet has been accepted and should be
-            //!< delivered to the given \p address.
-            REJECT,     //!< The packet has been rejected and should not be
-            //!< delivered to the given \p address.
-            CONTINUE,   //!< Whether the packet will be accepted or rejected
-            //!< has not yet been decided and rule checking should
-            //!< continue.
-            DEFAULT     //!< Whether the packet will be accepted or rejected
-            //!< should be decided by the global default action.
-        };
         virtual ~Action();  // Clang does not like pure virtual destructors.
         /** Return a copy of the Action polymorphically.
          *
@@ -70,24 +57,17 @@ class Action
          *
          *  Determine what action to take with the given \p packet sent to the
          *  given \p address.  The possible actions are documented in the \ref
-         *  Action::Option enum.
+         *  ActionResult.
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
          *      action allows it.
          *  \param recursion_checker A recursion checker used to ensure infinite
          *      recursion does not occur.
-         *  \retval Action::ACCEPT The packet is allowed to be sent to \p
-         *      address.
-         *  \retval Action::REJECT The packet is not allowed to be sent to \p
-         *      address.
-         *  \retval Action::CONTINUE The action to take on packet is not decided
-         *      yet.
-         *  \retval Action::DEFAULT Use the global default action.
-         *
-         *  The packet is not allowed to be sent to \p address.
+         *  \returns The action to take with the packet.  If this is the accept
+         *      object, it may also contain a priority for the packet.
          */
-        virtual Action::Option action(
+        virtual ActionResult action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const = 0;
         /** Equality comparison.

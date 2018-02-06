@@ -33,6 +33,7 @@ Action::~Action()
  *
  *  Some examples are:
  *      - `accept`
+ *      - `accept with priority 3`
  *      - `reject`
  *      - `call gcs_in`
  *      - `goto autopilot_out`
