@@ -25,6 +25,14 @@
 #include "MAVAddress.hpp"
 
 
+/** A MAVLink subnet.
+ *
+ *  Mavlink subnets work the same as IP subnets and allow the definition of a
+ *  range of addresses.  This is used to allow a single firewall rule to match
+ *  multiple addresses.
+ *
+ *  \sa MAVAddress
+ */
 class MAVSubnet
 {
     private:
