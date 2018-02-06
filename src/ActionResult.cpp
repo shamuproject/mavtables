@@ -25,29 +25,62 @@
 /** Construct an ActionResult.
  *
  *  \param action_ The action this result represents.
- *  \param priority_ The priority, only used with ACCEPT.
+ *  \param priority The priority, only used with ActionResult::ACCEPT.
  *  \sa ActionResult::Action
  */
 ActionResult::ActionResult(
-    ActionResult::Action action_, std::optional<int> priority_)
-    : action(action_), priority(std::move(priority_))
+    ActionResult::Action action_, std::optional<int> priority)
+    : action(action_), priority_(std::move(priority))
 {
 }
 
 
-/** Return a new action result with the ACCEPT action.
+/** Set the priority of the action result.
  *
- *  \param priority_ The priority to accept the packet with.  The default is to
+ *  This only has an effect if the result is ActionResult::ACCEPT and the
+ *  priority has never been set before.
+ *
+ *  The default priority is 0.  A higher priority will result in the
+ *  packet being prioritized over other packets.
+ *
+ *  \param priority The priority to apply to the accept action.
+ */
+void ActionResult::priority(int priority)
+{
+    if (action == ActionResult::ACCEPT)
+    {
+        if (!priority_)
+        {
+            priority_ = priority;
+        }
+    }
+}
+
+
+/** Return the priority if it exists.
+ *
+ *  \returns The priority of the action result.  This will always be empty if
+ *  the result is not ActionResult::ACCEPT.
+ */
+std::optional<int> ActionResult::priority() const
+{
+    return priority_;
+}
+
+
+/** Return a new action result with the ActionResult::ACCEPT action.
+ *
+ *  \param priority The priority to accept the packet with.  The default is to
  *      not apply a priority.
  *  \returns The new 'accept' action result
  */
-ActionResult ActionResult::make_accept(std::optional<int> priority_)
+ActionResult ActionResult::make_accept(std::optional<int> priority)
 {
-    return ActionResult(ActionResult::ACCEPT, priority_);
+    return ActionResult(ActionResult::ACCEPT, priority);
 }
 
 
-/** Return a new action result with the REJECT action.
+/** Return a new action result with the ActionResult::REJECT action.
  *
  *  \returns The new 'reject' action result
  */
@@ -57,7 +90,7 @@ ActionResult ActionResult::make_reject()
 }
 
 
-/** Return a new action result with the CONTINUE action.
+/** Return a new action result with the ActionResult::CONTINUE action.
  *
  *  \returns The new 'continue' action result
  */
@@ -67,7 +100,7 @@ ActionResult ActionResult::make_continue()
 }
 
 
-/** Return a new action result with the DEFAULT action.
+/** Return a new action result with the ActionResult::DEFAULT action.
  *
  *  \returns The new 'default' action result
  */
@@ -87,7 +120,7 @@ ActionResult ActionResult::make_default()
  */
 bool operator==(const ActionResult &lhs, const ActionResult &rhs)
 {
-    return (lhs.action == rhs.action) && (lhs.priority == rhs.priority);
+    return (lhs.action == rhs.action) && (lhs.priority() == rhs.priority());
 }
 
 
@@ -101,7 +134,7 @@ bool operator==(const ActionResult &lhs, const ActionResult &rhs)
  */
 bool operator!=(const ActionResult &lhs, const ActionResult &rhs)
 {
-    return (lhs.action != rhs.action) || (lhs.priority != rhs.priority);
+    return (lhs.action != rhs.action) || (lhs.priority() != rhs.priority());
 }
 
 
@@ -114,14 +147,14 @@ bool operator!=(const ActionResult &lhs, const ActionResult &rhs)
  */
 std::ostream &operator<<(std::ostream &os, const ActionResult &action_result)
 {
-    switch (action_option.action)
+    switch (action_result.action)
     {
         case ActionResult::ACCEPT:
             os << "accept";
 
-            if (action_option.priority)
+            if (action_result.priority())
             {
-                os << " with priority" << action_option.priority.value();
+                os << " with priority " << action_result.priority().value();
             }
 
             break;

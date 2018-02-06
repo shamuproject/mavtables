@@ -29,10 +29,6 @@
  */
 class ActionResult
 {
-    private:
-        ActionResult(
-            ActionResult::Action action, std::optional<int> priority = {});
-
     public:
         enum Action
         {
@@ -44,14 +40,13 @@ class ActionResult
         /** The action that has been chosen.
          */
         const ActionResult::Action action;
-        /** The priority associated with an action.
-         *
-         *  This is only valid if the action is ActionResult::ACCEPT.
-         *
-         *  The default priority is 0.  A higher priority will result in the
-         *  packet being prioritized over other packets.
-         */
-        std::optional<int> priority;
+    private:
+        std::optional<int> priority_;
+        ActionResult() = delete;
+        ActionResult(
+            ActionResult::Action action, std::optional<int> priority = {});
+
+    public:
         /** Copy constructor.
          *
          *  \param other ActionResult to copy.
@@ -62,20 +57,15 @@ class ActionResult
          *  \param other ActionResult to move from.
          */
         ActionResult(ActionResult &&other) = default;
-        ActionResult make_accept(std::optional<int> priority = {});
-        ActionResult make_reject();
-        ActionResult make_continue();
-        ActionResult make_default();
-        /** Assignment operator.
-         *
-         *  \param other ActionResult to copy.
-         */
-        ActionResult &operator=(const ActionResult &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         *  \param other ActionResult to move from.
-         */
-        ActionResult &operator=(ActionResult &&other) = default;
+        void priority(int priority);
+        std::optional<int> priority() const;
+        ActionResult &operator=(const ActionResult &other) = delete;
+        ActionResult &operator=(ActionResult &&other) = delete;
+
+        static ActionResult make_accept(std::optional<int> priority = {});
+        static ActionResult make_reject();
+        static ActionResult make_continue();
+        static ActionResult make_default();
 
 };
 
