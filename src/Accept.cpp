@@ -19,19 +19,37 @@
 #include <ostream>
 #include <typeinfo>
 
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
-#include "Action.hpp"
 #include "Accept.hpp"
+#include "Action.hpp"
+#include "ActionResult.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
+
+
+/** Construct an accept action with a priority.
+ *
+ *  \param priority The priority to accept packets with.
+ */
+Accept::Accept(int priority)
+    : priority_(priority)
+{
+}
 
 
 /** \copydoc Action::print_(std::ostream &os) const
  *
- *  Prints `"accept"`.
+ *  Prints `"accept"` or `"accept with priority <priority>"` if the priority is
+ *  given.
  */
 std::ostream &Accept::print_(std::ostream &os) const
 {
     os << "accept";
+
+    if (priority_)
+    {
+        os << " with priority " << priority_.value();
+    }
+
     return os;
 }
 
@@ -44,27 +62,31 @@ std::unique_ptr<Action> Accept::clone() const
 
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Accept class always returns \ref Action::ACCEPT, therefore it always
- *  indicates that the \p packet should be sent to the given \p address.
+ *  The Accept class always returns an accept action result.  Therefore it
+ *  always indicates that the \p packet should be sent to the given \p address.
+ *  If the priorty was set during construction the accept result will have a
+ *  priority.
  */
-Action::Option Accept::action(
+ActionResult Accept::action(
     Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
     (void)recursion_checker;
-    return Action::ACCEPT;
+    return ActionResult::make_accept(priority_);
 }
 
 
 bool Accept::operator==(const Action &other) const
 {
-    return typeid(*this) == typeid(other);
+    return typeid(*this) == typeid(other) &&
+           priority_ == static_cast<const Accept &>(other).priority_;
 }
 
 
 bool Accept::operator!=(const Action &other) const
 {
-    return typeid(*this) != typeid(other);
+    return typeid(*this) != typeid(other) ||
+           priority_ != static_cast<const Accept &>(other).priority_;
 }

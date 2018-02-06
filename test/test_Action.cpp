@@ -99,7 +99,7 @@ TEST_CASE("Action's determine what to do with a packet with respect to a "
           "destination address.", "[Action]")
 {
     auto ping = packet_v1::Packet(to_vector(PingV1()));
-    auto set_mode = packet_v2::Packet(to_vector(HeartbeatV2()));
+    auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));
     RecursionChecker rc;
     ActionTestClass action;
     REQUIRE(
@@ -171,7 +171,6 @@ TEST_CASE("Action's are printable.", "[Action]")
 
 TEST_CASE("Action's 'clone' method returns a polymorphic copy.", "[Action]")
 {
-    // Note: String comparisons are used because Action's are not comparable.
     ActionTestClass action;
     Action &polymorphic = action;
     std::unique_ptr<Action> polymorphic_copy = polymorphic.clone();
