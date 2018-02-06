@@ -74,20 +74,26 @@ TEST_CASE("Conditional's are comparable.", "[Conditional]")
         REQUIRE(Conditional() == Conditional());
         REQUIRE(Conditional({}, {}, {}) == Conditional());
         REQUIRE(Conditional(4, {}, {}) == Conditional(4));
-        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), {}) ==
-                Conditional({}, MAVSubnet("192.0/8")));
-        REQUIRE(Conditional({}, {}, MAVSubnet("192.0/8")) ==
-                Conditional({}, {}, MAVSubnet("192.0/8")));
-        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
-                Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
-        REQUIRE(Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
-                Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE(
+            Conditional({}, MAVSubnet("192.0/8"), {}) ==
+            Conditional({}, MAVSubnet("192.0/8")));
+        REQUIRE(
+            Conditional({}, {}, MAVSubnet("192.0/8")) ==
+            Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE(
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE(
+            Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
+            Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
         REQUIRE_FALSE(Conditional(0, {}, {}) == Conditional());
         REQUIRE_FALSE(Conditional(4, {}, {}) == Conditional(0));
-        REQUIRE_FALSE(Conditional({}, MAVSubnet("192.0/8"), {}) ==
-                      Conditional({}, MAVSubnet("192.0/7")));
-        REQUIRE_FALSE(Conditional({}, {}, MAVSubnet("191.0/8")) ==
-                      Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE_FALSE(
+            Conditional({}, MAVSubnet("192.0/8"), {}) ==
+            Conditional({}, MAVSubnet("192.0/7")));
+        REQUIRE_FALSE(
+            Conditional({}, {}, MAVSubnet("191.0/8")) ==
+            Conditional({}, {}, MAVSubnet("192.0/8")));
         REQUIRE_FALSE(
             Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) ==
             Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.1/8")));
@@ -100,21 +106,27 @@ TEST_CASE("Conditional's are comparable.", "[Conditional]")
         // This also tests the default arguments.
         REQUIRE(Conditional(0, {}, {}) != Conditional());
         REQUIRE(Conditional(4, {}, {}) != Conditional(0));
-        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), {}) !=
-                Conditional({}, MAVSubnet("192.0/7")));
-        REQUIRE(Conditional({}, {}, MAVSubnet("191.0/8")) !=
-                Conditional({}, {}, MAVSubnet("192.0/8")));
-        REQUIRE(Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
-                Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.1/8")));
-        REQUIRE(Conditional(1, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
-                Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
+        REQUIRE(
+            Conditional({}, MAVSubnet("192.0/8"), {}) !=
+            Conditional({}, MAVSubnet("192.0/7")));
+        REQUIRE(
+            Conditional({}, {}, MAVSubnet("191.0/8")) !=
+            Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE(
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
+            Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.1/8")));
+        REQUIRE(
+            Conditional(1, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
+            Conditional(11, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
         REQUIRE_FALSE(Conditional() != Conditional());
         REQUIRE_FALSE(Conditional({}, {}, {}) != Conditional());
         REQUIRE_FALSE(Conditional(4, {}, {}) != Conditional(4));
-        REQUIRE_FALSE(Conditional({}, MAVSubnet("192.0/8"), {}) !=
-                      Conditional({}, MAVSubnet("192.0/8")));
-        REQUIRE_FALSE(Conditional({}, {}, MAVSubnet("192.0/8")) !=
-                      Conditional({}, {}, MAVSubnet("192.0/8")));
+        REQUIRE_FALSE(
+            Conditional({}, MAVSubnet("192.0/8"), {}) !=
+            Conditional({}, MAVSubnet("192.0/8")));
+        REQUIRE_FALSE(
+            Conditional({}, {}, MAVSubnet("192.0/8")) !=
+            Conditional({}, {}, MAVSubnet("192.0/8")));
         REQUIRE_FALSE(
             Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")) !=
             Conditional({}, MAVSubnet("192.0/8"), MAVSubnet("168.0/8")));
@@ -374,12 +386,15 @@ TEST_CASE("Conditional's are printable.", "[Conditional]")
     REQUIRE(str(Conditional().from("192.0/8")) == "if from 192.0/8");
     REQUIRE(str(Conditional().to("172.16")) == "if to 172.16");
     REQUIRE(str(Conditional().to("172.0/8")) == "if to 172.0/8");
-    REQUIRE(str(Conditional().type("PING").from("192.168")) ==
-            "if PING from 192.168");
-    REQUIRE(str(Conditional().type("PING").to("172.16")) ==
-            "if PING to 172.16");
-    REQUIRE(str(Conditional().from("192.168").to("172.16")) ==
-            "if from 192.168 to 172.16");
-    REQUIRE(str(Conditional().type("PING").from("192.168").to("172.16")) ==
-            "if PING from 192.168 to 172.16");
+    REQUIRE(
+        str(Conditional().type("PING").from("192.168")) ==
+        "if PING from 192.168");
+    REQUIRE(
+        str(Conditional().type("PING").to("172.16")) == "if PING to 172.16");
+    REQUIRE(
+        str(Conditional().from("192.168").to("172.16")) ==
+        "if from 192.168 to 172.16");
+    REQUIRE(
+        str(Conditional().type("PING").from("192.168").to("172.16")) ==
+        "if PING from 192.168 to 172.16");
 }

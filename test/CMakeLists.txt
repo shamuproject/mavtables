@@ -4,7 +4,7 @@ set (SOURCES
     # "${CMAKE_CURRENT_LIST_DIR}/test_Action_comparison.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_ActionResult.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/test_Call.cpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/test_Conditional.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Conditional.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_DNSLookupError.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/test_GoTo.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_IPAddress.cpp"
