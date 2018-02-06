@@ -18,6 +18,7 @@
 #include <string>
 #include <stdexcept>
 
+#include "ActionResult.hpp"
 #include "Chain.hpp"
 
 
@@ -31,12 +32,12 @@ Chain::Chain(std::string name_)
 }
 
 
-Action::Option Chain::action(
+ActionResult Chain::action(
     Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
     (void)recursion_checker;
-    return Action::CONTINUE;
+    return ActionResult::make_continue();
 }

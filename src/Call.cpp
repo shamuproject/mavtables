@@ -16,23 +16,28 @@
 
 
 #include <memory>
+#include <optional>
 #include <ostream>
+#include <utility>
 
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
 #include "Action.hpp"
-#include "Chain.hpp"
+#include "ActionResult.hpp"
 #include "Call.hpp"
+#include "Chain.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
 
 
 /** Construct a call action given a chain to delegate to.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
  *      a packet to.
+ *  \param priority The priority to accept packets with, the default is no
+ *      priority.
  *  \throws std::invalid_argument if the given pointer is nullptr.
  */
-Call::Call(std::shared_ptr<Chain> chain)
-    : chain_(std::move(chain))
+Call::Call(std::shared_ptr<Chain> chain, std::optional<int> priority)
+    : chain_(std::move(chain)), priority_(std::move(priority))
 {
     if (chain_ == nullptr)
     {
@@ -43,11 +48,16 @@ Call::Call(std::shared_ptr<Chain> chain)
 
 /** \copydoc Action::print_(std::ostream &os) const
  *
- *  Prints `"call <Chain Name>"`.
+ *  Prints `"call <Chain Name>"` or `"call <Chain Name> with priority
+ *  <priority>"` if the priority is given.
  */
 std::ostream &Call::print_(std::ostream &os) const
 {
     os << "call " << chain_->name;
+    if (priority_)
+    {
+        os << " with priority " << priority_.value();
+    }
     return os;
 }
 
@@ -61,14 +71,19 @@ std::unique_ptr<Action> Call::clone() const
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Call class delegates the action choice to the contained \ref Chain.  If
- *  that action is \ref Action::CONTINUE then \ref Rule evaluation should
- *  continue on the next \ref Rule in the current \ref Chain.
+ *  that action is a continue then \ref Rule evaluation should continue on the
+ *  next \ref Rule in the current \ref Chain.
  */
-Action::Option Call::action(
+ActionResult Call::action(
     Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
-    return chain_->action(packet, address, recursion_checker);
+    ActionResult result = chain_->action(packet, address, recursion_checker);
+    if (priority_)
+    {
+        result.priority(priority_.value());
+    }
+    return result;
 }
 
 
@@ -78,27 +93,20 @@ Action::Option Call::action(
  */
 bool Call::operator==(const Action &other) const
 {
-    if (typeid(*this) == typeid(other))
-    {
-        const Call &other_ = static_cast<const Call &>(other);
-        return chain_ == other_.chain_;
-    }
-
-    return false;
+    return typeid(*this) == typeid(other) &&
+        chain_ == static_cast<const Call &>(other).chain_ &&
+        priority_ == static_cast<const Call &>(other).priority_;
 }
 
 
 /** \copydoc Action::operator!=(const Action &) const
  *
- *  Compares the chain associated with the call as well.
+ *  Compares the chain associated with the call as well.  If a priority was
+ *  given it will also be compared.
  */
 bool Call::operator!=(const Action &other) const
 {
-    if (typeid(*this) == typeid(other))
-    {
-        const Call &other_ = static_cast<const Call &>(other);
-        return chain_ != other_.chain_;
-    }
-
-    return true;
+    return typeid(*this) != typeid(other) ||
+        chain_ != static_cast<const Call &>(other).chain_ ||
+        priority_ != static_cast<const Call &>(other).priority_;
 }

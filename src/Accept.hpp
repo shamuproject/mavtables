@@ -40,10 +40,7 @@ class Accept : public Action
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        /** Construct an accept action without a priority.
-         */
-        Accept() = default;
-        Accept(int priority);
+        Accept(std::optional<int> priority = {});
         virtual std::unique_ptr<Action> clone() const;
         virtual ActionResult action(
             Packet &packet, const MAVAddress &address,

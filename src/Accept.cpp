@@ -16,8 +16,10 @@
 
 
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <typeinfo>
+#include <utility>
 
 #include "Accept.hpp"
 #include "Action.hpp"
@@ -26,12 +28,13 @@
 #include "Packet.hpp"
 
 
-/** Construct an accept action with a priority.
+/** Construct an accept action.
  *
- *  \param priority The priority to accept packets with.
+ *  \param priority The priority to accept packets with, the default is no
+ *      priority.
  */
-Accept::Accept(int priority)
-    : priority_(priority)
+Accept::Accept(std::optional<int> priority)
+    : priority_(std::move(priority))
 {
 }
 

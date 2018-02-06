@@ -16,6 +16,7 @@
 
 
 #include "Action.hpp"
+#include "ActionResult.hpp"
 #include "Chain.hpp"
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
@@ -30,7 +31,7 @@ namespace
     {
         public:
             using Chain::Chain;
-            virtual Action::Option action(
+            virtual ActionResult action(
                 Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
             {
@@ -40,13 +41,13 @@ namespace
                 {
                     if (MAVSubnet("192.0/14").contains(address))
                     {
-                        return Action::ACCEPT;
+                        return ActionResult::make_accept();
                     }
 
-                    return Action::REJECT;
+                    return ActionResult::make_reject();
                 }
 
-                return Action::CONTINUE;
+                return ActionResult::make_continue();
             }
     };
 

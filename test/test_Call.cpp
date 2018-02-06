@@ -20,16 +20,17 @@
 
 #include <catch.hpp>
 
-#include "util.hpp"
+#include "Action.hpp"
+#include "ActionResult.hpp"
+#include "Call.hpp"
+#include "Chain.hpp"
+#include "MAVAddress.hpp"
+#include "MAVSubnet.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "MAVAddress.hpp"
-#include "MAVSubnet.hpp"
 #include "RecursionChecker.hpp"
-#include "Chain.hpp"
-#include "Action.hpp"
-#include "Call.hpp"
+#include "util.hpp"
 
 #include "ChainTestClass.hpp"
 #include "common_Packet.hpp"
@@ -38,10 +39,13 @@
 TEST_CASE("Call's can be constructed.", "[Call]")
 {
     REQUIRE_NOTHROW(Call(std::make_shared<ChainTestClass>("test_chain")));
+    REQUIRE_NOTHROW(Call(std::make_shared<ChainTestClass>("test_chain"), 3));
     SECTION("Ensures the shared pointer is not null.")
     {
         REQUIRE_THROWS_AS(Call(nullptr), std::invalid_argument);
+        REQUIRE_THROWS_AS(Call(nullptr, 3), std::invalid_argument);
         REQUIRE_THROWS_WITH(Call(nullptr), "Given Chain pointer is null.");
+        REQUIRE_THROWS_WITH(Call(nullptr, 3), "Given Chain pointer is null.");
     }
 }
 
@@ -54,13 +58,17 @@ TEST_CASE("Call's are comparable.", "[Call]")
     {
         REQUIRE(Call(chain1) == Call(chain1));
         REQUIRE(Call(chain2) == Call(chain2));
+        REQUIRE(Call(chain1, 3) == Call(chain1, 3));
         REQUIRE_FALSE(Call(chain1) == Call(chain2));
+        REQUIRE_FALSE(Call(chain1) == Call(chain1, 3));
     }
     SECTION("with !=")
     {
+        REQUIRE(Call(chain1) != Call(chain2));
+        REQUIRE(Call(chain1) != Call(chain1, 3));
         REQUIRE_FALSE(Call(chain1) != Call(chain1));
         REQUIRE_FALSE(Call(chain2) != Call(chain2));
-        REQUIRE(Call(chain1) != Call(chain2));
+        REQUIRE_FALSE(Call(chain1, 3) != Call(chain1, 3));
     }
 }
 
@@ -68,63 +76,152 @@ TEST_CASE("Call's are comparable.", "[Call]")
 TEST_CASE("Call's 'action' method delegates the decision to the Chain it "
           "contains.", "[Call]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
+    auto ping = packet_v1::Packet(to_vector(PingV1()));
+    auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));
     RecursionChecker rc;
-    Call call(std::make_shared<ChainTestClass>("test_chain"));
-    REQUIRE(call.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-    REQUIRE(call.action(ping, MAVAddress("192.1"), rc) == Action::ACCEPT);
-    REQUIRE(call.action(ping, MAVAddress("192.2"), rc) == Action::ACCEPT);
-    REQUIRE(call.action(ping, MAVAddress("192.3"), rc) == Action::ACCEPT);
-    REQUIRE(call.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(call.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(call.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(call.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
-    REQUIRE(call.action(hb, MAVAddress("192.0"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.1"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.2"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.3"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.4"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.5"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.6"), rc) == Action::CONTINUE);
-    REQUIRE(call.action(hb, MAVAddress("192.7"), rc) == Action::CONTINUE);
+    SECTION("Without a priority.")
+    {
+        Call call(std::make_shared<ChainTestClass>("test_chain"));
+        REQUIRE(
+            call.action(ping, MAVAddress("192.0"), rc) ==
+            ActionResult::make_accept());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.1"), rc) ==
+            ActionResult::make_accept());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.2"), rc) ==
+            ActionResult::make_accept());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.3"), rc) ==
+            ActionResult::make_accept());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.4"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.5"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.6"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.7"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.0"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.1"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.2"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.3"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.4"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.5"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.6"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.7"), rc) ==
+            ActionResult::make_continue());
+    }
+    SECTION("With a priority.")
+    {
+        Call call(std::make_shared<ChainTestClass>("test_chain"), 3);
+        REQUIRE(
+            call.action(ping, MAVAddress("192.0"), rc) ==
+            ActionResult::make_accept(3));
+        REQUIRE(
+            call.action(ping, MAVAddress("192.1"), rc) ==
+            ActionResult::make_accept(3));
+        REQUIRE(
+            call.action(ping, MAVAddress("192.2"), rc) ==
+            ActionResult::make_accept(3));
+        REQUIRE(
+            call.action(ping, MAVAddress("192.3"), rc) ==
+            ActionResult::make_accept(3));
+        REQUIRE(
+            call.action(ping, MAVAddress("192.4"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.5"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.6"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(ping, MAVAddress("192.7"), rc) ==
+            ActionResult::make_reject());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.0"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.1"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.2"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.3"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.4"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.5"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.6"), rc) ==
+            ActionResult::make_continue());
+        REQUIRE(
+            call.action(set_mode, MAVAddress("192.7"), rc) ==
+            ActionResult::make_continue());
+    }
 }
 
 
 TEST_CASE("Call's are printable.", "[Call]")
 {
-    Call call(std::make_shared<ChainTestClass>("test_chain"));
-    Action &action = call;
-    SECTION("By direct type.")
+    SECTION("Without priority.")
     {
+        Call call(std::make_shared<ChainTestClass>("test_chain"));
+        Action &action = call;
         REQUIRE(str(call) == "call test_chain");
-    }
-    SECTION("By polymorphic type.")
-    {
         REQUIRE(str(action) == "call test_chain");
+    }
+    SECTION("With priority.")
+    {
+        Call call(std::make_shared<ChainTestClass>("test_chain"), -3);
+        Action &action = call;
+        REQUIRE(str(call) == "call test_chain with priority -3");
+        REQUIRE(str(action) == "call test_chain with priority -3");
     }
 }
 
 
 TEST_CASE("Call's 'clone' method returns a polymorphic copy.", "[Call]")
 {
-    // Note: String comparisons are used because Action's are not comparable.
     Call call(std::make_shared<ChainTestClass>("test_chain"));
     Action &action = call;
     std::unique_ptr<Action> polymorphic_copy = action.clone();
-    REQUIRE(str(call) == str(*polymorphic_copy));
+    REQUIRE(call == *polymorphic_copy);
 }
 
 
-// Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (Call).", "[Call]")
-{
-    ChainTestClass *chain = nullptr;
-    REQUIRE_NOTHROW(chain = new ChainTestClass("test_chain"));
-    REQUIRE_NOTHROW(delete chain);
-    Call *call = nullptr;
-    REQUIRE_NOTHROW(
-        call = new Call(std::make_shared<ChainTestClass>("test_chain")));
-    REQUIRE_NOTHROW(delete call);
-}
+// // Required for complete function coverage.
+// TEST_CASE("Run dynamic destructors (Call).", "[Call]")
+// {
+//     ChainTestClass *chain = nullptr;
+//     REQUIRE_NOTHROW(chain = new ChainTestClass("test_chain"));
+//     REQUIRE_NOTHROW(delete chain);
+//     Call *call = nullptr;
+//     REQUIRE_NOTHROW(
+//         call = new Call(std::make_shared<ChainTestClass>("test_chain")));
+//     REQUIRE_NOTHROW(delete call);
+// }

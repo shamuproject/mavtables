@@ -24,7 +24,6 @@
 
 #include <catch.hpp>
 
-#include "Connection.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "util.hpp"
