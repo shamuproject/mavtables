@@ -15,9 +15,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <optional>
 #include <ostream>
+#include <utility>
 
-#include "Result.hpp"
+#include "Rule.hpp"
+
+
+/** Base constructor for Rule classes.
+ *
+ *  \param condition The condition used to determine the rule matches a
+ *      particular packet/address combination given the \ref action method.
+ *  \sa action
+ */
+Rule::Rule(std::optional<If> condition)
+    : condition_(std::move(condition))
+{
+}
 
 
 // GCC generates a seemingly uncallable destructor for pure virtual classes.

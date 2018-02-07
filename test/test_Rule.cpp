@@ -20,13 +20,13 @@
 #include <catch.hpp>
 
 #include "Action.hpp"
-#include "ActionResult.hpp"
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
 #include "RecursionChecker.hpp"
+#include "Rule.hpp"
 #include "util.hpp"
 
 #include "common_Packet.hpp"
@@ -35,22 +35,22 @@
 namespace
 {
 
-    class ActionTestClass : public Action
+    class RuleTestClass : public Rule
     {
         protected:
             virtual std::ostream &print_(std::ostream &os) const
             {
-                os << "test";
+                os << "test_rule";
                 return os;
             }
 
         public:
-            virtual std::unique_ptr<Action> clone() const
+            virtual std::unique_ptr<Rule> clone() const
             {
-                return std::make_unique<ActionTestClass>();
+                return std::make_unique<RuleTestClass>();
             }
-            virtual ActionResult action(
-                Packet &packet, const MAVAddress &address,
+            virtual Action action(
+                const Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
             {
                 (void)recursion_checker;
@@ -59,20 +59,20 @@ namespace
                 {
                     if (MAVSubnet("192.0/14").contains(address))
                     {
-                        return ActionResult::make_accept();
+                        return Action::make_accept();
                     }
 
-                    return ActionResult::make_reject();
+                    return Action::make_reject();
                 }
 
-                return ActionResult::make_continue();
+                return Action::make_continue();
             }
-            virtual bool operator==(const Action &other) const
+            virtual bool operator==(const Rule &other) const
             {
                 (void)other;
                 return true;
             }
-            virtual bool operator!=(const Action &other) const
+            virtual bool operator!=(const Rule &other) const
             {
                 (void)other;
                 return false;
@@ -82,97 +82,89 @@ namespace
 }
 
 
-TEST_CASE("Action's can be constructed.", "[Action]")
+TEST_CASE("Rule's can be constructed.", "[Rule]")
 {
-    REQUIRE_NOTHROW(ActionTestClass());
+    REQUIRE_NOTHROW(RuleTestClass());
 }
 
 
-TEST_CASE("Action's are comparable.", "[Action]")
+TEST_CASE("Rule's are comparable.", "[Rule]")
 {
-    REQUIRE(ActionTestClass() == ActionTestClass());
-    REQUIRE_FALSE(ActionTestClass() != ActionTestClass());
+    REQUIRE(RuleTestClass() == RuleTestClass());
+    REQUIRE_FALSE(RuleTestClass() != RuleTestClass());
 }
 
 
-TEST_CASE("Action's determine what to do with a packet with respect to a "
-          "destination address.", "[Action]")
+TEST_CASE("Rule's 'action' method determine what to do with a packet withu "
+          "respect to a destination address.", "[Rule]")
 {
     auto ping = packet_v1::Packet(to_vector(PingV1()));
     auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));
     RecursionChecker rc;
-    ActionTestClass action;
+    RuleTestClass rule;
     REQUIRE(
-        action.action(ping, MAVAddress("192.0"), rc) ==
-        ActionResult::make_accept());
+        rule.action(ping, MAVAddress("192.0"), rc) == Action::make_accept());
     REQUIRE(
-        action.action(ping, MAVAddress("192.1"), rc) ==
-        ActionResult::make_accept());
+        rule.action(ping, MAVAddress("192.1"), rc) == Action::make_accept());
     REQUIRE(
-        action.action(ping, MAVAddress("192.2"), rc) ==
-        ActionResult::make_accept());
+        rule.action(ping, MAVAddress("192.2"), rc) == Action::make_accept());
     REQUIRE(
-        action.action(ping, MAVAddress("192.3"), rc) ==
-        ActionResult::make_accept());
+        rule.action(ping, MAVAddress("192.3"), rc) == Action::make_accept());
     REQUIRE(
-        action.action(ping, MAVAddress("192.4"), rc) ==
-        ActionResult::make_reject());
+        rule.action(ping, MAVAddress("192.4"), rc) == Action::make_reject());
     REQUIRE(
-        action.action(ping, MAVAddress("192.5"), rc) ==
-        ActionResult::make_reject());
+        rule.action(ping, MAVAddress("192.5"), rc) == Action::make_reject());
     REQUIRE(
-        action.action(ping, MAVAddress("192.6"), rc) ==
-        ActionResult::make_reject());
+        rule.action(ping, MAVAddress("192.6"), rc) == Action::make_reject());
     REQUIRE(
-        action.action(ping, MAVAddress("192.7"), rc) ==
-        ActionResult::make_reject());
+        rule.action(ping, MAVAddress("192.7"), rc) == Action::make_reject());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.0"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.0"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.1"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.1"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.2"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.2"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.3"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.3"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.4"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.4"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.5"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.5"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.6"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.6"), rc) ==
+        Action::make_continue());
     REQUIRE(
-        action.action(set_mode, MAVAddress("192.7"), rc) ==
-        ActionResult::make_continue());
+        rule.action(set_mode, MAVAddress("192.7"), rc) ==
+        Action::make_continue());
 }
 
 
-TEST_CASE("Action's are printable.", "[Action]")
+TEST_CASE("Rule's are printable.", "[Rule]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
-    ActionTestClass action;
-    Action &polymorphic = action;
+    RuleTestClass rule;
+    Rule &polymorphic = rule;
     SECTION("By direct type.")
     {
-        REQUIRE(str(action) == "test");
+        REQUIRE(str(rule) == "test_rule");
     }
     SECTION("By polymorphic type.")
     {
-        REQUIRE(str(polymorphic) == "test");
+        REQUIRE(str(polymorphic) == "test_rule");
     }
 }
 
 
-TEST_CASE("Action's 'clone' method returns a polymorphic copy.", "[Action]")
+TEST_CASE("Rule's 'clone' method returns a polymorphic copy.", "[Rule]")
 {
-    ActionTestClass action;
-    Action &polymorphic = action;
-    std::unique_ptr<Action> polymorphic_copy = polymorphic.clone();
-    REQUIRE(action == *polymorphic_copy);
+    RuleTestClass rule;
+    Rule &polymorphic = rule;
+    std::unique_ptr<Rule> polymorphic_copy = polymorphic.clone();
+    REQUIRE(rule == *polymorphic_copy);
 }
