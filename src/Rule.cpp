@@ -17,13 +17,13 @@
 
 #include <ostream>
 
-#include "Action.hpp"
+#include "Result.hpp"
 
 
 // GCC generates a seemingly uncallable destructor for pure virtual classes.
 // Therefore, it must be excluded from test coverage.
 // LCOV_EXCL_START
-Action::~Action()
+Rule::~Rule()
 {
 }
 // LCOV_EXCL_STOP
@@ -38,12 +38,12 @@ Action::~Action()
  *      - `call gcs_in`
  *      - `goto autopilot_out`
  *
- *  \relates Action
+ *  \relates Rule
  *  \param os The output stream to print to.
- *  \param action The action (or any child of Action) to print.
+ *  \param action The action (or any child of Rule) to print.
  *  \return The output stream.
  */
-std::ostream &operator<<(std::ostream &os, const Action &action)
+std::ostream &operator<<(std::ostream &os, const Rule &action)
 {
     return action.print_(os);
 }

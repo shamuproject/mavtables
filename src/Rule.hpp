@@ -22,7 +22,7 @@
 #include <memory>
 #include <ostream>
 
-#include "ActionResult.hpp"
+#include "RuleResult.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "RecursionChecker.hpp"
@@ -33,7 +33,7 @@
  *  These are used as the actions of a \ref Rule to determine what to do with a
  *  \ref Packet if it matches the \ref Rule.
  */
-class Action
+class Rule
 {
     protected:
         /** Print the action to the given output stream.
@@ -44,20 +44,20 @@ class Action
         virtual std::ostream &print_(std::ostream &os) const = 0;
 
     public:
-        virtual ~Action();  // Clang does not like pure virtual destructors.
-        /** Return a copy of the Action polymorphically.
+        virtual ~Rule();  // Clang does not like pure virtual destructors.
+        /** Return a copy of the Rule polymorphically.
          *
-         *  This allows Action's to be copied without knowing the derived type.
+         *  This allows Rule's to be copied without knowing the derived type.
          *
-         *  \returns A pointer to a new object with base type \ref Action which
+         *  \returns A pointer to a new object with base type \ref Rule which
          *      is an exact copy of this one.
          */
-        virtual std::unique_ptr<Action> clone() const = 0;
+        virtual std::unique_ptr<Rule> clone() const = 0;
         /** Decide what to do with a \ref Packet.
          *
          *  Determine what action to take with the given \p packet sent to the
          *  given \p address.  The possible actions are documented in the \ref
-         *  ActionResult.
+         *  RuleResult.
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
@@ -67,7 +67,7 @@ class Action
          *  \returns The action to take with the packet.  If this is the accept
          *      object, it may also contain a priority for the packet.
          */
-        virtual ActionResult action(
+        virtual RuleResult action(
             Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const = 0;
         /** Equality comparison.
@@ -76,20 +76,20 @@ class Action
          *  \retval true if this action is the same as \p other.
          *  \retval false if this action is not the same as \p other.
          */
-        virtual bool operator==(const Action &other) const = 0;
+        virtual bool operator==(const Rule &other) const = 0;
         /** Inequality comparison.
          *
          *  \param other The other action  to compare this to.
          *  \retval true if this action is not the same as \p other.
          *  \retval false if this action is the same as \p other.
          */
-        virtual bool operator!=(const Action &other) const = 0;
+        virtual bool operator!=(const Rule &other) const = 0;
 
-        friend std::ostream &operator<<(std::ostream &os, const Action &action);
+        friend std::ostream &operator<<(std::ostream &os, const Rule &action);
 };
 
 
-std::ostream &operator<<(std::ostream &os, const Action &action);
+std::ostream &operator<<(std::ostream &os, const Rule &action);
 
 
 #endif // ACTION_HPP_
