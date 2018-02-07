@@ -15,43 +15,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <utility>
 #include <optional>
 #include <stdexcept>
+#include <string>
+#include <utility>
 
+#include "If.hpp"
 #include "mavlink.hpp"
-#include "Packet.hpp"
 #include "MAVSubnet.hpp"
-#include "Conditional.hpp"
+#include "Packet.hpp"
 
 
-/** Construct a default condition.
- *
- *  The default conditional is initialized to match any packet type with and
- *  source and destination addresses.  Use \ref type, \ref to, and \ref from to
- *  restrict the matching.  Some examples are:
- *      - `auto cond = Conditional().type("PING").from("1.0/8").to("255.0");`
- *      - `auto cond = Conditional().type("HEARTBEAT").from("255.0/8");`
- *      - `auto cond = Conditional().type("SET_MODE").to("255.0/8");`
- *      - `auto cond = Conditional().from("255.0/8");`
- */
-Conditional::Conditional()
-{
-    // The default constructors for all data members give the desired empty
-    // option.
-}
-
-
-
-/** Construct a conditional.
+/** Construct an If statement.
  *
  *  The default is to allow any type of packet from any address to any address.
- *  This is so the \ref type, \ref from, and \ref to methods can be used to
- *  construct a packet with the form shown above.
+ *
+ *  The \ref type, \ref to, and \ref from methods can be used to apply
+ *  conditions after construction.  Some examples are:
+ *      - `If().type("PING").from("1.0/8").to("255.0");`
+ *      - `If().type("HEARTBEAT").from("255.0/8");`
+ *      - `If().type("SET_MODE").to("255.0/8");`
+ *      - `If().from("255.0/8");`
  *
  *  \param id The packet ID to match.  If {} or std::nullopt then any packet ID
- *      will match.
+ *      will match.  The defaut is {}.
  *  \param source The subnet a source address must be in to match.  If {} or
  *      nullopt then any source address will match.  The default is {}.
  *  \param dest The subnet a destination address must be in to match.  If {} or
@@ -59,7 +46,7 @@ Conditional::Conditional()
  *      {}.
  *  \throws std::invalid_argument if the given \p id is not valid.
  */
-Conditional::Conditional(
+If::If(
     std::optional<unsigned long> id,
     std::optional<MAVSubnet> source,
     std::optional<MAVSubnet> dest)
@@ -79,7 +66,7 @@ Conditional::Conditional(
  *  \throws std::invalid_argument if the given \p id is not valid.
  *  \sa type(const std::string &name)
  */
-Conditional &Conditional::type(unsigned long id)
+If &If::type(unsigned long id)
 {
     // Check packet ID, throws error if invalid.
     mavlink::name(id);
@@ -95,7 +82,7 @@ Conditional &Conditional::type(unsigned long id)
  *  \throws std::invalid_argument if the given message \p name is not valid.
  *  \sa type(unsigned long id)
  */
-Conditional &Conditional::type(const std::string &name)
+If &If::type(const std::string &name)
 {
     id_ = mavlink::id(name);
     return *this;
@@ -108,7 +95,7 @@ Conditional &Conditional::type(const std::string &name)
  *  \returns A reference to itself.
  *  \sa from(const std::string &subnet)
  */
-Conditional &Conditional::from(MAVSubnet subnet)
+If &If::from(MAVSubnet subnet)
 {
     source_ = std::move(subnet);
     return *this;
@@ -123,7 +110,7 @@ Conditional &Conditional::from(MAVSubnet subnet)
  *  \returns A reference to itself.
  *  \sa from(MAVSubnet subnet)
  */
-Conditional &Conditional::from(const std::string &subnet)
+If &If::from(const std::string &subnet)
 {
     source_ = MAVSubnet(subnet);
     return *this;
@@ -136,7 +123,7 @@ Conditional &Conditional::from(const std::string &subnet)
  *  \returns A reference to itself.
  *  \sa to(const std::string &subnet)
  */
-Conditional &Conditional::to(MAVSubnet subnet)
+If &If::to(MAVSubnet subnet)
 {
     dest_ = std::move(subnet);
     return *this;
@@ -152,7 +139,7 @@ Conditional &Conditional::to(MAVSubnet subnet)
  *  \returns A reference to itself.
  *  \sa to(MAVSubnet subnet)
  */
-Conditional &Conditional::to(const std::string &subnet)
+If &If::to(const std::string &subnet)
 {
     dest_ = MAVSubnet(subnet);
     return *this;
@@ -165,11 +152,11 @@ Conditional &Conditional::to(const std::string &subnet)
  *  \param address The address the packet is to be sent to.
  *  \retval true If the packet matches the type, source subnet (by \ref
  *      MAVSubnet::contains), and destination subnet (by \ref
- *      MAVSubnet::contains) of the conditional.
+ *      MAVSubnet::contains) of the if statement.
  *  \retval false If any of the packet type, source subnet, or destination
  *      subnet does not match.
  */
-bool Conditional::check(const Packet &packet, const MAVAddress &address) const
+bool If::check(const Packet &packet, const MAVAddress &address) const
 {
     bool result = true;
 
@@ -197,14 +184,14 @@ bool Conditional::check(const Packet &packet, const MAVAddress &address) const
 
 /** Equality comparison.
  *
- *  \relates Conditional
- *  \param lhs The left hand side conditional statement.
- *  \param rhs The right hand side conditional statement.
+ *  \relates If
+ *  \param lhs The left hand side if statement.
+ *  \param rhs The right hand side if statement.
  *  \retval true if \p lhs and \p rhs are the same.
  *  \retval false if \p lhs and \p rhs are not the same.
  *  \complexity \f$O(1)\f$
  */
-bool operator==(const Conditional &lhs, const Conditional &rhs)
+bool operator==(const If &lhs, const If &rhs)
 {
     return (lhs.id_ == rhs.id_) && (lhs.source_ == rhs.source_) &&
            (lhs.dest_ == rhs.dest_);
@@ -213,21 +200,21 @@ bool operator==(const Conditional &lhs, const Conditional &rhs)
 
 /** Inequality comparison.
  *
- *  \relates Conditional
- *  \param lhs The left hand side conditional statement.
- *  \param rhs The right hand side conditional statement.
+ *  \relates If
+ *  \param lhs The left hand side if statement.
+ *  \param rhs The right hand side if statement.
  *  \retval true if \p lhs and \p rhs are not the same.
  *  \retval false if \p lhs and \p rhs are the same.
  *  \complexity \f$O(1)\f$
  */
-bool operator!=(const Conditional &lhs, const Conditional &rhs)
+bool operator!=(const If &lhs, const If &rhs)
 {
     return (lhs.id_ != rhs.id_) || (lhs.source_ != rhs.source_) ||
            (lhs.dest_ != rhs.dest_);
 }
 
 
-/** Print the conditional to the given output stream.
+/** Print the if statement to the given output stream.
  *
  *  Some examples are:
  *  - `if PING from 1.0/8 to 255.0`
@@ -235,33 +222,33 @@ bool operator!=(const Conditional &lhs, const Conditional &rhs)
  *  - `if SET_MODE to 255.0`
  *  - `if from 255.0/8`
  */
-std::ostream &operator<<(std::ostream &os, const Conditional &conditional)
+std::ostream &operator<<(std::ostream &os, const If &if_)
 {
-    // Handle the match any conditional.
+    // Handle the match any if_.
     os << "if";
 
-    if (!conditional.id_ && !conditional.source_ && !conditional.dest_)
+    if (!if_.id_ && !if_.source_ && !if_.dest_)
     {
         os << " any";
         return os;
     }
 
     // Print packet name.
-    if (conditional.id_)
+    if (if_.id_)
     {
-        os << " " << mavlink::name(conditional.id_.value());
+        os << " " << mavlink::name(if_.id_.value());
     }
 
     // Print source subnet.
-    if (conditional.source_)
+    if (if_.source_)
     {
-        os << " from " << conditional.source_.value();
+        os << " from " << if_.source_.value();
     }
 
     // Print destination subnet.
-    if (conditional.dest_)
+    if (if_.dest_)
     {
-        os << " to " << conditional.dest_.value();
+        os << " to " << if_.dest_.value();
     }
 
     return os;

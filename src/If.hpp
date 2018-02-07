@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef CONDITIONAL_HPP_
-#define CONDITIONAL_HPP_
+#ifndef IF_HPP_
+#define IF_HPP_
 
 
 #include <string>
@@ -27,13 +27,13 @@
 #include "MAVAddress.hpp"
 
 
-/** A conditional used to determine if a packet matches a rule.
+/** An if statement used to determine if a packet matches a rule.
  *
  *  This uses the type, source, and destination of a packet to determine if it
  *  matches a \ref Rule.
  *
  */
-class Conditional
+class If
 {
     private:
         std::optional<unsigned long> id_;
@@ -41,49 +41,47 @@ class Conditional
         std::optional<MAVSubnet> dest_;
 
     public:
-        Conditional();
-        /** Copy constructor.
-         *
-         * \param other Conditional to copy.
-         */
-        Conditional(const Conditional &other) = default;
-        /** Move constructor.
-         *
-         * \param other Conditional to move from.
-         */
-        Conditional(Conditional &&other) = default;
-        Conditional(
-            std::optional<unsigned long> id,
+        If(std::optional<unsigned long> id = {},
             std::optional<MAVSubnet> source = {},
             std::optional<MAVSubnet> dest = {});
-        Conditional &type(unsigned long id);
-        Conditional &type(const std::string &name);
-        Conditional &from(MAVSubnet subnet);
-        Conditional &from(const std::string &subnet);
-        Conditional &to(MAVSubnet subnet);
-        Conditional &to(const std::string &subnet);
+        /** Copy constructor.
+         *
+         * \param other If to copy.
+         */
+        If(const If &other) = default;
+        /** Move constructor.
+         *
+         * \param other If to move from.
+         */
+        If(If &&other) = default;
+        If &type(unsigned long id);
+        If &type(const std::string &name);
+        If &from(MAVSubnet subnet);
+        If &from(const std::string &subnet);
+        If &to(MAVSubnet subnet);
+        If &to(const std::string &subnet);
         bool check(const Packet &packet, const MAVAddress &address) const;
         /** Assignment operator.
          *
-         * \param other Conditional to copy.
+         * \param other If to copy.
          */
-        Conditional &operator=(const Conditional &other) = default;
+        If &operator=(const If &other) = default;
         /** Assignment operator (by move semantics).
          *
-         * \param other Conditional to move from.
+         * \param other If to move from.
          */
-        Conditional &operator=(Conditional &&other) = default;
+        If &operator=(If &&other) = default;
 
-        friend bool operator==(const Conditional &lhs, const Conditional &rhs);
-        friend bool operator!=(const Conditional &lhs, const Conditional &rhs);
+        friend bool operator==(const If &lhs, const If &rhs);
+        friend bool operator!=(const If &lhs, const If &rhs);
         friend std::ostream &operator<<(
-            std::ostream &os, const Conditional &conditional);
+            std::ostream &os, const If &if_);
 };
 
 
-bool operator==(const Conditional &lhs, const Conditional &rhs);
-bool operator!=(const Conditional &lhs, const Conditional &rhs);
-std::ostream &operator<<(std::ostream &os, const Conditional &conditional);
+bool operator==(const If &lhs, const If &rhs);
+bool operator!=(const If &lhs, const If &rhs);
+std::ostream &operator<<(std::ostream &os, const If &if_);
 
 
-#endif // CONDITIONAL_HPP_
+#endif // IF_HPP_
