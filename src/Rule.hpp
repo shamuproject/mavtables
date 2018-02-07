@@ -38,10 +38,8 @@
  */
 class Rule
 {
-    private:
-        std::optional<If> condition_;
-
     protected:
+        std::optional<If> condition_;
         /** Print the rule to the given output stream.
          *
          *  \param os The output stream to print to.
@@ -56,7 +54,8 @@ class Rule
          *
          *  Determine what action to take with the given \p packet sent to the
          *  given \p address.  The possible actions are documented in the \ref
-         *  Action class.
+         *  Action class.  The continue object is always returned if the
+         *  condition was set and does not match the packet/address combination.
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the

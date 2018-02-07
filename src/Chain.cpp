@@ -18,8 +18,12 @@
 #include <string>
 #include <stdexcept>
 
-#include "ActionResult.hpp"
+#include "Action.hpp"
 #include "Chain.hpp"
+#include "MAVAddress.hpp"
+#include "MAVSubnet.hpp"
+#include "Packet.hpp"
+#include "RecursionChecker.hpp"
 
 
 Chain::Chain(std::string name_)
@@ -32,12 +36,12 @@ Chain::Chain(std::string name_)
 }
 
 
-ActionResult Chain::action(
-    Packet &packet, const MAVAddress &address,
+Action Chain::action(
+    const Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
     (void)recursion_checker;
-    return ActionResult::make_continue();
+    return Action::make_continue();
 }

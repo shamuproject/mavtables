@@ -16,8 +16,8 @@
 
 
 #include <vector>
+
 #include <catch.hpp>
-#include <fakeit.hpp>
 
 #include "util.hpp"
 

@@ -25,7 +25,9 @@
 /** Base constructor for Rule classes.
  *
  *  \param condition The condition used to determine the rule matches a
- *      particular packet/address combination given the \ref action method.
+ *      particular packet/address combination given to the \ref action method.
+ *      The default is {} which indicates the rule matches any packet/address
+ *      combination.
  *  \sa action
  */
 Rule::Rule(std::optional<If> condition)

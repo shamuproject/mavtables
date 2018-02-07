@@ -20,29 +20,31 @@
 
 
 #include <memory>
+#include <optional>
 #include <ostream>
 
 #include "Action.hpp"
-#include "ActionResult.hpp"
+#include "If.hpp"
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
-#include "Action.hpp"
+#include "Rule.hpp"
 
 
-/** Action to reject a packet.
+/** Rule to reject a packet.
  */
-class Reject : public Action
+class Reject : public Rule
 {
     protected:
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        virtual std::unique_ptr<Action> clone() const;
-        virtual ActionResult action(
-            Packet &packet, const MAVAddress &address,
+        Reject(std::optional<If> condition = {});
+        virtual Action action(
+            const Packet &packet, const MAVAddress &address,
             RecursionChecker &recusion_checker) const;
-        virtual bool operator==(const Action &other) const;
-        virtual bool operator!=(const Action &other) const;
+        virtual std::unique_ptr<Rule> clone() const;
+        virtual bool operator==(const Rule &other) const;
+        virtual bool operator!=(const Rule &other) const;
 };
 
 
