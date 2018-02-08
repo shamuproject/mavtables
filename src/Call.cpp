@@ -18,27 +18,34 @@
 #include <memory>
 #include <optional>
 #include <ostream>
-#include <stdexcept>
+#include <typeinfo>
 #include <utility>
 
 #include "Action.hpp"
-#include "ActionResult.hpp"
 #include "Call.hpp"
 #include "Chain.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include "Rule.hpp"
 
 
-/** Construct a call action given a chain to delegate to.
+/** Construct a call rule given a chain to delegate to, without a priority.
+ *
+ *  A call rule is used to delegate the decision on whether to accept or reject
+ *  a packet/address combination to another filter \ref Chain.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet to.
- *  \param priority The priority to accept packets with, the default is no
- *      priority.
+ *      a packet/address combination to.
+ *  \param condition The condition used to determine the rule matches a
+ *      particular packet/address combination given to the \ref action method.
+ *      The default is {} which indicates the rule matches any packet/address
+ *      combination.
  *  \throws std::invalid_argument if the given pointer is nullptr.
+ *  \sa action
  */
-Call::Call(std::shared_ptr<Chain> chain, std::optional<int> priority)
-    : chain_(std::move(chain)), priority_(std::move(priority))
+Call::Call(
+    std::shared_ptr<Chain> chain, std::optional<If> condition)
+    : Rule(std::move(condition)), chain_(std::move(chain))
 {
     if (chain_ == nullptr)
     {
@@ -47,7 +54,34 @@ Call::Call(std::shared_ptr<Chain> chain, std::optional<int> priority)
 }
 
 
-/** \copydoc Action::print_(std::ostream &os) const
+/** Construct a call rule given a chain to delegate to, with a priority.
+ *
+ *  A call rule is used to delegate the decision on whether to accept or reject
+ *  a packet/address combination to another filter \ref Chain.
+ *
+ *  \param chain The chain to delegate decisions of whether to accept or reject
+ *      a packet/address combination to.
+ *  \param priority The priority to accept packets with.  A higher number is
+ *      more important and will be routed first.
+ *  \param condition The condition used to determine the rule matches a
+ *      particular packet/address combination given to the \ref action method.
+ *      The default is {} which indicates the rule matches any packet/address
+ *      combination.
+ *  \throws std::invalid_argument if the given pointer is nullptr.
+ *  \sa action
+ */
+Call::Call(
+    std::shared_ptr<Chain> chain, int priority, std::optional<If> condition)
+    : Rule(std::move(condition)), chain_(std::move(chain)), priority_(priority)
+{
+    if (chain_ == nullptr)
+    {
+        throw std::invalid_argument("Given Chain pointer is null.");
+    }
+}
+
+
+/** \copydoc Rule::print_(std::ostream &os)const
  *
  *  Prints `"call <Chain Name>"` or `"call <Chain Name> with priority
  *  <priority>"` if the priority is given.
@@ -61,57 +95,77 @@ std::ostream &Call::print_(std::ostream &os) const
         os << " with priority " << priority_.value();
     }
 
+    if (condition_)
+    {
+        os << " " << condition_.value();
+    }
+
     return os;
 }
 
 
-std::unique_ptr<Action> Call::clone() const
-{
-    return std::make_unique<Call>(chain_);
-}
-
-
-/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Call class delegates the action choice to the contained \ref Chain.  If
- *  that action is a continue then \ref Rule evaluation should continue on the
- *  next \ref Rule in the current \ref Chain.
+ *  If the condition has not been set or it matches the given packet/address
+ *  combination then the choice of \ref Action will be delegated to the
+ *  contained \ref Chain.
+ *
+ *  If the result from the chain is an accept object and no priority has been
+ *  set on it but this \ref Rule has a priority then the priority will be set.
  */
-ActionResult Call::action(
-    Packet &packet, const MAVAddress &address,
+Action Call::action(
+    const Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
-    ActionResult result = chain_->action(packet, address, recursion_checker);
-
-    if (priority_)
+    if (!condition_ || condition_->check(packet, address))
     {
-        result.priority(priority_.value());
+        auto result = chain_->action(packet, address, recursion_checker);
+
+        if (priority_)
+        {
+            // Only has an effect if the action is accept and does not already
+            // have a priority.
+            result.priority(priority_.value());
+        }
+
+        return result;
     }
 
-    return result;
+    return Action::make_continue();
 }
 
 
-/** \copydoc Action::operator==(const Action &) const
+std::unique_ptr<Rule> Call::clone() const
+{
+    if (priority_)
+    {
+        return std::make_unique<Call>(chain_, priority_.value(), condition_);
+    }
+    return std::make_unique<Call>(chain_, condition_);
+}
+
+
+/** \copydoc Rule::operator==(const Rule&)const
  *
- *  Compares the chain associated with the call as well.
+ *  Compares the chain and priority (if set) associated with the rule as well.
  */
-bool Call::operator==(const Action &other) const
+bool Call::operator==(const Rule &other) const
 {
     return typeid(*this) == typeid(other) &&
            chain_ == static_cast<const Call &>(other).chain_ &&
+           condition_ == static_cast<const Call &>(other).condition_ &&
            priority_ == static_cast<const Call &>(other).priority_;
 }
 
 
-/** \copydoc Action::operator!=(const Action &) const
+/** \copydoc Rule::operator!=(const Rule&)const
  *
- *  Compares the chain associated with the call as well.  If a priority was
- *  given it will also be compared.
+ *  Compares the chain and priority (if set) associated with the rule as well.
  */
-bool Call::operator!=(const Action &other) const
+bool Call::operator!=(const Rule &other) const
 {
     return typeid(*this) != typeid(other) ||
            chain_ != static_cast<const Call &>(other).chain_ ||
+           condition_ != static_cast<const Call &>(other).condition_ ||
            priority_ != static_cast<const Call &>(other).priority_;
 }

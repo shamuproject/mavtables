@@ -18,7 +18,6 @@
 #include "Action.hpp"
 #include "Chain.hpp"
 #include "MAVAddress.hpp"
-#include "MAVSubnet.hpp"
 #include "Packet.hpp"
 #include "RecursionChecker.hpp"
 
@@ -26,28 +25,29 @@
 namespace
 {
 
-    class ChainTestClass : public Chain
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+    class TestChain : public Chain
     {
         public:
-            using Chain::Chain;
+            TestChain()
+                : Chain("test_chain")
+            {
+            }
             virtual Action action(
                 const Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
             {
+                (void)packet;
+                (void)address;
                 (void)recursion_checker;
-
-                if (packet.id() == 4)
-                {
-                    if (MAVSubnet("192.0/14").contains(address))
-                    {
-                        return Action::make_accept();
-                    }
-
-                    return Action::make_reject();
-                }
-
-                return Action::make_continue();
+                return Action::make_accept();
             }
     };
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif
 
 }

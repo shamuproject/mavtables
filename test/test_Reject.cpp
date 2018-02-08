@@ -18,6 +18,7 @@
 #include <catch.hpp>
 
 #include "Action.hpp"
+#include "If.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
@@ -134,7 +135,7 @@ TEST_CASE("Reject's are printable (with a condition).", "[Reject]")
 
 TEST_CASE("Reject's 'clone' method returns a polymorphic copy.", "[Reject]")
 {
-    Reject reject;
+    Reject reject(If().type("PING"));
     Rule &rule = reject;
     std::unique_ptr<Rule> polymorphic_copy = rule.clone();
     REQUIRE(reject == *polymorphic_copy);

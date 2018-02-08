@@ -19,6 +19,7 @@
 
 #include "Accept.hpp"
 #include "Action.hpp"
+#include "If.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
@@ -217,7 +218,7 @@ TEST_CASE("Accept's are printable (with a condition and a priority).",
 
 TEST_CASE("Accept's 'clone' method returns a polymorphic copy.", "[Accept]")
 {
-    Accept accept;
+    Accept accept(4, If().type("PING"));
     Rule &rule = accept;
     std::unique_ptr<Rule> polymorphic_copy = rule.clone();
     REQUIRE(accept == *polymorphic_copy);

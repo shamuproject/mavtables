@@ -20,6 +20,7 @@
 #include <catch.hpp>
 
 #include "Action.hpp"
+#include "If.hpp"
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"

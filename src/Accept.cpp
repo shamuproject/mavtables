@@ -64,7 +64,7 @@ Accept::Accept(int priority, std::optional<If> condition)
 }
 
 
-/** \copydoc Action::print_(std::ostream &os) const
+/** \copydoc Rule::print_(std::ostream &os)const
  *
  *  Prints `"reject <Priority> <If Statement>"` where the priority and if
  *  statement are only printed if the priority or condition is set,
@@ -111,10 +111,18 @@ Action Accept::action(
 
 std::unique_ptr<Rule> Accept::clone() const
 {
-    return std::make_unique<Accept>();
+    if (priority_)
+    {
+        return std::make_unique<Accept>(priority_.value(), condition_);
+    }
+    return std::make_unique<Accept>(condition_);
 }
 
 
+/** \copydoc Rule::operator==(const Rule&)const
+ *
+ *  Compares the priority (if set) associated with the rule as well.
+ */
 bool Accept::operator==(const Rule &other) const
 {
     return typeid(*this) == typeid(other) &&
@@ -123,6 +131,10 @@ bool Accept::operator==(const Rule &other) const
 }
 
 
+/** \copydoc Rule::operator!=(const Rule&)const
+ *
+ *  Compares the priority (if set) associated with the rule as well.
+ */
 bool Accept::operator!=(const Rule &other) const
 {
     return typeid(*this) != typeid(other) ||
