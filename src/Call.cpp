@@ -55,10 +55,12 @@ Call::Call(std::shared_ptr<Chain> chain, std::optional<int> priority)
 std::ostream &Call::print_(std::ostream &os) const
 {
     os << "call " << chain_->name;
+
     if (priority_)
     {
         os << " with priority " << priority_.value();
     }
+
     return os;
 }
 
@@ -80,10 +82,12 @@ ActionResult Call::action(
     RecursionChecker &recursion_checker) const
 {
     ActionResult result = chain_->action(packet, address, recursion_checker);
+
     if (priority_)
     {
         result.priority(priority_.value());
     }
+
     return result;
 }
 
@@ -95,8 +99,8 @@ ActionResult Call::action(
 bool Call::operator==(const Action &other) const
 {
     return typeid(*this) == typeid(other) &&
-        chain_ == static_cast<const Call &>(other).chain_ &&
-        priority_ == static_cast<const Call &>(other).priority_;
+           chain_ == static_cast<const Call &>(other).chain_ &&
+           priority_ == static_cast<const Call &>(other).priority_;
 }
 
 
@@ -108,6 +112,6 @@ bool Call::operator==(const Action &other) const
 bool Call::operator!=(const Action &other) const
 {
     return typeid(*this) != typeid(other) ||
-        chain_ != static_cast<const Call &>(other).chain_ ||
-        priority_ != static_cast<const Call &>(other).priority_;
+           chain_ != static_cast<const Call &>(other).chain_ ||
+           priority_ != static_cast<const Call &>(other).priority_;
 }

@@ -42,8 +42,8 @@ class If
 
     public:
         If(std::optional<unsigned long> id = {},
-            std::optional<MAVSubnet> source = {},
-            std::optional<MAVSubnet> dest = {});
+           std::optional<MAVSubnet> source = {},
+           std::optional<MAVSubnet> dest = {});
         /** Copy constructor.
          *
          * \param other If to copy.

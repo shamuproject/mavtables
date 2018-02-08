@@ -23,26 +23,52 @@
 
 #include "Accept.hpp"
 #include "Action.hpp"
-#include "ActionResult.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include "Rule.hpp"
 
 
-/** Construct an accept action.
+/** Construct an accept rule, without a priority.
  *
- *  \param priority The priority to accept packets with, the default is no
- *      priority.
+ *  An accept rule is used to accept packet/address combinations that match the
+ *  condition of the rule.
+ *
+ *  \param condition The condition used to determine the rule matches a
+ *      particular packet/address combination given to the \ref action method.
+ *      The default is {} which indicates the rule matches any packet/address
+ *      combination.
+ *  \sa action
  */
-Accept::Accept(std::optional<int> priority)
-    : priority_(std::move(priority))
+Accept::Accept(std::optional<If> condition)
+    : Rule(std::move(condition))
+{
+}
+
+
+/** Construct an accept rule, with a priority.
+ *
+ *  An accept rule is used to accept packet/address combinations that match the
+ *  condition of the rule.
+ *
+ *  \param condition The condition used to determine the rule matches a
+ *      particular packet/address combination given to the \ref action method.
+ *      The default is {} which indicates the rule matches any packet/address
+ *      combination.
+ *  \param priority The priority to accept packets with.  A higher number is
+ *      more important and will be routed first.
+ *  \sa action
+ */
+Accept::Accept(int priority, std::optional<If> condition)
+    : Rule(std::move(condition)), priority_(priority)
 {
 }
 
 
 /** \copydoc Action::print_(std::ostream &os) const
  *
- *  Prints `"accept"` or `"accept with priority <priority>"` if the priority is
- *  given.
+ *  Prints `"reject <Priority> <If Statement>"` where the priority and if
+ *  statement are only printed if the priority or condition is set,
+ *  respectively.
  */
 std::ostream &Accept::print_(std::ostream &os) const
 {
@@ -53,43 +79,53 @@ std::ostream &Accept::print_(std::ostream &os) const
         os << " with priority " << priority_.value();
     }
 
+    if (condition_)
+    {
+        os << " " << condition_.value();
+    }
+
     return os;
 }
 
 
-std::unique_ptr<Action> Accept::clone() const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+ *
+ *  If the condition has not been set or it matches the given packet/address
+ *  combination then it will return the accept object (with optional priority),
+ *  otherwise it will return the continue object.
+ */
+Action Accept::action(
+    const Packet &packet, const MAVAddress &address,
+    RecursionChecker &recursion_checker) const
+{
+    (void)recursion_checker;
+
+    if (!condition_ || condition_->check(packet, address))
+    {
+        return Action::make_accept(priority_);
+    }
+
+    return Action::make_continue();
+}
+
+
+std::unique_ptr<Rule> Accept::clone() const
 {
     return std::make_unique<Accept>();
 }
 
 
-/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
- *
- *  The Accept class always returns an accept action result.  Therefore it
- *  always indicates that the \p packet should be sent to the given \p address.
- *  If the priorty was set during construction the accept result will have a
- *  priority.
- */
-ActionResult Accept::action(
-    Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
-{
-    (void)packet;
-    (void)address;
-    (void)recursion_checker;
-    return ActionResult::make_accept(priority_);
-}
-
-
-bool Accept::operator==(const Action &other) const
+bool Accept::operator==(const Rule &other) const
 {
     return typeid(*this) == typeid(other) &&
+           condition_ == static_cast<const Accept &>(other).condition_ &&
            priority_ == static_cast<const Accept &>(other).priority_;
 }
 
 
-bool Accept::operator!=(const Action &other) const
+bool Accept::operator!=(const Rule &other) const
 {
     return typeid(*this) != typeid(other) ||
+           condition_ != static_cast<const Accept &>(other).condition_ ||
            priority_ != static_cast<const Accept &>(other).priority_;
 }

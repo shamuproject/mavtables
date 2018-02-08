@@ -18,6 +18,7 @@
 #include <memory>
 #include <optional>
 #include <ostream>
+#include <typeinfo>
 #include <utility>
 
 #include "Action.hpp"
@@ -52,29 +53,33 @@ Reject::Reject(std::optional<If> condition)
 std::ostream &Reject::print_(std::ostream &os) const
 {
     os << "reject";
+
     if (condition_)
     {
         os << " " << condition_.value();
     }
+
     return os;
 }
 
 
 /** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  If the condition has not been set 
- *  The Reject class always returns a reject object.  Therefore it always
- *  indicates that the \p packet should not be sent to the given \p address.
+ *  If the condition has not been set or it matches the given packet/address
+ *  combination then it will return the reject object, otherwise it will return
+ *  the continue object.
  */
 Action Reject::action(
     const Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)recursion_checker;
+
     if (!condition_ || condition_->check(packet, address))
     {
         return Action::make_reject();
     }
+
     return Action::make_continue();
 }
 
@@ -88,12 +93,12 @@ std::unique_ptr<Rule> Reject::clone() const
 bool Reject::operator==(const Rule &other) const
 {
     return typeid(*this) == typeid(other) &&
-        condition_ == static_cast<const Reject &>(other).condition_;
+           condition_ == static_cast<const Reject &>(other).condition_;
 }
 
 
 bool Reject::operator!=(const Rule &other) const
 {
     return typeid(*this) != typeid(other) ||
-        condition_ != static_cast<const Reject &>(other).condition_;
+           condition_ != static_cast<const Reject &>(other).condition_;
 }

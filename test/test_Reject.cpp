@@ -27,18 +27,11 @@
 #include "Rule.hpp"
 #include "util.hpp"
 
-#include "ChainTestClass.hpp"
 #include "common_Packet.hpp"
 
 
-// TEST_CASE("Reject's can be constructed.", "[Reject]")
-// {
-//     REQUIRE_NOTHROW(Reject());
-// }
-
 TEST_CASE("Reject's are constructable.", "[Reject]")
 {
-    // auto chain = std::make_shared<ChainTestClass>("test_chain");
     SECTION("Without a condition (match all packet/address combinations).")
     {
         REQUIRE_NOTHROW(Reject());
@@ -59,17 +52,10 @@ TEST_CASE("Reject's are comparable.", "[Reject]")
     {
         REQUIRE(Reject() == Reject());
         REQUIRE(Reject(If().type("PING")) == Reject(If().type("PING")));
-        REQUIRE_FALSE(Reject(If().type("PING")) == Reject(If().type("SET_MODE")));
+        REQUIRE_FALSE(
+            Reject(If().type("PING")) == Reject(If().type("SET_MODE")));
         REQUIRE_FALSE(Reject(If().type("PING")) == Reject(If()));
         REQUIRE_FALSE(Reject(If().type("PING")) == Reject());
-        // REQUIRE(Reject(If().from("192.168")) == Reject(If().from("192.168")));
-        // REQUIRE(Reject(If().to("172.16")) == Reject(If().to("172.16")));
-        // REQUIRE(Reject(If().type("PING")) == Reject());
-        // REQUIRE(Reject(If().from("192.168")) == Reject());
-        // REQUIRE(Reject(If().to("172.16")) == Reject());
-        // REQUIRE(Reject(If().type("PING")) == Reject(If().type("SET_MODE")));
-        // REQUIRE(Reject(If().from("192.168")) == Reject(If().from("192.0")));
-        // REQUIRE(Reject(If().to("172.16")) == Reject(If().to("172.0")));
     }
     SECTION("with !=")
     {

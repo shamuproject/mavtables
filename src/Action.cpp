@@ -69,6 +69,7 @@ int Action::priority() const
     {
         return priority_.value();
     }
+
     return 0;
 }
 

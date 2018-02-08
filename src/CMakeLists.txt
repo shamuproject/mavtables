@@ -1,5 +1,5 @@
 set (SOURCES
-    # "${CMAKE_CURRENT_LIST_DIR}/Accept.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Accept.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Call.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.cpp"
@@ -21,7 +21,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
 )
 set (HEADERS
-    # "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
     # "${CMAKE_CURRENT_LIST_DIR}/Call.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.hpp"

@@ -53,10 +53,12 @@ GoTo::GoTo(std::shared_ptr<Chain> chain, std::optional<int> priority)
 std::ostream &GoTo::print_(std::ostream &os) const
 {
     os << "goto " << chain_->name;
+
     if (priority_)
     {
         os << " with priority " << priority_.value();
     }
+
     return os;
 }
 
@@ -92,6 +94,7 @@ ActionResult GoTo::action(
     {
         result.priority(priority_.value());
     }
+
     return result;
 }
 
@@ -103,8 +106,8 @@ ActionResult GoTo::action(
 bool GoTo::operator==(const Action &other) const
 {
     return typeid(*this) == typeid(other) &&
-        chain_ == static_cast<const GoTo &>(other).chain_ &&
-        priority_ == static_cast<const GoTo &>(other).priority_;
+           chain_ == static_cast<const GoTo &>(other).chain_ &&
+           priority_ == static_cast<const GoTo &>(other).priority_;
 }
 
 
@@ -115,6 +118,6 @@ bool GoTo::operator==(const Action &other) const
 bool GoTo::operator!=(const Action &other) const
 {
     return typeid(*this) != typeid(other) ||
-        chain_ != static_cast<const GoTo &>(other).chain_ ||
-        priority_ != static_cast<const GoTo &>(other).priority_;
+           chain_ != static_cast<const GoTo &>(other).chain_ ||
+           priority_ != static_cast<const GoTo &>(other).priority_;
 }
