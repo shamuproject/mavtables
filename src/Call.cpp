@@ -35,7 +35,7 @@
  *  a packet/address combination to another filter \ref Chain.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet/address combination to.
+ *      a packet/address combination to.  null is not valid.
  *  \param condition The condition used to determine the rule matches a
  *      particular packet/address combination given to the \ref action method.
  *      The default is {} which indicates the rule matches any packet/address
@@ -60,7 +60,7 @@ Call::Call(
  *  a packet/address combination to another filter \ref Chain.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet/address combination to.
+ *      a packet/address combination to. null is not valid.
  *  \param priority The priority to accept packets with.  A higher number is
  *      more important and will be routed first.
  *  \param condition The condition used to determine the rule matches a
@@ -83,8 +83,9 @@ Call::Call(
 
 /** \copydoc Rule::print_(std::ostream &os)const
  *
- *  Prints `"call <Chain Name>"` or `"call <Chain Name> with priority
- *  <priority>"` if the priority is given.
+ *  Prints `"call <Chain Name> <If Statement>"` or `"call <Chain Name> with
+ *  priority <If Statement>"` with priority <priority>"` if the priority is
+ *  given.
  */
 std::ostream &Call::print_(std::ostream &os) const
 {
@@ -153,8 +154,8 @@ bool Call::operator==(const Rule &other) const
 {
     return typeid(*this) == typeid(other) &&
            chain_ == static_cast<const Call &>(other).chain_ &&
-           condition_ == static_cast<const Call &>(other).condition_ &&
-           priority_ == static_cast<const Call &>(other).priority_;
+           priority_ == static_cast<const Call &>(other).priority_ &&
+           condition_ == static_cast<const Call &>(other).condition_;
 }
 
 
@@ -166,6 +167,6 @@ bool Call::operator!=(const Rule &other) const
 {
     return typeid(*this) != typeid(other) ||
            chain_ != static_cast<const Call &>(other).chain_ ||
-           condition_ != static_cast<const Call &>(other).condition_ ||
-           priority_ != static_cast<const Call &>(other).priority_;
+           priority_ != static_cast<const Call &>(other).priority_ ||
+           condition_ != static_cast<const Call &>(other).condition_;
 }

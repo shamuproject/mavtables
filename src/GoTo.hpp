@@ -24,9 +24,10 @@
 #include <ostream>
 
 #include "Action.hpp"
-#include "ActionResult.hpp"
+#include "If.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include "Rule.hpp"
 
 
 // Forward declaration of the chain class.
@@ -35,12 +36,12 @@ class Chain;
 
 /** Delegate decision on a packet to another \ref Chain.
  *
- *  Action to delegate the decision on what to do with a packet to a filter \ref
+ *  Rule to delegate the decision on what to do with a packet to a filter \ref
  *  Chain.  In particular, final decision is given to this \ref Chain.  If the
  *  \ref Chain cannot decide what to do with the \ref Packet the global default
  *  action should be taken.
  */
-class GoTo : public Action
+class GoTo : public Rule
 {
     private:
         std::shared_ptr<Chain> chain_;
@@ -50,13 +51,15 @@ class GoTo : public Action
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        GoTo(std::shared_ptr<Chain> chain, std::optional<int> priority = {});
-        virtual std::unique_ptr<Action> clone() const;
-        virtual ActionResult action(
-            Packet &packet, const MAVAddress &address,
+        GoTo(std::shared_ptr<Chain> chain, std::optional<If> condition = {});
+        GoTo(std::shared_ptr<Chain> chain, int priority,
+             std::optional<If> condition = {});
+        virtual Action action(
+            const Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
-        virtual bool operator==(const Action &other) const;
-        virtual bool operator!=(const Action &other) const;
+        virtual std::unique_ptr<Rule> clone() const;
+        virtual bool operator==(const Rule &other) const;
+        virtual bool operator!=(const Rule &other) const;
 };
 
 

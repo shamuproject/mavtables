@@ -84,8 +84,6 @@ TEST_CASE("Call's are comparable.", "[Call]")
     fakeit::Mock<Chain> mock2;
     std::shared_ptr<Chain> chain1 = mock_shared(mock1.get());
     std::shared_ptr<Chain> chain2 = mock_shared(mock2.get());
-    // auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
-    // auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
     SECTION("with ==")
     {
         REQUIRE(Call(chain1) == Call(chain1));
@@ -149,7 +147,6 @@ TEST_CASE("Call's 'action' method determines what to do with a "
             Action::make_accept(10));
     std::shared_ptr<Chain> accept10_chain = mock_shared(accept10_mock.get());
 
-    // auto chain = std::make_shared<ChainTestClass>("test_chain");
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     RecursionChecker rc;
     SECTION("Check call to chain's action method.")
@@ -229,8 +226,6 @@ TEST_CASE("Call's 'action' method determines what to do with a "
 
 TEST_CASE("Call's are printable (without a condition or a priority).", "[Call]")
 {
-    // fakeit::Mock<TestChain> mock;
-    // std::shared_ptr<Chain> chain = mock_shared(mock.get());
     auto chain = std::make_shared<TestChain>();
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     Call call(chain);
@@ -284,8 +279,7 @@ TEST_CASE("Call's are printable (with a condition but without a priority).",
 }
 
 
-TEST_CASE("Call's are printable (with a condition and a priority).",
-          "[Call]")
+TEST_CASE("Call's are printable (with a condition and a priority).", "[Call]")
 {
     auto chain = std::make_shared<TestChain>();
     auto ping = packet_v2::Packet(to_vector(PingV2()));

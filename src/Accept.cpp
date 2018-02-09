@@ -126,8 +126,8 @@ std::unique_ptr<Rule> Accept::clone() const
 bool Accept::operator==(const Rule &other) const
 {
     return typeid(*this) == typeid(other) &&
-           condition_ == static_cast<const Accept &>(other).condition_ &&
-           priority_ == static_cast<const Accept &>(other).priority_;
+           priority_ == static_cast<const Accept &>(other).priority_ &&
+           condition_ == static_cast<const Accept &>(other).condition_;
 }
 
 
@@ -138,6 +138,6 @@ bool Accept::operator==(const Rule &other) const
 bool Accept::operator!=(const Rule &other) const
 {
     return typeid(*this) != typeid(other) ||
-           condition_ != static_cast<const Accept &>(other).condition_ ||
-           priority_ != static_cast<const Accept &>(other).priority_;
+           priority_ != static_cast<const Accept &>(other).priority_ ||
+           condition_ != static_cast<const Accept &>(other).condition_;
 }
