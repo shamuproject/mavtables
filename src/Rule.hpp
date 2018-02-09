@@ -27,7 +27,6 @@
 #include "If.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include "RecursionChecker.hpp"
 
 
 /** Base class of all rules, used in filter \ref Chain's.
@@ -60,14 +59,11 @@ class Rule
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
          *      action allows it.
-         *  \param recursion_checker A recursion checker used to ensure infinite
-         *      recursion does not occur.
          *  \returns The action to take with the packet.  If this is the accept
          *      object, it may also contain a priority for the packet.
          */
         virtual Action action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recursion_checker) const = 0;
+            const Packet &packet, const MAVAddress &address) const = 0;
         /** Return a copy of the Rule polymorphically.
          *
          *  This allows Rule's to be copied without knowing the derived type.

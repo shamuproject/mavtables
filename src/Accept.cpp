@@ -88,18 +88,15 @@ std::ostream &Accept::print_(std::ostream &os) const
 }
 
 
-/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
  *  If the condition has not been set or it matches the given packet/address
  *  combination then it will return the accept object (with optional priority),
  *  otherwise it will return the continue object.
  */
 Action Accept::action(
-    const Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
+    const Packet &packet, const MAVAddress &address) const
 {
-    (void)recursion_checker;
-
     if (!condition_ || condition_->check(packet, address))
     {
         return Action::make_accept(priority_);

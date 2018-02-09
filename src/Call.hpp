@@ -54,8 +54,7 @@ class Call : public Rule
         Call(std::shared_ptr<Chain> chain, int priority,
              std::optional<If> condition = {});
         virtual Action action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recursion_checker) const;
+            const Packet &packet, const MAVAddress &address) const;
         virtual std::unique_ptr<Rule> clone() const;
         virtual bool operator==(const Rule &other) const;
         virtual bool operator!=(const Rule &other) const;

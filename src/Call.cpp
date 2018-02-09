@@ -105,7 +105,7 @@ std::ostream &Call::print_(std::ostream &os) const
 }
 
 
-/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
  *  If the condition has not been set or it matches the given packet/address
  *  combination then the choice of \ref Action will be delegated to the
@@ -115,12 +115,11 @@ std::ostream &Call::print_(std::ostream &os) const
  *  set on it but this \ref Rule has a priority then the priority will be set.
  */
 Action Call::action(
-    const Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
+    const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {
-        auto result = chain_->action(packet, address, recursion_checker);
+        auto result = chain_->action(packet, address);
 
         if (priority_)
         {

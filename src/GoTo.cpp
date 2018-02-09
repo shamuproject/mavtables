@@ -104,7 +104,7 @@ std::ostream &GoTo::print_(std::ostream &os) const
 }
 
 
-/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
  *  The GoTo class delegates the action choice to the contained \ref Chain.  If
  *  the \ref Chain decides on the continue action this method will return the
@@ -114,12 +114,11 @@ std::ostream &GoTo::print_(std::ostream &os) const
  *  regardless of the contained chain.
  */
 Action GoTo::action(
-    const Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
+    const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {
-        auto result = chain_->action(packet, address, recursion_checker);
+        auto result = chain_->action(packet, address);
 
         if (priority_)
         {

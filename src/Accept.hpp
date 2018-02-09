@@ -44,8 +44,7 @@ class Accept : public Rule
         Accept(std::optional<If> condition = {});
         Accept(int priority, std::optional<If> condition = {});
         virtual Action action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
+            const Packet &packet, const MAVAddress &address) const;
         virtual std::unique_ptr<Rule> clone() const;
         virtual bool operator==(const Rule &other) const;
         virtual bool operator!=(const Rule &other) const;

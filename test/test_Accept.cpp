@@ -24,7 +24,6 @@
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "RecursionChecker.hpp"
 #include "Rule.hpp"
 #include "util.hpp"
 
@@ -95,16 +94,15 @@ TEST_CASE("Accept's 'action' method determines what to do with a "
           "packet/address combination.", "[Accept]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
-    RecursionChecker rc;
     SECTION("Returns the accept action if there is no conditional.")
     {
         // Without priority.
         REQUIRE(
-            Accept().action(ping, MAVAddress("192.168"), rc) ==
+            Accept().action(ping, MAVAddress("192.168")) ==
             Action::make_accept());
         // With priority.
         REQUIRE(
-            Accept(3).action(ping, MAVAddress("192.168"), rc) ==
+            Accept(3).action(ping, MAVAddress("192.168")) ==
             Action::make_accept(3));
     }
     SECTION("Returns the accept action if the conditional is a match.")
@@ -112,34 +110,34 @@ TEST_CASE("Accept's 'action' method determines what to do with a "
         // Without priority.
         REQUIRE(
             Accept(If().type("PING")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept());
+                ping, MAVAddress("192.168")) == Action::make_accept());
         REQUIRE(
             Accept(If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept());
+                ping, MAVAddress("192.168")) == Action::make_accept());
         // With priority.
         REQUIRE(
             Accept(3, If().type("PING")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept(3));
+                ping, MAVAddress("192.168")) == Action::make_accept(3));
         REQUIRE(
             Accept(3, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept(3));
+                ping, MAVAddress("192.168")) == Action::make_accept(3));
     }
     SECTION("Returns the continue action if the conditional does not match.")
     {
         // Without priority.
         REQUIRE(
             Accept(If().type("SET_MODE")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
         REQUIRE(
             Accept(If().to("172.16")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
         // With priority.
         REQUIRE(
             Accept(3, If().type("SET_MODE")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
         REQUIRE(
             Accept(3, If().to("172.16")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
     }
 }
 

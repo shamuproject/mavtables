@@ -23,7 +23,6 @@
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"
-#include "RecursionChecker.hpp"
 
 
 Chain::Chain(std::string name_)
@@ -37,11 +36,9 @@ Chain::Chain(std::string name_)
 
 
 Action Chain::action(
-    const Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
+    const Packet &packet, const MAVAddress &address) const
 {
     (void)packet;
     (void)address;
-    (void)recursion_checker;
     return Action::make_continue();
 }
