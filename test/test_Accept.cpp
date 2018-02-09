@@ -218,8 +218,18 @@ TEST_CASE("Accept's are printable (with a condition and a priority).",
 
 TEST_CASE("Accept's 'clone' method returns a polymorphic copy.", "[Accept]")
 {
-    Accept accept(4, If().type("PING"));
-    Rule &rule = accept;
-    std::unique_ptr<Rule> polymorphic_copy = rule.clone();
-    REQUIRE(accept == *polymorphic_copy);
+    SECTION("Without a priority.")
+    {
+        Accept accept(If().type("PING"));
+        Rule &rule = accept;
+        std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+        REQUIRE(accept == *polymorphic_copy);
+    }
+    SECTION("With a priority.")
+    {
+        Accept accept(4, If().type("PING"));
+        Rule &rule = accept;
+        std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+        REQUIRE(accept == *polymorphic_copy);
+    }
 }

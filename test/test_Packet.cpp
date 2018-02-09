@@ -49,6 +49,9 @@ namespace
                 : Packet(std::move(data))
             {
             }
+            // LCOV_EXCL_START
+            ~PacketTestClass() = default;
+            // LCOV_EXCL_STOP
             virtual ::Packet::Version version() const
             {
                 return ::Packet::V1;

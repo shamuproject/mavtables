@@ -36,6 +36,9 @@ namespace
                 : Chain("test_chain")
             {
             }
+            // LCOV_EXCL_START
+            ~TestChain() = default;
+            // LCOV_EXCL_STOP
             virtual Action action(
                 const Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const

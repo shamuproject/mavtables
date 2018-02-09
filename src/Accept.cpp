@@ -115,6 +115,7 @@ std::unique_ptr<Rule> Accept::clone() const
     {
         return std::make_unique<Accept>(priority_.value(), condition_);
     }
+
     return std::make_unique<Accept>(condition_);
 }
 

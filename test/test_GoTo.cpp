@@ -128,29 +128,30 @@ TEST_CASE("GoTo's 'action' method determines what to do with a "
 {
     fakeit::Mock<Chain> accept_mock;
     fakeit::When(Method(accept_mock, action)).AlwaysReturn(
-            Action::make_accept());
+        Action::make_accept());
     std::shared_ptr<Chain> accept_chain = mock_shared(accept_mock.get());
     fakeit::Mock<Chain> reject_mock;
     fakeit::When(Method(reject_mock, action)).AlwaysReturn(
-            Action::make_reject());
+        Action::make_reject());
     std::shared_ptr<Chain> reject_chain = mock_shared(reject_mock.get());
     fakeit::Mock<Chain> continue_mock;
     fakeit::When(Method(continue_mock, action)).AlwaysReturn(
-            Action::make_continue());
+        Action::make_continue());
     std::shared_ptr<Chain> continue_chain = mock_shared(continue_mock.get());
     fakeit::Mock<Chain> default_mock;
     fakeit::When(Method(default_mock, action)).AlwaysReturn(
-            Action::make_default());
+        Action::make_default());
     std::shared_ptr<Chain> default_chain = mock_shared(default_mock.get());
     fakeit::Mock<Chain> accept10_mock;
     fakeit::When(Method(accept10_mock, action)).AlwaysReturn(
-            Action::make_accept(10));
+        Action::make_accept(10));
     std::shared_ptr<Chain> accept10_chain = mock_shared(accept10_mock.get());
-
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     RecursionChecker rc;
     SECTION("Check call to chain's action method.")
     {
+        REQUIRE(GoTo(std::make_shared<TestChain>()).action(
+                    ping, MAVAddress("192.168"), rc) == Action::make_accept());
         fakeit::Mock<Chain> mock;
         fakeit::When(Method(mock, action)).AlwaysReturn(Action::make_accept());
         std::shared_ptr<Chain> chain = mock_shared(mock.get());
@@ -305,8 +306,18 @@ TEST_CASE("GoTo's are printable (with a condition and a priority).", "[GoTo]")
 TEST_CASE("GoTo's 'clone' method returns a polymorphic copy.", "[GoTo]")
 {
     auto chain = std::make_shared<TestChain>();
-    GoTo goto_(chain, 3, If().type("PING"));
-    Rule &rule = goto_;
-    std::unique_ptr<Rule> polymorphic_copy = rule.clone();
-    REQUIRE(goto_ == *polymorphic_copy);
+    SECTION("Without a priority.")
+    {
+        GoTo goto_(chain, If().type("PING"));
+        Rule &rule = goto_;
+        std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+        REQUIRE(goto_ == *polymorphic_copy);
+    }
+    SECTION("With a priority.")
+    {
+        GoTo goto_(chain, 3, If().type("PING"));
+        Rule &rule = goto_;
+        std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+        REQUIRE(goto_ == *polymorphic_copy);
+    }
 }

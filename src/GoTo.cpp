@@ -147,6 +147,7 @@ std::unique_ptr<Rule> GoTo::clone() const
     {
         return std::make_unique<GoTo>(chain_, priority_.value(), condition_);
     }
+
     return std::make_unique<GoTo>(chain_, condition_);
 }
 

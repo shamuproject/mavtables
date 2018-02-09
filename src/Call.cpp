@@ -142,6 +142,7 @@ std::unique_ptr<Rule> Call::clone() const
     {
         return std::make_unique<Call>(chain_, priority_.value(), condition_);
     }
+
     return std::make_unique<Call>(chain_, condition_);
 }
 
