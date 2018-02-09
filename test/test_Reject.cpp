@@ -35,6 +35,13 @@ TEST_CASE("Reject's can be constructed.", "[Reject]")
 }
 
 
+TEST_CASE("Reject's are comparable.", "[Reject]")
+{
+    REQUIRE(Reject() == Reject());
+    REQUIRE_FALSE(Reject() != Reject());
+}
+
+
 TEST_CASE("Reject's 'action' method always returns Action::REJECT.", "[Reject]")
 {
     auto conn = std::make_shared<ConnectionTestClass>();
@@ -75,6 +82,16 @@ TEST_CASE("Reject's are printable.", "[Reject]")
     {
         REQUIRE(str(reject) == "reject");
     }
+}
+
+
+TEST_CASE("Reject's 'clone' method returns a polymorphic copy.", "[Reject]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    Reject reject;
+    Action &action = reject;
+    std::unique_ptr<Action> polymorphic_copy = action.clone();
+    REQUIRE(str(reject) == str(*polymorphic_copy));
 }
 
 

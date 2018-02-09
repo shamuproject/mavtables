@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
 #include <ostream>
 
 #include "Packet.hpp"
@@ -34,17 +35,35 @@ std::ostream &Reject::print_(std::ostream &os) const
 }
 
 
+std::unique_ptr<Action> Reject::clone() const
+{
+    return std::make_unique<Reject>();
+}
+
+
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Reject class always returns \ref Action::REJECT, therefore it always
  *  indicates that the \p packet should not be sent to the given \p address.
  */
 Action::Option Reject::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
     (void)recursion_checker;
     return Action::REJECT;
+}
+
+
+bool Reject::operator==(const Action &other) const
+{
+    return typeid(*this) == typeid(other);
+}
+
+
+bool Reject::operator!=(const Action &other) const
+{
+    return typeid(*this) != typeid(other);
 }

@@ -16,6 +16,7 @@
 
 
 #include <ostream>
+#include <stdexcept>
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
@@ -27,11 +28,16 @@
 /** Construct a goto action given a chain to delegate to.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet to.
+ *      a packet to.  A nullptr is not a valid input.
+ *  \throws std::invalid_argument if the given pointer is nullptr.
  */
 GoTo::GoTo(std::shared_ptr<Chain> chain)
     : chain_(std::move(chain))
 {
+    if (chain_ == nullptr)
+    {
+        throw std::invalid_argument("Given Chain pointer is null.");
+    }
 }
 
 
@@ -46,6 +52,13 @@ std::ostream &GoTo::print_(std::ostream &os) const
 }
 
 
+//! \copydoc Action::clone() const
+std::unique_ptr<Action> GoTo::clone() const
+{
+    return std::make_unique<GoTo>(chain_);
+}
+
+
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The GoTo class delegates the action choice to the contained \ref Chain.  If
@@ -56,7 +69,7 @@ std::ostream &GoTo::print_(std::ostream &os) const
  *  chain should ever be ran.
  */
 Action::Option GoTo::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     Action::Option option = chain_->action(packet, address, recursion_checker);
@@ -67,4 +80,34 @@ Action::Option GoTo::action(
     }
 
     return option;
+}
+
+
+/** \copydoc Action::operator==(const Action &) const
+ *
+ *  Compares the chain associated with the goto as well.
+ */
+bool GoTo::operator==(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const GoTo &other_ = static_cast<const GoTo &>(other);
+        return chain_ == other_.chain_;
+    }
+    return false;
+}
+
+
+/** \copydoc Action::operator!=(const Action &) const
+ *
+ *  Compares the chain associated with the goto as well.
+ */
+bool GoTo::operator!=(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const GoTo &other_ = static_cast<const GoTo &>(other);
+        return chain_ != other_.chain_;
+    }
+    return true;
 }

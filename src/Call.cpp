@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
 #include <ostream>
 
 #include "Packet.hpp"
@@ -28,10 +29,15 @@
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
  *      a packet to.
+ *  \throws std::invalid_argument if the given pointer is nullptr.
  */
 Call::Call(std::shared_ptr<Chain> chain)
     : chain_(std::move(chain))
 {
+    if (chain_ == nullptr)
+    {
+        throw std::invalid_argument("Given Chain pointer is null.");
+    }
 }
 
 
@@ -46,6 +52,12 @@ std::ostream &Call::print_(std::ostream &os) const
 }
 
 
+std::unique_ptr<Action> Call::clone() const
+{
+    return std::make_unique<Call>(chain_);
+}
+
+
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Call class delegates the action choice to the contained \ref Chain.  If
@@ -53,8 +65,38 @@ std::ostream &Call::print_(std::ostream &os) const
  *  continue on the next \ref Rule in the current \ref Chain.
  */
 Action::Option Call::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     return chain_->action(packet, address, recursion_checker);
+}
+
+
+/** \copydoc Action::operator==(const Action &) const
+ *
+ *  Compares the chain associated with the call as well.
+ */
+bool Call::operator==(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const Call &other_ = static_cast<const Call &>(other);
+        return chain_ == other_.chain_;
+    }
+    return false;
+}
+
+
+/** \copydoc Action::operator!=(const Action &) const
+ *
+ *  Compares the chain associated with the call as well.
+ */
+bool Call::operator!=(const Action &other) const
+{
+    if (typeid(*this) == typeid(other))
+    {
+        const Call &other_ = static_cast<const Call &>(other);
+        return chain_ != other_.chain_;
+    }
+    return true;
 }

@@ -44,8 +44,12 @@ namespace
             }
 
         public:
+            virtual std::unique_ptr<Action> clone() const
+            {
+                return std::make_unique<ActionTestClass>();
+            }
             virtual Action::Option action(
-                const Packet &packet, const MAVAddress &address,
+                Packet &packet, const MAVAddress &address,
                 RecursionChecker &recursion_checker) const
             {
                 (void)recursion_checker;
@@ -62,6 +66,16 @@ namespace
 
                 return Action::CONTINUE;
             }
+            virtual bool operator==(const Action &other) const
+            {
+                (void)other;
+                return true;
+            }
+            virtual bool operator!=(const Action &other) const
+            {
+                (void)other;
+                return false;
+            }
     };
 
 }
@@ -70,6 +84,13 @@ namespace
 TEST_CASE("Action's can be constructed.", "[Action]")
 {
     REQUIRE_NOTHROW(ActionTestClass());
+}
+
+
+TEST_CASE("Action's are comparable.", "[Action]")
+{
+    REQUIRE(ActionTestClass() == ActionTestClass());
+    REQUIRE_FALSE(ActionTestClass() != ActionTestClass());
 }
 
 
@@ -105,15 +126,25 @@ TEST_CASE("Action's are printable.", "[Action]")
     auto conn = std::make_shared<ConnectionTestClass>();
     auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
     ActionTestClass action;
-    Action &polymophic_action = action;
+    Action &polymorphic = action;
     SECTION("By direct type.")
     {
         REQUIRE(str(action) == "test");
     }
     SECTION("By polymorphic type.")
     {
-        REQUIRE(str(polymophic_action) == "test");
+        REQUIRE(str(polymorphic) == "test");
     }
+}
+
+
+TEST_CASE("Action's 'clone' method returns a polymorphic copy.", "[Action]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    ActionTestClass action;
+    Action &polymorphic = action;
+    std::unique_ptr<Action> polymorphic_copy = polymorphic.clone();
+    REQUIRE(str(action) == str(*polymorphic_copy));
 }
 
 

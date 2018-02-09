@@ -42,6 +42,16 @@ class Conditional
 
     public:
         Conditional();
+        /** Copy constructor.
+         *
+         * \param other Conditional to copy.
+         */
+        Conditional(const Conditional &other) = default;
+        /** Move constructor.
+         *
+         * \param other Conditional to move from.
+         */
+        Conditional(Conditional &&other) = default;
         Conditional(
             std::optional<unsigned long> id,
             std::optional<MAVSubnet> source = {},
@@ -52,13 +62,27 @@ class Conditional
         Conditional &from(const std::string &subnet);
         Conditional &to(MAVSubnet subnet);
         Conditional &to(const std::string &subnet);
-        bool check(const Packet &packet, const MAVAddress &address);
+        bool check(const Packet &packet, const MAVAddress &address) const;
+        /** Assignment operator.
+         *
+         * \param other Conditional to copy.
+         */
+        Conditional &operator=(const Conditional &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other Conditional to move from.
+         */
+        Conditional &operator=(Conditional &&other) = default;
 
+        friend bool operator==(const Conditional &lhs, const Conditional &rhs);
+        friend bool operator!=(const Conditional &lhs, const Conditional &rhs);
         friend std::ostream &operator<<(
             std::ostream &os, const Conditional &conditional);
 };
 
 
+bool operator==(const Conditional &lhs, const Conditional &rhs);
+bool operator!=(const Conditional &lhs, const Conditional &rhs);
 std::ostream &operator<<(std::ostream &os, const Conditional &conditional);
 
 

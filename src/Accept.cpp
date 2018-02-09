@@ -15,7 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
 #include <ostream>
+#include <typeinfo>
 
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
@@ -34,17 +36,35 @@ std::ostream &Accept::print_(std::ostream &os) const
 }
 
 
+std::unique_ptr<Action> Accept::clone() const
+{
+    return std::make_unique<Accept>();
+}
+
+
 /** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
  *  The Accept class always returns \ref Action::ACCEPT, therefore it always
  *  indicates that the \p packet should be sent to the given \p address.
  */
 Action::Option Accept::action(
-    const Packet &packet, const MAVAddress &address,
+    Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
     (void)packet;
     (void)address;
     (void)recursion_checker;
     return Action::ACCEPT;
+}
+
+
+bool Accept::operator==(const Action &other) const
+{
+    return typeid(*this) == typeid(other);
+}
+
+
+bool Accept::operator!=(const Action &other) const
+{
+    return typeid(*this) != typeid(other);
 }

@@ -48,9 +48,12 @@ class GoTo : public Action
 
     public:
         GoTo(std::shared_ptr<Chain> chain);
+        virtual std::unique_ptr<Action> clone() const;
         virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
+            Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
+        virtual bool operator==(const Action &other) const;
+        virtual bool operator!=(const Action &other) const;
 };
 
 

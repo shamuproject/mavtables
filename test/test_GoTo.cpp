@@ -16,6 +16,7 @@
 
 
 #include <memory>
+#include <stdexcept>
 
 #include <catch.hpp>
 
@@ -30,42 +31,37 @@
 #include "Action.hpp"
 #include "GoTo.hpp"
 
+#include "ChainTestClass.hpp"
 #include "common_Packet.hpp"
-
-
-namespace
-{
-
-    class ChainTestClass : public Chain
-    {
-        public:
-            using Chain::Chain;
-            virtual Action::Option action(
-                const Packet &packet, const MAVAddress &address,
-                RecursionChecker &recursion_checker) const
-            {
-                (void)recursion_checker;
-
-                if (packet.name() == "PING")
-                {
-                    if (MAVSubnet("192.0/14").contains(address))
-                    {
-                        return Action::ACCEPT;
-                    }
-
-                    return Action::REJECT;
-                }
-
-                return Action::CONTINUE;
-            }
-    };
-
-}
 
 
 TEST_CASE("GoTo's can be constructed.", "[GoTo]")
 {
     REQUIRE_NOTHROW(GoTo(std::make_shared<ChainTestClass>("test_chain")));
+    SECTION("Ensures the shared pointer is not null.")
+    {
+        REQUIRE_THROWS_AS(GoTo(nullptr), std::invalid_argument);
+        REQUIRE_THROWS_WITH(GoTo(nullptr), "Given Chain pointer is null.");
+    }
+}
+
+
+TEST_CASE("GoTo's are comparable.", "[GoTo]")
+{
+    auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
+    auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
+    SECTION("with ==")
+    {
+        REQUIRE(GoTo(chain1) == GoTo(chain1));
+        REQUIRE(GoTo(chain2) == GoTo(chain2));
+        REQUIRE_FALSE(GoTo(chain1) == GoTo(chain2));
+    }
+    SECTION("with !=")
+    {
+        REQUIRE_FALSE(GoTo(chain1) != GoTo(chain1));
+        REQUIRE_FALSE(GoTo(chain2) != GoTo(chain2));
+        REQUIRE(GoTo(chain1) != GoTo(chain2));
+    }
 }
 
 
@@ -110,6 +106,16 @@ TEST_CASE("GoTo's are printable.", "[GoTo]")
     {
         REQUIRE(str(action) == "goto test_chain");
     }
+}
+
+
+TEST_CASE("GoTo's 'clone' method returns a polymorphic copy.", "[GoTo]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    GoTo goto_(std::make_shared<ChainTestClass>("test_chain"));
+    Action &action = goto_;
+    std::unique_ptr<Action> polymorphic_copy = action.clone();
+    REQUIRE(str(goto_) == str(*polymorphic_copy));
 }
 
 

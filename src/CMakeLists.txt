@@ -17,17 +17,18 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionChecker.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Reject.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Rule.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
 )
 set (HEADERS
-    "${CMAKE_CURRENT_LIST_DIR}/Accept.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/Action.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/Call.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Call.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Conditional.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Connection.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/Chain.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Chain.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/GoTo.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/GoTo.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
@@ -38,7 +39,8 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionChecker.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/Reject.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Reject.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Rule.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
 )
 target_sources (mavtables 

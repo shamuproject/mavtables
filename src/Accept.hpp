@@ -19,6 +19,7 @@
 #define ACCEPT_HPP_
 
 
+#include <memory>
 #include <ostream>
 
 #include "Action.hpp"
@@ -34,9 +35,12 @@ class Accept : public Action
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
+        virtual std::unique_ptr<Action> clone() const;
         virtual Action::Option action(
-            const Packet &packet, const MAVAddress &address,
+            Packet &packet, const MAVAddress &address,
             RecursionChecker &recusion_checker) const;
+        virtual bool operator==(const Action &other) const;
+        virtual bool operator!=(const Action &other) const;
 };
 
 

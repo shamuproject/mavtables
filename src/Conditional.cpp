@@ -31,11 +31,10 @@
  *  The default conditional is initialized to match any packet type with and
  *  source and destination addresses.  Use \ref type, \ref to, and \ref from to
  *  restrict the matching.  Some examples are:
- *
- *  - `auto cond = Conditional().type("PING").from("1.0/8").to("255.0");`
- *  - `auto cond = Conditional().type("HEARTBEAT").from("255.0/8");`
- *  - `auto cond = Conditional().type("SET_MODE").to("255.0/8");`
- *  - `auto cond = Conditional().from("255.0/8");`
+ *      - `auto cond = Conditional().type("PING").from("1.0/8").to("255.0");`
+ *      - `auto cond = Conditional().type("HEARTBEAT").from("255.0/8");`
+ *      - `auto cond = Conditional().type("SET_MODE").to("255.0/8");`
+ *      - `auto cond = Conditional().from("255.0/8");`
  */
 Conditional::Conditional()
 {
@@ -170,7 +169,7 @@ Conditional &Conditional::to(const std::string &subnet)
  *  \retval false If any of the packet type, source subnet, or destination
  *      subnet does not match.
  */
-bool Conditional::check(const Packet &packet, const MAVAddress &address)
+bool Conditional::check(const Packet &packet, const MAVAddress &address) const
 {
     bool result = true;
 
@@ -196,13 +195,45 @@ bool Conditional::check(const Packet &packet, const MAVAddress &address)
 }
 
 
+/** Equality comparison.
+ *
+ *  \relates Conditional
+ *  \param lhs The left hand side conditional statement.
+ *  \param rhs The right hand side conditional statement.
+ *  \retval true if \p lhs and \p rhs are the same.
+ *  \retval false if \p lhs and \p rhs are not the same.
+ *  \complexity \f$O(1)\f$
+ */
+bool operator==(const Conditional &lhs, const Conditional &rhs)
+{
+    return (lhs.id_ == rhs.id_) && (lhs.source_ == rhs.source_) &&
+           (lhs.dest_ == rhs.dest_);
+}
+
+
+/** Inequality comparison.
+ *
+ *  \relates Conditional
+ *  \param lhs The left hand side conditional statement.
+ *  \param rhs The right hand side conditional statement.
+ *  \retval true if \p lhs and \p rhs are not the same.
+ *  \retval false if \p lhs and \p rhs are the same.
+ *  \complexity \f$O(1)\f$
+ */
+bool operator!=(const Conditional &lhs, const Conditional &rhs)
+{
+    return (lhs.id_ != rhs.id_) || (lhs.source_ != rhs.source_) ||
+           (lhs.dest_ != rhs.dest_);
+}
+
+
 /** Print the conditional to the given output stream.
  *
  *  Some examples are:
- *      - `if PING from 1.0/8 to 255.0`
- *      - `if HEARTBEAT from 255.0/8`
- *      - `if SET_MODE to 255.0`
- *      - `if from 255.0/8`
+ *  - `if PING from 1.0/8 to 255.0`
+ *  - `if HEARTBEAT from 255.0/8`
+ *  - `if SET_MODE to 255.0`
+ *  - `if from 255.0/8`
  */
 std::ostream &operator<<(std::ostream &os, const Conditional &conditional)
 {

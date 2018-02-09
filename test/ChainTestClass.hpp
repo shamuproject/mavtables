@@ -15,34 +15,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef REJECT_HPP_
-#define REJECT_HPP_
-
-
-#include <memory>
-#include <ostream>
-
 #include "Action.hpp"
-#include "Packet.hpp"
+#include "Chain.hpp"
 #include "MAVAddress.hpp"
-#include "Action.hpp"
+#include "MAVSubnet.hpp"
+#include "Packet.hpp"
+#include "RecursionChecker.hpp"
 
 
-/** Action to reject a packet.
- */
-class Reject : public Action
+namespace
 {
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
 
-    public:
-        virtual std::unique_ptr<Action> clone() const;
-        virtual Action::Option action(
-            Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
-        virtual bool operator==(const Action &other) const;
-        virtual bool operator!=(const Action &other) const;
-};
+    class ChainTestClass : public Chain
+    {
+        public:
+            using Chain::Chain;
+            virtual Action::Option action(
+                Packet &packet, const MAVAddress &address,
+                RecursionChecker &recursion_checker) const
+            {
+                (void)recursion_checker;
 
+                if (packet.id() == 4)
+                {
+                    if (MAVSubnet("192.0/14").contains(address))
+                    {
+                        return Action::ACCEPT;
+                    }
 
-#endif // REJECT_HPP_
+                    return Action::REJECT;
+                }
+
+                return Action::CONTINUE;
+            }
+    };
+
+}

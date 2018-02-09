@@ -16,6 +16,7 @@
 
 
 #include <memory>
+#include <stdexcept>
 
 #include <catch.hpp>
 
@@ -30,42 +31,37 @@
 #include "Action.hpp"
 #include "Call.hpp"
 
+#include "ChainTestClass.hpp"
 #include "common_Packet.hpp"
-
-
-namespace
-{
-
-    class ChainTestClass : public Chain
-    {
-        public:
-            using Chain::Chain;
-            virtual Action::Option action(
-                const Packet &packet, const MAVAddress &address,
-                RecursionChecker &recursion_checker) const
-            {
-                (void)recursion_checker;
-
-                if (packet.name() == "PING")
-                {
-                    if (MAVSubnet("192.0/14").contains(address))
-                    {
-                        return Action::ACCEPT;
-                    }
-
-                    return Action::REJECT;
-                }
-
-                return Action::CONTINUE;
-            }
-    };
-
-}
 
 
 TEST_CASE("Call's can be constructed.", "[Call]")
 {
     REQUIRE_NOTHROW(Call(std::make_shared<ChainTestClass>("test_chain")));
+    SECTION("Ensures the shared pointer is not null.")
+    {
+        REQUIRE_THROWS_AS(Call(nullptr), std::invalid_argument);
+        REQUIRE_THROWS_WITH(Call(nullptr), "Given Chain pointer is null.");
+    }
+}
+
+
+TEST_CASE("Call's are comparable.", "[Call]")
+{
+    auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
+    auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
+    SECTION("with ==")
+    {
+        REQUIRE(Call(chain1) == Call(chain1));
+        REQUIRE(Call(chain2) == Call(chain2));
+        REQUIRE_FALSE(Call(chain1) == Call(chain2));
+    }
+    SECTION("with !=")
+    {
+        REQUIRE_FALSE(Call(chain1) != Call(chain1));
+        REQUIRE_FALSE(Call(chain2) != Call(chain2));
+        REQUIRE(Call(chain1) != Call(chain2));
+    }
 }
 
 
@@ -98,8 +94,6 @@ TEST_CASE("Call's 'action' method delegates the decision to the Chain it "
 
 TEST_CASE("Call's are printable.", "[Call]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
     Call call(std::make_shared<ChainTestClass>("test_chain"));
     Action &action = call;
     SECTION("By direct type.")
@@ -110,6 +104,16 @@ TEST_CASE("Call's are printable.", "[Call]")
     {
         REQUIRE(str(action) == "call test_chain");
     }
+}
+
+
+TEST_CASE("Call's 'clone' method returns a polymorphic copy.", "[Call]")
+{
+    // Note: String comparisons are used because Action's are not comparable.
+    Call call(std::make_shared<ChainTestClass>("test_chain"));
+    Action &action = call;
+    std::unique_ptr<Action> polymorphic_copy = action.clone();
+    REQUIRE(str(call) == str(*polymorphic_copy));
 }
 
 
