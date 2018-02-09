@@ -17,88 +17,219 @@
 
 #include <catch.hpp>
 
-#include "util.hpp"
+#include "Accept.hpp"
+#include "Action.hpp"
+#include "If.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "MAVAddress.hpp"
 #include "RecursionChecker.hpp"
-#include "Action.hpp"
-#include "Accept.hpp"
+#include "Rule.hpp"
+#include "util.hpp"
 
 #include "common_Packet.hpp"
 
 
-TEST_CASE("Accept's can be constructed.", "[Accept]")
+TEST_CASE("Accept's are constructable.", "[Accept]")
 {
-    REQUIRE_NOTHROW(Accept());
+    SECTION("Without a condition (match all packet/address combinations) or a "
+            "priority.")
+    {
+        REQUIRE_NOTHROW(Accept());
+    }
+    SECTION("Without a condition (match all packet/address combinations) but "
+            "with a priority.")
+    {
+        REQUIRE_NOTHROW(Accept(3));
+    }
+    SECTION("With a condition and without a priority.")
+    {
+        REQUIRE_NOTHROW(Accept(If()));
+        REQUIRE_NOTHROW(Accept(If().type("PING")));
+        REQUIRE_NOTHROW(Accept(If().from("192.168")));
+        REQUIRE_NOTHROW(Accept(If().to("172.16")));
+    }
+    SECTION("With both a condition and a priority.")
+    {
+        REQUIRE_NOTHROW(Accept(3, If()));
+        REQUIRE_NOTHROW(Accept(3, If().type("PING")));
+        REQUIRE_NOTHROW(Accept(3, If().from("192.168")));
+        REQUIRE_NOTHROW(Accept(3, If().to("172.16")));
+    }
 }
 
 
 TEST_CASE("Accept's are comparable.", "[Accept]")
 {
-    REQUIRE(Accept() == Accept());
-    REQUIRE_FALSE(Accept() != Accept());
+    SECTION("with ==")
+    {
+        REQUIRE(Accept() == Accept());
+        REQUIRE(Accept(If().type("PING")) == Accept(If().type("PING")));
+        REQUIRE(Accept(3) == Accept(3));
+        REQUIRE(Accept(3, If().type("PING")) == Accept(3, If().type("PING")));
+        REQUIRE_FALSE(
+            Accept(If().type("PING")) == Accept(If().type("SET_MODE")));
+        REQUIRE_FALSE(Accept(If().type("PING")) == Accept(If()));
+        REQUIRE_FALSE(Accept(If().type("PING")) == Accept());
+        REQUIRE_FALSE(Accept(3) == Accept(-3));
+        REQUIRE_FALSE(Accept(3) == Accept());
+    }
+    SECTION("with !=")
+    {
+        REQUIRE(Accept(If().type("PING")) != Accept());
+        REQUIRE(Accept(If().type("PING")) != Accept(If()));
+        REQUIRE(Accept(If().type("PING")) != Accept(If().type("SET_MODE")));
+        REQUIRE(Accept(3) != Accept(-3));
+        REQUIRE(Accept(3) != Accept());
+        REQUIRE_FALSE(Accept() != Accept());
+        REQUIRE_FALSE(Accept(If().type("PING")) != Accept(If().type("PING")));
+        REQUIRE_FALSE(Accept(3) != Accept(3));
+        REQUIRE_FALSE(
+            Accept(3, If().type("PING")) != Accept(3, If().type("PING")));
+    }
 }
 
 
-TEST_CASE("Accept's 'action' method always returns Action::ACCEPT.", "[Accept]")
+TEST_CASE("Accept's 'action' method determines what to do with a "
+          "packet/address combination.", "[Accept]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
     RecursionChecker rc;
-    Accept accept;
-    REQUIRE(accept.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.1"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.2"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.3"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.4"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.5"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.6"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(ping, MAVAddress("192.7"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.0"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.1"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.2"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.3"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.4"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.5"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.6"), rc) == Action::ACCEPT);
-    REQUIRE(accept.action(hb, MAVAddress("192.7"), rc) == Action::ACCEPT);
+    SECTION("Returns the accept action if there is no conditional.")
+    {
+        // Without priority.
+        REQUIRE(
+            Accept().action(ping, MAVAddress("192.168"), rc) ==
+            Action::make_accept());
+        // With priority.
+        REQUIRE(
+            Accept(3).action(ping, MAVAddress("192.168"), rc) ==
+            Action::make_accept(3));
+    }
+    SECTION("Returns the accept action if the conditional is a match.")
+    {
+        // Without priority.
+        REQUIRE(
+            Accept(If().type("PING")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_accept());
+        REQUIRE(
+            Accept(If().to("192.168")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_accept());
+        // With priority.
+        REQUIRE(
+            Accept(3, If().type("PING")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_accept(3));
+        REQUIRE(
+            Accept(3, If().to("192.168")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_accept(3));
+    }
+    SECTION("Returns the continue action if the conditional does not match.")
+    {
+        // Without priority.
+        REQUIRE(
+            Accept(If().type("SET_MODE")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+        REQUIRE(
+            Accept(If().to("172.16")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+        // With priority.
+        REQUIRE(
+            Accept(3, If().type("SET_MODE")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+        REQUIRE(
+            Accept(3, If().to("172.16")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+    }
 }
 
 
-TEST_CASE("Accept's are printable.", "[Accept]")
+TEST_CASE("Accept's are printable (without a condition or a priority).",
+          "[Accept]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
     Accept accept;
-    Action &action = accept;
+    Rule &rule = accept;
     SECTION("By direct type.")
     {
         REQUIRE(str(accept) == "accept");
     }
     SECTION("By polymorphic type.")
     {
-        REQUIRE(str(action) == "accept");
+        REQUIRE(str(rule) == "accept");
+    }
+}
+
+
+TEST_CASE("Accept's are printable (without a condition but with a priority).",
+          "[Accept]")
+{
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
+    Accept accept(-3);
+    Rule &rule = accept;
+    SECTION("By direct type.")
+    {
+        REQUIRE(str(accept) == "accept with priority -3");
+    }
+    SECTION("By polymorphic type.")
+    {
+        REQUIRE(str(rule) == "accept with priority -3");
+    }
+}
+
+
+TEST_CASE("Accept's are printable (with a condition but without a priority).",
+          "[Accept]")
+{
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
+    Accept accept(If().type("PING").from("192.168/8").to("172.16/4"));
+    Rule &rule = accept;
+    SECTION("By direct type.")
+    {
+        REQUIRE(str(accept) == "accept if PING from 192.168/8 to 172.16/4");
+    }
+    SECTION("By polymorphic type.")
+    {
+        REQUIRE(str(rule) == "accept if PING from 192.168/8 to 172.16/4");
+    }
+}
+
+
+TEST_CASE("Accept's are printable (with a condition and a priority).",
+          "[Accept]")
+{
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
+    Accept accept(-3, If().type("PING").from("192.168/8").to("172.16/4"));
+    Rule &rule = accept;
+    SECTION("By direct type.")
+    {
+        REQUIRE(
+            str(accept) ==
+            "accept with priority -3 if PING from 192.168/8 to 172.16/4");
+    }
+    SECTION("By polymorphic type.")
+    {
+        REQUIRE(
+            str(rule) ==
+            "accept with priority -3 if PING from 192.168/8 to 172.16/4");
     }
 }
 
 
 TEST_CASE("Accept's 'clone' method returns a polymorphic copy.", "[Accept]")
 {
-    // Note: String comparisons are used because Action's are not comparable.
-    Accept accept;
-    Action &action = accept;
-    std::unique_ptr<Action> polymorphic_copy = action.clone();
-    REQUIRE(str(accept) == str(*polymorphic_copy));
-}
-
-
-// Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (Accept).", "[Accept]")
-{
-    Accept *accept = nullptr;
-    REQUIRE_NOTHROW(accept = new Accept());
-    REQUIRE_NOTHROW(delete accept);
+    SECTION("Without a priority.")
+    {
+        Accept accept(If().type("PING"));
+        Rule &rule = accept;
+        std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+        REQUIRE(accept == *polymorphic_copy);
+    }
+    SECTION("With a priority.")
+    {
+        Accept accept(4, If().type("PING"));
+        Rule &rule = accept;
+        std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+        REQUIRE(accept == *polymorphic_copy);
+    }
 }

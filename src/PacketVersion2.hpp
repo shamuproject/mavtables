@@ -19,13 +19,12 @@
 #define PACKETVERSION2_HPP_
 
 
+#include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include <cstdint>
 
 #include "mavlink.hpp"
-#include "Connection.hpp"
 #include "Packet.hpp"
 
 
@@ -75,10 +74,7 @@ namespace packet_v2
              *  \param other Packet to move from.
              */
             Packet(Packet &&other) = default;
-            Packet(
-                std::vector<uint8_t> data,
-                std::weak_ptr<Connection> connection,
-                int priority = 0);
+            Packet(std::vector<uint8_t> data);
             virtual ::Packet::Version version() const;
             virtual unsigned long id() const;
             virtual std::string name() const;

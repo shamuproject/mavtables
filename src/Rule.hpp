@@ -21,62 +21,81 @@
 
 #include <memory>
 #include <optional>
+#include <ostream>
 
 #include "Action.hpp"
-#include "Chain.hpp"
-#include "Conditional.hpp"
+#include "If.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include "RecursionChecker.hpp"
 
 
-/** A rule used in filter \ref Chains.
+/** Base class of all rules, used in filter \ref Chain's.
  *
- * Rules are used to determine an \ref Action to take with a packet based on its
- * type, source address, and destination address.  The are very much like the
- * rules found in typical software defined firewalls.
+ *  Rules are used to determine an \ref Action to take with a packet based on
+ *  its type, source address, and destination address.  The are very much like
+ *  the rules found in typical software defined firewalls.
  */
 class Rule
 {
-    private:
-        std::unique_ptr<Action> action_;
-        std::optional<Conditional> condition_;
-        std::optional<int> priority_;
+    protected:
+        std::optional<If> condition_;
+        /** Print the rule to the given output stream.
+         *
+         *  \param os The output stream to print to.
+         *  \return The output stream.
+         */
+        virtual std::ostream &print_(std::ostream &os) const = 0;
 
     public:
-        Rule();
-        Rule(const Rule &other);
-        /** Move constructor.
+        Rule(std::optional<If> condition = {});
+        virtual ~Rule();  // Clang does not like pure virtual destructors.
+        /** Decide what to do with a \ref Packet.
          *
-         * \param other Rule to move from.
-         */
-        Rule(Rule &&other) = default;
-        Rule(std::unique_ptr<Action> action,
-             std::optional<Conditional> condition = {});
-        Rule &accept();
-        Rule &reject();
-        Rule &call(std::shared_ptr<Chain> chain);
-        Rule &goto_(std::shared_ptr<Chain> chain);
-        Rule &with_priority(int priority);
-        Conditional &if_();
-        Action::Option action(
-            Packet &packet, const MAVAddress &address,
-            RecursionChecker &recursion_checker) const;
-        Rule &operator=(const Rule &other);
-        /** Assignment operator (by move semantics).
+         *  Determine what action to take with the given \p packet sent to the
+         *  given \p address.  The possible actions are documented in the \ref
+         *  Action class.  The continue object is always returned if the
+         *  condition was set and does not match the packet/address combination.
          *
-         * \param other Rule to move from.
+         *  \param packet The packet to determine whether to allow or not.
+         *  \param address The address the \p packet will be sent out on if the
+         *      action allows it.
+         *  \param recursion_checker A recursion checker used to ensure infinite
+         *      recursion does not occur.
+         *  \returns The action to take with the packet.  If this is the accept
+         *      object, it may also contain a priority for the packet.
          */
-        Rule &operator=(Rule &&other) = default;
+        virtual Action action(
+            const Packet &packet, const MAVAddress &address,
+            RecursionChecker &recursion_checker) const = 0;
+        /** Return a copy of the Rule polymorphically.
+         *
+         *  This allows Rule's to be copied without knowing the derived type.
+         *
+         *  \returns A pointer to a new object with base type \ref Rule which
+         *      is an exact copy of this one.
+         */
+        virtual std::unique_ptr<Rule> clone() const = 0;
+        /** Equality comparison.
+         *
+         *  \param other The other rule to compare this to.
+         *  \retval true if this rule is the same as \p other.
+         *  \retval false if this rule is not the same as \p other.
+         */
+        virtual bool operator==(const Rule &other) const = 0;
+        /** Inequality comparison.
+         *
+         *  \param other The other rule to compare this to.
+         *  \retval true if this rule is not the same as \p other.
+         *  \retval false if this rule is the same as \p other.
+         */
+        virtual bool operator!=(const Rule &other) const = 0;
 
-        friend bool operator==(const Rule &lhs, const Rule &rhs);
-        friend bool operator!=(const Rule &lhs, const Rule &rhs);
-        friend std::ostream &operator<<(std::ostream &os, const Rule &rule);
-
+        friend std::ostream &operator<<(std::ostream &os, const Rule &action);
 };
 
 
-bool operator==(const Rule &lhs, const Rule &rhs);
-bool operator!=(const Rule &lhs, const Rule &rhs);
-std::ostream &operator<<(std::ostream &os, const Rule &rule);
+std::ostream &operator<<(std::ostream &os, const Rule &action);
 
 
 #endif // RULE_HPP_

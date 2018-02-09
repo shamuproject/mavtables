@@ -22,6 +22,9 @@
 #include <string>
 
 #include "Action.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
+#include "RecursionChecker.hpp"
 
 
 class Chain
@@ -30,8 +33,8 @@ class Chain
         const std::string name;
         Chain(std::string name_);
         virtual ~Chain() = default;
-        virtual Action::Option action(
-            Packet &packet, const MAVAddress &address,
+        virtual Action action(
+            const Packet &packet, const MAVAddress &address,
             RecursionChecker &recursion_checker) const;
 
 };

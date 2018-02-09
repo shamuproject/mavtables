@@ -17,88 +17,126 @@
 
 #include <catch.hpp>
 
-#include "util.hpp"
+#include "Action.hpp"
+#include "If.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "MAVAddress.hpp"
 #include "RecursionChecker.hpp"
-#include "Action.hpp"
 #include "Reject.hpp"
+#include "Rule.hpp"
+#include "util.hpp"
 
 #include "common_Packet.hpp"
 
 
-TEST_CASE("Reject's can be constructed.", "[Reject]")
+TEST_CASE("Reject's are constructable.", "[Reject]")
 {
-    REQUIRE_NOTHROW(Reject());
+    SECTION("Without a condition (match all packet/address combinations).")
+    {
+        REQUIRE_NOTHROW(Reject());
+    }
+    SECTION("With a condition.")
+    {
+        REQUIRE_NOTHROW(Reject(If()));
+        REQUIRE_NOTHROW(Reject(If().type("PING")));
+        REQUIRE_NOTHROW(Reject(If().from("192.168")));
+        REQUIRE_NOTHROW(Reject(If().to("172.16")));
+    }
 }
 
 
 TEST_CASE("Reject's are comparable.", "[Reject]")
 {
-    REQUIRE(Reject() == Reject());
-    REQUIRE_FALSE(Reject() != Reject());
+    SECTION("with ==")
+    {
+        REQUIRE(Reject() == Reject());
+        REQUIRE(Reject(If().type("PING")) == Reject(If().type("PING")));
+        REQUIRE_FALSE(
+            Reject(If().type("PING")) == Reject(If().type("SET_MODE")));
+        REQUIRE_FALSE(Reject(If().type("PING")) == Reject(If()));
+        REQUIRE_FALSE(Reject(If().type("PING")) == Reject());
+    }
+    SECTION("with !=")
+    {
+        REQUIRE(Reject(If().type("PING")) != Reject());
+        REQUIRE(Reject(If().type("PING")) != Reject(If()));
+        REQUIRE(Reject(If().type("PING")) != Reject(If().type("SET_MODE")));
+        REQUIRE_FALSE(Reject() != Reject());
+        REQUIRE_FALSE(Reject(If().type("PING")) != Reject(If().type("PING")));
+    }
 }
 
 
-TEST_CASE("Reject's 'action' method always returns Action::REJECT.", "[Reject]")
+TEST_CASE("Reject's 'action' method determines what to do with a "
+          "packet/address combination.", "[Reject]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
     RecursionChecker rc;
-    Reject reject;
-    REQUIRE(reject.action(ping, MAVAddress("192.0"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.1"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.2"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.3"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(reject.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.0"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.1"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.2"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.3"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(reject.action(hb, MAVAddress("192.7"), rc) == Action::REJECT);
+    SECTION("Returns the reject action if there is no conditional.")
+    {
+        REQUIRE(
+            Reject().action(ping, MAVAddress("192.168"), rc) ==
+            Action::make_reject());
+    }
+    SECTION("Returns the reject action if the conditional is a match.")
+    {
+        REQUIRE(
+            Reject(If().type("PING")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_reject());
+        REQUIRE(
+            Reject(If().to("192.168")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_reject());
+    }
+    SECTION("Returns the continue action if the conditional does not match.")
+    {
+        REQUIRE(
+            Reject(If().type("SET_MODE")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+        REQUIRE(
+            Reject(If().to("172.16")).action(
+                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+    }
 }
 
 
-TEST_CASE("Reject's are printable.", "[Reject]")
+TEST_CASE("Reject's are printable (without a condition).", "[Reject]")
 {
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
     Reject reject;
-    Action &action = reject;
+    Rule &rule = reject;
     SECTION("By direct type.")
     {
         REQUIRE(str(reject) == "reject");
     }
     SECTION("By polymorphic type.")
     {
-        REQUIRE(str(reject) == "reject");
+        REQUIRE(str(rule) == "reject");
+    }
+}
+
+
+TEST_CASE("Reject's are printable (with a condition).", "[Reject]")
+{
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
+    Reject reject(If().type("PING").from("192.168/8").to("172.16/4"));
+    Rule &rule = reject;
+    SECTION("By direct type.")
+    {
+        REQUIRE(str(reject) == "reject if PING from 192.168/8 to 172.16/4");
+    }
+    SECTION("By polymorphic type.")
+    {
+        REQUIRE(str(rule) == "reject if PING from 192.168/8 to 172.16/4");
     }
 }
 
 
 TEST_CASE("Reject's 'clone' method returns a polymorphic copy.", "[Reject]")
 {
-    // Note: String comparisons are used because Action's are not comparable.
-    Reject reject;
-    Action &action = reject;
-    std::unique_ptr<Action> polymorphic_copy = action.clone();
-    REQUIRE(str(reject) == str(*polymorphic_copy));
-}
-
-
-// Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (Reject).", "[Reject]")
-{
-    Reject *reject = nullptr;
-    REQUIRE_NOTHROW(reject = new Reject());
-    REQUIRE_NOTHROW(delete reject);
+    Reject reject(If().type("PING"));
+    Rule &rule = reject;
+    std::unique_ptr<Rule> polymorphic_copy = rule.clone();
+    REQUIRE(reject == *polymorphic_copy);
 }

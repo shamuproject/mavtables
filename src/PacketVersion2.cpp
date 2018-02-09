@@ -15,36 +15,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
-#include <vector>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <sstream>
-#include <cstdint>
-#include <cstdlib>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include "mavlink.hpp"
-#include "Connection.hpp"
 #include "PacketVersion2.hpp"
 
 
 namespace packet_v2
 {
 
-    /** Construct a packet.
-     *
-     *  \param data Raw packet data.
-     *  \param connection Connection packet was received on.
-     *  \param priority Set the priority (default is 0).
+    /** \copydoc ::Packet::Packet(std::vector<uint8_t> data)
      *
      *  \throws std::invalid_argument If packet data does not start with magic
      *      byte (0xFD).
      *  \throws std::length_error If packet data is not of correct length.
      */
-    Packet::Packet(
-        std::vector<uint8_t> data,
-        std::weak_ptr<Connection> connection, int priority)
-        : ::Packet(std::move(data), std::move(connection), priority)
+    Packet::Packet(std::vector<uint8_t> data)
+        : ::Packet(std::move(data))
     {
         const std::vector<uint8_t> &packet_data = this->data();
 
@@ -245,7 +238,7 @@ namespace packet_v2
 
     /** Determine if a MAVLink v2.0 packet is signed or not.
      *
-     *  \relates Packet
+     *  \relates packet_v2::Packet
      *  \throws std::invalid_argument Header is not complete or is invalid.
      *  \throws std::length_error If packet data is not of correct length.
      */
@@ -263,7 +256,7 @@ namespace packet_v2
 
     /** Determine if the given data contains a complete v2.0 header.
      *
-     *  \relates Packet
+     *  \relates packet_v2::Packet
      *  \retval true if \p data contains a complete header (starting with the
      *      magic byte).
      *  \retval false if \p data contains does not contain a complete v2.0
@@ -278,7 +271,7 @@ namespace packet_v2
 
     /** Determine if the given data contains a complete v1.0 packet.
      *
-     *  \relates Packet
+     *  \relates packet_v2::Packet
      *  \retval true if \p data contains a complete packet (starting with the
      *      magic byte).
      *  \retval false if \p data contains does not contain a complete v1.0

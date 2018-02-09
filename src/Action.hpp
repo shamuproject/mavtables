@@ -19,96 +19,66 @@
 #define ACTION_HPP_
 
 
-#include <memory>
+#include <optional>
 #include <ostream>
 
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
-#include "RecursionChecker.hpp"
 
-
-/** Base class of all rule actions.
+/** An action that is to be taken with a packet.
  *
- *  These are used as the actions of a \ref Rule to determine what to do with a
- *  \ref Packet if it matches the \ref Rule.
+ *  This is used as a return value to determine what to do with a packet.
  */
 class Action
 {
-    protected:
-        /** Print the action to the given output stream.
-         *
-         *  \param os The output stream to print to.
-         *  \return The output stream.
-         */
-        virtual std::ostream &print_(std::ostream &os) const = 0;
-
     public:
-        /** Filter rule actions.
+        /** Possible actions.
          */
         enum Option
         {
-            ACCEPT,     //!< The packet has been accepted and should be
-            //!< delivered to the given \p address.
-            REJECT,     //!< The packet has been rejected and should not be
-            //!< delivered to the given \p address.
-            CONTINUE,   //!< Whether the packet will be accepted or rejected
-            //!< has not yet been decided and rule checking should
-            //!< continue.
-            DEFAULT     //!< Whether the packet will be accepted or rejected
-            //!< should be decided by the global default action.
+            ACCEPT,   //!< The packet has been accepted, possibly with priority.
+            REJECT,   //!< The packet has been rejected.
+            CONTINUE, //!< Continue evaluating rules.
+            DEFAULT   //!< Use the default rule.
         };
-        virtual ~Action();  // Clang does not like pure virtual destructors.
-        /** Return a copy of the Action polymorphically.
-         *
-         *  This allows Action's to be copied without knowing the derived type.
-         *
-         *  \returns A pointer to a new object with base type \ref Action which
-         *      is an exact copy of this one.
+        /** The action that has been chosen.
          */
-        virtual std::unique_ptr<Action> clone() const = 0;
-        /** Decide what to do with a \ref Packet.
-         *
-         *  Determine what action to take with the given \p packet sent to the
-         *  given \p address.  The possible actions are documented in the \ref
-         *  Action::Option enum.
-         *
-         *  \param packet The packet to determine whether to allow or not.
-         *  \param address The address the \p packet will be sent out on if the
-         *      action allows it.
-         *  \param recursion_checker A recursion checker used to ensure infinite
-         *      recursion does not occur.
-         *  \retval Action::ACCEPT The packet is allowed to be sent to \p
-         *      address.
-         *  \retval Action::REJECT The packet is not allowed to be sent to \p
-         *      address.
-         *  \retval Action::CONTINUE The action to take on packet is not decided
-         *      yet.
-         *  \retval Action::DEFAULT Use the global default action.
-         *
-         *  The packet is not allowed to be sent to \p address.
-         */
-        virtual Action::Option action(
-            Packet &packet, const MAVAddress &address,
-            RecursionChecker &recursion_checker) const = 0;
-        /** Equality comparison.
-         *
-         *  \param other The other action  to compare this to.
-         *  \retval true if this action is the same as \p other.
-         *  \retval false if this action is not the same as \p other.
-         */
-        virtual bool operator==(const Action &other) const = 0;
-        /** Inequality comparison.
-         *
-         *  \param other The other action  to compare this to.
-         *  \retval true if this action is not the same as \p other.
-         *  \retval false if this action is the same as \p other.
-         */
-        virtual bool operator!=(const Action &other) const = 0;
+        const Action::Option action;
 
-        friend std::ostream &operator<<(std::ostream &os, const Action &action);
+    private:
+        // Note: The reason this is optional is because there is a difference
+        //       between {} and 0.  This is because a priority of {} can still
+        //       be set to something other than 0 by a higher level rule (see
+        //       \ref Call or \ref GoTo) while if the priority has been set to 0
+        //       it cannot be set again.
+        std::optional<int> priority_;
+        Action() = delete;
+        Action(Action::Option action, std::optional<int> priority = {});
+
+    public:
+        /** Copy constructor.
+         *
+         *  \param other Action to copy.
+         */
+        Action(const Action &other) = default;
+        /** Move constructor.
+         *
+         *  \param other Action to move from.
+         */
+        Action(Action &&other) = default;
+        void priority(int priority);
+        int priority() const;
+        Action &operator=(const Action &other) = delete;
+        Action &operator=(Action &&other) = delete;
+
+        static Action make_accept(std::optional<int> priority = {});
+        static Action make_reject();
+        static Action make_continue();
+        static Action make_default();
+
 };
 
 
+bool operator==(const Action &lhs, const Action &rhs);
+bool operator!=(const Action &lhs, const Action &rhs);
 std::ostream &operator<<(std::ostream &os, const Action &action);
 
 

@@ -15,143 +15,140 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <ostream>
+#include <utility>
 
 #include <catch.hpp>
 
-#include "util.hpp"
-#include "Packet.hpp"
-#include "PacketVersion1.hpp"
-#include "PacketVersion2.hpp"
-#include "MAVAddress.hpp"
-#include "MAVSubnet.hpp"
-#include "RecursionChecker.hpp"
 #include "Action.hpp"
+#include "util.hpp"
 
-#include "common_Packet.hpp"
 
-
-namespace
+TEST_CASE("Action's 'make_accept' factory method constructs an ACCEPT action.",
+          "[Action]")
 {
-
-    class ActionTestClass : public Action
+    SECTION("Without a priority.")
     {
-        protected:
-            virtual std::ostream &print_(std::ostream &os) const
-            {
-                os << "test";
-                return os;
-            }
-
-        public:
-            virtual std::unique_ptr<Action> clone() const
-            {
-                return std::make_unique<ActionTestClass>();
-            }
-            virtual Action::Option action(
-                Packet &packet, const MAVAddress &address,
-                RecursionChecker &recursion_checker) const
-            {
-                (void)recursion_checker;
-
-                if (packet.name() == "PING")
-                {
-                    if (MAVSubnet("192.0/14").contains(address))
-                    {
-                        return Action::ACCEPT;
-                    }
-
-                    return Action::REJECT;
-                }
-
-                return Action::CONTINUE;
-            }
-            virtual bool operator==(const Action &other) const
-            {
-                (void)other;
-                return true;
-            }
-            virtual bool operator!=(const Action &other) const
-            {
-                (void)other;
-                return false;
-            }
-    };
-
+        auto result = Action::make_accept();
+        REQUIRE(result.action == Action::ACCEPT);
+        REQUIRE(result.priority() == 0);
+    }
+    SECTION("With a priority.")
+    {
+        auto result = Action::make_accept(-10);
+        REQUIRE(result.action == Action::ACCEPT);
+        REQUIRE(result.priority() == -10);
+    }
 }
 
 
-TEST_CASE("Action's can be constructed.", "[Action]")
+TEST_CASE("Action's 'make_reject' factory method constructs a REJECT action.",
+          "[Action]")
 {
-    REQUIRE_NOTHROW(ActionTestClass());
+    auto result = Action::make_reject();
+    REQUIRE(result.action == Action::REJECT);
+    REQUIRE(result.priority() == 0);
+}
+
+
+TEST_CASE("Action's 'make_continue' factory method constructs a CONTINUE "
+          "action.", "[Action]")
+{
+    auto result = Action::make_continue();
+    REQUIRE(result.action == Action::CONTINUE);
+    REQUIRE(result.priority() == 0);
+}
+
+
+TEST_CASE("Action's 'make_default' factory method constructs a DEFAULT action.",
+          "[Action]")
+{
+    auto result = Action::make_default();
+    REQUIRE(result.action == Action::DEFAULT);
+    REQUIRE(result.priority() == 0);
+}
+
+
+TEST_CASE("Action's 'priority' method sets and gets the priority.",
+          "[Action]")
+{
+    SECTION("Can be set exactly once for accept results without a priority.")
+    {
+        auto result = Action::make_accept();
+        REQUIRE(result.priority() == 0);
+        result.priority(10);
+        REQUIRE(result.priority() == 10);
+        result.priority(100);
+        REQUIRE(result.priority() == 10);
+    }
+    SECTION("Cannot be set for accept results with a priority.")
+    {
+        auto result = Action::make_accept(10);
+        REQUIRE(result.priority() == 10);
+        result.priority(100);
+        REQUIRE(result.priority() == 10);
+    }
+    SECTION("Cannot be set on reject, continue, or default actions.")
+    {
+        auto reject = Action::make_reject();
+        reject.priority(10);
+        REQUIRE(reject.priority() == 0);
+        auto continue_ = Action::make_continue();
+        continue_.priority(10);
+        REQUIRE(continue_.priority() == 0);
+        auto default_ = Action::make_default();
+        default_.priority(10);
+        REQUIRE(default_.priority() == 0);
+    }
 }
 
 
 TEST_CASE("Action's are comparable.", "[Action]")
 {
-    REQUIRE(ActionTestClass() == ActionTestClass());
-    REQUIRE_FALSE(ActionTestClass() != ActionTestClass());
-}
-
-
-TEST_CASE("Action's determine what to do with a packet with respect to a "
-          "destination address.", "[Action]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto hb = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    RecursionChecker rc;
-    ActionTestClass action;
-    REQUIRE(action.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.1"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.2"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.3"), rc) == Action::ACCEPT);
-    REQUIRE(action.action(ping, MAVAddress("192.4"), rc) == Action::REJECT);
-    REQUIRE(action.action(ping, MAVAddress("192.5"), rc) == Action::REJECT);
-    REQUIRE(action.action(ping, MAVAddress("192.6"), rc) == Action::REJECT);
-    REQUIRE(action.action(ping, MAVAddress("192.7"), rc) == Action::REJECT);
-    REQUIRE(action.action(hb, MAVAddress("192.0"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.1"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.2"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.3"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.4"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.5"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.6"), rc) == Action::CONTINUE);
-    REQUIRE(action.action(hb, MAVAddress("192.7"), rc) == Action::CONTINUE);
-}
-
-
-TEST_CASE("Action's are printable.", "[Action]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    ActionTestClass action;
-    Action &polymorphic = action;
-    SECTION("By direct type.")
+    SECTION("with ==")
     {
-        REQUIRE(str(action) == "test");
+        REQUIRE(Action::make_accept() == Action::make_accept());
+        REQUIRE(Action::make_accept(10) == Action::make_accept(10));
+        REQUIRE_FALSE(Action::make_accept(1) == Action::make_accept());
+        REQUIRE_FALSE(Action::make_accept(1) == Action::make_accept(-1));
+        REQUIRE_FALSE(Action::make_accept() == Action::make_reject());
+        REQUIRE_FALSE(Action::make_accept() == Action::make_continue());
+        REQUIRE_FALSE(Action::make_accept() == Action::make_default());
     }
-    SECTION("By polymorphic type.")
+    SECTION("with !=")
     {
-        REQUIRE(str(polymorphic) == "test");
+        REQUIRE(Action::make_accept(1) != Action::make_accept());
+        REQUIRE(Action::make_accept(1) != Action::make_accept(-1));
+        REQUIRE(Action::make_accept() != Action::make_reject());
+        REQUIRE(Action::make_accept() != Action::make_continue());
+        REQUIRE(Action::make_accept() != Action::make_default());
+        REQUIRE_FALSE(Action::make_accept() != Action::make_accept());
+        REQUIRE_FALSE(Action::make_accept(10) != Action::make_accept(10));
     }
 }
 
 
-TEST_CASE("Action's 'clone' method returns a polymorphic copy.", "[Action]")
+TEST_CASE("Action's are copyable.", "[Action]")
 {
-    // Note: String comparisons are used because Action's are not comparable.
-    ActionTestClass action;
-    Action &polymorphic = action;
-    std::unique_ptr<Action> polymorphic_copy = polymorphic.clone();
-    REQUIRE(str(action) == str(*polymorphic_copy));
+    auto original = Action::make_accept(10);
+    auto copy(original);
+    REQUIRE(copy == Action::make_accept(10));
 }
 
 
-// Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (Action).", "[Action]")
+TEST_CASE("Action's are movable.", "[Action]")
 {
-    ActionTestClass *action = nullptr;
-    REQUIRE_NOTHROW(action = new ActionTestClass());
-    REQUIRE_NOTHROW(delete action);
+    auto original = Action::make_accept(10);
+    auto moved(std::move(original));
+    REQUIRE(moved == Action::make_accept(10));
+}
+
+
+TEST_CASE("Action's are printable.")
+{
+    REQUIRE(str(Action::make_accept()) == "accept");
+    REQUIRE(str(Action::make_accept(-10)) == "accept with priority -10");
+    REQUIRE(str(Action::make_accept(10)) == "accept with priority 10");
+    REQUIRE(str(Action::make_reject()) == "reject");
+    REQUIRE(str(Action::make_continue()) == "continue");
+    REQUIRE(str(Action::make_default()) == "default");
 }

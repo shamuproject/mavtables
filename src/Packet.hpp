@@ -19,18 +19,17 @@
 #define PACKET_HPP_
 
 
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <memory>
-#include <cstdint>
-#include <ostream>
-#include <optional>
 
 #include "MAVAddress.hpp"
-#include "Connection.hpp"
 
 
-/** A MAVLink packet with a reference to the connection it arrived on.
+/** A MAVLink packet.
  *
  *  This is an abstract class, it is meant to be overridden by classes
  *  implementing either version 1 or version 2 of the MAVLink packet wire
@@ -40,8 +39,6 @@ class Packet
 {
     private:
         std::vector<uint8_t> data_;
-        std::weak_ptr<Connection> connection_;
-        int priority_;
 
     public:
         enum Version {V1 = 0x0100, V2 = 0x0200};
@@ -56,10 +53,8 @@ class Packet
          *  \param other Packet to move from.
          */
         Packet(Packet &&other) = default;
-        Packet(std::vector<uint8_t> data, std::weak_ptr<Connection> connection,
-               int priority = 0);
+        Packet(std::vector<uint8_t> data);
         virtual ~Packet();  // Clang does not like pure virtual destructors.
-        std::weak_ptr<Connection> connection() const;
         /** Return packet version.
          *
          *  \returns Two byte Packet version with major version in MSB and minor
@@ -93,8 +88,6 @@ class Packet
          *      broadcast packet.
          */
         virtual std::optional<MAVAddress> dest() const = 0;
-        int priority() const;
-        int priority(int priority);
         const std::vector<uint8_t> &data() const;
         /** Assignment operator.
          *
@@ -110,6 +103,8 @@ class Packet
 };
 
 
+bool operator==(const Packet &lhs, const Packet &rhs);
+bool operator!=(const Packet &lhs, const Packet &rhs);
 std::ostream &operator<<(std::ostream &os, const Packet &packet);
 
 

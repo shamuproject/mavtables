@@ -15,365 +15,157 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <memory>
-#include <utility>
+#include <ostream>
 
 #include <catch.hpp>
-#include <fakeit.hpp>
 
 #include "Action.hpp"
-#include "Accept.hpp"
-#include "Call.hpp"
-#include "GoTo.hpp"
+#include "If.hpp"
+#include "MAVAddress.hpp"
+#include "MAVSubnet.hpp"
+#include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "Reject.hpp"
+#include "RecursionChecker.hpp"
 #include "Rule.hpp"
 #include "util.hpp"
 
-#include "ChainTestClass.hpp"
 #include "common_Packet.hpp"
 
 
-TEST_CASE("Rule's are constructable.", "[Rule]")
+namespace
 {
-    auto chain = std::make_shared<ChainTestClass>("test_chain");
-    SECTION("With the default constructor.")
+
+    class RuleTestClass : public Rule
     {
-        REQUIRE_NOTHROW(Rule());
-    }
-    SECTION("With action only.  Match all packet/address combinations.")
-    {
-        REQUIRE_NOTHROW(Rule(std::make_unique<Accept>()));
-        REQUIRE_NOTHROW(Rule(std::make_unique<Reject>()));
-        REQUIRE_NOTHROW(Rule(std::make_unique<Call>(chain)));
-        REQUIRE_NOTHROW(Rule(std::make_unique<GoTo>(chain)));
-    }
-    SECTION("Ensures action is not nullptr.")
-    {
-        REQUIRE_THROWS_AS(Rule(nullptr), std::invalid_argument);
-        REQUIRE_THROWS_WITH(Rule(nullptr), "Given Action pointer is null.");
-    }
-    SECTION("With action and condition.")
-    {
-        REQUIRE_NOTHROW(Rule(std::make_unique<Accept>(), Conditional()));
-        REQUIRE_NOTHROW(
-            Rule(std::make_unique<Reject>(), Conditional().type("PING")));
-        REQUIRE_NOTHROW(
-            Rule(std::make_unique<Call>(chain), Conditional().from("192.168")));
-        REQUIRE_NOTHROW(
-            Rule(std::make_unique<GoTo>(chain), Conditional().to("172.16")));
-    }
+        protected:
+            virtual std::ostream &print_(std::ostream &os) const
+            {
+                os << "test_rule";
+                return os;
+            }
+
+        public:
+            virtual std::unique_ptr<Rule> clone() const
+            {
+                return std::make_unique<RuleTestClass>();
+            }
+            virtual Action action(
+                const Packet &packet, const MAVAddress &address,
+                RecursionChecker &recursion_checker) const
+            {
+                (void)recursion_checker;
+
+                if (packet.name() == "PING")
+                {
+                    if (MAVSubnet("192.0/14").contains(address))
+                    {
+                        return Action::make_accept();
+                    }
+
+                    return Action::make_reject();
+                }
+
+                return Action::make_continue();
+            }
+            virtual bool operator==(const Rule &other) const
+            {
+                (void)other;
+                return true;
+            }
+            virtual bool operator!=(const Rule &other) const
+            {
+                (void)other;
+                return false;
+            }
+    };
+
+}
+
+
+TEST_CASE("Rule's can be constructed.", "[Rule]")
+{
+    REQUIRE_NOTHROW(RuleTestClass());
 }
 
 
 TEST_CASE("Rule's are comparable.", "[Rule]")
 {
-    auto chain1 = std::make_shared<ChainTestClass>("test_chain_1");
-    auto chain2 = std::make_shared<ChainTestClass>("test_chain_2");
-    SECTION("with ==")
-    {
-        // True
-        REQUIRE(Rule() == Rule());
-        REQUIRE(Rule(std::make_unique<Accept>()) ==
-                Rule(std::make_unique<Accept>()));
-        REQUIRE(Rule(std::make_unique<Accept>()).with_priority(10) ==
-                Rule(std::make_unique<Accept>()).with_priority(10));
-        REQUIRE(Rule(std::make_unique<Reject>(), Conditional().type("PING")) ==
-                Rule(std::make_unique<Reject>(), Conditional().type("PING")));
-        // False
-        REQUIRE_FALSE(Rule(std::make_unique<Accept>()) == Rule());
-        REQUIRE_FALSE(
-            Rule(std::make_unique<Accept>()) ==
-            Rule(std::make_unique<Reject>()));
-        REQUIRE_FALSE(
-            Rule(std::make_unique<Accept>()).with_priority(1) ==
-            Rule(std::make_unique<Accept>()).with_priority(10));
-        REQUIRE_FALSE(
-            Rule(std::make_unique<Reject>(), Conditional().type("PING")) ==
-            Rule(std::make_unique<Reject>(), Conditional().type("DEBUG")));
-    }
-    SECTION("with !=")
-    {
-        // True
-        REQUIRE(Rule(std::make_unique<Accept>()) != Rule());
-        REQUIRE(
-            Rule(std::make_unique<Accept>()) !=
-            Rule(std::make_unique<Reject>()));
-        REQUIRE(
-            Rule(std::make_unique<Accept>()).with_priority(1) !=
-            Rule(std::make_unique<Accept>()).with_priority(10));
-        REQUIRE(
-            Rule(std::make_unique<Reject>(), Conditional().type("PING")) !=
-            Rule(std::make_unique<Reject>(), Conditional().type("DEBUG")));
-        // False
-        REQUIRE_FALSE(Rule() != Rule());
-        REQUIRE_FALSE(
-            Rule(std::make_unique<Accept>()) !=
-            Rule(std::make_unique<Accept>()));
-        REQUIRE_FALSE(
-            Rule(std::make_unique<Accept>()).with_priority(10) !=
-            Rule(std::make_unique<Accept>()).with_priority(10));
-        REQUIRE_FALSE(
-            Rule(std::make_unique<Reject>(), Conditional().type("PING")) !=
-            Rule(std::make_unique<Reject>(), Conditional().type("PING")));
-    }
+    REQUIRE(RuleTestClass() == RuleTestClass());
+    REQUIRE_FALSE(RuleTestClass() != RuleTestClass());
 }
 
 
-TEST_CASE("Rule's are copyable.", "[Rule]")
+TEST_CASE("Rule's 'action' method determine what to do with a packet withu "
+          "respect to a destination address.", "[Rule]")
 {
-    Rule original(Rule(std::make_unique<Accept>(), Conditional().type("PING")));
-    original.with_priority(10);
-    Rule copy(original);
-    Rule rule_for_comparison(
-        std::make_unique<Accept>(), Conditional().type("PING"));
-    rule_for_comparison.with_priority(10);
-    REQUIRE(copy == rule_for_comparison);
-}
-
-
-TEST_CASE("Rule's are movable.", "[Rule]")
-{
-    Rule original(Rule(std::make_unique<Accept>(), Conditional().type("PING")));
-    original.with_priority(10);
-    Rule moved(std::move(original));
-    Rule rule_for_comparison(
-        std::make_unique<Accept>(), Conditional().type("PING"));
-    rule_for_comparison.with_priority(10);
-    REQUIRE(moved == rule_for_comparison);
-}
-
-
-TEST_CASE("Rule's are assignable.", "[Rule]")
-{
-    Rule a(std::make_unique<Accept>(), Conditional().type("PING"));
-    a.with_priority(10);
-    Rule b(std::make_unique<Reject>(), Conditional().type("DEBUG"));
-    b.with_priority(1);
-    Rule rule_for_comparison_a(
-        std::make_unique<Accept>(), Conditional().type("PING"));
-    rule_for_comparison_a.with_priority(10);
-    REQUIRE(a == rule_for_comparison_a);
-    a = b;
-    Rule rule_for_comparison_b(
-        std::make_unique<Reject>(), Conditional().type("DEBUG"));
-    rule_for_comparison_b.with_priority(1);
-    REQUIRE(a == rule_for_comparison_b);
-}
-
-
-TEST_CASE("Rule's are assignable (by move semantics).", "[Rule]")
-{
-    Rule a(std::make_unique<Accept>(), Conditional().type("PING"));
-    a.with_priority(10);
-    Rule b(std::make_unique<Reject>(), Conditional().type("DEBUG"));
-    b.with_priority(1);
-    Rule rule_for_comparison_a(
-        std::make_unique<Accept>(), Conditional().type("PING"));
-    rule_for_comparison_a.with_priority(10);
-    REQUIRE(a == rule_for_comparison_a);
-    a = std::move(b);
-    Rule rule_for_comparison_b(
-        std::make_unique<Reject>(), Conditional().type("DEBUG"));
-    rule_for_comparison_b.with_priority(1);
-    REQUIRE(a == rule_for_comparison_b);
-}
-
-
-TEST_CASE("Rule's 'action' method determines what to do with a packet.",
-          "[Rule]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto chain = std::make_shared<ChainTestClass>("test_chain");
+    auto ping = packet_v1::Packet(to_vector(PingV1()));
+    auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));
     RecursionChecker rc;
-    SECTION("When no conditional is supplied.")
-    {
-        REQUIRE(Rule(std::make_unique<Accept>()).action(
-                    ping, MAVAddress("192.168"), rc) == Action::ACCEPT);
-        REQUIRE(Rule(std::make_unique<Reject>()).action(
-                    ping, MAVAddress("192.168"), rc) == Action::REJECT);
-        REQUIRE(Rule(std::make_unique<Call>(chain)).action(
-                    ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-        REQUIRE(Rule(std::make_unique<Call>(chain)).action(
-                    ping, MAVAddress("192.168"), rc) == Action::REJECT);
-        REQUIRE(Rule(std::make_unique<GoTo>(chain)).action(
-                    ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-        REQUIRE(Rule(std::make_unique<GoTo>(chain)).action(
-                    ping, MAVAddress("192.168"), rc) == Action::REJECT);
-        REQUIRE(Rule(std::make_unique<Accept>()).action(
-                    heartbeat, MAVAddress("192.168"), rc) == Action::ACCEPT);
-        REQUIRE(Rule(std::make_unique<Reject>()).action(
-                    heartbeat, MAVAddress("192.168"), rc) == Action::REJECT);
-        REQUIRE(Rule(std::make_unique<Call>(chain)).action(
-                    heartbeat, MAVAddress("192.0"), rc) == Action::CONTINUE);
-        REQUIRE(Rule(std::make_unique<Call>(chain)).action(
-                    heartbeat, MAVAddress("192.168"), rc) == Action::CONTINUE);
-        REQUIRE(Rule(std::make_unique<GoTo>(chain)).action(
-                    heartbeat, MAVAddress("192.0"), rc) == Action::DEFAULT);
-        REQUIRE(Rule(std::make_unique<GoTo>(chain)).action(
-                    heartbeat, MAVAddress("192.168"), rc) == Action::DEFAULT);
-    }
-    SECTION("When a conditional is supplied.")
-    {
-        REQUIRE(Rule(std::make_unique<Accept>(), Conditional(4)).action(
-                    ping, MAVAddress("192.168"), rc) == Action::ACCEPT);
-        REQUIRE(Rule(std::make_unique<Accept>(), Conditional(4)).action(
-                    heartbeat, MAVAddress("192.168"), rc) == Action::CONTINUE);
-    }
-    SECTION("Can set the priority of the packet.")
-    {
-        Rule(std::make_unique<Accept>()).with_priority(0).action(
-            ping, MAVAddress("192.168"), rc);
-        REQUIRE(ping.priority() == 0);
-        Rule(std::make_unique<Accept>()).with_priority(-5).action(
-            ping, MAVAddress("192.168"), rc);
-        REQUIRE(ping.priority() == -5);
-        Rule(std::make_unique<Accept>()).with_priority(5).action(
-            ping, MAVAddress("192.168"), rc);
-        REQUIRE(ping.priority() == 5);
-    }
-}
-
-
-TEST_CASE("Rule's 'accept' method sets the action to Accept.", "[Rule]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    RecursionChecker rc;
-    REQUIRE(Rule().accept().action(ping, MAVAddress("192.0"), rc) ==
-            Action::ACCEPT);
-    REQUIRE(Rule().accept().action(ping, MAVAddress("192.168"), rc) ==
-            Action::ACCEPT);
-    REQUIRE(Rule().accept().action(heartbeat, MAVAddress("192.0"), rc) ==
-            Action::ACCEPT);
-    REQUIRE(Rule().accept().action(heartbeat, MAVAddress("192.168"), rc) ==
-            Action::ACCEPT);
-}
-
-
-TEST_CASE("Rule's 'reject' method sets the action to Reject.", "[Rule]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    RecursionChecker rc;
-    REQUIRE(Rule().reject().action(ping, MAVAddress("192.0"), rc) ==
-            Action::REJECT);
-    REQUIRE(Rule().reject().action(ping, MAVAddress("192.168"), rc) ==
-            Action::REJECT);
-    REQUIRE(Rule().reject().action(heartbeat, MAVAddress("192.0"), rc) ==
-            Action::REJECT);
-    REQUIRE(Rule().reject().action(heartbeat, MAVAddress("192.168"), rc) ==
-            Action::REJECT);
-}
-
-
-TEST_CASE("Rule's 'call' method sets the action to Call.", "[Rule]")
-{
-    auto chain = std::make_shared<ChainTestClass>("test_chain");
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    RecursionChecker rc;
-    REQUIRE(Rule().call(chain).action(ping, MAVAddress("192.0"), rc) ==
-            Action::ACCEPT);
-    REQUIRE(Rule().call(chain).action(ping, MAVAddress("192.168"), rc) ==
-            Action::REJECT);
-    REQUIRE(Rule().call(chain).action(heartbeat, MAVAddress("192.0"), rc) ==
-            Action::CONTINUE);
-    REQUIRE(Rule().call(chain).action(heartbeat, MAVAddress("192.168"), rc) ==
-            Action::CONTINUE);
-}
-
-
-TEST_CASE("Rule's 'goto_' method sets the action to Goto.", "[Rule]")
-{
-    auto chain = std::make_shared<ChainTestClass>("test_chain");
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    RecursionChecker rc;
-    REQUIRE(Rule().goto_(chain).action(ping, MAVAddress("192.0"), rc) ==
-            Action::ACCEPT);
-    REQUIRE(Rule().goto_(chain).action(ping, MAVAddress("192.168"), rc) ==
-            Action::REJECT);
-    REQUIRE(Rule().goto_(chain).action(heartbeat, MAVAddress("192.0"), rc) ==
-            Action::DEFAULT);
-    REQUIRE(Rule().goto_(chain).action(heartbeat, MAVAddress("192.168"), rc) ==
-            Action::DEFAULT);
-}
-
-
-TEST_CASE("Rule's 'if_' method adds a conditional.", "[Rule]")
-{
-    auto conn = std::make_shared<ConnectionTestClass>();
-    auto ping = packet_v2::Packet(to_vector(PingV2()), conn);
-    auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()), conn);
-    RecursionChecker rc;
-    Rule rule;
-    SECTION("Adding type condition.")
-    {
-        rule.accept().if_().type("PING");
-        REQUIRE(rule.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-        REQUIRE(rule.action(heartbeat, MAVAddress("192.0"), rc) ==
-                Action::CONTINUE);
-        rule.accept().if_().type("HEARTBEAT");
-        REQUIRE(rule.action(ping, MAVAddress("192.0"), rc) == Action::CONTINUE);
-        REQUIRE(rule.action(heartbeat, MAVAddress("192.0"), rc) ==
-                Action::ACCEPT);
-    }
-    SECTION("Adding source subnet condition.")
-    {
-        rule.accept().if_().from("60.0/8");
-        REQUIRE(rule.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-        REQUIRE(rule.action(heartbeat, MAVAddress("192.0"), rc) ==
-                Action::CONTINUE);
-        rule.accept().if_().from("1.0/8");
-        REQUIRE(rule.action(ping, MAVAddress("192.0"), rc) == Action::CONTINUE);
-        REQUIRE(rule.action(heartbeat, MAVAddress("192.0"), rc) ==
-                Action::ACCEPT);
-    }
-    SECTION("Adding destination subnet condition.")
-    {
-        rule.accept().if_().to("192.0/8");
-        REQUIRE(rule.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-        REQUIRE(rule.action(ping, MAVAddress("192.168"), rc) == Action::ACCEPT);
-        rule.accept().if_().to("192.0");
-        REQUIRE(rule.action(ping, MAVAddress("192.0"), rc) == Action::ACCEPT);
-        REQUIRE(rule.action(ping, MAVAddress("192.168"), rc) ==
-                Action::CONTINUE);
-    }
+    RuleTestClass rule;
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.0"), rc) == Action::make_accept());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.1"), rc) == Action::make_accept());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.2"), rc) == Action::make_accept());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.3"), rc) == Action::make_accept());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.4"), rc) == Action::make_reject());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.5"), rc) == Action::make_reject());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.6"), rc) == Action::make_reject());
+    REQUIRE(
+        rule.action(ping, MAVAddress("192.7"), rc) == Action::make_reject());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.0"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.1"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.2"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.3"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.4"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.5"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.6"), rc) ==
+        Action::make_continue());
+    REQUIRE(
+        rule.action(set_mode, MAVAddress("192.7"), rc) ==
+        Action::make_continue());
 }
 
 
 TEST_CASE("Rule's are printable.", "[Rule]")
 {
-    auto chain = std::make_shared<ChainTestClass>("test_chain");
-    Rule rule;
-    SECTION("Nothing is printed when the rule does not have an action.")
+    auto ping = packet_v2::Packet(to_vector(PingV2()));
+    RuleTestClass rule;
+    Rule &polymorphic = rule;
+    SECTION("By direct type.")
     {
-        REQUIRE(str(rule) == "");
+        REQUIRE(str(rule) == "test_rule");
     }
-    SECTION("When there is only an action.")
+    SECTION("By polymorphic type.")
     {
-        REQUIRE(str(rule.accept()) == "accept");
-        REQUIRE(str(rule.reject()) == "reject");
-        REQUIRE(str(rule.call(chain)) == "call test_chain");
-        REQUIRE(str(rule.goto_(chain)) == "goto test_chain");
+        REQUIRE(str(polymorphic) == "test_rule");
     }
-    SECTION("When there is an action and a conditional.")
-    {
-        rule.accept().if_().type("PING");
-        REQUIRE(str(rule) == "accept if PING");
-        rule.reject().if_().from("192.0/8");
-        REQUIRE(str(rule) == "reject if from 192.0/8");
-        rule.call(chain).if_().to("172.16");
-        REQUIRE(str(rule) == "call test_chain if to 172.16");
-        rule.goto_(chain).if_().type("PING").from("192.0/8").to("172.16");
-        REQUIRE(str(rule) == "goto test_chain if PING from 192.0/8 to 172.16");
-    }
+}
+
+
+TEST_CASE("Rule's 'clone' method returns a polymorphic copy.", "[Rule]")
+{
+    RuleTestClass rule;
+    Rule &polymorphic = rule;
+    std::unique_ptr<Rule> polymorphic_copy = polymorphic.clone();
+    REQUIRE(rule == *polymorphic_copy);
 }

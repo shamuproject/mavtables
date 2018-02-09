@@ -20,27 +20,35 @@
 
 
 #include <memory>
+#include <optional>
 #include <ostream>
 
 #include "Action.hpp"
-#include "Packet.hpp"
+#include "If.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
+#include "Rule.hpp"
 
 
-/** Action to accept a packet.
+/** Rule to accept a packet, possibly with a priority.
  */
-class Accept : public Action
+class Accept : public Rule
 {
+    private:
+        std::optional<int> priority_;
+
     protected:
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        virtual std::unique_ptr<Action> clone() const;
-        virtual Action::Option action(
-            Packet &packet, const MAVAddress &address,
+        Accept(std::optional<If> condition = {});
+        Accept(int priority, std::optional<If> condition = {});
+        virtual Action action(
+            const Packet &packet, const MAVAddress &address,
             RecursionChecker &recusion_checker) const;
-        virtual bool operator==(const Action &other) const;
-        virtual bool operator!=(const Action &other) const;
+        virtual std::unique_ptr<Rule> clone() const;
+        virtual bool operator==(const Rule &other) const;
+        virtual bool operator!=(const Rule &other) const;
 };
 
 

@@ -15,37 +15,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef REJECT_HPP_
-#define REJECT_HPP_
-
-
 #include <memory>
-#include <optional>
-#include <ostream>
-
-#include "Action.hpp"
-#include "If.hpp"
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
-#include "Rule.hpp"
+#include <utility>
 
 
-/** Rule to reject a packet.
- */
-class Reject : public Rule
-{
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
-    public:
-        Reject(std::optional<If> condition = {});
-        virtual Action action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recusion_checker) const;
-        virtual std::unique_ptr<Rule> clone() const;
-        virtual bool operator==(const Rule &other) const;
-        virtual bool operator!=(const Rule &other) const;
-};
+// See https://github.com/eranpeer/FakeIt/issues/27
+template<typename T>
+void blank_deleter(T *ptr) {(void)ptr;}
 
 
-#endif // REJECT_HPP_
+template<typename T>
+std::unique_ptr<T, void(*)(T*)> mock_unique(T &mock){
+    std::unique_ptr<T, void(*)(T*)> ptr(&mock, blank_deleter<T>);
+    return std::move(ptr);
+}
+
+
+template<typename T>
+std::shared_ptr<T> mock_shared(T &mock){
+    std::shared_ptr<T> ptr(&mock, blank_deleter<T>);
+    return std::move(ptr);
+}

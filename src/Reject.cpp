@@ -16,54 +16,89 @@
 
 
 #include <memory>
+#include <optional>
 #include <ostream>
+#include <typeinfo>
+#include <utility>
 
-#include "Packet.hpp"
-#include "MAVAddress.hpp"
 #include "Action.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
 #include "Reject.hpp"
+#include "Rule.hpp"
 
 
-/** \copydoc Action::print_(std::ostream &os) const
+/** Construct a reject rule.
  *
- *  Prints `"reject"`.
+ *  A reject rule is used to reject packet/address combinations that match the
+ *  condition of the rule.
+ *
+ *  \param condition The condition used to determine the rule matches a
+ *      particular packet/address combination given to the \ref action method.
+ *      The default is {} which indicates the rule matches any packet/address
+ *      combination.
+ *  \sa action
+ */
+Reject::Reject(std::optional<If> condition)
+    : Rule(std::move(condition))
+{
+}
+
+
+/** \copydoc Rule::print_(std::ostream &os) const
+ *
+ *  Prints `"reject"` or `"reject <If Statement>"` if the rule's condition was
+ *  set.
  */
 std::ostream &Reject::print_(std::ostream &os) const
 {
     os << "reject";
+
+    if (condition_)
+    {
+        os << " " << condition_.value();
+    }
+
     return os;
 }
 
 
-std::unique_ptr<Action> Reject::clone() const
-{
-    return std::make_unique<Reject>();
-}
-
-
-/** \copydoc Action::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
  *
- *  The Reject class always returns \ref Action::REJECT, therefore it always
- *  indicates that the \p packet should not be sent to the given \p address.
+ *  If the condition has not been set or it matches the given packet/address
+ *  combination then it will return the reject object, otherwise it will return
+ *  the continue object.
  */
-Action::Option Reject::action(
-    Packet &packet, const MAVAddress &address,
+Action Reject::action(
+    const Packet &packet, const MAVAddress &address,
     RecursionChecker &recursion_checker) const
 {
-    (void)packet;
-    (void)address;
     (void)recursion_checker;
-    return Action::REJECT;
+
+    if (!condition_ || condition_->check(packet, address))
+    {
+        return Action::make_reject();
+    }
+
+    return Action::make_continue();
 }
 
 
-bool Reject::operator==(const Action &other) const
+std::unique_ptr<Rule> Reject::clone() const
 {
-    return typeid(*this) == typeid(other);
+    return std::make_unique<Reject>(condition_);
 }
 
 
-bool Reject::operator!=(const Action &other) const
+bool Reject::operator==(const Rule &other) const
 {
-    return typeid(*this) != typeid(other);
+    return typeid(*this) == typeid(other) &&
+           condition_ == static_cast<const Reject &>(other).condition_;
+}
+
+
+bool Reject::operator!=(const Rule &other) const
+{
+    return typeid(*this) != typeid(other) ||
+           condition_ != static_cast<const Reject &>(other).condition_;
 }
