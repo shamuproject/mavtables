@@ -155,9 +155,8 @@ TEST_CASE("GoTo's 'action' method determines what to do with a "
         std::shared_ptr<Chain> chain = mock_shared(mock.get());
         GoTo(chain).action(ping, MAVAddress("192.168"));
         fakeit::Verify(
-            Method(mock, action).Matching([&](auto & a, auto & b, auto & c)
+            Method(mock, action).Matching([&](auto &a, auto &b)
         {
-            (void)c;
             return a == ping && b == MAVAddress("192.168");
         })).Once();
     }
