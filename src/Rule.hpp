@@ -30,7 +30,7 @@
 #include "RecursionChecker.hpp"
 
 
-/** Base class of all rules, used in filter \ref Chains.
+/** Base class of all rules, used in filter \ref Chain's.
  *
  *  Rules are used to determine an \ref Action to take with a packet based on
  *  its type, source address, and destination address.  The are very much like

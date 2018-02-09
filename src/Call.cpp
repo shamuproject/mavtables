@@ -84,7 +84,7 @@ Call::Call(
 /** \copydoc Rule::print_(std::ostream &os)const
  *
  *  Prints `"call <Chain Name> <If Statement>"` or `"call <Chain Name> with
- *  priority <If Statement>"` with priority <priority>"` if the priority is
+ *  priority <If Statement> with priority <priority>"` if the priority is
  *  given.
  */
 std::ostream &Call::print_(std::ostream &os) const
