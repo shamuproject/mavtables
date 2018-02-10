@@ -33,8 +33,8 @@
 #include "Rule.hpp"
 
 
-
-
+/** A filter chain, containing a list of rules to check packets against.
+ */
 class Chain
 {
     public:
