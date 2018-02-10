@@ -43,7 +43,7 @@
  *      // shared data between calls
  *      static RecursionData rdata;
  *      // take ownership of the call
- *      RecursionGuard rguard(rdata);  
+ *      RecursionGuard rguard(rdata);
  *      return b_function(value);
  *      // the recursion guard is released upon destruction of rguard
  *  }

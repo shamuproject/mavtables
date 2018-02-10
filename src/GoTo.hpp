@@ -52,7 +52,7 @@ class GoTo : public Rule
 
     public:
         GoTo(std::shared_ptr<Chain> chain,
-                std::optional<const If> condition = {});
+             std::optional<const If> condition = {});
         GoTo(std::shared_ptr<Chain> chain, int priority,
              std::optional<const If> condition = {});
         virtual Action action(

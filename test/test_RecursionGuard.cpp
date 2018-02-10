@@ -31,7 +31,7 @@ TEST_CASE("RecursionGuard's are constructable.", "[RecursionGuard]")
 }
 
 
-TEST_CASE("RecusionGuard's prevent recursion within a single thread.", 
+TEST_CASE("RecusionGuard's prevent recursion within a single thread.",
           "[RecursionGuard]")
 {
     SECTION("No recursion.")
@@ -58,7 +58,10 @@ TEST_CASE("RecusionGuard's prevent recursion within a single thread.",
     {
         RecursionData rdata;
         RecursionGuard rguard(rdata);
-        std::thread thread([&](){RecursionGuard rguard_(rdata);});
+        std::thread thread([&]()
+        {
+            RecursionGuard rguard_(rdata);
+        });
         thread.join();
     }
 }

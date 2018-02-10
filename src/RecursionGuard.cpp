@@ -37,6 +37,7 @@ RecursionGuard::RecursionGuard(RecursionData &data)
 {
     std::lock_guard<std::mutex> lock(data_.mutex_);
     std::thread::id id = std::this_thread::get_id();
+
     if (!(data_.calling_threads_.insert(id).second))
     {
         throw RecursionError("Recursion detected.");

@@ -28,7 +28,7 @@
  */
 class RecursionData
 {
-    friend class RecursionGuard;
+        friend class RecursionGuard;
 
     private:
         std::set<std::thread::id> calling_threads_;
