@@ -20,10 +20,12 @@
 
 
 #include <mutex>
-#include <thread>
 #include <set>
+#include <thread>
 
 
+/** A data structure used by RecursionGuard to detect unwanted recursion.
+ */
 class RecursionGuardData
 {
     friend class RecursionGuard;

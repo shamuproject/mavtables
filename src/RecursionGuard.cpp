@@ -23,6 +23,15 @@
 #include <RecursionGuardData.hpp>
 
 
+/** Construct a RecursionGuard.
+ *
+ *  This marks the given \ref RecuarsionGuardData structure, ensuring it cannot
+ *  be used to construct another guard.
+ *
+ *  \param data The object used to prevent recursion.
+ *  \throws RecursionError if the given data has already been marked by a
+ *      RecursionGuard that is still in scope.
+ */
 RecursionGuard::RecursionGuard(RecursionGuardData &data)
     : data_(data)
 {

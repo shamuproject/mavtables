@@ -22,9 +22,41 @@
 #include <mutex>
 #include <thread>
 
-#include <RecursionGuardData.hpp>
+#include "RecursionGuardData.hpp"
 
 
+/** Guard against recursion.
+ *
+ *  A recursion guard is an RAII (Resource Acquisition Is Initialization) data
+ *  structure used to raise an error upon recursion.  The constructor marks a
+ *  \ref RecursionGuardData structure, acquiring ownership of the containing
+ *  function (within the given thread).  Recursion guards treat calls from
+ *  different threads and different, therefore, it will not guard against
+ *  reentrancy.
+ *
+ *  An example of how to use this is:
+ *
+ *  ```
+ *  #include "RecursionGuard.hpp"
+ *
+ *  int a_function(int value)
+ *  {
+ *      // shared data between calls
+ *      static RecursionGuardData rg_data;
+ *      // take ownership of the call
+ *      RecursionGuard rg(rg_data);  
+ *      return b_function(value);
+ *      // the recursion guard is released upon destruction of rg
+ *  }
+ *  ```
+ *
+ *  %If `b_function`, or any function it calls, ever calls `a_function` then this
+ *  will throw \ref RecursionError.  However, if multiple threads call
+ *  `a_function` (possibly at the same time) but `b_function` does not call
+ *  `a_function` then no error will be thrown.
+ *
+ *  \sa RecursionError
+ */
 class RecursionGuard
 {
     private:
