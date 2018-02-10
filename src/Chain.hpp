@@ -18,24 +18,49 @@
 #ifndef CHAIN_HPP_
 #define CHAIN_HPP_
 
-
+#include <memory>
+#include <mutex>
+#include <ostream>
+#include <set>
 #include <string>
+#include <thread>
+#include <vector>
 
 #include "Action.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include <RecursionGuard.hpp>
+#include "Rule.hpp"
+
+
 
 
 class Chain
 {
     public:
+        /** The name of the chain.
+         *
+         *  \note This is only used when printing the chain.
+         */
         const std::string name;
-        Chain(std::string name_);
+
+    private:
+        std::vector<std::unique_ptr<const Rule>> rules_;
+        RecursionData recursion_data_;
+
+    public:
+        Chain(std::string name_,
+              std::vector<std::unique_ptr<const Rule>> rules = {});
         virtual ~Chain() = default;
         virtual Action action(
-            const Packet &packet, const MAVAddress &address) const;
+            const Packet &packet, const MAVAddress &address);
+        void append(std::unique_ptr<const Rule> rule);
 
+        friend std::ostream &operator<<(std::ostream &os, const Chain &chain);
 };
+
+
+std::ostream &operator<<(std::ostream &os, const Chain &chain);
 
 
 #endif // CHAIN_HPP_

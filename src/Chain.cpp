@@ -15,18 +15,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
+#include <memory>
+#include <ostream>
+#include <set>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include "Action.hpp"
 #include "Chain.hpp"
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"
+#include <RecursionGuard.hpp>
 
 
-Chain::Chain(std::string name_)
-    : name(std::move(name_))
+
+
+Chain::Chain(
+    std::string name_, std::vector<std::unique_ptr<const Rule>> rules)
+    : name(std::move(name_)), rules_(std::move(rules))
 {
     if (name.find_first_of("\t\n ") != std::string::npos)
     {
@@ -36,9 +44,42 @@ Chain::Chain(std::string name_)
 
 
 Action Chain::action(
-    const Packet &packet, const MAVAddress &address) const
+    const Packet &packet, const MAVAddress &address)
 {
-    (void)packet;
-    (void)address;
+    // Prevent recursion.
+    RecursionGuard recursion_guard(recursion_data_);
+
+    // Loop throught the rules.
+    for (auto const &rule : rules_)
+    {
+        auto result = rule->action(packet, address);
+
+        // Return rule result if not CONTINUE.
+        if (result.action != Action::CONTINUE)
+        {
+            return result;
+        }
+    }
+
     return Action::make_continue();
+}
+
+
+void Chain::append(std::unique_ptr<const Rule> rule)
+{
+    rules_.push_back(std::move(rule));
+}
+
+
+std::ostream &operator<<(std::ostream &os, const Chain &chain)
+{
+    os << "chain " << chain.name << " {" << std::endl;
+
+    for (auto const &rule : chain.rules_)
+    {
+        os << *rule << ";" << std::endl;
+    }
+
+    os << ";" << std::endl;
+    return os;
 }
