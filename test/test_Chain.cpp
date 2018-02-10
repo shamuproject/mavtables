@@ -51,6 +51,21 @@ TEST_CASE("Chain's are constructable.", "[Chain]")
         rules.push_back(std::make_unique<Reject>());
         REQUIRE_NOTHROW(Chain("test_chain", std::move(rules)));
     }
+    SECTION("Ensures the chain name does not contain whitespace.")
+    {
+        // Spaces
+        REQUIRE_THROWS_AS(Chain("test chain"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(
+            Chain("test chain"), "Chain names cannot contain whitespace.");
+        // Tabs
+        REQUIRE_THROWS_AS(Chain("test\tchain"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(
+            Chain("test\tchain"), "Chain names cannot contain whitespace.");
+        // Newlines
+        REQUIRE_THROWS_AS(Chain("test\nchain"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(
+            Chain("test\nchain"), "Chain names cannot contain whitespace.");
+    }
 }
 
 
@@ -264,4 +279,13 @@ TEST_CASE("Chain's are printable.", "[Chain]")
         "    call ap-out if to 192.168;\n"
         "    reject;\n"
         "}");
+}
+
+
+// Required for complete function coverage.
+TEST_CASE("Run dynamic destructors (Chain).", "[Chain]")
+{
+    Chain *chain = nullptr;
+    REQUIRE_NOTHROW(chain = new Chain("chain"));
+    REQUIRE_NOTHROW(delete chain);
 }

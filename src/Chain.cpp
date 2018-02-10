@@ -60,7 +60,7 @@ Chain::Chain(
     std::string name, std::vector<std::unique_ptr<Rule>> &&rules)
     : name_(std::move(name)), rules_(std::move(rules))
 {
-    if (name.find_first_of("\t\n ") != std::string::npos)
+    if (name_.find_first_of("\t\n ") != std::string::npos)
     {
         throw std::invalid_argument("Chain names cannot contain whitespace.");
     }
