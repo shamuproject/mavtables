@@ -44,7 +44,7 @@
  *  \sa action
  */
 Call::Call(
-    std::shared_ptr<Chain> chain, std::optional<If> condition)
+    std::shared_ptr<Chain> chain, std::optional<const If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain))
 {
     if (chain_ == nullptr)
@@ -71,7 +71,8 @@ Call::Call(
  *  \sa action
  */
 Call::Call(
-    std::shared_ptr<Chain> chain, int priority, std::optional<If> condition)
+    std::shared_ptr<Chain> chain, int priority,
+    std::optional<const If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain)), priority_(priority)
 {
     if (chain_ == nullptr)

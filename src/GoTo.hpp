@@ -51,9 +51,10 @@ class GoTo : public Rule
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        GoTo(std::shared_ptr<Chain> chain, std::optional<If> condition = {});
+        GoTo(std::shared_ptr<Chain> chain,
+                std::optional<const If> condition = {});
         GoTo(std::shared_ptr<Chain> chain, int priority,
-             std::optional<If> condition = {});
+             std::optional<const If> condition = {});
         virtual Action action(
             const Packet &packet, const MAVAddress &address) const;
         virtual std::unique_ptr<Rule> clone() const;

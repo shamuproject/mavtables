@@ -39,7 +39,7 @@ namespace
             ~TestChain() = default;
             // LCOV_EXCL_STOP
             virtual Action action(
-                const Packet &packet, const MAVAddress &address) const
+                const Packet &packet, const MAVAddress &address)
             {
                 (void)packet;
                 (void)address;

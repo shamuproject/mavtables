@@ -30,7 +30,7 @@
  *      combination.
  *  \sa action
  */
-Rule::Rule(std::optional<If> condition)
+Rule::Rule(std::optional<const If> condition)
     : condition_(std::move(condition))
 {
 }

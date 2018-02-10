@@ -41,8 +41,8 @@ class Accept : public Rule
         virtual std::ostream &print_(std::ostream &os) const;
 
     public:
-        Accept(std::optional<If> condition = {});
-        Accept(int priority, std::optional<If> condition = {});
+        Accept(std::optional<const If> condition = {});
+        Accept(int priority, std::optional<const If> condition = {});
         virtual Action action(
             const Packet &packet, const MAVAddress &address) const;
         virtual std::unique_ptr<Rule> clone() const;

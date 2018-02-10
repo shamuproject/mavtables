@@ -39,7 +39,7 @@
  *      combination.
  *  \sa action
  */
-Accept::Accept(std::optional<If> condition)
+Accept::Accept(std::optional<const If> condition)
     : Rule(std::move(condition))
 {
 }
@@ -58,7 +58,7 @@ Accept::Accept(std::optional<If> condition)
  *      more important and will be routed first.
  *  \sa action
  */
-Accept::Accept(int priority, std::optional<If> condition)
+Accept::Accept(int priority, std::optional<const If> condition)
     : Rule(std::move(condition)), priority_(priority)
 {
 }

@@ -39,7 +39,7 @@
  *      combination.
  *  \sa action
  */
-Reject::Reject(std::optional<If> condition)
+Reject::Reject(std::optional<const If> condition)
     : Rule(std::move(condition))
 {
 }
