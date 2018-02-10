@@ -13,6 +13,8 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion2.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_RecursionError.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_RecursionGuard.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Reject.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Rule.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Rule_comparison.cpp"
