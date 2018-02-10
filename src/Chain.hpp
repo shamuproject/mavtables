@@ -42,24 +42,38 @@ class Chain
          *
          *  \note This is only used when printing the chain.
          */
-        const std::string name;
+        std::string name;
 
     private:
         std::vector<std::unique_ptr<const Rule>> rules_;
         RecursionData recursion_data_;
 
     public:
+        /** Copy constructor.
+         *
+         *  \param other Chain to copy.
+         */
+        Chain(const Chain &other) = delete;
+        /** Move constructor.
+         *
+         *  \param other Chain to move from.
+         */
+        Chain(Chain &&other) = default;
         Chain(std::string name_,
-              std::vector<std::unique_ptr<const Rule>> rules = {});
+              std::vector<std::unique_ptr<const Rule>> &&rules = {});
         virtual ~Chain() = default;
         virtual Action action(
             const Packet &packet, const MAVAddress &address);
         void append(std::unique_ptr<const Rule> rule);
 
+        friend bool operator==(const Chain &lhs, const Chain &rhs);
+        friend bool operator!=(const Chain &lhs, const Chain &rhs);
         friend std::ostream &operator<<(std::ostream &os, const Chain &chain);
 };
 
 
+bool operator==(const Chain &lhs, const Chain &rhs);
+bool operator!=(const Chain &lhs, const Chain &rhs);
 std::ostream &operator<<(std::ostream &os, const Chain &chain);
 
 

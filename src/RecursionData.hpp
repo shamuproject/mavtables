@@ -33,6 +33,13 @@ class RecursionData
     private:
         std::set<std::thread::id> calling_threads_;
         std::mutex mutex_;
+    public:
+        RecursionData() = default;
+        RecursionData(RecursionData &&other)
+        {
+            std::lock_guard<std::mutex> lock(other.mutex_);
+            calling_threads_ = std::move(other.calling_threads_);
+        }
 };
 
 

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <cstddef>
 #include <memory>
 #include <ostream>
 #include <set>
@@ -35,13 +36,16 @@
  *  \note No rule in the chain may contain a \ref GoTo or \ref Call that would
  *  directly or indirectly result in returning to this chain.
  *
+ *
+ *
  *  \param name_ The name of the filter chain.  This is only used when printing
  *      the chain.  The name cannot contain whitespace.
- *  \param rules A vector of the rules used in the filter chain.
+ *  \param rules A vector of the rules used in the filter chain.  This must be
+ *      moved from since the vector is made up of std::unique_ptr.
  *  \throws std::invalid_argument if the name contains whitespace.
  */
 Chain::Chain(
-    std::string name_, std::vector<std::unique_ptr<const Rule>> rules)
+    std::string name_, std::vector<std::unique_ptr<const Rule>> &&rules)
     : name(std::move(name_)), rules_(std::move(rules))
 {
     if (name.find_first_of("\t\n ") != std::string::npos)
@@ -103,6 +107,52 @@ void Chain::append(std::unique_ptr<const Rule> rule)
 }
 
 
+/** Equality comparison.
+ *
+ *  \relates Chain
+ *  \param lhs The left hand side filter chain.
+ *  \param rhs The right hand side filter chain.
+ *  \retval true if \p lhs is the same as rhs.
+ *  \retval false if \p lhs is not the same as rhs.
+ */
+bool operator==(const Chain &lhs, const Chain &rhs)
+{
+    // Compare names.
+    if (lhs.name != rhs.name)
+    {
+        return false;
+    }
+    // Compare number of rules.
+    if (lhs.rules_.size() != rhs.rules_.size())
+    {
+        return false;
+    }
+    // Compare rules one by one.
+    for (size_t i = 0; i < lhs.rules_.size(); ++i)
+    {
+        if (*(lhs.rules_[i]) != *(rhs.rules_[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+/** Inequality comparison.
+ *
+ *  \relates Chain
+ *  \param lhs The left hand side action.
+ *  \param rhs The right hand side action.
+ *  \retval true if \p lhs is not the same as rhs.
+ *  \retval false if \p lhs is the same as rhs.
+ */
+bool operator!=(const Chain &lhs, const Chain &rhs)
+{
+    return !(lhs == rhs);
+}
+
+
 /** Print the given filter chain to to the given output stream.
  *
  *  An example is:
@@ -114,6 +164,11 @@ void Chain::append(std::unique_ptr<const Rule> rule)
  *      accept;
  *  }
  *  ```
+ *
+ *  \relates Chain
+ *  \param os The output stream to print to.
+ *  \param chain The filter chain to print.
+ *  \return The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Chain &chain)
 {
@@ -121,9 +176,9 @@ std::ostream &operator<<(std::ostream &os, const Chain &chain)
 
     for (auto const &rule : chain.rules_)
     {
-        os << *rule << ";" << std::endl;
+        os << "    " << *rule << ";" << std::endl;
     }
 
-    os << ";" << std::endl;
+    os << "}" << std::endl;
     return os;
 }

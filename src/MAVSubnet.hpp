@@ -31,7 +31,7 @@
  *  range of addresses.  This is used to allow a single firewall rule to match
  *  multiple addresses.
  *
- *  \sa \ref MAVAddress
+ *  \sa MAVAddress
  */
 class MAVSubnet
 {
