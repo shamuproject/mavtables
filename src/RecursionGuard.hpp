@@ -49,7 +49,7 @@
  *  }
  *  ```
  *
- *  %If `b_function`, or any function it calls, ever calls `a_function` then this
+ *  If `b_function`, or any function it calls, ever calls `a_function` then this
  *  will throw \ref RecursionError.  However, if multiple threads call
  *  `a_function` (possibly at the same time) but `b_function` does not call
  *  `a_function` then no error will be thrown.

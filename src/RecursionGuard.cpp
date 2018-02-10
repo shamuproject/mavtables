@@ -25,7 +25,7 @@
 
 /** Construct a RecursionGuard.
  *
- *  This marks the given \ref RecuarsionData structure, ensuring it cannot
+ *  This marks the given \ref RecursionData structure, ensuring it cannot
  *  be used to construct another guard.
  *
  *  \param data The object used to prevent recursion.
