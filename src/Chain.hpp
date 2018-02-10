@@ -45,11 +45,7 @@ class Chain
         RecursionData recursion_data_;
 
     public:
-        /** Copy constructor.
-         *
-         *  \param other Chain to copy.
-         */
-        Chain(const Chain &other) = delete;
+        Chain(const Chain &other);
         /** Move constructor.
          *
          *  \param other Chain to move from.
@@ -62,6 +58,8 @@ class Chain
             const Packet &packet, const MAVAddress &address);
         void append(std::unique_ptr<Rule> rule);
         const std::string &name() const;
+        Chain &operator=(const Chain &other);
+        Chain &operator=(Chain &&other) = default;
 
         friend bool operator==(const Chain &lhs, const Chain &rhs);
         friend bool operator!=(const Chain &lhs, const Chain &rhs);

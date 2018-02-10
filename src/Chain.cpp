@@ -31,12 +31,24 @@
 #include <RecursionGuard.hpp>
 
 
+/** Copy constructor.
+ *
+ *  \param other Chain to copy.
+ */
+Chain::Chain(const Chain &other)
+    : name_(other.name_)
+{
+    for (auto &rule : other.rules_)
+    {
+        rules_.push_back(rule->clone());
+    }
+}
+
+
 /** Construct a new filter chain.
  *
  *  \note No rule in the chain may contain a \ref GoTo or \ref Call that would
  *  directly or indirectly result in returning to this chain.
- *
- *
  *
  *  \param name The name of the filter chain.  This is only used when printing
  *      the chain.  The name cannot contain whitespace.
@@ -119,6 +131,28 @@ const std::string &Chain::name() const
 }
 
 
+Chain &Chain::operator=(const Chain &other)
+{
+    name_ = other.name_;
+    rules_.clear();
+    for (auto &rule : other.rules_)
+    {
+        rules_.push_back(rule->clone());
+    }
+    recursion_data_ = other.recursion_data_;
+    return *this;
+}
+
+
+// Chain &Chain::operator=(Chain &&other)
+// {
+//     name_ = other.name_;
+//     rules_ = std::move(other.rules_);
+//     recursion_data_ = RecursionData();
+//     return *this;
+// }
+
+
 /** Equality comparison.
 *
 *  \relates Chain
@@ -172,11 +206,13 @@ bool operator!=(const Chain &lhs, const Chain &rhs)
  *
  *  An example is:
  *  ```
- *  chain ap-in {
- *      accept if GPS_STATUS to 255.200;
- *      accept if GLOBAL_POSITION_INT to 255.200;
- *      reject if to 255.100;
- *      accept;
+ *  chain default {
+ *      reject if HEARTBEAT from 10.10;
+ *      accept with priority -3 if GPS_STATUS to 172.0/8;
+ *      accept if GLOBAL_POSITION_INT to 172.0/8;
+ *      goto ap-in with priority 3 if from 192.168;
+ *      call ap-out if to 192.168;
+ *      reject;
  *  }
  *  ```
  *
@@ -194,6 +230,6 @@ std::ostream &operator<<(std::ostream &os, const Chain &chain)
         os << "    " << *rule << ";" << std::endl;
     }
 
-    os << "}" << std::endl;
+    os << "}";
     return os;
 }

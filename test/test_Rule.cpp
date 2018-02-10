@@ -92,7 +92,7 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
 }
 
 
-TEST_CASE("Rule's 'action' method determine what to do with a packet withu "
+TEST_CASE("Rule's 'action' method determines what to do with a packet with "
           "respect to a destination address.", "[Rule]")
 {
     auto ping = packet_v1::Packet(to_vector(PingV1()));

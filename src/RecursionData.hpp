@@ -25,6 +25,15 @@
 
 
 /** A data structure used by RecursionGuard to detect unwanted recursion.
+ *
+ *  \note While RecursionData supports copy and move semantics both is
+ *      constructors and assignment, a recursion data structure should never
+ *      change instance.  One way to deal with this would have been to delete
+ *      these operators but this would force users to manually implement copy
+ *      and move semantics for their classes.  Therefore, RecursionData will
+ *      always make a new data structure on copy, move or assignment, allowed
+ *      default copy and move constructors/assignment operators to be created
+ *      for classes using RecursionData.
  */
 class RecursionData
 {
@@ -35,10 +44,25 @@ class RecursionData
         std::mutex mutex_;
     public:
         RecursionData() = default;
+        RecursionData(const RecursionData &other)
+        {
+            (void)other;
+        }
         RecursionData(RecursionData &&other)
         {
-            std::lock_guard<std::mutex> lock(other.mutex_);
-            calling_threads_ = std::move(other.calling_threads_);
+            (void)other;
+        }
+        RecursionData &operator=(const RecursionData &other)
+        {
+            (void)other;
+            calling_threads_.clear();
+            return *this;
+        }
+        RecursionData &operator=(RecursionData &&other)
+        {
+            (void)other;
+            calling_threads_.clear();
+            return *this;
         }
 };
 
