@@ -37,7 +37,7 @@ class Chain;
 /** Delegate decision on a packet to another \ref Chain.
  *
  *  Rule to delegate the decision on what to do with a packet to a filter \ref
- *  Chain.  If this chain cannot make a determination (continue action
+ *  Chain.  %If this chain cannot make a determination (continue action
  *  returned), \ref Rule evaluation should resume after this rule.
  */
 class Call : public Rule

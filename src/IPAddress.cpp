@@ -76,7 +76,7 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
  *
  *  \param other IP address to copy from.
  *  \param port Port number (0 - 65535).  A port of 0 means no specific port.
- *  \throws std::out_of_range If the port number is out of range.
+ *  \throws std::out_of_range %If the port number is out of range.
  */
 IPAddress::IPAddress(const IPAddress &other, unsigned int port)
 {
@@ -89,7 +89,7 @@ IPAddress::IPAddress(const IPAddress &other, unsigned int port)
  *  \param address 32-bit IP address in system byte order (0x00000000 -
  *      0xFFFFFFFF).
  *  \param port Port number (0 - 65535).  A port of 0 means no specific port.
- *  \throws std::out_of_range If the address or port number is out of range.
+ *  \throws std::out_of_range %If the address or port number is out of range.
  */
 IPAddress::IPAddress(unsigned long address, unsigned int port)
 {
@@ -106,13 +106,13 @@ IPAddress::IPAddress(unsigned long address, unsigned int port)
  *      - "127.0.0.1:8888"
  *      - "183.125.120.42:443"
  *
- *  If no port is given the 0 port is used which represents no specific port.
+ *  %If no port is given the 0 port is used which represents no specific port.
  *
  *  \param address String representing the IP address and optionally the port
  *      number.
- *  \throws std::invalid_argument If the string does not represent a valid IP
+ *  \throws std::invalid_argument %If the string does not represent a valid IP
  *      address.
- *  \throws std::out_of_range If an address octet or the port number is out of
+ *  \throws std::out_of_range %If an address octet or the port number is out of
  *      range.
  */
 IPAddress::IPAddress(std::string address)
@@ -350,7 +350,7 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
  *  \relates IPAddress
  *  \param url The URL to get an IP address for.
  *  \return IP addresses corrensponding to the given URL.
- *  \throws DNSLookupError If the address cannot be found.
+ *  \throws DNSLookupError %If the address cannot be found.
  */
 IPAddress dnslookup(const std::string &url)
 {

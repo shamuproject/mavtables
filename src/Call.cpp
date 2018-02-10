@@ -108,11 +108,11 @@ std::ostream &Call::print_(std::ostream &os) const
 
 /** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
- *  If the condition has not been set or it matches the given packet/address
+ *  %If the condition has not been set or it matches the given packet/address
  *  combination then the choice of \ref Action will be delegated to the
  *  contained \ref Chain.
  *
- *  If the result from the chain is an accept object and no priority has been
+ *  %If the result from the chain is an accept object and no priority has been
  *  set on it but this \ref Rule has a priority then the priority will be set.
  */
 Action Call::action(

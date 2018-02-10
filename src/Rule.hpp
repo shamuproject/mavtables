@@ -59,7 +59,7 @@ class Rule
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
          *      action allows it.
-         *  \returns The action to take with the packet.  If this is the accept
+         *  \returns The action to take with the packet.  %If this is the accept
          *      object, it may also contain a priority for the packet.
          */
         virtual Action action(

@@ -37,11 +37,11 @@
  *      - `If().type("SET_MODE").to("255.0/8");`
  *      - `If().from("255.0/8");`
  *
- *  \param id The packet ID to match.  If {} or std::nullopt then any packet ID
+ *  \param id The packet ID to match.  %If {} or std::nullopt then any packet ID
  *      will match.  The defaut is {}.
- *  \param source The subnet a source address must be in to match.  If {} or
+ *  \param source The subnet a source address must be in to match.  %If {} or
  *      nullopt then any source address will match.  The default is {}.
- *  \param dest The subnet a destination address must be in to match.  If {} or
+ *  \param dest The subnet a destination address must be in to match.  %If {} or
  *      std::nullopt then any destination address will match.  The default is
  *      {}.
  *  \throws std::invalid_argument if the given \p id is not valid.
@@ -150,10 +150,10 @@ If &If::to(const std::string &subnet)
  *
  *  \param packet The packet to check for a match.
  *  \param address The address the packet is to be sent to.
- *  \retval true If the packet matches the type, source subnet (by \ref
+ *  \retval true %If the packet matches the type, source subnet (by \ref
  *      MAVSubnet::contains), and destination subnet (by \ref
  *      MAVSubnet::contains) of the if statement.
- *  \retval false If any of the packet type, source subnet, or destination
+ *  \retval false %If any of the packet type, source subnet, or destination
  *      subnet does not match.
  */
 bool If::check(const Packet &packet, const MAVAddress &address) const

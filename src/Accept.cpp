@@ -90,7 +90,7 @@ std::ostream &Accept::print_(std::ostream &os) const
 
 /** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
- *  If the condition has not been set or it matches the given packet/address
+ *  %If the condition has not been set or it matches the given packet/address
  *  combination then it will return the accept object (with optional priority),
  *  otherwise it will return the continue object.
  */

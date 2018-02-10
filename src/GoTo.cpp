@@ -107,7 +107,7 @@ std::ostream &GoTo::print_(std::ostream &os) const
 
 /** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
- *  The GoTo class delegates the action choice to the contained \ref Chain.  If
+ *  The GoTo class delegates the action choice to the contained \ref Chain.  %If
  *  the \ref Chain decides on the continue action this method will return the
  *  default instead since final decision for a \ref GoTo should be with the
  *  contained \ref Chain or with the default action.  In other words, once a
