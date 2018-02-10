@@ -38,14 +38,10 @@
 class Chain
 {
     public:
-        /** The name of the chain.
-         *
-         *  \note This is only used when printing the chain.
-         */
-        std::string name;
+        std::string name_;
 
     private:
-        std::vector<std::unique_ptr<const Rule>> rules_;
+        std::vector<std::unique_ptr<Rule>> rules_;
         RecursionData recursion_data_;
 
     public:
@@ -60,11 +56,12 @@ class Chain
          */
         Chain(Chain &&other) = default;
         Chain(std::string name_,
-              std::vector<std::unique_ptr<const Rule>> &&rules = {});
+              std::vector<std::unique_ptr<Rule>> &&rules = {});
         virtual ~Chain() = default;
         virtual Action action(
             const Packet &packet, const MAVAddress &address);
-        void append(std::unique_ptr<const Rule> rule);
+        void append(std::unique_ptr<Rule> rule);
+        const std::string &name() const;
 
         friend bool operator==(const Chain &lhs, const Chain &rhs);
         friend bool operator!=(const Chain &lhs, const Chain &rhs);

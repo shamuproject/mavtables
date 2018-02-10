@@ -29,13 +29,13 @@ TEST_CASE("Action's 'make_accept' factory method constructs an ACCEPT action.",
     SECTION("Without a priority.")
     {
         auto result = Action::make_accept();
-        REQUIRE(result.action == Action::ACCEPT);
+        REQUIRE(result.action() == Action::ACCEPT);
         REQUIRE(result.priority() == 0);
     }
     SECTION("With a priority.")
     {
         auto result = Action::make_accept(-10);
-        REQUIRE(result.action == Action::ACCEPT);
+        REQUIRE(result.action() == Action::ACCEPT);
         REQUIRE(result.priority() == -10);
     }
 }
@@ -45,7 +45,7 @@ TEST_CASE("Action's 'make_reject' factory method constructs a REJECT action.",
           "[Action]")
 {
     auto result = Action::make_reject();
-    REQUIRE(result.action == Action::REJECT);
+    REQUIRE(result.action() == Action::REJECT);
     REQUIRE(result.priority() == 0);
 }
 
@@ -54,7 +54,7 @@ TEST_CASE("Action's 'make_continue' factory method constructs a CONTINUE "
           "action.", "[Action]")
 {
     auto result = Action::make_continue();
-    REQUIRE(result.action == Action::CONTINUE);
+    REQUIRE(result.action() == Action::CONTINUE);
     REQUIRE(result.priority() == 0);
 }
 
@@ -63,7 +63,7 @@ TEST_CASE("Action's 'make_default' factory method constructs a DEFAULT action.",
           "[Action]")
 {
     auto result = Action::make_default();
-    REQUIRE(result.action == Action::DEFAULT);
+    REQUIRE(result.action() == Action::DEFAULT);
     REQUIRE(result.priority() == 0);
 }
 
@@ -140,6 +140,26 @@ TEST_CASE("Action's are movable.", "[Action]")
     auto original = Action::make_accept(10);
     auto moved(std::move(original));
     REQUIRE(moved == Action::make_accept(10));
+}
+
+
+TEST_CASE("Action's are assignable.", "[Action]")
+{
+    auto a = Action::make_accept(-10);
+    auto b = Action::make_accept(100);
+    REQUIRE(a == Action::make_accept(-10));
+    a = b;
+    REQUIRE(a == Action::make_accept(100));
+}
+
+
+TEST_CASE("Action's are assignable (by move semantics.)", "[Action]")
+{
+    auto a = Action::make_accept(-10);
+    auto b = Action::make_accept(100);
+    REQUIRE(a == Action::make_accept(-10));
+    a = std::move(b);
+    REQUIRE(a == Action::make_accept(100));
 }
 
 

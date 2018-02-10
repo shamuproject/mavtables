@@ -38,15 +38,15 @@
  *
  *
  *
- *  \param name_ The name of the filter chain.  This is only used when printing
+ *  \param name The name of the filter chain.  This is only used when printing
  *      the chain.  The name cannot contain whitespace.
  *  \param rules A vector of the rules used in the filter chain.  This must be
  *      moved from since the vector is made up of std::unique_ptr.
  *  \throws std::invalid_argument if the name contains whitespace.
  */
 Chain::Chain(
-    std::string name_, std::vector<std::unique_ptr<const Rule>> &&rules)
-    : name(std::move(name_)), rules_(std::move(rules))
+    std::string name, std::vector<std::unique_ptr<Rule>> &&rules)
+    : name_(std::move(name)), rules_(std::move(rules))
 {
     if (name.find_first_of("\t\n ") != std::string::npos)
     {
@@ -87,7 +87,7 @@ Action Chain::action(
         auto result = rule->action(packet, address);
 
         // Return rule result if not CONTINUE.
-        if (result.action != Action::CONTINUE)
+        if (result.action() != Action::CONTINUE)
         {
             return result;
         }
@@ -101,32 +101,46 @@ Action Chain::action(
  *
  *  \param rule A new filter rule to append to the chain.
  */
-void Chain::append(std::unique_ptr<const Rule> rule)
+void Chain::append(std::unique_ptr<Rule> rule)
 {
     rules_.push_back(std::move(rule));
 }
 
 
-/** Equality comparison.
+/** Return the name of the chain.
  *
- *  \relates Chain
- *  \param lhs The left hand side filter chain.
- *  \param rhs The right hand side filter chain.
- *  \retval true if \p lhs is the same as rhs.
- *  \retval false if \p lhs is not the same as rhs.
+ *  \note This is only used when printing the chain.
+ *
+ *  \returns The chain's name.
  */
+const std::string &Chain::name() const
+{
+    return name_;
+}
+
+
+/** Equality comparison.
+*
+*  \relates Chain
+*  \param lhs The left hand side filter chain.
+*  \param rhs The right hand side filter chain.
+*  \retval true if \p lhs is the same as rhs.
+*  \retval false if \p lhs is not the same as rhs.
+*/
 bool operator==(const Chain &lhs, const Chain &rhs)
 {
     // Compare names.
-    if (lhs.name != rhs.name)
+    if (lhs.name() != rhs.name())
     {
         return false;
     }
+
     // Compare number of rules.
     if (lhs.rules_.size() != rhs.rules_.size())
     {
         return false;
     }
+
     // Compare rules one by one.
     for (size_t i = 0; i < lhs.rules_.size(); ++i)
     {
@@ -135,6 +149,7 @@ bool operator==(const Chain &lhs, const Chain &rhs)
             return false;
         }
     }
+
     return true;
 }
 
@@ -172,7 +187,7 @@ bool operator!=(const Chain &lhs, const Chain &rhs)
  */
 std::ostream &operator<<(std::ostream &os, const Chain &chain)
 {
-    os << "chain " << chain.name << " {" << std::endl;
+    os << "chain " << chain.name() << " {" << std::endl;
 
     for (auto const &rule : chain.rules_)
     {

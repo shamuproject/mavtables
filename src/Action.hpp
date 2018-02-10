@@ -39,9 +39,7 @@ class Action
             CONTINUE, //!< Continue evaluating rules.
             DEFAULT   //!< Use the default rule.
         };
-        /** The action that has been chosen.
-         */
-        const Action::Option action;
+        Action::Option action_;
 
     private:
         // Note: The reason this is optional is because there is a difference
@@ -50,7 +48,6 @@ class Action
         //       \ref Call or \ref GoTo) while if the priority has been set to 0
         //       it cannot be set again.
         std::optional<int> priority_;
-        Action() = delete;
         Action(Action::Option action, std::optional<int> priority = {});
 
     public:
@@ -64,10 +61,21 @@ class Action
          *  \param other Action to move from.
          */
         Action(Action &&other) = default;
+        Action::Option action() const;
         void priority(int priority);
         int priority() const;
-        Action &operator=(const Action &other) = delete;
-        Action &operator=(Action &&other) = delete;
+        // Action &operator=(const Action &other) = delete;
+        // Action &operator=(Action &&other) = delete;
+        /** Assignment operator.
+         *
+         * \param other Action to copy.
+         */
+        Action &operator=(const Action &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other Action to move from.
+         */
+        Action &operator=(Action &&other) = default;
 
         static Action make_accept(std::optional<int> priority = {});
         static Action make_reject();

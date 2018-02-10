@@ -45,7 +45,7 @@ TEST_CASE("Chain's are constructable.", "[Chain]")
     }
     SECTION("With rules.")
     {
-        std::vector<std::unique_ptr<const Rule>> rules;
+        std::vector<std::unique_ptr<Rule>> rules;
         rules.push_back(std::make_unique<Accept>(If().type("PING")));
         rules.push_back(std::make_unique<Reject>());
         REQUIRE_NOTHROW(Chain("test_chain", std::move(rules)));
@@ -64,11 +64,11 @@ TEST_CASE("Chain's are comparable.", "[Chain]")
     }
     SECTION("When the number of rules are not the same.")
     {
-        std::vector<std::unique_ptr<const Rule>> rules1;
+        std::vector<std::unique_ptr<Rule>> rules1;
         rules1.push_back(std::make_unique<Accept>(If().to("192.168")));
         rules1.push_back(std::make_unique<Reject>());
         Chain chain1("test_chain", std::move(rules1));
-        std::vector<std::unique_ptr<const Rule>> rules2;
+        std::vector<std::unique_ptr<Rule>> rules2;
         rules2.push_back(std::make_unique<Accept>(If().to("192.168")));
         Chain chain2("test_chain", std::move(rules2));
         REQUIRE_FALSE(chain1 == chain2);
@@ -76,11 +76,11 @@ TEST_CASE("Chain's are comparable.", "[Chain]")
     }
     SECTION("When the rules are the same.")
     {
-        std::vector<std::unique_ptr<const Rule>> rules1;
+        std::vector<std::unique_ptr<Rule>> rules1;
         rules1.push_back(std::make_unique<Accept>(If().to("192.168")));
         rules1.push_back(std::make_unique<Reject>());
         Chain chain1("test_chain", std::move(rules1));
-        std::vector<std::unique_ptr<const Rule>> rules2;
+        std::vector<std::unique_ptr<Rule>> rules2;
         rules2.push_back(std::make_unique<Accept>(If().to("192.168")));
         rules2.push_back(std::make_unique<Reject>());
         Chain chain2("test_chain", std::move(rules2));
@@ -89,11 +89,11 @@ TEST_CASE("Chain's are comparable.", "[Chain]")
     }
     SECTION("When the rules are not the same.")
     {
-        std::vector<std::unique_ptr<const Rule>> rules1;
+        std::vector<std::unique_ptr<Rule>> rules1;
         rules1.push_back(std::make_unique<Accept>(If().to("192.168")));
         rules1.push_back(std::make_unique<Reject>());
         Chain chain1("test_chain", std::move(rules1));
-        std::vector<std::unique_ptr<const Rule>> rules2;
+        std::vector<std::unique_ptr<Rule>> rules2;
         rules2.push_back(std::make_unique<Accept>(If().from("172.16")));
         rules2.push_back(std::make_unique<Reject>());
         Chain chain2("test_chain", std::move(rules2));
@@ -106,7 +106,7 @@ TEST_CASE("Chain's are comparable.", "[Chain]")
 TEST_CASE("Chain's 'append' method appends a new rule to the filter chain.",
           "[Chain]")
 {
-    std::vector<std::unique_ptr<const Rule>> rules;
+    std::vector<std::unique_ptr<Rule>> rules;
     rules.push_back(std::make_unique<Accept>(If().to("192.168")));
     rules.push_back(std::make_unique<Reject>());
     Chain chain1("test_chain", std::move(rules));

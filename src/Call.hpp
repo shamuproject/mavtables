@@ -51,9 +51,9 @@ class Call : public Rule
 
     public:
         Call(std::shared_ptr<Chain> chain,
-             std::optional<const If> condition = {});
+             std::optional<If> condition = {});
         Call(std::shared_ptr<Chain> chain, int priority,
-             std::optional<const If> condition = {});
+             std::optional<If> condition = {});
         virtual Action action(
             const Packet &packet, const MAVAddress &address) const;
         virtual std::unique_ptr<Rule> clone() const;
