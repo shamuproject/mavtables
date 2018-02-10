@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef RECURSIONGUARDDATA_HPP_
-#define RECURSIONGUARDDATA_HPP_
+#ifndef RECURSIONDATA_HPP_
+#define RECURSIONDATA_HPP_
 
 
 #include <mutex>
@@ -26,7 +26,7 @@
 
 /** A data structure used by RecursionGuard to detect unwanted recursion.
  */
-class RecursionGuardData
+class RecursionData
 {
     friend class RecursionGuard;
 
@@ -36,4 +36,4 @@ class RecursionGuardData
 };
 
 
-#endif // RECURSIONGUARDDATA_HPP_
+#endif // RECURSIONDATA_HPP_

@@ -22,17 +22,16 @@
 #include <mutex>
 #include <thread>
 
-#include "RecursionGuardData.hpp"
+#include "RecursionData.hpp"
 
 
 /** Guard against recursion.
  *
  *  A recursion guard is an RAII (Resource Acquisition Is Initialization) data
  *  structure used to raise an error upon recursion.  The constructor marks a
- *  \ref RecursionGuardData structure, acquiring ownership of the containing
- *  function (within the given thread).  Recursion guards treat calls from
- *  different threads and different, therefore, it will not guard against
- *  reentrancy.
+ *  \ref RecursionData structure, acquiring ownership of the containing function
+ *  (within the given thread).  Recursion guards treat calls from different
+ *  threads and different, therefore, it will not guard against reentrancy.
  *
  *  An example of how to use this is:
  *
@@ -42,11 +41,11 @@
  *  int a_function(int value)
  *  {
  *      // shared data between calls
- *      static RecursionGuardData rg_data;
+ *      static RecursionData rdata;
  *      // take ownership of the call
- *      RecursionGuard rg(rg_data);  
+ *      RecursionGuard rguard(rdata);  
  *      return b_function(value);
- *      // the recursion guard is released upon destruction of rg
+ *      // the recursion guard is released upon destruction of rguard
  *  }
  *  ```
  *
@@ -60,10 +59,10 @@
 class RecursionGuard
 {
     private:
-        RecursionGuardData &data_;
+        RecursionData &data_;
 
     public:
-        RecursionGuard(RecursionGuardData &data);
+        RecursionGuard(RecursionData &data);
         ~RecursionGuard();
 };
 

@@ -20,14 +20,14 @@
 #include <catch.hpp>
 
 #include "RecursionError.hpp"
+#include "RecursionData.hpp"
 #include "RecursionGuard.hpp"
-#include "RecursionGuardData.hpp"
 
 
 TEST_CASE("RecursionGuard's are constructable.", "[RecursionGuard]")
 {
-    RecursionGuardData rg_data;
-    REQUIRE_NOTHROW(RecursionGuard(rg_data));
+    RecursionData rdata;
+    REQUIRE_NOTHROW(RecursionGuard(rdata));
 }
 
 
@@ -36,29 +36,29 @@ TEST_CASE("RecusionGuard's prevent recursion within a single thread.",
 {
     SECTION("No recursion.")
     {
-        RecursionGuardData rg_data;
+        RecursionData rdata;
         {
-            REQUIRE_NOTHROW(RecursionGuard(rg_data));
+            REQUIRE_NOTHROW(RecursionGuard(rdata));
         }
         {
-            REQUIRE_NOTHROW(RecursionGuard(rg_data));
+            REQUIRE_NOTHROW(RecursionGuard(rdata));
         }
         {
-            REQUIRE_NOTHROW(RecursionGuard(rg_data));
+            REQUIRE_NOTHROW(RecursionGuard(rdata));
         }
     }
     SECTION("Throws an error on recursion.")
     {
-        RecursionGuardData rg_data;
-        RecursionGuard rg(rg_data);
-        REQUIRE_THROWS_AS(RecursionGuard(rg_data), RecursionError);
-        REQUIRE_THROWS_WITH(RecursionGuard(rg_data), "Recursion detected.");
+        RecursionData rdata;
+        RecursionGuard rg(rdata);
+        REQUIRE_THROWS_AS(RecursionGuard(rdata), RecursionError);
+        REQUIRE_THROWS_WITH(RecursionGuard(rdata), "Recursion detected.");
     }
     SECTION("Is thread safe (calls across threads is not recursion).")
     {
-        RecursionGuardData rg_data;
-        RecursionGuard rg(rg_data);
-        std::thread thread([&](){RecursionGuard rg_(rg_data);});
+        RecursionData rdata;
+        RecursionGuard rguard(rdata);
+        std::thread thread([&](){RecursionGuard rguard_(rdata);});
         thread.join();
     }
 }

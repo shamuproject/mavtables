@@ -41,7 +41,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/RecursionGuardData.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/RecursionData.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Reject.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Rule.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
