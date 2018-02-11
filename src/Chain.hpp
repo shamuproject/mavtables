@@ -34,10 +34,8 @@
  */
 class Chain
 {
-    public:
-        std::string name_;
-
     private:
+        std::string name_;
         std::vector<std::unique_ptr<Rule>> rules_;
         RecursionData recursion_data_;
 
