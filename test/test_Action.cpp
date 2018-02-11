@@ -153,7 +153,7 @@ TEST_CASE("Action's are assignable.", "[Action]")
 }
 
 
-TEST_CASE("Action's are assignable (by move semantics.)", "[Action]")
+TEST_CASE("Action's are assignable (by move semantics).", "[Action]")
 {
     auto a = Action::make_accept(-10);
     auto b = Action::make_accept(100);

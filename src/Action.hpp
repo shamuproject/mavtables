@@ -64,8 +64,6 @@ class Action
         Action::Option action() const;
         void priority(int priority);
         int priority() const;
-        // Action &operator=(const Action &other) = delete;
-        // Action &operator=(Action &&other) = delete;
         /** Assignment operator.
          *
          * \param other Action to copy.
