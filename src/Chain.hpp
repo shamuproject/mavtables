@@ -19,11 +19,8 @@
 #define CHAIN_HPP_
 
 #include <memory>
-#include <mutex>
 #include <ostream>
-#include <set>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "Action.hpp"
@@ -37,10 +34,8 @@
  */
 class Chain
 {
-    public:
-        std::string name_;
-
     private:
+        std::string name_;
         std::vector<std::unique_ptr<Rule>> rules_;
         RecursionData recursion_data_;
 
@@ -59,6 +54,10 @@ class Chain
         void append(std::unique_ptr<Rule> rule);
         const std::string &name() const;
         Chain &operator=(const Chain &other);
+        /** Assignment operator (by move semantics).
+         *
+         * \param other Chain to move from.
+         */
         Chain &operator=(Chain &&other) = default;
 
         friend bool operator==(const Chain &lhs, const Chain &rhs);
