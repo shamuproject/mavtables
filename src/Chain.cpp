@@ -135,10 +135,12 @@ Chain &Chain::operator=(const Chain &other)
 {
     name_ = other.name_;
     rules_.clear();
+
     for (auto &rule : other.rules_)
     {
         rules_.push_back(rule->clone());
     }
+
     recursion_data_ = other.recursion_data_;
     return *this;
 }

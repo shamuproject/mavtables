@@ -35,7 +35,7 @@
  */
 Filter::Filter(Chain default_chain, bool accept_by_default)
     : default_chain_(std::move(default_chain)),
-    accept_by_default_(accept_by_default)
+      accept_by_default_(accept_by_default)
 {
 }
 
@@ -54,8 +54,8 @@ Filter::Filter(Chain default_chain, bool accept_by_default)
 std::pair<bool, int> Filter::will_accept(
     const Packet &packet, const MAVAddress &address)
 {
-
     Action result = default_chain_.action(packet, address);
+
     switch (result.action())
     {
         case Action::ACCEPT:
@@ -64,9 +64,11 @@ std::pair<bool, int> Filter::will_accept(
             return {false, 0};
         case Action::CONTINUE:
             break;
+
         case Action::DEFAULT:
             break;
     }
+
     return {accept_by_default_, 0};
 }
 
@@ -82,7 +84,7 @@ std::pair<bool, int> Filter::will_accept(
 bool operator==(const Filter &lhs, const Filter &rhs)
 {
     return (lhs.default_chain_ == rhs.default_chain_) &&
-        (lhs.accept_by_default_ == rhs.accept_by_default_);
+           (lhs.accept_by_default_ == rhs.accept_by_default_);
 }
 
 
@@ -97,5 +99,5 @@ bool operator==(const Filter &lhs, const Filter &rhs)
 bool operator!=(const Filter &lhs, const Filter &rhs)
 {
     return (lhs.default_chain_ != rhs.default_chain_) ||
-        (lhs.accept_by_default_ != rhs.accept_by_default_);
+           (lhs.accept_by_default_ != rhs.accept_by_default_);
 }
