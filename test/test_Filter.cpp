@@ -133,8 +133,9 @@ TEST_CASE("Filter's 'will_accept' method determines whether to accept or "
     SECTION("Reject packet.")
     {
         Chain chain("test_chain");
-        chain.append(std::make_unique<Accept>());
-        REQUIRE(Filter(chain).will_accept(ping, MAVAddress("192.168")).first);
+        chain.append(std::make_unique<Reject>());
+        REQUIRE_FALSE(
+            Filter(chain).will_accept(ping, MAVAddress("192.168")).first);
     }
     SECTION("Default action.")
     {
