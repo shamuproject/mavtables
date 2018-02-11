@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.3)
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 11)
+set (VERSION_PATCH 12)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -26,6 +26,7 @@ endif()
 
 # packages
 add_subdirectory (cmake)
+find_package (Threads)
 find_package (codecov)
 find_package (Boost 1.56 REQUIRED COMPONENTS)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
@@ -35,12 +36,20 @@ add_subdirectory (lib)
 
 # mavtables
 add_executable (mavtables src/mavtables.cpp)
-target_link_libraries (mavtables ${Boost_LIBRARIES} MAVLink)
+target_link_libraries (mavtables
+    MAVLink 
+    ${Boost_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT})
 install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
 add_executable (unit_tests test/CMakeLists.txt)
-target_link_libraries (unit_tests Catch FakeIt ${Boost_LIBRARIES} MAVLink)
+target_link_libraries (unit_tests
+    Catch
+    FakeIt
+    MAVLink
+    ${Boost_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT})
 add_test(NAME UnitTests COMMAND unit_tests)
 
 # add sources and evaluate test coverage

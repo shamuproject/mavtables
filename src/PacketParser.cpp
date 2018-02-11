@@ -46,7 +46,7 @@ size_t PacketParser::bytes_parsed() const
 
 /** Reset packet parser so it can parse another packet.
  *
- *  If called while parsing a packet, that packet will be lost.
+ *  %If called while parsing a packet, that packet will be lost.
  */
 void PacketParser::clear()
 {
@@ -64,8 +64,8 @@ void PacketParser::clear()
  *  can be used to continue parsing.
  *
  *  \param byte A byte from the MAVLink wire protocol.
- *  \returns A complete v1.0 or v2.0 packet.  If the parser has not yet parsed a
- *      complete packet, nullptr is returned.
+ *  \returns A complete v1.0 or v2.0 packet.  %If the parser has not yet parsed
+ *      a complete packet, nullptr is returned.
  */
 std::unique_ptr<Packet> PacketParser::parse_byte(uint8_t byte)
 {
@@ -162,12 +162,12 @@ void PacketParser::waiting_for_header_(uint8_t byte)
 
 /** Parse packet bytes.
  *
- *  If this byte completes the packet a \ref std::unique_ptr to the packet is
+ *  %If this byte completes the packet a \ref std::unique_ptr to the packet is
  *  returned and the parser is reset to begin parsing another packet (next state
  *  WAITING_FOR_START_BYTE).  Otherwise a nullptr is returned.
  *
  *  \param byte The next byte to attempt parsing.
- *  \returns A unique pointer to the complete packet.  If the packet is not
+ *  \returns A unique pointer to the complete packet.  %If the packet is not
  *      complete a nullptr is returned.
  */
 std::unique_ptr<Packet> PacketParser::waiting_for_packet_(uint8_t byte)

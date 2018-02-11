@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,14 +15,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef RECURSIONCHECKER_HPP_
-#define RECURSIONCHECKER_HPP_
+#include <string>
+#include <utility>
+
+#include "RecursionError.hpp"
 
 
-class RecursionChecker
+/** Construct a RecursionError given a message.
+ *
+ *  \param message The error message.
+ */
+RecursionError::RecursionError(std::string message)
+    : message_(std::move(message))
 {
-    public:
-};
+}
 
 
-#endif // RECURSIONCHECKER_HPP_
+/** Return error message string.
+ *
+ *  \return Error message string.
+ */
+const char *RecursionError::what() const noexcept
+{
+    return message_.c_str();
+}

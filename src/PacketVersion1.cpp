@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  %If not, see <http://www.gnu.org/licenses/>.
 
 
 #include <cstddef>
@@ -32,9 +32,9 @@ namespace packet_v1
 
     /** \copydoc ::Packet::Packet(std::vector<uint8_t> data)
      *
-     *  \throws std::invalid_argument If packet data does not start with magic
+     *  \throws std::invalid_argument %If packet data does not start with magic
      *      byte (0xFE).
-     *  \throws std::length_error If packet data is not of correct length.
+     *  \throws std::length_error %If packet data is not of correct length.
      */
     Packet::Packet(std::vector<uint8_t> data)
         : ::Packet(std::move(data))
@@ -118,7 +118,7 @@ namespace packet_v1
 
     /** \copydoc ::Packet::name()
      *
-     *  \throws std::runtime_error If the packet data has an invalid ID.
+     *  \throws std::runtime_error %If the packet data has an invalid ID.
      *  \complexity \f$O(log(n))\f$ where \f$n\f$ is the total number of MAVLink
      *      messages.
      */
@@ -157,7 +157,7 @@ namespace packet_v1
      *  \thanks The [mavlink-router](https://github.com/intel/mavlink-router)
      *      project for an example of how to extract the destination address.
      *
-     *  \throws std::runtime_error If the packet data has an invalid ID.
+     *  \throws std::runtime_error %If the packet data has an invalid ID.
      */
     std::optional<MAVAddress> Packet::dest() const
     {
@@ -248,7 +248,7 @@ namespace packet_v1
     /** Cast data as a v1.0 packet header structure pointer.
      *
      *  \return A pointer to the given data, cast to a v1.0 header structure.
-     *      If an incomplete header is given a nullptr will be returned.
+     *      %If an incomplete header is given a nullptr will be returned.
      */
     const struct mavlink::v1_header *header(
         const std::vector<uint8_t> &data)

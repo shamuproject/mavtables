@@ -19,7 +19,6 @@
 #include "Chain.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include "RecursionChecker.hpp"
 
 
 namespace
@@ -40,12 +39,10 @@ namespace
             ~TestChain() = default;
             // LCOV_EXCL_STOP
             virtual Action action(
-                const Packet &packet, const MAVAddress &address,
-                RecursionChecker &recursion_checker) const
+                const Packet &packet, const MAVAddress &address)
             {
                 (void)packet;
                 (void)address;
-                (void)recursion_checker;
                 return Action::make_accept();
             }
     };

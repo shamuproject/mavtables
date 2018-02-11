@@ -63,18 +63,15 @@ std::ostream &Reject::print_(std::ostream &os) const
 }
 
 
-/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
- *  If the condition has not been set or it matches the given packet/address
+ *  %If the condition has not been set or it matches the given packet/address
  *  combination then it will return the reject object, otherwise it will return
  *  the continue object.
  */
 Action Reject::action(
-    const Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
+    const Packet &packet, const MAVAddress &address) const
 {
-    (void)recursion_checker;
-
     if (!condition_ || condition_->check(packet, address))
     {
         return Action::make_reject();

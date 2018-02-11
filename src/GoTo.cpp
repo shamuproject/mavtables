@@ -70,7 +70,8 @@ GoTo::GoTo(
  *  \throws std::invalid_argument if the given pointer is nullptr.
  */
 GoTo::GoTo(
-    std::shared_ptr<Chain> chain, int priority, std::optional<If> condition)
+    std::shared_ptr<Chain> chain, int priority,
+    std::optional<If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain)), priority_(priority)
 {
     if (chain_ == nullptr)
@@ -88,7 +89,7 @@ GoTo::GoTo(
  */
 std::ostream &GoTo::print_(std::ostream &os) const
 {
-    os << "goto " << chain_->name;
+    os << "goto " << chain_->name();
 
     if (priority_)
     {
@@ -104,9 +105,9 @@ std::ostream &GoTo::print_(std::ostream &os) const
 }
 
 
-/** \copydoc Rule::action(const Packet&,const MAVAddress&,RecursionChecker&)const
+/** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
- *  The GoTo class delegates the action choice to the contained \ref Chain.  If
+ *  The GoTo class delegates the action choice to the contained \ref Chain.  %If
  *  the \ref Chain decides on the continue action this method will return the
  *  default instead since final decision for a \ref GoTo should be with the
  *  contained \ref Chain or with the default action.  In other words, once a
@@ -114,12 +115,11 @@ std::ostream &GoTo::print_(std::ostream &os) const
  *  regardless of the contained chain.
  */
 Action GoTo::action(
-    const Packet &packet, const MAVAddress &address,
-    RecursionChecker &recursion_checker) const
+    const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {
-        auto result = chain_->action(packet, address, recursion_checker);
+        auto result = chain_->action(packet, address);
 
         if (priority_)
         {
@@ -129,7 +129,7 @@ Action GoTo::action(
         }
 
         // Rewrite continue actions into default actions.
-        if (result.action == Action::CONTINUE)
+        if (result.action() == Action::CONTINUE)
         {
             return Action::make_default();
         }

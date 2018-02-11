@@ -24,14 +24,25 @@
 
 /** Construct an Action.
  *
- *  \param action_ The action this result represents.
+ *  \param action The action this result represents.
  *  \param priority The priority, only used with Action::ACCEPT.
  *  \sa Action::Option
  */
 Action::Action(
-    Action::Option action_, std::optional<int> priority)
-    : action(action_), priority_(std::move(priority))
+    Action::Option action, std::optional<int> priority)
+    : action_(action), priority_(std::move(priority))
 {
+}
+
+
+
+/** Return the action that has been chosen.
+ *
+ *  \returns The Action::Option enum associated with this action.
+ */
+Action::Option Action::action() const
+{
+    return action_;
 }
 
 
@@ -47,7 +58,7 @@ Action::Action(
  */
 void Action::priority(int priority)
 {
-    if (action == Action::ACCEPT)
+    if (action_ == Action::ACCEPT)
     {
         if (!priority_)
         {
@@ -139,7 +150,7 @@ Action Action::make_default()
  */
 bool operator==(const Action &lhs, const Action &rhs)
 {
-    return (lhs.action == rhs.action) && (lhs.priority() == rhs.priority());
+    return (lhs.action() == rhs.action()) && (lhs.priority() == rhs.priority());
 }
 
 
@@ -153,7 +164,7 @@ bool operator==(const Action &lhs, const Action &rhs)
  */
 bool operator!=(const Action &lhs, const Action &rhs)
 {
-    return (lhs.action != rhs.action) || (lhs.priority() != rhs.priority());
+    return (lhs.action() != rhs.action()) || (lhs.priority() != rhs.priority());
 }
 
 
@@ -166,7 +177,7 @@ bool operator!=(const Action &lhs, const Action &rhs)
  */
 std::ostream &operator<<(std::ostream &os, const Action &action)
 {
-    switch (action.action)
+    switch (action.action())
     {
         case Action::ACCEPT:
             os << "accept";

@@ -26,7 +26,6 @@
 #include "Packet.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "RecursionChecker.hpp"
 #include "Rule.hpp"
 #include "util.hpp"
 
@@ -147,19 +146,17 @@ TEST_CASE("Call's 'action' method determines what to do with a "
         Action::make_accept(10));
     std::shared_ptr<Chain> accept10_chain = mock_shared(accept10_mock.get());
     auto ping = packet_v2::Packet(to_vector(PingV2()));
-    RecursionChecker rc;
     SECTION("Check call to chain's action method.")
     {
         REQUIRE(Call(std::make_shared<TestChain>()).action(
-                    ping, MAVAddress("192.168"), rc) == Action::make_accept());
+                    ping, MAVAddress("192.168")) == Action::make_accept());
         fakeit::Mock<Chain> mock;
         fakeit::When(Method(mock, action)).AlwaysReturn(Action::make_accept());
         std::shared_ptr<Chain> chain = mock_shared(mock.get());
-        Call(chain).action(ping, MAVAddress("192.168"), rc);
+        Call(chain).action(ping, MAVAddress("192.168"));
         fakeit::Verify(
-            Method(mock, action).Matching([&](auto & a, auto & b, auto & c)
+            Method(mock, action).Matching([&](auto & a, auto & b)
         {
-            (void)c;
             return a == ping && b == MAVAddress("192.168");
         })).Once();
     }
@@ -167,24 +164,24 @@ TEST_CASE("Call's 'action' method determines what to do with a "
     {
         // Without priority.
         REQUIRE(
-            Call(accept_chain).action(ping, MAVAddress("192.168"), rc) ==
+            Call(accept_chain).action(ping, MAVAddress("192.168")) ==
             Action::make_accept());
         REQUIRE(
-            Call(reject_chain).action(ping, MAVAddress("192.168"), rc) ==
+            Call(reject_chain).action(ping, MAVAddress("192.168")) ==
             Action::make_reject());
         REQUIRE(
-            Call(continue_chain).action(ping, MAVAddress("192.168"), rc) ==
+            Call(continue_chain).action(ping, MAVAddress("192.168")) ==
             Action::make_continue());
         REQUIRE(
-            Call(default_chain).action(ping, MAVAddress("192.168"), rc) ==
+            Call(default_chain).action(ping, MAVAddress("192.168")) ==
             Action::make_default());
         // With priority (adds priority).
         REQUIRE(
-            Call(accept_chain, 3).action(ping, MAVAddress("192.168"), rc) ==
+            Call(accept_chain, 3).action(ping, MAVAddress("192.168")) ==
             Action::make_accept(3));
         // Priority already set (no override).
         REQUIRE(
-            Call(accept10_chain, 3).action(ping, MAVAddress("192.168"), rc) ==
+            Call(accept10_chain, 3).action(ping, MAVAddress("192.168")) ==
             Action::make_accept(10));
     }
     SECTION("Delegates to the contained chain if the conditional is a match.")
@@ -192,35 +189,35 @@ TEST_CASE("Call's 'action' method determines what to do with a "
         // Without priority.
         REQUIRE(
             Call(accept_chain, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept());
+                ping, MAVAddress("192.168")) == Action::make_accept());
         REQUIRE(
             Call(reject_chain, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_reject());
+                ping, MAVAddress("192.168")) == Action::make_reject());
         REQUIRE(
             Call(continue_chain, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
         REQUIRE(
             Call(default_chain, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_default());
+                ping, MAVAddress("192.168")) == Action::make_default());
         // With priority (adds priority).
         REQUIRE(
             Call(accept_chain, 3, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept(3));
+                ping, MAVAddress("192.168")) == Action::make_accept(3));
         // Priority already set (no override).
         REQUIRE(
             Call(accept10_chain, 3, If().to("192.168")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_accept(10));
+                ping, MAVAddress("192.168")) == Action::make_accept(10));
     }
     SECTION("Returns the continue action if the conditional does not match.")
     {
         // Without priority.
         REQUIRE(
             Call(accept_chain, If().to("172.16")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
         // With priority.
         REQUIRE(
             Call(accept_chain, 3, If().to("172.16")).action(
-                ping, MAVAddress("192.168"), rc) == Action::make_continue());
+                ping, MAVAddress("192.168")) == Action::make_continue());
     }
 }
 

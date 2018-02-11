@@ -18,26 +18,58 @@
 #ifndef CHAIN_HPP_
 #define CHAIN_HPP_
 
-
+#include <memory>
+#include <mutex>
+#include <ostream>
+#include <set>
 #include <string>
+#include <thread>
+#include <vector>
 
 #include "Action.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include "RecursionChecker.hpp"
+#include <RecursionGuard.hpp>
+#include "Rule.hpp"
 
 
+/** A filter chain, containing a list of rules to check packets against.
+ */
 class Chain
 {
     public:
-        const std::string name;
-        Chain(std::string name_);
+        std::string name_;
+
+    private:
+        std::vector<std::unique_ptr<Rule>> rules_;
+        RecursionData recursion_data_;
+
+    public:
+        Chain(const Chain &other);
+        /** Move constructor.
+         *
+         *  \param other Chain to move from.
+         */
+        Chain(Chain &&other) = default;
+        Chain(std::string name_,
+              std::vector<std::unique_ptr<Rule>> &&rules = {});
         virtual ~Chain() = default;
         virtual Action action(
-            const Packet &packet, const MAVAddress &address,
-            RecursionChecker &recursion_checker) const;
+            const Packet &packet, const MAVAddress &address);
+        void append(std::unique_ptr<Rule> rule);
+        const std::string &name() const;
+        Chain &operator=(const Chain &other);
+        Chain &operator=(Chain &&other) = default;
 
+        friend bool operator==(const Chain &lhs, const Chain &rhs);
+        friend bool operator!=(const Chain &lhs, const Chain &rhs);
+        friend std::ostream &operator<<(std::ostream &os, const Chain &chain);
 };
+
+
+bool operator==(const Chain &lhs, const Chain &rhs);
+bool operator!=(const Chain &lhs, const Chain &rhs);
+std::ostream &operator<<(std::ostream &os, const Chain &chain);
 
 
 #endif // CHAIN_HPP_

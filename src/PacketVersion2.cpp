@@ -32,9 +32,9 @@ namespace packet_v2
 
     /** \copydoc ::Packet::Packet(std::vector<uint8_t> data)
      *
-     *  \throws std::invalid_argument If packet data does not start with magic
+     *  \throws std::invalid_argument %If packet data does not start with magic
      *      byte (0xFD).
-     *  \throws std::length_error If packet data is not of correct length.
+     *  \throws std::length_error %If packet data is not of correct length.
      */
     Packet::Packet(std::vector<uint8_t> data)
         : ::Packet(std::move(data))
@@ -127,7 +127,7 @@ namespace packet_v2
 
     /** \copydoc ::Packet::name()
      *
-     *  \throws std::runtime_error If the packet data has an invalid ID.
+     *  \throws std::runtime_error %If the packet data has an invalid ID.
      *  \complexity \f$O(log(n))\f$ where \f$n\f$ is the total number of MAVLink
      *      messages.
      */
@@ -162,7 +162,7 @@ namespace packet_v2
 
     /** \copydoc ::Packet::dest()
      *
-     *  \throws std::runtime_error If the packet data has an invalid ID.
+     *  \throws std::runtime_error %If the packet data has an invalid ID.
      *  \complexity \f$O(1)\f$
      *  \thanks The [mavlink-router](https://github.com/intel/mavlink-router)
      *      project for an example of how to extract the destination address.
@@ -240,7 +240,7 @@ namespace packet_v2
      *
      *  \relates packet_v2::Packet
      *  \throws std::invalid_argument Header is not complete or is invalid.
-     *  \throws std::length_error If packet data is not of correct length.
+     *  \throws std::length_error %If packet data is not of correct length.
      */
     bool is_signed(const std::vector<uint8_t> &data)
     {
@@ -299,7 +299,7 @@ namespace packet_v2
     /** Cast data as a v2.0 packet header structure pointer.
      *
      *  \return A pointer to the given data, cast to a v2.0 header structure.
-     *      If an incomplete header is given a nullptr will be returned.
+     *      %If an incomplete header is given a nullptr will be returned.
      */
     const struct mavlink::v2_header *header(
         const std::vector<uint8_t> &data)

@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,3 +13,27 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+#ifndef RECURSIONERROR_HPP_
+#define RECURSIONERROR_HPP_
+
+
+#include <string>
+#include <exception>
+
+
+/** Exception type emmited by a recursion guard.
+ */
+class RecursionError : public std::exception
+{
+    private:
+        std::string message_;
+
+    public:
+        RecursionError(std::string message);
+        const char *what() const noexcept;
+};
+
+
+#endif // RECURSIONERROR_HPP_

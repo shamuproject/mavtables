@@ -81,7 +81,7 @@ class Packet
         /** Return destination address.
          *
          *  Where the packet is sent to.  This is optional because not all
-         *  packets have a destination.   If a system is specified but not a
+         *  packets have a destination.   %If a system is specified but not a
          *  component a component ID of 0 will be used (the broadcast ID).
          *
          *  \returns The destination MAVLink address of the packet if not a

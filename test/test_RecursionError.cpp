@@ -20,45 +20,42 @@
 
 #include <catch.hpp>
 
-#include "DNSLookupError.hpp"
+#include "RecursionError.hpp"
 
 
-[[noreturn]] static void throw_lookup_error(std::string hostname)
+[[noreturn]] static void throw_recursion_error(std::string message)
 {
-    throw DNSLookupError(hostname);
+    throw RecursionError(message);
 }
 
 
-TEST_CASE("DNSLookupError's can be thrown.", "[DNSLookupError]")
+TEST_CASE("RecursionError's can be thrown.", "[RecursionError]")
 {
     SECTION("And can be caught.")
     {
-        REQUIRE_THROWS(throw_lookup_error("example.com"));
+        REQUIRE_THROWS(throw_recursion_error("example"));
     }
     SECTION("And can be caught as DNSLookupError.")
     {
-        REQUIRE_THROWS_AS(throw_lookup_error("example.com"), DNSLookupError);
+        REQUIRE_THROWS_AS(throw_recursion_error("example"), RecursionError);
     }
     SECTION("And can be caught as std::exception.")
     {
-        REQUIRE_THROWS_AS(throw_lookup_error("example.com"), std::exception);
+        REQUIRE_THROWS_AS(throw_recursion_error("example"), std::exception);
     }
 }
 
 
-TEST_CASE("The 'what' method gives the unresolved hostname.",
-          "[DNSLookupError]")
+TEST_CASE("RecursionError's have a message.", "[RecursionError]")
 {
-    REQUIRE_THROWS_WITH(
-        throw_lookup_error("example.com"),
-        "DNSLookupError: Could not find an IP address for \"example.com\"");
+    REQUIRE_THROWS_WITH(throw_recursion_error("example"), "example");
 }
 
 
 // Required for complete function coverage.
-TEST_CASE("Run dynamic destructors (DNSLookupError).", "[DNSLookupError]")
+TEST_CASE("Run dynamic destructors (RecursionError).", "[RecursionError]")
 {
-    DNSLookupError *dns = nullptr;
-    REQUIRE_NOTHROW(dns = new DNSLookupError("error"));
-    REQUIRE_NOTHROW(delete dns);
+    RecursionError *recursion = nullptr;
+    REQUIRE_NOTHROW(recursion = new RecursionError("error"));
+    REQUIRE_NOTHROW(delete recursion);
 }
