@@ -33,10 +33,30 @@ class QueuedPacket
         unsigned long long ticket_number_;
 
     public:
+        /** Copy constructor.
+         *
+         *  \param other QueuedPacket to copy.
+         */
+        QueuedPacket(const QueuedPacket &other) = default;
+        /** Move constructor.
+         *
+         *  \param other QueuedPacket to move from.
+         */
+        QueuedPacket(QueuedPacket &&other) = default;
         QueuedPacket(
             std::shared_ptr<Packet> packet, int priority,
             unsigned long long ticket_number);
         std::shared_ptr<Packet> packet() const;
+        /** Assignment operator.
+         *
+         * \param other QueuedPacket to copy.
+         */
+        QueuedPacket &operator=(const QueuedPacket &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         * \param other QueuedPacket to move from.
+         */
+        QueuedPacket &operator=(QueuedPacket &&other) = default;
 
         friend bool operator==(
             const QueuedPacket &lhs, const QueuedPacket &rhs);
