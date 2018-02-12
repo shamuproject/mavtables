@@ -25,22 +25,39 @@
 #include "Packet.hpp"
 
 
+/** Add a connection to the pool.
+ *
+ *  \param connection The connection to add.
+ *  \throws std::invalid_argument if the given connection pointer is nullptr.
+ */
 void ConnectionPool::add(std::shared_ptr<Connection> connection)
 {
     if (connection == nullptr)
     {
         throw std::invalid_argument("Given Connection pointer is null.");
     }
+
     connections_.insert(std::move(connection));
 }
 
 
+/** Remove a connection from the pool.
+ *
+ *  \param connection The connection to remove.
+ */
 void ConnectionPool::remove(const std::shared_ptr<Connection> &connection)
 {
     connections_.erase(connection);
 }
 
 
+/** Send a packet to every connection.
+ *
+ *  \note Each connection may decide to ignore the packet based on the filter
+ *      rules.
+ *
+ *  \param packet Send a packet to every connection.
+ */
 void ConnectionPool::send(std::shared_ptr<const Packet> packet)
 {
     for (auto i : connections_)

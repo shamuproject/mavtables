@@ -26,6 +26,11 @@
 #include "Packet.hpp"
 
 
+/** A pool of connections to send packets out on.
+ *
+ *  A connection pool stores a reference to all connections that packets can be
+ *  sent out over.
+ */
 class ConnectionPool
 {
     private:

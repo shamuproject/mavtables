@@ -26,7 +26,8 @@ class Connection
 {
     public:
         virtual ~Connection();
-        void send(std::shared_ptr<const Packet> packet);
+        // virtual for testing
+        virtual void send(std::shared_ptr<const Packet> packet);
 };
 
 
