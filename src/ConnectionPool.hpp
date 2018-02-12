@@ -15,19 +15,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef CONNECTION_HPP_
-#define CONNECTION_HPP_
+#ifndef CONNECTIONPOOL_HPP_
+#define CONNECTIONPOOL_HPP_
 
 
+#include <memory>
+#include <set>
+
+#include "Connection.hpp"
 #include "Packet.hpp"
 
 
-class Connection
+class ConnectionPool
 {
+    private:
+        std::set<std::shared_ptr<Connection>> connections_;
+
     public:
-        virtual ~Connection();
+        void add(std::shared_ptr<Connection> connection);
+        void remove(const std::shared_ptr<Connection> &connection);
         void send(std::shared_ptr<const Packet> packet);
 };
 
 
-#endif // CONNECTION_HPP_
+#endif // CONNECTIONPOOL_HPP_

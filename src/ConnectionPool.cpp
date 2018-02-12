@@ -15,19 +15,36 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef CONNECTION_HPP_
-#define CONNECTION_HPP_
+#include <memory>
+#include <set>
+#include <stdexcept>
+#include <utility>
 
-
+#include "Connection.hpp"
+#include "ConnectionPool.hpp"
 #include "Packet.hpp"
 
 
-class Connection
+void ConnectionPool::add(std::shared_ptr<Connection> connection)
 {
-    public:
-        virtual ~Connection();
-        void send(std::shared_ptr<const Packet> packet);
-};
+    if (connection == nullptr)
+    {
+        throw std::invalid_argument("Given Connection pointer is null.");
+    }
+    connections_.insert(std::move(connection));
+}
 
 
-#endif // CONNECTION_HPP_
+void ConnectionPool::remove(const std::shared_ptr<Connection> &connection)
+{
+    connections_.erase(connection);
+}
+
+
+void ConnectionPool::send(std::shared_ptr<const Packet> packet)
+{
+    for (auto i : connections_)
+    {
+        i->send(packet);
+    }
+}

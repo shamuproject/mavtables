@@ -21,3 +21,9 @@
 Connection::~Connection()
 {
 }
+
+
+void Connection::send(std::shared_ptr<const Packet> packet)
+{
+    (void)packet;
+}
