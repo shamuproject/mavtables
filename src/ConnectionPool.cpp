@@ -30,7 +30,7 @@
  *  \param connection The connection to add.
  *  \throws std::invalid_argument if the given connection pointer is nullptr.
  */
-void ConnectionPool::add(std::shared_ptr<Connection> connection)
+void ConnectionPool::add(std::shared_ptr<Connection<>> connection)
 {
     if (connection == nullptr)
     {
@@ -45,7 +45,7 @@ void ConnectionPool::add(std::shared_ptr<Connection> connection)
  *
  *  \param connection The connection to remove.
  */
-void ConnectionPool::remove(const std::shared_ptr<Connection> &connection)
+void ConnectionPool::remove(const std::shared_ptr<Connection<>> &connection)
 {
     connections_.erase(connection);
 }

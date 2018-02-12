@@ -34,11 +34,11 @@
 class ConnectionPool
 {
     private:
-        std::set<std::shared_ptr<Connection>> connections_;
+        std::set<std::shared_ptr<Connection<>>> connections_;
 
     public:
-        void add(std::shared_ptr<Connection> connection);
-        void remove(const std::shared_ptr<Connection> &connection);
+        void add(std::shared_ptr<Connection<>> connection);
+        void remove(const std::shared_ptr<Connection<>> &connection);
         void send(std::shared_ptr<const Packet> packet);
 };
 

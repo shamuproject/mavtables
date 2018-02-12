@@ -18,12 +18,12 @@
 #include "Connection.hpp"
 
 
-Connection::~Connection()
-{
-}
-
-
-void Connection::send(std::shared_ptr<const Packet> packet)
-{
-    (void)packet;
-}
+// Connection::~Connection()
+// {
+// }
+//
+//
+// void Connection::send(std::shared_ptr<const Packet> packet)
+// {
+//     (void)packet;
+// }
