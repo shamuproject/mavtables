@@ -22,7 +22,6 @@
 #include <memory>
 #include <set>
 #include <shared_mutex>
-#include <mutex>
 
 #include "Connection.hpp"
 #include "Packet.hpp"
