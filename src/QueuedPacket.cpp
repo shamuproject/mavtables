@@ -33,7 +33,7 @@
  *  \throws std::invalid_argument if the given packet pointer is nullptr.
  */
 QueuedPacket::QueuedPacket(
-    std::shared_ptr<Packet> packet, int priority,
+    std::shared_ptr<const Packet> packet, int priority,
     unsigned long long ticket_number)
     : packet_(std::move(packet)), priority_(priority),
       ticket_number_(ticket_number)
@@ -49,7 +49,7 @@ QueuedPacket::QueuedPacket(
  *
  *  \returns The contained MAVLink packet.
  */
-std::shared_ptr<Packet> QueuedPacket::packet() const
+std::shared_ptr<const Packet> QueuedPacket::packet() const
 {
     return packet_;
 }
