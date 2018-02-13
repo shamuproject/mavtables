@@ -19,13 +19,11 @@
 #include <utility>
 
 #include <catch.hpp>
-// #include <fakeit.hpp>
 
 #include "PacketVersion2.hpp"
 #include "QueuedPacket.hpp"
 #include "util.hpp"
 
-// #include "common.hpp"
 #include "common_Packet.hpp"
 
 
