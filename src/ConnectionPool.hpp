@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <set>
+#include <shared_mutex>
 
 #include "Connection.hpp"
 #include "Packet.hpp"
@@ -35,6 +36,7 @@ class ConnectionPool
 {
     private:
         std::set<std::shared_ptr<Connection<>>> connections_;
+        std::shared_mutex mutex_;
 
     public:
         void add(std::shared_ptr<Connection<>> connection);

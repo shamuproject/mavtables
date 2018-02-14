@@ -16,7 +16,9 @@
 
 
 #include <memory>
+#include <mutex>
 #include <set>
+#include <shared_mutex>
 #include <stdexcept>
 #include <utility>
 
@@ -37,6 +39,7 @@ void ConnectionPool::add(std::shared_ptr<Connection<>> connection)
         throw std::invalid_argument("Given Connection pointer is null.");
     }
 
+    std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.insert(std::move(connection));
 }
 
@@ -47,6 +50,7 @@ void ConnectionPool::add(std::shared_ptr<Connection<>> connection)
  */
 void ConnectionPool::remove(const std::shared_ptr<Connection<>> &connection)
 {
+    std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.erase(connection);
 }
 
@@ -60,6 +64,8 @@ void ConnectionPool::remove(const std::shared_ptr<Connection<>> &connection)
  */
 void ConnectionPool::send(std::shared_ptr<const Packet> packet)
 {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+
     for (auto i : connections_)
     {
         i->send(packet);

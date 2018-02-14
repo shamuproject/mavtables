@@ -25,6 +25,13 @@
 #include "Packet.hpp"
 
 
+/** A packet in the queue to be sent out.
+ *
+ *  This is the data structure used in the priority queues used by the \ref
+ *  Connection class.  It stores a MAVLink packet as well as a priority and
+ *  ticket number used to maintain packet order in the priority queue when
+ *  packets have the same priority.
+ */
 class QueuedPacket
 {
     private:
