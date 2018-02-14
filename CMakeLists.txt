@@ -47,6 +47,7 @@ add_executable (unit_tests test/CMakeLists.txt)
 target_link_libraries (unit_tests
     Catch
     FakeIt
+    FakeClock
     MAVLink
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
