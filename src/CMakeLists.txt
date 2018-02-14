@@ -4,7 +4,6 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Call.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Filter.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.cpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/Connection.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/ConnectionPool.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Chain.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.cpp"
@@ -27,6 +26,7 @@ set (SOURCES
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/AddressPool.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Call.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Filter.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.hpp"
