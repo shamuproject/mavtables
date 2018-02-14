@@ -194,7 +194,11 @@ bool operator>=(const QueuedPacket &lhs, const QueuedPacket &rhs)
 
 /** Print the packet to the given output stream.
  *
- *
+ *  Some examples are:
+ *      - `HEARTBEAT (#1) from 16.8 (v1.0) with priority -3`
+ *      - `PING (#4) from 128.4 to 16.8 (v2.0) with priority 0`
+ *      - `DATA_TRANSMISSION_HANDSHAKE (#130) from 16.8 (v2.0) with priority 3`
+ *      - `ENCAPSULATED_DATA (#131) from 128.4 (v2.0) with priority 1`
  *
  *  \relates QueuedPacket
  *  \param os The output stream to print to.
