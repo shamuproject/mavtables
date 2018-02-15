@@ -125,8 +125,11 @@ bool operator<(const QueuedPacket &lhs, const QueuedPacket &rhs)
     // std::cout << "b: " << b << std::endl;
     // std::cout << "c: " << c << std::endl;
     return (lhs.priority_ < rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
-            (lhs.ticket_number_ - rhs.ticket_number_ >
+            (rhs.ticket_number_ - lhs.ticket_number_ >
              std::numeric_limits<unsigned long long>::max() / 2));
+    // return (lhs.priority_ < rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
+    //         lhs.ticket_number_ < rhs.ticket_number_);
+    // return lhs.ticket_number_ < rhs.ticket_number_;
 }
 
 
@@ -159,7 +162,7 @@ bool operator>(const QueuedPacket &lhs, const QueuedPacket &rhs)
     // std::cout << "b: " << b << std::endl;
     // std::cout << "c: " << c << std::endl;
     return (lhs.priority_ > rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
-            (rhs.ticket_number_ - lhs.ticket_number_ >
+            (lhs.ticket_number_ - rhs.ticket_number_ >
              std::numeric_limits<unsigned long long>::max() / 2));
 }
 

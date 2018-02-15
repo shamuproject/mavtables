@@ -60,25 +60,25 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
     {
         // Priority takes precidence.
         REQUIRE(
-            QueuedPacket(packet, 0, 100) < QueuedPacket(packet, 3, 10));
+            QueuedPacket(packet, 0, 10) < QueuedPacket(packet, 3, 100));
         REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 10) < QueuedPacket(packet, 0, 100));
+            QueuedPacket(packet, 3, 100) < QueuedPacket(packet, 0, 10));
         // Ticket number.
         REQUIRE(
-            QueuedPacket(packet, 3, 10) < QueuedPacket(packet, 3, 100));
-        REQUIRE_FALSE(
             QueuedPacket(packet, 3, 100) < QueuedPacket(packet, 3, 10));
+        REQUIRE_FALSE(
+            QueuedPacket(packet, 3, 10) < QueuedPacket(packet, 3, 100));
         // Ticket number, with rollover.
         REQUIRE(
+            QueuedPacket(packet, 3, 0) <
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2 + 1) <
-            QueuedPacket(packet, 3, 0));
+                std::numeric_limits<unsigned long long>::max() / 2 + 1));
         REQUIRE_FALSE(
+            QueuedPacket(packet, 3, 0) <
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2) <
-            QueuedPacket(packet, 3, 0));
+                std::numeric_limits<unsigned long long>::max() / 2));
         // Not equal.
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) < QueuedPacket(packet, 3, 10));
@@ -92,20 +92,20 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
             QueuedPacket(packet, 0, 100) > QueuedPacket(packet, 3, 10));
         // Ticket number.
         REQUIRE(
-            QueuedPacket(packet, 3, 100) > QueuedPacket(packet, 3, 10));
-        REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) > QueuedPacket(packet, 3, 100));
+        REQUIRE_FALSE(
+            QueuedPacket(packet, 3, 100) > QueuedPacket(packet, 3, 10));
         // Ticket number, with rollover.
         REQUIRE(
-            QueuedPacket(packet, 3, 0) >
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2 + 1));
+                std::numeric_limits<unsigned long long>::max() / 2 + 1) >
+            QueuedPacket(packet, 3, 0));
         REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 0) >
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2));
+                std::numeric_limits<unsigned long long>::max() / 2) >
+            QueuedPacket(packet, 3, 0));
         // Not equal.
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) > QueuedPacket(packet, 3, 10));
@@ -114,48 +114,32 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
     {
         // Equality.
         REQUIRE(QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 3, 10));
-        REQUIRE(
-            QueuedPacket(packet, 0, 10) <= QueuedPacket(packet, 3, 10));
-        REQUIRE(
-            QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 3, 100));
-        REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 0, 10));
-        REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 100) <= QueuedPacket(packet, 3, 10));
         // Priority takes precidence.
         REQUIRE(
-            QueuedPacket(packet, 0, 100) <= QueuedPacket(packet, 3, 10));
+            QueuedPacket(packet, 0, 10) <= QueuedPacket(packet, 3, 100));
         REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 0, 100));
+            QueuedPacket(packet, 3, 100) <= QueuedPacket(packet, 0, 10));
         // Ticket number.
         REQUIRE(
-            QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 3, 100));
-        REQUIRE_FALSE(
             QueuedPacket(packet, 3, 100) <= QueuedPacket(packet, 3, 10));
+        REQUIRE_FALSE(
+            QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 3, 100));
         // Ticket number, with rollover.
         REQUIRE(
+            QueuedPacket(packet, 3, 0) <=
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2 + 1) <=
-            QueuedPacket(packet, 3, 0));
+                std::numeric_limits<unsigned long long>::max() / 2 + 1));
         REQUIRE_FALSE(
+            QueuedPacket(packet, 3, 0) <=
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2) <=
-            QueuedPacket(packet, 3, 0));
+                std::numeric_limits<unsigned long long>::max() / 2));
     }
     SECTION("with >=")
     {
         // Equality.
         REQUIRE(QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 3, 10));
-        REQUIRE(
-            QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 0, 10));
-        REQUIRE(
-            QueuedPacket(packet, 3, 100) >= QueuedPacket(packet, 3, 10));
-        REQUIRE_FALSE(
-            QueuedPacket(packet, 0, 10) >= QueuedPacket(packet, 3, 10));
-        REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 3, 100));
         // Priority takes precidence.
         REQUIRE(
             QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 0, 100));
@@ -163,20 +147,20 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
             QueuedPacket(packet, 0, 100) >= QueuedPacket(packet, 3, 10));
         // Ticket number.
         REQUIRE(
-            QueuedPacket(packet, 3, 100) >= QueuedPacket(packet, 3, 10));
-        REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 3, 100));
+        REQUIRE_FALSE(
+            QueuedPacket(packet, 3, 100) >= QueuedPacket(packet, 3, 10));
         // Ticket number, with rollover.
         REQUIRE(
-            QueuedPacket(packet, 3, 0) >=
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2 + 1));
+                std::numeric_limits<unsigned long long>::max() / 2 + 1) >=
+            QueuedPacket(packet, 3, 0));
         REQUIRE_FALSE(
-            QueuedPacket(packet, 3, 0) >=
             QueuedPacket(
                 packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2));
+                std::numeric_limits<unsigned long long>::max() / 2) >=
+            QueuedPacket(packet, 3, 0));
     }
 }
 
