@@ -20,8 +20,26 @@
 
 
 #include <array>
-#include <sstream>
 #include <boost/range/irange.hpp>
+#include <ostream>
+#include <sstream>
+#include <vector>
+
+
+/** Convert any object supporting the output stream operator (<<) to a string.
+ *
+ *  \ingroup utility
+ *  \tparam T Type of the object to convert to a string.
+ *  \param object The object to convert to a string.
+ *  \return The string representing the object.
+ */
+template <class T>
+std::string str(const T &object)
+{
+    std::ostringstream oss;
+    oss << object;
+    return oss.str();
+}
 
 
 /** Convert numeric types to bytes.
@@ -48,20 +66,27 @@ std::array<ByteType, sizeof(T)> to_bytes(T number)
 }
 
 
-/** Convert any object supporting the output stream operator (<<) to a string.
+/** Print a vector to the given output stream.
  *
- *  \ingroup utility
- *  \tparam T Type of the object to convert to a string.
- *  \param object The object to convert to a string.
- *  \return The string representing the object.
+ *  \param T The type stored in the vector, it must support the << operator.
+ *  \param os The output stream to print to.
+ *  \param vector The vector of elements to print.
  */
 template <class T>
-std::string str(const T &object)
+std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
 {
-    std::ostringstream oss;
-    oss << object;
-    return oss.str();
+    os << "[";
+    if (vector.size() > 0)
+    {
+        auto it = vector.begin();
+        os << *(it++);
+        for (; it != vector.end(); ++it)
+        {
+            os << ", " << *it;
+        }
+    }
+    os << "]";
+    return os;
 }
-
 
 #endif // UTIL_HPP_
