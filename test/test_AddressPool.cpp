@@ -44,7 +44,7 @@ TEST_CASE("AddressPool's can be constructed.", "[AddressPool]")
 }
 
 
-TEST_CASE("AddressPool's 'add' method adds an address to the pool.", 
+TEST_CASE("AddressPool's 'add' method adds an address to the pool.",
           "[AddressPool]")
 {
     AddressPool<fake_clock> pool;
@@ -54,7 +54,8 @@ TEST_CASE("AddressPool's 'add' method adds an address to the pool.",
     auto addr = pool.addresses();
     std::sort(addr.begin(), addr.end(), std::greater<MAVAddress>());
     REQUIRE(addr.size() == 3);
-    std::vector<MAVAddress> compare = {
+    std::vector<MAVAddress> compare =
+    {
         MAVAddress("192.168"),
         MAVAddress("172.16"),
         MAVAddress("10.10")
@@ -79,7 +80,6 @@ TEST_CASE("AddressPool's 'contains' method determines whether an address is "
 
 TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
 {
-
     SECTION("When using the 'contains' method (and default timeout of 2 min).")
     {
         AddressPool<fake_clock> pool;
@@ -171,7 +171,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         fake_clock::advance(1s); // 00:00:03
         pool.add(MAVAddress("3.3"));
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -183,7 +184,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(117s); // 00:02:00
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -195,7 +197,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(1s); // 00:02:01
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
@@ -206,7 +209,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(1s); // 00:02:02
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
             };
@@ -216,7 +220,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(1s); // 00:02:03
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("3.3"),
             };
             auto addr = pool.addresses();
@@ -240,7 +245,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         fake_clock::advance(1s); // 00:00:03
         pool.add(MAVAddress("3.3"));
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -252,7 +258,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(3597s); // 01:00:00
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -264,7 +271,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(1s); // 01:00:01
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
@@ -275,7 +283,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(1s); // 01:00:02
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
             };
@@ -285,7 +294,8 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
         }
         fake_clock::advance(1s); // 01:00:03
         {
-            std::vector<MAVAddress> vec = {
+            std::vector<MAVAddress> vec =
+            {
                 MAVAddress("3.3"),
             };
             auto addr = pool.addresses();

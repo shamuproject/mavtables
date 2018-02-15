@@ -39,7 +39,7 @@ class AddressPool
 
     public:
         AddressPool(std::chrono::milliseconds timeout =
-                std::chrono::milliseconds(120000));
+                        std::chrono::milliseconds(120000));
         void add(MAVAddress address);
         std::vector<MAVAddress> addresses();
         bool contains(const MAVAddress &address);
@@ -120,16 +120,20 @@ bool AddressPool<TC>::contains(const MAVAddress &address)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     auto it = addresses_.find(address);
+
     if (it != addresses_.end())
     {
         auto current_time = TC::now();
+
         if (current_time - it->second > timeout_)
         {
             addresses_.erase(it);
             return false;
         }
+
         return true;
     }
+
     return false;
 }
 

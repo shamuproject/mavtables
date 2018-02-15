@@ -86,15 +86,18 @@ template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
 {
     os << "[";
+
     if (vector.size() > 0)
     {
         auto it = vector.begin();
         os << *(it++);
+
         for (; it != vector.end(); ++it)
         {
             os << ", " << *it;
         }
     }
+
     os << "]";
     return os;
 }
