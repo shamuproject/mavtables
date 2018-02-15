@@ -118,6 +118,7 @@ std::vector<MAVAddress> AddressPool<TC>::addresses()
 template <class TC>
 bool AddressPool<TC>::contains(const MAVAddress &address)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     auto it = addresses_.find(address);
     if (it != addresses_.end())
     {
