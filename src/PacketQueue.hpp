@@ -28,6 +28,8 @@
 #include "QueuedPacket.hpp"
 
 
+/** A threadsafe priority queue for MAVLink packets.
+ */
 class PacketQueue
 {
     private:

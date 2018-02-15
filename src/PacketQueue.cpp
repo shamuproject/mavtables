@@ -26,6 +26,18 @@
 #include "QueuedPacket.hpp"
 
 
+/** Remove and return the packet at the front of the queue.
+ *
+ *  \param blocking
+ *      * **true** %If the queue is empty the call will block until a packet is
+ *          available or the queue is shutdown.  In the latter case a null
+ *          pointer is returned.
+ *      * **false** %If the queue is empty (or shutdown) a null pointer is
+ *          returned.  This is the default.
+ *   \returns The packet that was at the front of the queue.
+ *  \remarks
+ *      Threadsafe (locking).
+ */
 std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
 {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -51,6 +63,18 @@ std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
 }
 
 
+/** Add a new packet to the queue, with a priority.
+ *
+ *  A higher \p priority will result in the packet being pushed to the front of
+ *  the queue.  When priorities are equal the order in which the packets were
+ *  added to the queue is maintained.
+ *
+ *  \param packet The packet to add to the queue.
+ *  \param priority The priority to use when adding it to the queue.  The
+ *      default is 0.
+ *  \remarks
+ *      Threadsafe (locking).
+ */
 void PacketQueue::push(std::shared_ptr<const Packet> packet, int priority)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -59,6 +83,12 @@ void PacketQueue::push(std::shared_ptr<const Packet> packet, int priority)
 }
 
 
+/** Shutdown the queue.
+ *
+ *  This will release any blocking calls to \ref pop.
+ *  \remarks
+ *      Threadsafe (locking).
+ */
 void PacketQueue::shutdown()
 {
     {
