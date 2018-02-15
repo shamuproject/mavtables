@@ -117,19 +117,9 @@ bool operator!=(const QueuedPacket &lhs, const QueuedPacket &rhs)
  */
 bool operator<(const QueuedPacket &lhs, const QueuedPacket &rhs)
 {
-    // auto a = lhs.ticket_number_ - rhs.ticket_number_;
-    // auto b = std::numeric_limits<unsigned long long>::max() / 2;
-    // auto c = lhs.ticket_number_ - rhs.ticket_number_ >
-    //          std::numeric_limits<unsigned long long>::max() / 2;
-    // std::cout << "a: " << a << std::endl;
-    // std::cout << "b: " << b << std::endl;
-    // std::cout << "c: " << c << std::endl;
     return (lhs.priority_ < rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
             (rhs.ticket_number_ - lhs.ticket_number_ >
              std::numeric_limits<unsigned long long>::max() / 2));
-    // return (lhs.priority_ < rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
-    //         lhs.ticket_number_ < rhs.ticket_number_);
-    // return lhs.ticket_number_ < rhs.ticket_number_;
 }
 
 
@@ -154,13 +144,6 @@ bool operator<(const QueuedPacket &lhs, const QueuedPacket &rhs)
  */
 bool operator>(const QueuedPacket &lhs, const QueuedPacket &rhs)
 {
-    // auto a = rhs.ticket_number_ - lhs.ticket_number_;
-    // auto b = std::numeric_limits<unsigned long long>::max() / 2;
-    // auto c = rhs.ticket_number_ - lhs.ticket_number_ >
-    //          std::numeric_limits<unsigned long long>::max() / 2;
-    // std::cout << "a: " << a << std::endl;
-    // std::cout << "b: " << b << std::endl;
-    // std::cout << "c: " << c << std::endl;
     return (lhs.priority_ > rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
             (lhs.ticket_number_ - rhs.ticket_number_ >
              std::numeric_limits<unsigned long long>::max() / 2));
