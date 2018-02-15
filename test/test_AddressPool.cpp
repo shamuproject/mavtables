@@ -19,19 +19,13 @@
 #include <chrono>
 
 #include <catch.hpp>
-#ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreserved-id-macro"
-#endif
 #include <fake_clock.hh>
-#ifdef __clang__
-    #pragma clang diagnostic pop
-#endif
 
 #include <AddressPool.hpp>
 #include <MAVAddress.hpp>
 
 #include "util.hpp"
+
 
 using namespace std::chrono_literals;
 using namespace testing;
