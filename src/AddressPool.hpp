@@ -27,6 +27,8 @@
 #include "MAVAddress.hpp"
 
 
+/** A container for addresses that expire after a certain time.
+ */
 template <class TC = std::chrono::steady_clock>
 class AddressPool
 {
@@ -120,7 +122,7 @@ bool AddressPool<TC>::contains(const MAVAddress &address)
     if (it != addresses_.end())
     {
         auto current_time = TC::now();
-        if (current_time - it->second < timeout_)
+        if (current_time - it->second > timeout_)
         {
             addresses_.erase(it);
             return false;

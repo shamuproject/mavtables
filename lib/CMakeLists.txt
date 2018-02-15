@@ -43,7 +43,9 @@ endif ()
 set (FAKE_CLOCK_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/fake_clock")
 list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fake_clock/*')
 add_library (FakeClock STATIC "${FAKE_CLOCK_INCLUDE_DIR}/fake_clock.cc")
-target_include_directories (FakeClock SYSTEM INTERFACE "${FAKE_CLOCK_INCLUDE_DIR}")
+target_include_directories (
+    FakeClock SYSTEM INTERFACE "${FAKE_CLOCK_INCLUDE_DIR}")
+target_compile_options(FakeClock PRIVATE "-Wno-reserved-id-macro")
 
 
 # MAVLink

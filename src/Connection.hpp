@@ -46,8 +46,8 @@ class Connection
 {
     private:
         // Variables
+        std::shared_ptr<Filter> filter_;
         bool mirror_;
-        std::shared_ptr<const Filter> filter_;
         std::map<MAVAddress, std::chrono::time_point<TC>> addresses_;
         std::chrono::milliseconds address_timeout_;
         std::priority_queue<std::unique_ptr<QueuedPacket>> packet_queue_;
@@ -63,7 +63,7 @@ class Connection
 
     public:
         Connection(
-            std::shared_ptr<const Filter> filter, bool mirror = false,
+            std::shared_ptr<Filter> filter, bool mirror = false,
             std::chrono::milliseconds address_timeout =
                 std::chrono::milliseconds(120000));
         virtual ~Connection() = default;
@@ -125,6 +125,7 @@ void Connection<TC>::send_to_address_(
     auto current_time = TC::now();
     std::lock_guard<std::mutex> lock(mutex_);
 
+    // THIS WILL THROW UNCAUGHT ERROR
     // Remove address if expired.
     if (current_time - addresses_.at(dest) < address_timeout_)
     {
@@ -200,7 +201,7 @@ void Connection<TC>::send_to_all_(std::shared_ptr<const Packet> packet)
  */
 template <class TC>
 Connection<TC>::Connection(
-    std::shared_ptr<const Filter> filter, bool mirror,
+    std::shared_ptr<Filter> filter, bool mirror,
     std::chrono::milliseconds address_timeout)
     : filter_(std::move(filter)), mirror_(mirror),
       address_timeout_(address_timeout), ticket_number_(0), running_(true)
@@ -244,7 +245,7 @@ void Connection<TC>::add_address(MAVAddress address)
  *      queue.  The default value is false.
  */
 template <class TC>
-std::shared_ptr<const Packet> Connection<TC>::next_packet(blocking)
+std::shared_ptr<const Packet> Connection<TC>::next_packet(bool blocking)
 {
     std::unique_lock<std::mutex> lock(mutex_);
 

@@ -26,6 +26,16 @@
 #include <vector>
 
 
+template <class T>
+std::string str(const T &object);
+
+template <class ByteType = unsigned char, class T>
+std::array<ByteType, sizeof(T)> to_bytes(T number);
+
+template <class T>
+std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
+
+
 /** Convert any object supporting the output stream operator (<<) to a string.
  *
  *  \ingroup utility
@@ -51,7 +61,7 @@ std::string str(const T &object)
  *  \return The array of bytes from the given number, in LSB order.
  *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type \p T.
  */
-template <class ByteType = unsigned char, class T>
+template <class ByteType, class T>
 std::array<ByteType, sizeof(T)> to_bytes(T number)
 {
     std::array<ByteType, sizeof(T)> n;
@@ -68,7 +78,7 @@ std::array<ByteType, sizeof(T)> to_bytes(T number)
 
 /** Print a vector to the given output stream.
  *
- *  \param T The type stored in the vector, it must support the << operator.
+ *  \tparam T The type stored in the vector, it must support the << operator.
  *  \param os The output stream to print to.
  *  \param vector The vector of elements to print.
  */

@@ -19,24 +19,27 @@
 
 #include <catch.hpp>
 
-#include <MAVAddress.hpp>
 #include <Connection.hpp>
+#include <MAVAddress.hpp>
+#include "Filter.hpp"
 
 using namespace std::chrono_literals;
 
 
 TEST_CASE("Connection's can be constructed.", "[ConnectionPool]")
 {
-    REQUIRE_NOTHROW(Connection<>());
+    auto filter = std::make_shared<Filter>(Chain("test_chain"));
+    REQUIRE_NOTHROW(Connection<>(filter));
 }
 
 
 TEST_CASE("Test stuff.", "[ConnectionPool]")
 {
-    Connection<> conn;
+    auto filter = std::make_shared<Filter>(Chain("test_chain"));
+    Connection<> conn(filter);
     conn.add_address(MAVAddress("192.168"));
-    std::this_thread::sleep_for(2s);
+    // std::this_thread::sleep_for(2s);
     conn.add_address(MAVAddress("172.16"));
-    std::this_thread::sleep_for(2s);
+    // std::this_thread::sleep_for(2s);
     conn.add_address(MAVAddress("10.10"));
 }
