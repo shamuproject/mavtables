@@ -48,8 +48,8 @@ class Chain
         Chain(Chain &&other) = default;
         Chain(std::string name_,
               std::vector<std::unique_ptr<Rule>> &&rules = {});
-        virtual ~Chain() = default;
-        virtual Action action(
+        TEST_VIRTUAL ~Chain() = default;
+        TEST_VIRTUAL Action action(
             const Packet &packet, const MAVAddress &address);
         void append(std::unique_ptr<Rule> rule);
         const std::string &name() const;

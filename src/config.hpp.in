@@ -22,3 +22,4 @@
 #define VERSION_PATCH @VERSION_PATCH@
 #cmakedefine UNIX
 #cmakedefine WIN32
+#cmakedefine TEST_VIRTUAL @TEST_VIRTUAL@

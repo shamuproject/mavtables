@@ -66,7 +66,7 @@ class Connection
             std::shared_ptr<Filter> filter, bool mirror = false,
             std::chrono::milliseconds address_timeout =
                 std::chrono::milliseconds(120000));
-        virtual ~Connection() = default;
+        TEST_VIRTUAL ~Connection() = default;
         void add_address(MAVAddress address);
         std::shared_ptr<const Packet> next_packet(bool blocking = false);
         // virtual for testing
