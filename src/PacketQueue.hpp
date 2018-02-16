@@ -33,13 +33,14 @@
 class PacketQueue
 {
     private:
-        std::priority_queue<std::unique_ptr<QueuedPacket>> queue_;
+        std::priority_queue<QueuedPacket> queue_;
         unsigned long long ticket_;
         bool running_;
         std::mutex mutex_;
         std::condition_variable cv_;
 
     public:
+        PacketQueue();
         std::shared_ptr<const Packet> pop(bool blocking = false);
         void push(std::shared_ptr<const Packet> packet, int priority = 0);
         void shutdown();

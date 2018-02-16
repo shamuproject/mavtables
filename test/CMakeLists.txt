@@ -18,6 +18,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion2.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_PacketQueue.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_QueuedPacket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_RecursionError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_RecursionGuard.cpp"

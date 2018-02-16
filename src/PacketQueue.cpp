@@ -26,6 +26,14 @@
 #include "QueuedPacket.hpp"
 
 
+/** Construct a packet queue.
+ */
+PacketQueue::PacketQueue()
+    : ticket_(0), running_(true)
+{
+}
+
+
 /** Remove and return the packet at the front of the queue.
  *
  *  \param blocking
@@ -45,7 +53,7 @@ std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
     if (blocking)
     {
         // Wait for available packet (or shutdown).
-        cv_.wait(lock, [this]
+        cv_.wait(lock, [this]()
         {
             return !running_ || !queue_.empty();
         });
@@ -54,7 +62,7 @@ std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
     // Return the packet if connection is running and queue is not empty.
     if (running_ && !queue_.empty())
     {
-        std::shared_ptr<const Packet> packet = queue_.top()->packet();
+        std::shared_ptr<const Packet> packet = queue_.top().packet();
         queue_.pop();
         return packet;
     }
@@ -78,8 +86,8 @@ std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
 void PacketQueue::push(std::shared_ptr<const Packet> packet, int priority)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    queue_.push(std::make_unique<QueuedPacket>(
-                    std::move(packet), priority, ticket_++));
+    queue_.emplace(std::move(packet), priority, ticket_++);
+    cv_.notify_one();
 }
 
 
