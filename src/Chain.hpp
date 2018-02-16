@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "Action.hpp"
+#include "config.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include <RecursionGuard.hpp>
