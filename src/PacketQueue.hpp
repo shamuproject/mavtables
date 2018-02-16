@@ -24,6 +24,7 @@
 #include <mutex>
 #include <queue>
 
+#include "config.hpp"
 #include "Packet.hpp"
 #include "QueuedPacket.hpp"
 
@@ -41,9 +42,11 @@ class PacketQueue
 
     public:
         PacketQueue();
-        std::shared_ptr<const Packet> pop(bool blocking = false);
-        void push(std::shared_ptr<const Packet> packet, int priority = 0);
-        void shutdown();
+        TEST_VIRTUAL ~PacketQueue() = default;
+        TEST_VIRTUAL std::shared_ptr<const Packet> pop(bool blocking = false);
+        TEST_VIRTUAL void push(
+                std::shared_ptr<const Packet> packet, int priority = 0);
+        TEST_VIRTUAL void shutdown();
 };
 
 

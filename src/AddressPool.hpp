@@ -24,6 +24,7 @@
 #include <mutex>
 #include <vector>
 
+#include "config.hpp"
 #include "MAVAddress.hpp"
 
 
@@ -40,9 +41,10 @@ class AddressPool
     public:
         AddressPool(std::chrono::milliseconds timeout =
                         std::chrono::milliseconds(120000));
-        void add(MAVAddress address);
-        std::vector<MAVAddress> addresses();
-        bool contains(const MAVAddress &address);
+        TEST_VIRTUAL ~AddressPool() = default;
+        TEST_VIRTUAL void add(MAVAddress address);
+        TEST_VIRTUAL std::vector<MAVAddress> addresses();
+        TEST_VIRTUAL bool contains(const MAVAddress &address);
 };
 
 

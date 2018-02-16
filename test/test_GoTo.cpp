@@ -37,7 +37,7 @@
 TEST_CASE("GoTo's are constructable.", "[GoTo]")
 {
     fakeit::Mock<Chain> mock;
-    std::shared_ptr<Chain> chain = mock_shared(mock.get());
+    std::shared_ptr<Chain> chain = mock_shared(mock);
     SECTION("Without a condition (match all packet/address combinations) or a "
             "priority.")
     {
@@ -81,8 +81,8 @@ TEST_CASE("GoTo's are comparable.", "[GoTo]")
 {
     fakeit::Mock<Chain> mock1;
     fakeit::Mock<Chain> mock2;
-    std::shared_ptr<Chain> chain1 = mock_shared(mock1.get());
-    std::shared_ptr<Chain> chain2 = mock_shared(mock2.get());
+    std::shared_ptr<Chain> chain1 = mock_shared(mock1);
+    std::shared_ptr<Chain> chain2 = mock_shared(mock2);
     SECTION("with ==")
     {
         REQUIRE(GoTo(chain1) == GoTo(chain1));
@@ -128,23 +128,23 @@ TEST_CASE("GoTo's 'action' method determines what to do with a "
     fakeit::Mock<Chain> accept_mock;
     fakeit::When(Method(accept_mock, action)).AlwaysReturn(
         Action::make_accept());
-    std::shared_ptr<Chain> accept_chain = mock_shared(accept_mock.get());
+    std::shared_ptr<Chain> accept_chain = mock_shared(accept_mock);
     fakeit::Mock<Chain> reject_mock;
     fakeit::When(Method(reject_mock, action)).AlwaysReturn(
         Action::make_reject());
-    std::shared_ptr<Chain> reject_chain = mock_shared(reject_mock.get());
+    std::shared_ptr<Chain> reject_chain = mock_shared(reject_mock);
     fakeit::Mock<Chain> continue_mock;
     fakeit::When(Method(continue_mock, action)).AlwaysReturn(
         Action::make_continue());
-    std::shared_ptr<Chain> continue_chain = mock_shared(continue_mock.get());
+    std::shared_ptr<Chain> continue_chain = mock_shared(continue_mock);
     fakeit::Mock<Chain> default_mock;
     fakeit::When(Method(default_mock, action)).AlwaysReturn(
         Action::make_default());
-    std::shared_ptr<Chain> default_chain = mock_shared(default_mock.get());
+    std::shared_ptr<Chain> default_chain = mock_shared(default_mock);
     fakeit::Mock<Chain> accept10_mock;
     fakeit::When(Method(accept10_mock, action)).AlwaysReturn(
         Action::make_accept(10));
-    std::shared_ptr<Chain> accept10_chain = mock_shared(accept10_mock.get());
+    std::shared_ptr<Chain> accept10_chain = mock_shared(accept10_mock);
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     SECTION("Check call to chain's action method.")
     {
@@ -152,7 +152,7 @@ TEST_CASE("GoTo's 'action' method determines what to do with a "
                     ping, MAVAddress("192.168")) == Action::make_accept());
         fakeit::Mock<Chain> mock;
         fakeit::When(Method(mock, action)).AlwaysReturn(Action::make_accept());
-        std::shared_ptr<Chain> chain = mock_shared(mock.get());
+        std::shared_ptr<Chain> chain = mock_shared(mock);
         GoTo(chain).action(ping, MAVAddress("192.168"));
         fakeit::Verify(
             Method(mock, action).Matching([&](auto & a, auto & b)
