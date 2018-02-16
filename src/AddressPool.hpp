@@ -27,7 +27,7 @@
 #include "MAVAddress.hpp"
 
 
-/** A container for addresses that expire after a certain time.
+/** A threadsafe container for addresses that expire after a given time.
  */
 template <class TC = std::chrono::steady_clock>
 class AddressPool
@@ -66,6 +66,8 @@ AddressPool<TC>::AddressPool(std::chrono::milliseconds timeout)
  *      runs out) will reset the timeout.
  *
  *  \param address The MAVLink address to add or update the timeout for.
+ *  \remarks
+ *      Threadsafe (locking).
  */
 template <class TC>
 void AddressPool<TC>::add(MAVAddress address)
@@ -81,6 +83,8 @@ void AddressPool<TC>::add(MAVAddress address)
  *      call thread safe.
  *
  *  \returns A vector of the addresses in the pool.
+ *  \remarks
+ *      Threadsafe (locking).
  */
 template <class TC>
 std::vector<MAVAddress> AddressPool<TC>::addresses()
@@ -114,6 +118,8 @@ std::vector<MAVAddress> AddressPool<TC>::addresses()
  *  \param address The MAVLink address to test for.
  *  \retval true If the pool contains \p address.
  *  \retval false If the pool does not contain \p address.
+ *  \remarks
+ *      Threadsafe (locking).
  */
 template <class TC>
 bool AddressPool<TC>::contains(const MAVAddress &address)
