@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 #include "AddressPool.hpp"
