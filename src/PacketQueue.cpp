@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <stdexcept>
 #include <utility>
 
 #include "Packet.hpp"
@@ -77,14 +78,20 @@ std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
  *  the queue.  When priorities are equal the order in which the packets were
  *  added to the queue is maintained.
  *
- *  \param packet The packet to add to the queue.
+ *  \param packet The packet to add to the queue.  It must not be nullptr.
  *  \param priority The priority to use when adding it to the queue.  The
  *      default is 0.
+ *  \throws std::invalid_argument if the packet pointer is null.
  *  \remarks
  *      Threadsafe (locking).
  */
 void PacketQueue::push(std::shared_ptr<const Packet> packet, int priority)
 {
+    if (packet == nullptr)
+    {
+        throw std::invalid_argument("Given packet pointer is null.");
+    }
+
     std::lock_guard<std::mutex> lock(mutex_);
     queue_.emplace(std::move(packet), priority, ticket_++);
     cv_.notify_one();

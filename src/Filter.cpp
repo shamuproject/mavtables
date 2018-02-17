@@ -40,7 +40,6 @@ Filter::Filter(Chain default_chain, bool accept_by_default)
 }
 
 
-#include <iostream>
 /** Determine whether to accept or reject a packet/address combination.
  *
  *  \param packet The packet to determine whether to allow or not.

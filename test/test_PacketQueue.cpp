@@ -18,6 +18,7 @@
 #include <chrono>
 #include <future>
 #include <memory>
+#include <stdexcept>
 #include <thread>
 
 #include <catch.hpp>
@@ -35,6 +36,15 @@ using namespace std::chrono_literals;
 TEST_CASE("PacketQueue's can be constructed.", "[AddressPool]")
 {
     REQUIRE_NOTHROW(PacketQueue());
+}
+
+
+TEST_CASE("PacketQueue's 'push' method ensures that the packet pointer is "
+          "not null.", "[PacketQueue]")
+{
+    PacketQueue queue;
+    REQUIRE_THROWS_AS(queue.push(nullptr), std::invalid_argument);
+    REQUIRE_THROWS_WITH(queue.push(nullptr), "Given packet pointer is null.");
 }
 
 

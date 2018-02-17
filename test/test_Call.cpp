@@ -68,11 +68,11 @@ TEST_CASE("Call's are constructable.", "[Call]")
         REQUIRE_THROWS_AS(Call(nullptr, 3), std::invalid_argument);
         REQUIRE_THROWS_AS(
             Call(nullptr, 3, If().type("PING")), std::invalid_argument);
-        REQUIRE_THROWS_WITH(Call(nullptr), "Given Chain pointer is null.");
-        REQUIRE_THROWS_WITH(Call(nullptr, 3), "Given Chain pointer is null.");
+        REQUIRE_THROWS_WITH(Call(nullptr), "Given chain pointer is null.");
+        REQUIRE_THROWS_WITH(Call(nullptr, 3), "Given chain pointer is null.");
         REQUIRE_THROWS_WITH(
             Call(nullptr, 3, If().type("PING")),
-            "Given Chain pointer is null.");
+            "Given chain pointer is null.");
     }
 }
 

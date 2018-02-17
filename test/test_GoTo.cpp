@@ -68,11 +68,11 @@ TEST_CASE("GoTo's are constructable.", "[GoTo]")
         REQUIRE_THROWS_AS(GoTo(nullptr, 3), std::invalid_argument);
         REQUIRE_THROWS_AS(
             GoTo(nullptr, 3, If().type("PING")), std::invalid_argument);
-        REQUIRE_THROWS_WITH(GoTo(nullptr), "Given Chain pointer is null.");
-        REQUIRE_THROWS_WITH(GoTo(nullptr, 3), "Given Chain pointer is null.");
+        REQUIRE_THROWS_WITH(GoTo(nullptr), "Given chain pointer is null.");
+        REQUIRE_THROWS_WITH(GoTo(nullptr, 3), "Given chain pointer is null.");
         REQUIRE_THROWS_WITH(
             GoTo(nullptr, 3, If().type("PING")),
-            "Given Chain pointer is null.");
+            "Given chain pointer is null.");
     }
 }
 
