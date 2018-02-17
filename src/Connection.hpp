@@ -52,7 +52,9 @@ class Connection
         Connection(
             std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
             std::unique_ptr<PacketQueue> queue, bool mirror = false);
+        // LCOV_EXCL_START
         TEST_VIRTUAL ~Connection() = default;
+        // LCOV_EXCL_STOP
         void add_address(MAVAddress address);
         std::shared_ptr<const Packet> next_packet();
         TEST_VIRTUAL void send(std::shared_ptr<const Packet> packet);

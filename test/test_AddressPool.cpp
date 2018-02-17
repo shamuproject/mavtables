@@ -41,34 +41,68 @@ TEST_CASE("AddressPool's can be constructed.", "[AddressPool]")
 TEST_CASE("AddressPool's 'add' method adds an address to the pool.",
           "[AddressPool]")
 {
-    AddressPool<fake_clock> pool;
-    pool.add(MAVAddress("192.168"));
-    pool.add(MAVAddress("172.16"));
-    pool.add(MAVAddress("10.10"));
-    auto addr = pool.addresses();
-    std::sort(addr.begin(), addr.end(), std::greater<MAVAddress>());
-    REQUIRE(addr.size() == 3);
-    std::vector<MAVAddress> compare =
+    SECTION("With fake_clock.")
     {
-        MAVAddress("192.168"),
-        MAVAddress("172.16"),
-        MAVAddress("10.10")
-    };
-    REQUIRE(addr == compare);
+        AddressPool<fake_clock> pool;
+        pool.add(MAVAddress("192.168"));
+        pool.add(MAVAddress("172.16"));
+        pool.add(MAVAddress("10.10"));
+        auto addr = pool.addresses();
+        std::sort(addr.begin(), addr.end(), std::greater<MAVAddress>());
+        REQUIRE(addr.size() == 3);
+        std::vector<MAVAddress> compare =
+        {
+            MAVAddress("192.168"),
+            MAVAddress("172.16"),
+            MAVAddress("10.10")
+        };
+        REQUIRE(addr == compare);
+    }
+    SECTION("With std::chrono::steady_clock.")  // for complete coverage
+    {
+        AddressPool<std::chrono::steady_clock> pool;
+        pool.add(MAVAddress("192.168"));
+        pool.add(MAVAddress("172.16"));
+        pool.add(MAVAddress("10.10"));
+        auto addr = pool.addresses();
+        std::sort(addr.begin(), addr.end(), std::greater<MAVAddress>());
+        REQUIRE(addr.size() == 3);
+        std::vector<MAVAddress> compare =
+        {
+            MAVAddress("192.168"),
+            MAVAddress("172.16"),
+            MAVAddress("10.10")
+        };
+        REQUIRE(addr == compare);
+    }
 }
 
 
 TEST_CASE("AddressPool's 'contains' method determines whether an address is "
           "in the pool or not.", "[AddressPool]")
 {
-    AddressPool<fake_clock> pool;
-    pool.add(MAVAddress("192.168"));
-    pool.add(MAVAddress("172.16"));
-    pool.add(MAVAddress("10.10"));
-    REQUIRE(pool.contains(MAVAddress("192.168")));
-    REQUIRE(pool.contains(MAVAddress("172.16")));
-    REQUIRE(pool.contains(MAVAddress("10.10")));
-    REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
+    SECTION("With fake_clock.")
+    {
+        AddressPool<fake_clock> pool;
+        pool.add(MAVAddress("192.168"));
+        pool.add(MAVAddress("172.16"));
+        pool.add(MAVAddress("10.10"));
+        REQUIRE(pool.contains(MAVAddress("192.168")));
+        REQUIRE(pool.contains(MAVAddress("172.16")));
+        REQUIRE(pool.contains(MAVAddress("10.10")));
+        REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
+    }
+    SECTION("With std::chrono::steady_clock.")  // for complete coverage
+    {
+        AddressPool<std::chrono::steady_clock> pool;
+        pool.add(MAVAddress("192.168"));
+        pool.add(MAVAddress("172.16"));
+        pool.add(MAVAddress("10.10"));
+        REQUIRE(pool.contains(MAVAddress("192.168")));
+        REQUIRE(pool.contains(MAVAddress("172.16")));
+        REQUIRE(pool.contains(MAVAddress("10.10")));
+        REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
+    }
 }
 
 

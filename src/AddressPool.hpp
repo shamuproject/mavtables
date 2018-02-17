@@ -41,7 +41,9 @@ class AddressPool
     public:
         AddressPool(std::chrono::milliseconds timeout =
                         std::chrono::milliseconds(120000));
+        // LCOV_EXCL_START
         TEST_VIRTUAL ~AddressPool() = default;
+        // LCOV_EXCL_STOP
         TEST_VIRTUAL void add(MAVAddress address);
         TEST_VIRTUAL std::vector<MAVAddress> addresses();
         TEST_VIRTUAL bool contains(const MAVAddress &address);
