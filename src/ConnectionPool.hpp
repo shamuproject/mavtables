@@ -41,7 +41,7 @@ class ConnectionPool
     public:
         void add(std::shared_ptr<Connection> connection);
         void remove(const std::shared_ptr<Connection> &connection);
-        void send(std::shared_ptr<const Packet> packet);
+        void send(std::unique_ptr<const Packet> packet);
 };
 
 
