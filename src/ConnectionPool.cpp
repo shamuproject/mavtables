@@ -66,7 +66,7 @@ void ConnectionPool::send(std::unique_ptr<const Packet> packet)
 {
     std::shared_lock<std::shared_mutex> lock(mutex_);
 
-    std::shared_ptr<const Packet> shared = std::move(packet)
+    std::shared_ptr<const Packet> shared = std::move(packet);
     for (auto i : connections_)
     {
         i->send(shared);
