@@ -29,52 +29,6 @@
 
 using namespace std::chrono_literals;
 
-// namespace
-// {
-//
-// #ifdef __clang__
-//     #pragma clang diagnostic push
-//     #pragma clang diagnostic ignored "-Wweak-vtables"
-// #endif
-//
-//     // Subclass of Interface used for testing the abstract class Interface.
-//     class UDPSocketTestClass : public UDPSocket
-//     {
-//         public:
-//             unsigned int port_;
-//             std::optional<IPAddress> address_;
-//             std::vector<std::chrono::microseconds> _timeout;
-//             std::vector<std::chrono::microseconds> receive_timeout;
-//             UDPSocket(unsigned int port, std::optional<IPAddress> address = {})
-//                 : port_(port), address_(std::move(address))
-//             {
-//             }
-//             // LCOV_EXCL_START
-//             ~UDPSocketTestClass() = default;
-//             // LCOV_EXCL_STOP
-//             void send(
-//                 std::vector<uint8_t>::const_iterator first,
-//                 std::vector<uint8_t>::const_iterator last,
-//                 const IPAddress &address) final
-//             {
-//
-//             }
-//             virtual IPAddress receive(
-//                 std::back_insert_iterator<std::vector<uint8_t>> it,
-//                 const std::chrono::microseconds &timeout =
-//                     std::chrono::microseconds(100000)) final
-//             {
-//                 std::vector<uint8_t> vec = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-//                 std::copy(vec.begin(), vec.end(), it);
-//             }
-//     };
-//
-// #ifdef __clang__
-//     #pragma clang diagnostic pop
-// #endif
-//
-// }
-
 
 TEST_CASE("UDPSocket's 'send' method accepts a vector and address.",
           "[UDPSocket]")
