@@ -15,15 +15,198 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <algorithm>
+#include <memory>
+#include <stdexcept>
+#include <utility>
+
+#include "AddressPool.hpp"
 #include "Connection.hpp"
+#include "Filter.hpp"
+#include "MAVAddress.hpp"
+#include "Packet.hpp"
+#include "PacketQueue.hpp"
 
 
-Connection::~Connection()
+/** Send a packet to a particular address.
+ *
+ *  Packets are ran through the contained \ref Filter before being placed into
+ *  the \ref PacketQueue given in the constructor.  Packets are read from the
+ *  queue (for sending) by using the \ref next_packet method.
+ *
+ *  \note This disregards the destination address of the packet.
+ *
+ *  \param packet The packet to send.
+ *  \param dest The address to send the packet to, if this address is not
+ *      handled by this connection the packet will be silently dropped.
+ */
+void Connection::send_to_address_(
+    std::shared_ptr<const Packet> packet, const MAVAddress &dest)
 {
+    // Address reachable on this connection.
+    if (pool_->contains(dest))
+    {
+        // Run packet/address combination through the filter.
+        auto [accept, priority] = filter_->will_accept(*packet, dest);
+
+        // Add packet to the queue.
+        if (accept)
+        {
+            queue_->push(std::move(packet), priority);
+        }
+    }
 }
 
 
+/** Send a packet to every address reachable on the connection.
+ *
+ *  Packets are ran through the contained \ref Filter before being placed into
+ *  the \ref PacketQueue given in the constructor.  Packets are read from the
+ *  queue (for sending) by using the \ref next_packet method.
+ *
+ *  \note This disregards the destination address of the packet.
+ *
+ *  \param packet The packet to send.
+ */
+void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
+{
+    bool accept = false;
+    int priority = std::numeric_limits<int>::min();
+
+    // Loop over addresses.
+    for (const auto &i : pool_->addresses())
+    {
+        // Filter packet/address combination.
+        auto [accept_, priority_] = filter_->will_accept(*packet, i);
+
+        // Update accept/priority.
+        if (accept_)
+        {
+            accept = accept_;
+            priority = std::max(priority, priority_);
+        }
+    }
+
+    // Add packet to the queue.
+    if (accept)
+    {
+        queue_->push(std::move(packet), priority);
+    }
+}
+
+
+/** Construct a connection.
+ *
+ *  \param filter The packet filter to use for determining whether and with what
+ *      priority to add a packet to the queue for transmission.
+ *  \param pool The AddressPool to use for keeping track of the addresses
+ *      reachable by the connection.
+ *  \param queue The PacketQueue to used to hold packets awaiting transmission.
+ *  \param mirror Set to true if this is to be a mirror connection.  A mirror
+ *      connection is one that will receive all packets, regardless of
+ *      destination address.  The default is false.
+ *  \throws std::invalid_argument if the given any of the \p filter, \p pool, or
+ *      \p queue pointers are null.
+ *  \remarks If the given \ref AddressPool and \ref PacketQueue are threadsafe
+ *      then the connection will also be threadsafe.
+ */
+Connection::Connection(
+    std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
+    std::unique_ptr<PacketQueue> queue, bool mirror)
+    : filter_(std::move(filter)), pool_(std::move(pool)),
+    queue_(std::move(queue)), mirror_(mirror)
+{
+    if (filter_ == nullptr)
+    {
+        throw std::invalid_argument("Given filter pointer is null.");
+    }
+    if (pool_ == nullptr)
+    {
+        throw std::invalid_argument("Given pool pointer is null.");
+    }
+    if (queue_ == nullptr)
+    {
+        throw std::invalid_argument("Given queue pointer is null.");
+    }
+}
+
+
+/** Add a MAVLink address to the connection.
+ *
+ *  This adds an address to the list of components that can be reached on this
+ *  connection.
+ *
+ *  \note Addresses will be removed after the timeout set in the AddressPool
+ *      given in the constructor.  Readding the address (even before this time
+ *      runs out) will reset the timeout.
+ *
+ *  \param address The MAVLink address to add or update the timeout for.
+ */
+void Connection::add_address(MAVAddress address)
+{
+    pool_->add(std::move(address));
+}
+
+
+/** Get next packet to send.
+ *
+ *  Blocks until a packet is ready to be sent or the connection is shut down.
+ *  Returns nullptr in the later case.
+ *
+ *  \note If the connection is \ref shutdown then a nullptr is returned
+ *      immediately.
+ *
+ *  \returns The next packet to send.  Or nullptr if the connection was
+ *      shutdown.
+ */
+std::shared_ptr<const Packet> Connection::next_packet()
+{
+    return queue_->pop(true);
+}
+
+
+/** Send a packet out on the connection.
+ *
+ *  Packets are ran through the contained \ref Filter before being placed into
+ *  the \ref PacketQueue given in the constructor.  Packets are read from the
+ *  queue (for sending) by using the \ref next_packet method.
+ *
+ *  \note If the packet has a destination address that is not 0.0 (the broadcast
+ *      address) it will only be sent if that address is reachable on this
+ *      connection.
+ *
+ *  \note If this is a mirror connection then the destination address of the
+ *      packet is ignored.
+ *
+ *  \param packet The packet to send.
+ *  \throws std::invalid_argument if the \p packet pointer is null.
+ */
 void Connection::send(std::shared_ptr<const Packet> packet)
 {
-    (void)packet;
+    if (packet == nullptr)
+    {
+        throw std::invalid_argument("Given packet pointer is null.");
+    }
+
+    auto dest = packet->dest();
+
+    if (dest && dest.value() != MAVAddress(0, 0) && !mirror_)
+    {
+        send_to_address_(std::move(packet), dest.value());
+    }
+    else
+    {
+        send_to_all_(std::move(packet));
+    }
+}
+
+
+/** Shutdown the connection.
+ *
+ *  This releases any blocking calls.  In particular the \ref next_packet
+ *  method.
+ */
+void Connection::shutdown()
+{
+    queue_->shutdown();
 }

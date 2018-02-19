@@ -17,6 +17,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.cpp"
@@ -27,6 +28,7 @@ set (SOURCES
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/AddressPool.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Call.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Filter.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.hpp"
@@ -44,6 +46,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.hpp"
@@ -58,21 +61,25 @@ target_sources (mavtables
         ${SOURCES}
         ${HEADERS}
 )
-target_sources (unit_tests
-    PRIVATE
-        ${SOURCES}
-        ${HEADERS}
-)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_sources (unit_tests
+        PRIVATE
+            ${SOURCES}
+            ${HEADERS}
+    )
+endif ()
 target_include_directories (mavtables 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}"
         "${PROJECT_BINARY_DIR}"
 )
-target_include_directories (unit_tests
-    PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}"
-        "${PROJECT_BINARY_DIR}"
-)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_include_directories (unit_tests
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}"
+            "${PROJECT_BINARY_DIR}"
+    )
+endif ()
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/config.hpp.in"
     "${PROJECT_BINARY_DIR}/config.hpp"

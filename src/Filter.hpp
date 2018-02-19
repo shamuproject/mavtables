@@ -18,11 +18,13 @@
 #ifndef FILTER_HPP_
 #define FILTER_HPP_
 
+
 #include <memory>
 #include <utility>
 
 #include "Action.hpp"
 #include "Chain.hpp"
+#include "config.hpp"
 #include "Packet.hpp"
 #include "MAVAddress.hpp"
 
@@ -51,7 +53,10 @@ class Filter
          */
         Filter(Filter &&other) = default;
         Filter(Chain default_chain, bool accept_by_default = false);
-        std::pair<bool, int> will_accept(
+        // LCOV_EXCL_START
+        TEST_VIRTUAL ~Filter() = default;
+        // LCOV_EXCL_STOP
+        TEST_VIRTUAL std::pair<bool, int> will_accept(
             const Packet &packet, const MAVAddress &address);
         /** Assignment operator.
          *

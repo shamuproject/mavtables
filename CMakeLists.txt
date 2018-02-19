@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.3)
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 15)
+set (VERSION_PATCH 16)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -23,6 +23,11 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
+
+# debug only
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set (TEST_VIRTUAL virtual)
+endif ()
 
 # packages
 add_subdirectory (cmake)
@@ -43,19 +48,26 @@ target_link_libraries (mavtables
 install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
-add_executable (unit_tests test/CMakeLists.txt)
-target_link_libraries (unit_tests
-    Catch
-    FakeIt
-    MAVLink
-    ${Boost_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT})
-add_test(NAME UnitTests COMMAND unit_tests)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_executable (unit_tests test/CMakeLists.txt)
+    target_link_libraries (unit_tests
+        Catch
+        FakeIt
+        FakeClock
+        MAVLink
+        ${Boost_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT})
+    add_test(NAME UnitTests COMMAND unit_tests)
+endif ()
 
 # add sources and evaluate test coverage
 add_subdirectory (src)
-add_subdirectory (test)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_subdirectory (test)
+endif ()
 add_subdirectory (doc)
 add_coverage (mavtables)
-add_coverage (unit_tests)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_coverage (unit_tests)
+endif ()
 coverage_evaluate ()

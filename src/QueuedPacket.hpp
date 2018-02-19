@@ -35,7 +35,7 @@
 class QueuedPacket
 {
     private:
-        std::shared_ptr<Packet> packet_;
+        std::shared_ptr<const Packet> packet_;
         int priority_;
         unsigned long long ticket_number_;
 
@@ -51,9 +51,9 @@ class QueuedPacket
          */
         QueuedPacket(QueuedPacket &&other) = default;
         QueuedPacket(
-            std::shared_ptr<Packet> packet, int priority,
+            std::shared_ptr<const Packet> packet, int priority,
             unsigned long long ticket_number);
-        std::shared_ptr<Packet> packet() const;
+        std::shared_ptr<const Packet> packet() const;
         /** Assignment operator.
          *
          * \param other QueuedPacket to copy.

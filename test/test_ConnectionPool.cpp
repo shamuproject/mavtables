@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include <memory>
 
 #include <catch.hpp>
@@ -48,7 +49,7 @@ TEST_CASE("ConnectionPool's can store at least one connection and send a "
     auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock;
     fakeit::Fake(Method(mock, send));
-    std::shared_ptr<Connection> connection = mock_shared(mock.get());
+    std::shared_ptr<Connection> connection = mock_shared(mock);
     ConnectionPool pool;
     pool.add(connection);
     pool.send(packet);
@@ -67,8 +68,8 @@ TEST_CASE("ConnectionPool's can store more than one connection and send a "
     fakeit::Mock<Connection> mock2;
     fakeit::Fake(Method(mock1, send));
     fakeit::Fake(Method(mock2, send));
-    std::shared_ptr<Connection> connection1 = mock_shared(mock1.get());
-    std::shared_ptr<Connection> connection2 = mock_shared(mock2.get());
+    std::shared_ptr<Connection> connection1 = mock_shared(mock1);
+    std::shared_ptr<Connection> connection2 = mock_shared(mock2);
     ConnectionPool pool;
     pool.add(connection1);
     pool.add(connection2);
@@ -92,8 +93,8 @@ TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
     fakeit::Mock<Connection> mock2;
     fakeit::Fake(Method(mock1, send));
     fakeit::Fake(Method(mock2, send));
-    std::shared_ptr<Connection> connection1 = mock_shared(mock1.get());
-    std::shared_ptr<Connection> connection2 = mock_shared(mock2.get());
+    std::shared_ptr<Connection> connection1 = mock_shared(mock1);
+    std::shared_ptr<Connection> connection2 = mock_shared(mock2);
     ConnectionPool pool;
     pool.add(connection1);
     pool.add(connection2);

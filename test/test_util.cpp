@@ -22,7 +22,7 @@
 #include "util.hpp"
 
 
-TEST_CASE("to_bytes: Convert numeric types to bytes.", "[to_bytes]")
+TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
 {
     SECTION("char's can be converted to at least 1 bytes")
     {
@@ -113,9 +113,34 @@ TEST_CASE("to_bytes: Convert numeric types to bytes.", "[to_bytes]")
 }
 
 
-TEST_CASE("str: Convert printable types to strings.", "[to_string]")
+TEST_CASE("'str' converts printable types to strings.", "[util]")
 {
     REQUIRE(str(256) == "256");
     REQUIRE(str(3.14159) == "3.14159");
     REQUIRE(str("Hello world") == "Hello world");
+}
+
+
+TEST_CASE("'operator<<' makes vectors printable", "[util]")
+{
+    SECTION("When the vector is empty.")
+    {
+        std::vector<int> vec = {};
+        REQUIRE(str(vec) == "[]");
+    }
+    SECTION("When the vector has a single element.")
+    {
+        std::vector<int> vec = {1};
+        REQUIRE(str(vec) == "[1]");
+    }
+    SECTION("When the vector has two elements.")
+    {
+        std::vector<int> vec = {1, 2};
+        REQUIRE(str(vec) == "[1, 2]");
+    }
+    SECTION("When the vector has multiple elements.")
+    {
+        std::vector<int> vec = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        REQUIRE(str(vec) == "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]");
+    }
 }

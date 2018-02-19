@@ -51,7 +51,6 @@ class PacketParser
         void waiting_for_header_(uint8_t byte);
         std::unique_ptr<Packet> waiting_for_packet_(uint8_t byte);
 
-
     public:
         PacketParser();
         PacketParser(const PacketParser &other) = delete;

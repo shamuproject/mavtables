@@ -18,7 +18,6 @@
 #include <catch.hpp>
 #include <fakeit.hpp>
 
-
 #include "Accept.hpp"
 #include "Call.hpp"
 #include "Rule.hpp"
@@ -32,7 +31,7 @@
 TEST_CASE("Rule's are polymorphically comparable.", "[Rule]")
 {
     fakeit::Mock<Chain> mock;
-    std::shared_ptr<Chain> chain = mock_shared(mock.get());
+    std::shared_ptr<Chain> chain = mock_shared(mock);
     SECTION("with ==")
     {
         REQUIRE_FALSE(Accept() == Reject());

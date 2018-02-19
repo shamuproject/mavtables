@@ -19,15 +19,46 @@
 #define CONNECTION_HPP_
 
 
+#include <memory>
+
+#include "AddressPool.hpp"
+#include "config.hpp"
+#include "Filter.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
+#include "PacketQueue.hpp"
 
 
+/** Represents a connection that packets can be sent over.
+ *
+ *  The connection class does not actually send anything.  It filters and sorts
+ *  packets in a queue for sending by an \ref Interface.  It also maintains a
+ *  list of addresses reachable on this connection.
+ */
 class Connection
 {
+    private:
+        // Variables
+        std::shared_ptr<Filter> filter_;
+        std::unique_ptr<AddressPool<>> pool_;
+        std::unique_ptr<PacketQueue> queue_;
+        bool mirror_;
+        // Methods
+        void send_to_address_(
+            std::shared_ptr<const Packet> packet, const MAVAddress &dest);
+        void send_to_all_(std::shared_ptr<const Packet> packet);
+
     public:
-        virtual ~Connection();
-        // virtual for testing
-        virtual void send(std::shared_ptr<const Packet> packet);
+        Connection(
+            std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
+            std::unique_ptr<PacketQueue> queue, bool mirror = false);
+        // LCOV_EXCL_START
+        TEST_VIRTUAL ~Connection() = default;
+        // LCOV_EXCL_STOP
+        void add_address(MAVAddress address);
+        std::shared_ptr<const Packet> next_packet();
+        TEST_VIRTUAL void send(std::shared_ptr<const Packet> packet);
+        void shutdown();
 };
 
 

@@ -49,7 +49,7 @@ GoTo::GoTo(
 {
     if (chain_ == nullptr)
     {
-        throw std::invalid_argument("Given Chain pointer is null.");
+        throw std::invalid_argument("Given chain pointer is null.");
     }
 }
 
@@ -76,7 +76,7 @@ GoTo::GoTo(
 {
     if (chain_ == nullptr)
     {
-        throw std::invalid_argument("Given Chain pointer is null.");
+        throw std::invalid_argument("Given chain pointer is null.");
     }
 }
 

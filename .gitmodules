@@ -10,3 +10,6 @@
 [submodule "lib/mavlink/mavlink/v2.0"]
 	path = lib/mavlink/mavlink/v2.0
 	url = https://github.com/mavlink/c_library_v2.git
+[submodule "lib/fake_clock"]
+	path = lib/fake_clock
+	url = https://github.com/korfuri/fake_clock.git

@@ -18,21 +18,30 @@
 #include <memory>
 #include <utility>
 
+#include "fakeit.hpp"
 
-// See https://github.com/eranpeer/FakeIt/issues/27
+
+/** Construct a std::shared_ptr from a fakit::Mock object.
+ *
+ *  \tparam T The type of object being mocked.
+ *  \param mock The mock object itself.
+ */
 template<typename T>
-void blank_deleter(T *ptr) {(void)ptr;}
-
-
-template<typename T>
-std::unique_ptr<T, void(*)(T*)> mock_unique(T &mock){
-    std::unique_ptr<T, void(*)(T*)> ptr(&mock, blank_deleter<T>);
+std::shared_ptr<T> mock_shared(fakeit::Mock<T> &mock){
+    fakeit::Fake(Dtor(mock));
+    std::shared_ptr<T> ptr(&mock.get());
     return std::move(ptr);
 }
 
 
+/** Construct a std::unique_ptr from a fakit::Mock object.
+ *
+ *  \tparam T The type of object being mocked.
+ *  \param mock The mock object itself.
+ */
 template<typename T>
-std::shared_ptr<T> mock_shared(T &mock){
-    std::shared_ptr<T> ptr(&mock, blank_deleter<T>);
+std::unique_ptr<T> mock_unique(fakeit::Mock<T> &mock){
+    fakeit::Fake(Dtor(mock));
+    std::unique_ptr<T> ptr(&mock.get());
     return std::move(ptr);
 }
