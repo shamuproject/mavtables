@@ -69,7 +69,6 @@ namespace
 
 TEST_CASE("Interface's can be constructed.", "[Interface]")
 {
-
     REQUIRE_NOTHROW(
         InterfaceTestClass(
             std::make_shared<ConnectionPool>(), Interface::DELAY_START));
@@ -82,5 +81,4 @@ TEST_CASE("Interface's can be constructed.", "[Interface]")
     //         std::make_shared<ConnectionPool>()));
     // InterfaceTestClass interface(std::make_shared<ConnectionPool>());
     // interface.
-
 }

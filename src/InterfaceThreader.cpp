@@ -47,6 +47,7 @@ void Interface::rx_runner_()
     while (running_.load())
     {
     }
+
     // while (running_.load())
     // {
     //     // std::cout << "In rx" << std::endl;
@@ -84,6 +85,7 @@ Interface::Interface(
 Interface::~Interface()
 {
     std::cout << "shutdown" << std::endl;
+
     if (running_.load())
     {
         running_.store(false);
@@ -107,12 +109,11 @@ void Interface::start()
 {
     // TODO: Calls pure virtual (in constructor).  Need to make constructor
     // private and use a factory method.
-
     // Care to avoid: https://stackoverflow.com/q/25145994/8093188
     running_.store(true);
     // tx_thread_ = std::thread(&Interface::tx_runner_, this);
     // rx_thread_ = std::thread(&Interface::rx_runner_, this);
-    tx_thread_ = std::thread([this]{this->tx_runner_();});
+    tx_thread_ = std::thread([this] {this->tx_runner_();});
     // rx_thread_ = std::thread([this]{this->rx_runner_();});
     std::cout << " Threads running." << std::endl;
     std::this_thread::sleep_for(4s);
@@ -128,6 +129,7 @@ void Interface::start()
 void Interface::shutdown()
 {
     std::cout << "shutdown" << std::endl;
+
     if (running_.load())
     {
         running_.store(false);

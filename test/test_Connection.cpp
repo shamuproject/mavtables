@@ -93,7 +93,7 @@ TEST_CASE("Connection's can be constructed.", "[Connection]")
 }
 
 
-TEST_CASE("Connection's 'add_address' method adds/updates addresses.", 
+TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
           "[Connection]")
 {
     fakeit::Mock<Filter> mock_filter;
@@ -165,7 +165,7 @@ TEST_CASE("Connection's 'send' method ensures the given packet is not "
 }
 
 
-TEST_CASE("Connection's 'send' method (with destination address).", 
+TEST_CASE("Connection's 'send' method (with destination address).",
           "[Connection]")
 {
     // Vectors for capturing reference arguments.
@@ -187,14 +187,16 @@ TEST_CASE("Connection's 'send' method (with destination address).",
             "reached on this connection.")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
             return std::pair<bool, int>(true, 2);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto &a){
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
             contains_addresses.push_back(a);
             return true;
         });
@@ -217,14 +219,16 @@ TEST_CASE("Connection's 'send' method (with destination address).",
     SECTION("Silently drops the packet if the filter rejects it.")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto &a){
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
             contains_addresses.push_back(a);
             return true;
         });
@@ -246,7 +250,8 @@ TEST_CASE("Connection's 'send' method (with destination address).",
     {
         fakeit::Fake(Method(mock_filter, will_accept));
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto &a){
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
             contains_addresses.push_back(a);
             return false;
         });
@@ -283,23 +288,29 @@ TEST_CASE("Connection's 'send' method (without destination address).",
             "(increasing priority).")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
+
             if (b == MAVAddress("192.168"))
             {
                 return std::pair<bool, int>(true, 2);
             }
+
             if (b == MAVAddress("172.16"))
             {
                 return std::pair<bool, int>(true, -3);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([](){
-            std::vector<MAVAddress> addr= {
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
                 MAVAddress("10.10"),
                 MAVAddress("172.16"),
                 MAVAddress("192.168")
@@ -329,23 +340,29 @@ TEST_CASE("Connection's 'send' method (without destination address).",
             "(decreasing priority).")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
+
             if (b == MAVAddress("192.168"))
             {
                 return std::pair<bool, int>(true, 2);
             }
+
             if (b == MAVAddress("172.16"))
             {
                 return std::pair<bool, int>(true, -3);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([](){
-            std::vector<MAVAddress> addr= {
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
                 MAVAddress("192.168"),
                 MAVAddress("172.16"),
                 MAVAddress("10.10")
@@ -374,15 +391,18 @@ TEST_CASE("Connection's 'send' method (without destination address).",
             "reachable addresses.")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([](){
-            std::vector<MAVAddress> addr= {
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
                 MAVAddress("192.168"),
                 MAVAddress("172.16"),
                 MAVAddress("10.10")
@@ -430,23 +450,29 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
             "(increasing priority).")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
+
             if (b == MAVAddress("192.168"))
             {
                 return std::pair<bool, int>(true, 2);
             }
+
             if (b == MAVAddress("172.16"))
             {
                 return std::pair<bool, int>(true, -3);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([](){
-            std::vector<MAVAddress> addr= {
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
                 MAVAddress("10.10"),
                 MAVAddress("172.16"),
                 MAVAddress("192.168")
@@ -476,23 +502,29 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
             "(decreasing priority).")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
+
             if (b == MAVAddress("192.168"))
             {
                 return std::pair<bool, int>(true, 2);
             }
+
             if (b == MAVAddress("172.16"))
             {
                 return std::pair<bool, int>(true, -3);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([](){
-            std::vector<MAVAddress> addr= {
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
                 MAVAddress("192.168"),
                 MAVAddress("172.16"),
                 MAVAddress("10.10")
@@ -521,15 +553,18 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
             "reachable addresses.")
     {
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-                [&](auto &a, auto &b){
+            [&](auto & a, auto & b)
+        {
             will_accept_packets.push_back(
-                    dynamic_cast<const packet_v2::Packet&>(a));
+                dynamic_cast<const packet_v2::Packet &>(a));
             will_accept_addresses.push_back(b);
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
-        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([](){
-            std::vector<MAVAddress> addr= {
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
                 MAVAddress("192.168"),
                 MAVAddress("172.16"),
                 MAVAddress("10.10")

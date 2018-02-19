@@ -72,7 +72,8 @@ class InterfaceThreader
         virtual std::unique_ptr<Packet> rx_() = 0;
 
     public:
-        enum Threads {
+        enum Threads
+        {
             START,  //!< Start the interface (and worker threads) immediately.
             DELAY_START //!< Delay starting, use \ref start to launch threads.
         };
