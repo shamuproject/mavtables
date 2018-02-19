@@ -27,9 +27,11 @@
 
 
 // Placed here to avoid weak-vtables error.
+// LCOV_EXCL_START
 UDPSocket::~UDPSocket()
 {
 }
+// LCOV_EXCL_STOP
 
 
 /** Send data on the socket to the given address.
