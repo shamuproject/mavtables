@@ -36,21 +36,23 @@ TEST_CASE("UDPSocket's 'send' method accepts a vector and address.",
     // This test ensures the non virtual convenience send method correctly calls
     // the pure virtual send method that takes iterators.
     fakeit::Mock<UDPSocket> mock_socket;
-    fakeit::Fake(OverloadedMethod(
-                     mock_socket, send,
-                     void(std::vector<uint8_t>::const_iterator,
-                          std::vector<uint8_t>::const_iterator,
-                          const IPAddress & address)));
+    fakeit::Fake(
+        OverloadedMethod(
+            mock_socket, send,
+            void(std::vector<uint8_t>::const_iterator,
+                 std::vector<uint8_t>::const_iterator,
+                 const IPAddress & address)));
     UDPSocket &socket = mock_socket.get();
     std::vector<uint8_t> vec = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     IPAddress addr("192.168.0.0");
     socket.send(vec, addr);
-    fakeit::Verify(OverloadedMethod(
-                       mock_socket, send,
-                       void(std::vector<uint8_t>::const_iterator,
-                            std::vector<uint8_t>::const_iterator,
-                            const IPAddress & address)).Matching(
-                       [&](auto a, auto b, auto c)
+    fakeit::Verify(
+        OverloadedMethod(
+            mock_socket, send,
+            void(std::vector<uint8_t>::const_iterator,
+                 std::vector<uint8_t>::const_iterator,
+                 const IPAddress & address)).Matching(
+            [&](auto a, auto b, auto c)
     {
         return a == vec.begin() && b == vec.end() && c == addr;
     })).Once();
@@ -64,11 +66,12 @@ TEST_CASE("UDPSocket's 'receive' method takes a timeout and returns a vector "
     // calls the pure virtual receive method that takes iterators to write the
     // data into.
     fakeit::Mock<UDPSocket> mock_socket;
-    fakeit::When(OverloadedMethod(
-                     mock_socket, receive,
-                     IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
-                               const std::chrono::microseconds &))).AlwaysDo(
-                                   [](auto a, auto b)
+    fakeit::When(
+        OverloadedMethod(
+            mock_socket, receive,
+            IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
+                      const std::chrono::microseconds &))).AlwaysDo(
+                          [](auto a, auto b)
     {
         (void)b;
         std::vector<uint8_t> vec = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -80,11 +83,12 @@ TEST_CASE("UDPSocket's 'receive' method takes a timeout and returns a vector "
     auto [data, addr] = socket.receive(1s);
     REQUIRE(data == vec_compare);
     REQUIRE(addr == IPAddress("192.168.0.0"));
-    fakeit::Verify(OverloadedMethod(
-                     mock_socket, receive,
-                     IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
-                               const std::chrono::microseconds &)).Matching(
-                                   [](auto a, auto b)
+    fakeit::Verify(
+        OverloadedMethod(
+            mock_socket, receive,
+            IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
+                      const std::chrono::microseconds &)).Matching(
+            [](auto a, auto b)
     {
         (void)a;
         return b == 1s;
