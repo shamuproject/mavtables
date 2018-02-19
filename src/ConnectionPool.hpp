@@ -23,6 +23,7 @@
 #include <set>
 #include <shared_mutex>
 
+#include "config.hpp"
 #include "Connection.hpp"
 #include "Packet.hpp"
 
@@ -39,9 +40,12 @@ class ConnectionPool
         std::shared_mutex mutex_;
 
     public:
-        void add(std::shared_ptr<Connection> connection);
-        void remove(const std::shared_ptr<Connection> &connection);
-        void send(std::unique_ptr<const Packet> packet);
+        // LCOV_EXCL_START
+        TEST_VIRTUAL ~ConnectionPool() = default;
+        // LCOV_EXCL_STOP
+        TEST_VIRTUAL void add(std::shared_ptr<Connection> connection);
+        TEST_VIRTUAL void remove(const std::shared_ptr<Connection> &connection);
+        TEST_VIRTUAL void send(std::unique_ptr<const Packet> packet);
 };
 
 

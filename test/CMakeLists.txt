@@ -10,6 +10,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_Filter.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_GoTo.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_If.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Interface.cpp"
     # "${CMAKE_CURRENT_LIST_DIR}/test_InterfaceThreader.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_IPAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_MAVAddress.cpp"
