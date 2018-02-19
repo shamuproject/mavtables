@@ -42,10 +42,12 @@ if ((NOT FAKE_CLOCK_INCLUDE_DIR) OR (NOT EXISTS "${FAKE_CLOCK_INCLUDE_DIR}"))
 endif ()
 set (FAKE_CLOCK_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/fake_clock")
 list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fake_clock/*')
-add_library (FakeClock STATIC "${FAKE_CLOCK_INCLUDE_DIR}/fake_clock.cc")
-target_include_directories (
-    FakeClock SYSTEM INTERFACE "${FAKE_CLOCK_INCLUDE_DIR}")
-target_compile_options(FakeClock PRIVATE "-Wno-reserved-id-macro")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_library (FakeClock STATIC "${FAKE_CLOCK_INCLUDE_DIR}/fake_clock.cc")
+    target_include_directories (
+        FakeClock SYSTEM INTERFACE "${FAKE_CLOCK_INCLUDE_DIR}")
+    target_compile_options(FakeClock PRIVATE "-Wno-reserved-id-macro")
+endif ()
 
 
 # MAVLink
