@@ -20,56 +20,24 @@
 
 
 #include <atomic>
-#include <chrono>
 #include <memory>
 #include <thread>
 
-#include "ConnectionPool.hpp"
+#include "Interface.hpp"
 
 
 class InterfaceThreader
 {
     private:
         // Variables
-        std::shared_ptr<ConnectionPool> connection_pool_;
+        std::shared_ptr<Interface> interface_;
         std::thread tx_thread_;
         std::thread rx_thread_;
+        std::chrono::microseconds timeout_;
         std::atomic<bool> running_;
         // Methods
         void tx_runner_();
         void rx_runner_();
-
-    protected:
-        // Variables
-        /** True while interface is running.
-         *
-         *  %If this becomes cleared then the overloaded \ref tx_ and \ref rx_
-         *  methods must return within 250 ms.
-         *
-         *  \remarks
-         *      This is an atomic variable and is thus threadsafe.
-         */
-        // Methods
-        /** Transmit packets on the interface (from the contained connections).
-         *
-         *  Must be defined by any derived class and should only return if the
-         *  \ref running_ flag is set to false, and should do so no later than
-         *  250 ms after the \ref running_ flag is cleared.
-         */
-        virtual void tx_() = 0;
-        /** Read next packet.
-         *
-         *  Must be defined by any derived class.  It should return upon
-         *  receiving a complete packet or if the \ref running_ flag is set to
-         *  false, and should do so no later than 250 ms after the \ref running_
-         *  flag is cleared.  In the later case, the pointer should be nullptr.
-         *
-         *  This method is also responsible for managing any of the interface's
-         *  connections.
-         *
-         *  \returns A packet received on the interface.
-         */
-        virtual std::unique_ptr<Packet> rx_() = 0;
 
     public:
         enum Threads
@@ -77,14 +45,17 @@ class InterfaceThreader
             START,  //!< Start the interface (and worker threads) immediately.
             DELAY_START //!< Delay starting, use \ref start to launch threads.
         };
-        Interface(
-            std::shared_ptr<ConnectionPool> connection_pool,
-            Threads start_threads = Interface::START);
-        // LCOV_EXCL_START
-        virtual ~Interface();
-        // LCOV_EXCL_STOP
+        InterfaceThreader(
+            std::shared_ptr<Interface> interface,
+            std::chrono::microseconds = std::chrono::microseconds(100000),
+            Threads start_threads = InterfaceThreader::START);
+        InterfaceThreader(const InterfaceThreader &other) = default;
+        InterfaceThreader(InterfaceThreader &&other) = default;
+        ~InterfaceThreader();
         void start();
         void shutdown();
+        InterfaceThreader &operator=(const InterfaceThreader &other) = default;
+        InterfaceThreader &operator=(InterfaceThreader &&other) = default;
 };
 
 

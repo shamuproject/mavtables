@@ -22,17 +22,6 @@
 #include "Interface.hpp"
 
 
-/** Construct an interface.
- *
- *  \param connection_pool The pool used to register connections and send
- *      received packets.
- */
-Interface::Interface(std::shared_ptr<ConnectionPool> connection_pool)
-    : connection_pool_(std::move(connection_pool))
-{
-}
-
-
 // Placed here to avoid weak-vtables error.
 // LCOV_EXCL_START
 Interface::~Interface()

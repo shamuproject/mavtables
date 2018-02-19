@@ -20,20 +20,18 @@
 #include <utility>
 
 #include "Interface.hpp"
-
-
-#include <iostream>
+#include "InterfaceThreader.hpp"
 
 
 /** The transmitting thread runner.
  *
  *  This handles all transmission related tasks in a separate thread.
  */
-void Interface::tx_runner_()
+void InterfaceThreader::tx_runner_()
 {
     while (running_.load())
     {
-        tx_();
+        interface_->send_packet(timeout_);
     }
 }
 
@@ -42,38 +40,37 @@ void Interface::tx_runner_()
  *
  *  This handles all receiving related tasks in a separate thread.
  */
-void Interface::rx_runner_()
+void InterfaceThreader::rx_runner_()
 {
     while (running_.load())
     {
+        interface_->receive_packet(timeout_);
     }
-
-    // while (running_.load())
-    // {
-    //     // std::cout << "In rx" << std::endl;
-    //     // auto packet = rx_();
-    //     // if (packet != nullptr)
-    //     // {
-    //     //     connection_pool_->send(std::move(packet));
-    //     // }
-    // }
 }
 
 
 /** Construct and optionally start an interface.
  *
- *  \param connection_pool The connection pool to use for registering
- *      connections and sending packets.
- *  \param start_threads Set to \ref Interface::START (the default value) to
- *      start the interface (including worker threads) on construction.  Set to
- *      \ref Interface::DELAY_START to delay starting the interface (and worker
- *      threads) until the \ref start method is called.
+ *  \param interface The interface to run in TX/RX threads.  It's \ref
+ *      Interface::send_packet and \ref Interface::receive_packet methods will
+ *      be called repeatedly in two separate worker threads.
+ *  \param timeout The maximum amount of time to wait for incoming data or a
+ *      packet to transmit.  The default value is 100000 us (100 ms).
+ *  \param start_threads Set to \ref InterfaceThreader::START (the default
+ *      value) to start the interface (including worker threads) on
+ *      construction.  Set to \ref InterfaceThreader::DELAY_START to delay
+ *      starting the interface (and worker threads) until the \ref start method
+ *      is called.
  */
-Interface::Interface(
-    std::shared_ptr<ConnectionPool> connection_pool, Threads start_threads)
-    : connection_pool_(std::move(connection_pool)), running_(false)
+InterfaceThreader::InterfaceThreader(
+    std::shared_ptr<Interface> interface, 
+    std::chrono::microseconds timeout,
+    Threads start_threads)
+    : interface_(std::move(interface)),
+      timeout_(std::move(timeout)),
+      running_(false)
 {
-    if (start_threads == Interface::START)
+    if (start_threads == InterfaceThreader::START)
     {
         start();
     }
@@ -82,60 +79,34 @@ Interface::Interface(
 
 /** Shutdown the interface and its associated worker threads.
  */
-Interface::~Interface()
+InterfaceThreader::~InterfaceThreader()
 {
-    std::cout << "shutdown" << std::endl;
-
-    if (running_.load())
-    {
-        running_.store(false);
-        std::cout << "wait for join" << std::endl;
-        tx_thread_.join();
-        std::cout << "wait for join" << std::endl;
-        // rx_thread_.join();
-    }
+    shutdown();
 }
 
-
-#include <chrono>
-
-using namespace std::chrono_literals;
 
 /** Start the worker threads for the interface.
  *
  *  This starts a receiver and transmitter thread.
  */
-void Interface::start()
+void InterfaceThreader::start()
 {
-    // TODO: Calls pure virtual (in constructor).  Need to make constructor
-    // private and use a factory method.
-    // Care to avoid: https://stackoverflow.com/q/25145994/8093188
     running_.store(true);
-    // tx_thread_ = std::thread(&Interface::tx_runner_, this);
-    // rx_thread_ = std::thread(&Interface::rx_runner_, this);
-    tx_thread_ = std::thread([this] {this->tx_runner_();});
-    // rx_thread_ = std::thread([this]{this->rx_runner_();});
-    std::cout << " Threads running." << std::endl;
-    std::this_thread::sleep_for(4s);
-    shutdown();
+    tx_thread_ = std::thread(&InterfaceThreader::tx_runner_, this);
+    rx_thread_ = std::thread(&InterfaceThreader::rx_runner_, this);
 }
 
 
 /** Shutdown the interface and its associated worker threads.
  *
  *  \note This will always be called by the interface's destructor.
- *
  */
-void Interface::shutdown()
+void InterfaceThreader::shutdown()
 {
-    std::cout << "shutdown" << std::endl;
-
     if (running_.load())
     {
         running_.store(false);
-        std::cout << "wait for join" << std::endl;
         tx_thread_.join();
-        std::cout << "wait for join" << std::endl;
         rx_thread_.join();
     }
 }

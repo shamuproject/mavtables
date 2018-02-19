@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <chrono>
+#include <atomic>
 #include <memory>
 #include <vector>
 
@@ -22,12 +24,12 @@
 
 #include "ConnectionPool.hpp"
 #include "Interface.hpp"
-#include "Packet.hpp"
-#include "PacketVersion2.hpp"
+#include "InterfaceThreader.hpp"
 
+#include <iostream>
+#include <thread>
 
-#include "common_Packet.hpp"
-
+using namespace std::chrono_literals;
 
 namespace
 {
@@ -40,23 +42,31 @@ namespace
     // Subclass of Interface used for testing the abstract class Interface.
     class InterfaceTestClass : public Interface
     {
-        protected:
-            virtual void tx_()
-            {
-                ++tx_count;
-            }
-            virtual std::unique_ptr<Packet> rx_()
-            {
-                ++rx_count;
-                packets.push_back(
-                    std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-                return std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
-            }
+        private:
+            std::atomic<unsigned int> &tx_counter;
+            std::atomic<unsigned int> &rx_counter;
+
         public:
-            unsigned int tx_count = 0;
-            unsigned int rx_count = 0;
-            std::vector<std::unique_ptr<const Packet>> packets;
-            using Interface::Interface;
+            InterfaceTestClass(
+                std::atomic<unsigned int> &tx_counter_,
+                std::atomic<unsigned int> &rx_counter_)
+                : tx_counter(tx_counter_), rx_counter(rx_counter_)
+            {
+            }
+            void send_packet(
+                const std::chrono::microseconds &timeout =
+                    std::chrono::microseconds(100000)) final
+            {
+                std::this_thread::sleep_for(timeout);
+                ++tx_counter;
+            }
+            void receive_packet(
+                const std::chrono::microseconds &timeout =
+                    std::chrono::microseconds(100000)) final
+            {
+                std::this_thread::sleep_for(timeout);
+                ++rx_counter;
+            }
     };
 
 #ifdef __clang__
@@ -66,19 +76,83 @@ namespace
 }
 
 
-
-TEST_CASE("Interface's can be constructed.", "[Interface]")
+TEST_CASE("InterfaceThreader's can be constructed.", "[InterfaceThreader]")
 {
-    REQUIRE_NOTHROW(
-        InterfaceTestClass(
-            std::make_shared<ConnectionPool>(), Interface::DELAY_START));
-    InterfaceTestClass interface(
-            std::make_shared<ConnectionPool>());
-    // std::thread::
-    // interface.shutdown();
-    // REQUIRE_NOTHROW(
-    //     InterfaceTestClass(
-    //         std::make_shared<ConnectionPool>()));
-    // InterfaceTestClass interface(std::make_shared<ConnectionPool>());
-    // interface.
+    std::atomic<unsigned int> tx_count(0);
+    std::atomic<unsigned int> rx_count(0);
+    SECTION("With delayed start.")
+    {
+        REQUIRE_NOTHROW(
+            InterfaceThreader(
+                std::make_unique<InterfaceTestClass>(tx_count, rx_count),
+                1ms, InterfaceThreader::DELAY_START));
+    }
+    SECTION("With immediate start.")
+    {
+        REQUIRE_NOTHROW(
+            InterfaceThreader(
+                std::make_unique<InterfaceTestClass>(tx_count, rx_count)));
+    }
+}
+
+
+TEST_CASE("InterfaceThreader's run Interface::send_packet and "
+          "Interface::receive_packet methods of the contained "
+          "Interface repeatedly.", "[InterfaceThreader]")
+{
+    std::atomic<unsigned int> tx_count(0);
+    std::atomic<unsigned int> rx_count(0);
+    SECTION("With delayed start.")
+    {
+        REQUIRE(tx_count == 0);
+        REQUIRE(rx_count == 0);
+        InterfaceThreader threader(
+            std::make_unique<InterfaceTestClass>(tx_count, rx_count),
+            1us, InterfaceThreader::DELAY_START);
+        REQUIRE(tx_count == 0);
+        REQUIRE(rx_count == 0);
+        threader.start();
+        std::this_thread::sleep_for(10ms);
+        threader.shutdown();
+        auto tx_count_ = tx_count.load();
+        auto rx_count_ = rx_count.load();
+        REQUIRE(tx_count > 0);
+        REQUIRE(rx_count > 0);
+        std::this_thread::sleep_for(10ms);
+        REQUIRE(tx_count == tx_count_);
+        REQUIRE(rx_count == rx_count_);
+    }
+    SECTION("With immediate start (manual shutdown).")
+    {
+        REQUIRE(tx_count == 0);
+        REQUIRE(rx_count == 0);
+        InterfaceThreader threader(
+            std::make_unique<InterfaceTestClass>(tx_count, rx_count), 1us);
+        std::this_thread::sleep_for(10ms);
+        threader.shutdown();
+        auto tx_count_ = tx_count.load();
+        auto rx_count_ = rx_count.load();
+        REQUIRE(tx_count > 0);
+        REQUIRE(rx_count > 0);
+        std::this_thread::sleep_for(10ms);
+        REQUIRE(tx_count == tx_count_);
+        REQUIRE(rx_count == rx_count_);
+    }
+    SECTION("With immediate start (RAII shutdown).")
+    {
+        REQUIRE(tx_count == 0);
+        REQUIRE(rx_count == 0);
+        {
+            InterfaceThreader threader(
+                std::make_unique<InterfaceTestClass>(tx_count, rx_count), 1us);
+            std::this_thread::sleep_for(10ms);
+        }
+        auto tx_count_ = tx_count.load();
+        auto rx_count_ = rx_count.load();
+        REQUIRE(tx_count > 0);
+        REQUIRE(rx_count > 0);
+        std::this_thread::sleep_for(10ms);
+        REQUIRE(tx_count == tx_count_);
+        REQUIRE(rx_count == rx_count_);
+    }
 }

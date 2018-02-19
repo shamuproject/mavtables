@@ -41,19 +41,25 @@ namespace
     // Subclass of Interface used for testing the abstract class Interface.
     class InterfaceTestClass : public Interface
     {
+        private:
+            std::shared_ptr<ConnectionPool> connection_pool_;
+
         public:
-            using Interface::Interface;
+            InterfaceTestClass(std::shared_ptr<ConnectionPool> connection_pool)
+                : connection_pool_(std::move(connection_pool))
+            {
+            }
             // LCOV_EXCL_START
             ~InterfaceTestClass() = default;
             // LCOV_EXCL_STOP
             void send_packet(
-                std::chrono::microseconds timeout =
+                const std::chrono::microseconds &timeout =
                     std::chrono::microseconds(100000)) final
             {
                 (void)timeout;
             }
             void receive_packet(
-                std::chrono::microseconds timeout =
+                const std::chrono::microseconds &timeout =
                     std::chrono::microseconds(100000)) final
             {
                 (void)timeout;

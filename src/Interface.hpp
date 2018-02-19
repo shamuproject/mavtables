@@ -32,11 +32,7 @@
  */
 class Interface
 {
-    protected:
-        std::shared_ptr<ConnectionPool> connection_pool_;
-
     public:
-        Interface(std::shared_ptr<ConnectionPool> connection_pool);
         virtual ~Interface();
         /** Send a packet from one of the interface's connections.
          *
@@ -44,7 +40,7 @@ class Interface
          *      available for sending.  The default value is 100000 us (100 ms).
          */
         virtual void send_packet(
-            std::chrono::microseconds timeout =
+            const std::chrono::microseconds &timeout =
                 std::chrono::microseconds(100000)) = 0;
         /** Receive a packet on the interface.
          *
@@ -52,7 +48,7 @@ class Interface
          *      The default value is 100000 us (100 ms).
          */
         virtual void receive_packet(
-            std::chrono::microseconds timeout =
+            const std::chrono::microseconds &timeout =
                 std::chrono::microseconds(100000)) = 0;
 };
 
