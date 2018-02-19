@@ -114,16 +114,18 @@ Connection::Connection(
     std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
     std::unique_ptr<PacketQueue> queue, bool mirror)
     : filter_(std::move(filter)), pool_(std::move(pool)),
-    queue_(std::move(queue)), mirror_(mirror)
+      queue_(std::move(queue)), mirror_(mirror)
 {
     if (filter_ == nullptr)
     {
         throw std::invalid_argument("Given filter pointer is null.");
     }
+
     if (pool_ == nullptr)
     {
         throw std::invalid_argument("Given pool pointer is null.");
     }
+
     if (queue_ == nullptr)
     {
         throw std::invalid_argument("Given queue pointer is null.");

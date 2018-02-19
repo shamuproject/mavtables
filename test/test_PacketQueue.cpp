@@ -48,7 +48,7 @@ TEST_CASE("PacketQueue's 'push' method ensures that the packet pointer is "
 }
 
 
-TEST_CASE("PacketQueue's can be managed with 'push' and 'pop' methods.", 
+TEST_CASE("PacketQueue's can be managed with 'push' and 'pop' methods.",
           "[PacketQueue]")
 {
     auto heartbeat =
@@ -174,7 +174,8 @@ TEST_CASE("PacketQueue's is threadsafe.", "[PacketQueue]")
     SECTION("The 'pop' method can optionally block.  Will be released when "
             "a packet becomes available.")
     {
-        auto future = std::async(std::launch::async, [&](){
+        auto future = std::async(std::launch::async, [&]()
+        {
             return queue.pop(true);
         });
         auto status = future.wait_for(0s);
@@ -187,10 +188,12 @@ TEST_CASE("PacketQueue's is threadsafe.", "[PacketQueue]")
     SECTION("The 'pop' method can optionally block.  Will be released when "
             "the 'shutdown' method is called.")
     {
-        auto future1 = std::async(std::launch::async, [&](){
+        auto future1 = std::async(std::launch::async, [&]()
+        {
             return queue.pop(true);
         });
-        auto future2 = std::async(std::launch::async, [&](){
+        auto future2 = std::async(std::launch::async, [&]()
+        {
             return queue.pop(true);
         });
         auto status1 = future1.wait_for(0s);

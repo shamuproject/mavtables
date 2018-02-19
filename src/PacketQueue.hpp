@@ -47,7 +47,7 @@ class PacketQueue
         // LCOV_EXCL_STOP
         TEST_VIRTUAL std::shared_ptr<const Packet> pop(bool blocking = false);
         TEST_VIRTUAL void push(
-                std::shared_ptr<const Packet> packet, int priority = 0);
+            std::shared_ptr<const Packet> packet, int priority = 0);
         TEST_VIRTUAL void shutdown();
 };
 

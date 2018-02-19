@@ -46,13 +46,13 @@ TEST_CASE("ConnectionPool's 'add' method ensures the given connection is not "
 TEST_CASE("ConnectionPool's can store at least one connection and send a "
           "packet over it.", "[ConnectionPool]")
 {
-    auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock;
     fakeit::Fake(Method(mock, send));
     std::shared_ptr<Connection> connection = mock_shared(mock);
     ConnectionPool pool;
     pool.add(connection);
-    pool.send(packet);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     fakeit::Verify(Method(mock, send).Matching([&](auto a)
     {
         return *a == *packet;
@@ -63,7 +63,7 @@ TEST_CASE("ConnectionPool's can store at least one connection and send a "
 TEST_CASE("ConnectionPool's can store more than one connection and send a "
           "packet over them.", "[ConnectionPool]")
 {
-    auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;
     fakeit::Mock<Connection> mock2;
     fakeit::Fake(Method(mock1, send));
@@ -73,7 +73,7 @@ TEST_CASE("ConnectionPool's can store more than one connection and send a "
     ConnectionPool pool;
     pool.add(connection1);
     pool.add(connection2);
-    pool.send(packet);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     fakeit::Verify(Method(mock1, send).Matching([&](auto a)
     {
         return *a == *packet;
@@ -88,7 +88,7 @@ TEST_CASE("ConnectionPool's can store more than one connection and send a "
 TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
           "[ConnectionPool]")
 {
-    auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;
     fakeit::Mock<Connection> mock2;
     fakeit::Fake(Method(mock1, send));
@@ -98,9 +98,9 @@ TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
     ConnectionPool pool;
     pool.add(connection1);
     pool.add(connection2);
-    pool.send(packet);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     pool.remove(connection1);
-    pool.send(packet);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     fakeit::Verify(Method(mock1, send).Matching([&](auto a)
     {
         return *a == *packet;
