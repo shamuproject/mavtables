@@ -25,6 +25,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Reject.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Rule.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/UDPInterface.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UDPSocket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
 )
@@ -58,6 +59,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/RecursionData.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Reject.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Rule.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/UDPInterface.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/UDPSocket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
 )
