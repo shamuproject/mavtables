@@ -82,7 +82,7 @@ bool semaphore::wait_until(
     const std::chrono::time_point<Clock, Duration> &timeout_time)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    bool result = cv_.wait_for(lock, timeout_time, [this]()
+    bool result = cv_.wait_until(lock, timeout_time, [this]()
     {
         return value_ > 0;
     });
