@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <chrono>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -124,23 +125,38 @@ TEST_CASE("Connection's 'next_packet' method.", "[Connection]")
     Connection conn(filter, std::move(pool), std::move(queue));
     SECTION("Returns the next packet.")
     {
-        fakeit::When(Method(mock_queue, pop)).Return(ping);
-        auto packet = conn.next_packet();
+        fakeit::When(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &))).Return(ping);
+        auto packet = conn.next_packet(1ms);
         REQUIRE(packet != nullptr);
         REQUIRE(*packet == *ping);
-        fakeit::Verify(Method(mock_queue, pop).Matching([](auto a)
+        fakeit::Verify(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &)).Matching([](auto a)
         {
-            return a == true; // blocking
+            return a == 1ms;
         })).Once();
     }
-    SECTION("Returns nullptr if the connection is shutdown.")
+    SECTION("Or times out and returns nullptr.")
     {
-        fakeit::When(Method(mock_queue, pop)).Return(nullptr);
-        auto packet = conn.next_packet();
-        REQUIRE(packet == nullptr);
-        fakeit::Verify(Method(mock_queue, pop).Matching([](auto a)
+        fakeit::When(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &))).Return(nullptr);
+        REQUIRE(conn.next_packet(0ms) == nullptr);
+        fakeit::Verify(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &)).Matching([](auto a)
         {
-            return a == true; // blocking
+            return a == 0ms;
         })).Once();
     }
 }
@@ -586,21 +602,4 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         fakeit::Verify(Method(mock_pool, addresses)).Once();
     }
-}
-
-
-TEST_CASE("Connection's 'shutdown' method shutdown the contained threadsafe "
-          " PacketQueue.", "[Connection]")
-{
-    fakeit::Mock<Filter> mock_filter;
-    fakeit::Mock<AddressPool<>> mock_pool;
-    fakeit::Mock<PacketQueue> mock_queue;
-    fakeit::Fake(Method(mock_pool, add));
-    auto filter = mock_shared(mock_filter);
-    auto pool = mock_unique(mock_pool);
-    auto queue = mock_unique(mock_queue);
-    fakeit::Fake(Method(mock_queue, shutdown));
-    Connection conn(filter, std::move(pool), std::move(queue));
-    conn.shutdown();
-    fakeit::Verify(Method(mock_queue, shutdown)).Once();
 }
