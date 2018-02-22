@@ -44,7 +44,7 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
         {
             sp.wait();
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(1ms) == std::future_status::ready);
         future.wait();
@@ -57,7 +57,7 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
             sp.wait();
             sp.wait();
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         sp.notify();
@@ -124,7 +124,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         {
             return sp.wait_for(2ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(1ms) == std::future_status::ready);
         REQUIRE(future.get());
@@ -136,7 +136,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         {
             return sp.wait_for(1ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(2ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
@@ -147,7 +147,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         {
             return sp.wait_for(2ms) && sp.wait_for(2ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         sp.notify();
@@ -161,7 +161,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         {
             return sp.wait_for(1ms) && sp.wait_for(1ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(3ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
@@ -179,7 +179,7 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         {
             return sp.wait_until(std::chrono::steady_clock::now() + 2ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(1ms) == std::future_status::ready);
         REQUIRE(future.get());
@@ -191,7 +191,7 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         {
             return sp.wait_until(std::chrono::steady_clock::now() + 1ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(2ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
@@ -201,9 +201,9 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         auto future = std::async(std::launch::async, [&]()
         {
             return sp.wait_until(std::chrono::steady_clock::now() + 2ms) &&
-                sp.wait_until(std::chrono::steady_clock::now() + 2ms);
+                   sp.wait_until(std::chrono::steady_clock::now() + 2ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         sp.notify();
@@ -216,9 +216,9 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         auto future = std::async(std::launch::async, [&]()
         {
             return sp.wait_until(std::chrono::steady_clock::now() + 1ms) &&
-                sp.wait_until(std::chrono::steady_clock::now() + 1ms);
+                   sp.wait_until(std::chrono::steady_clock::now() + 1ms);
         });
-        REQUIRE(future.wait_for(0s) != std::future_status::ready);
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(3ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }

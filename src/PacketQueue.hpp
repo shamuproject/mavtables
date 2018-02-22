@@ -20,8 +20,10 @@
 
 
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
 
 #include "config.hpp"
@@ -33,22 +35,29 @@
  */
 class PacketQueue
 {
-    private:
-        std::priority_queue<QueuedPacket> queue_;
-        unsigned long long ticket_;
-        bool running_;
-        std::mutex mutex_;
-        std::condition_variable cv_;
-
     public:
-        PacketQueue();
+        PacketQueue(std::optional<std::function<void(void)>> callback = {});
         // LCOV_EXCL_START
         TEST_VIRTUAL ~PacketQueue() = default;
         // LCOV_EXCL_STOP
-        TEST_VIRTUAL std::shared_ptr<const Packet> pop(bool blocking = false);
+        TEST_VIRTUAL void close();
+        TEST_VIRTUAL bool empty();
+        TEST_VIRTUAL std::shared_ptr<const Packet> pop();
+        TEST_VIRTUAL std::shared_ptr<const Packet> pop(
+            const std::chrono::nanoseconds &timeout);
         TEST_VIRTUAL void push(
             std::shared_ptr<const Packet> packet, int priority = 0);
-        TEST_VIRTUAL void shutdown();
+
+    private:
+        // Variables.
+        std::optional<std::function<void(void)>> callback_;
+        unsigned long long ticket_;
+        bool running_;
+        std::priority_queue<QueuedPacket> queue_;
+        std::mutex mutex_;
+        std::condition_variable cv_;
+        // Methods
+        std::shared_ptr<const Packet> get_packet_();
 };
 
 
