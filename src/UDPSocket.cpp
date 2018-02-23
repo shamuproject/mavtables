@@ -51,7 +51,7 @@ void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
  *  \returns The data read from the socket and the IP address it was sent from.
  */
 std::pair<std::vector<uint8_t>, IPAddress> UDPSocket::receive(
-    const std::chrono::microseconds &timeout)
+    const std::chrono::nanoseconds &timeout)
 {
     std::vector<uint8_t> vec;
     return {vec, receive(std::back_inserter(vec), timeout)};

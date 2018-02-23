@@ -111,8 +111,9 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
  *      then the connection will also be threadsafe.
  */
 Connection::Connection(
-    std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
-    std::unique_ptr<PacketQueue> queue, bool mirror)
+    std::shared_ptr<Filter> filter, bool mirror,
+    std::unique_ptr<AddressPool<>> pool,
+    std::unique_ptr<PacketQueue> queue)
     : filter_(std::move(filter)), pool_(std::move(pool)),
       queue_(std::move(queue)), mirror_(mirror)
 {

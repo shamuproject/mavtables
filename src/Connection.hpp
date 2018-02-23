@@ -39,8 +39,11 @@ class Connection
 {
     public:
         Connection(
-            std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
-            std::unique_ptr<PacketQueue> queue, bool mirror = false);
+            std::shared_ptr<Filter> filter, bool mirror = false,
+            std::unique_ptr<AddressPool<>> pool =
+                std::make_unique<AddressPool<>>(),
+            std::unique_ptr<PacketQueue> queue =
+                std::make_unique<PacketQueue>());
         // LCOV_EXCL_START
         TEST_VIRTUAL ~Connection() = default;
         // LCOV_EXCL_STOP
