@@ -36,6 +36,8 @@
 class semaphore
 {
     public:
+        semaphore(const semaphore &other) = delete;
+        semaphore(semaphore &&other) = delete;
         semaphore(size_t initial_value = 0);
         void notify();
         void wait();
@@ -44,6 +46,8 @@ class semaphore
         template<class Clock, class Duration>
         bool wait_until(
             const std::chrono::time_point<Clock, Duration> &timeout_time);
+        semaphore &operator=(const semaphore &other) = delete;
+        semaphore &operator=(semaphore &&other) = delete;
 
     private:
         size_t value_;

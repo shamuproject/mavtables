@@ -58,7 +58,7 @@ TEST_CASE("Connection's can be constructed.", "[Connection]")
     SECTION("As a regular connection.")
     {
         REQUIRE_NOTHROW(Connection(
-            filter, false, std::move(pool), std::move(queue)));
+                            filter, false, std::move(pool), std::move(queue)));
     }
     SECTION("As a mirror connection.")
     {

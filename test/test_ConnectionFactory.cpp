@@ -56,7 +56,8 @@ TEST_CASE("ConnectionFactory's 'get' method returns a new connection.",
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;
-    fakeit::When(Method(mock_filter, will_accept)).AlwaysDo([](auto &a, auto &b)
+    fakeit::When(Method(mock_filter, will_accept)
+                ).AlwaysDo([](auto & a, auto & b)
     {
         (void)a;
         (void)b;
@@ -75,13 +76,14 @@ TEST_CASE("ConnectionFactory's 'get' method returns a new connection.",
 
 
 TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
-          "on any of the connections created by the factory.", 
+          "on any of the connections created by the factory.",
           "[ConnectionFactory]")
 {
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;
-    fakeit::When(Method(mock_filter, will_accept)).AlwaysDo([](auto &a, auto &b)
+    fakeit::When(Method(mock_filter, will_accept)
+                ).AlwaysDo([](auto & a, auto & b)
     {
         (void)a;
         (void)b;

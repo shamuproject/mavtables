@@ -73,10 +73,12 @@ template <class C, class AP, class PQ>
 std::unique_ptr<C> ConnectionFactory<C, AP, PQ>::get()
 {
     return std::make_unique<C>(
-        filter_, mirror_, std::make_unique<AP>(), std::make_unique<PQ>([this]()
-        {
-            semaphore_.notify();
-        }));
+               filter_, mirror_,
+               std::make_unique<AP>(),
+               std::make_unique<PQ>([this]()
+    {
+        semaphore_.notify();
+    }));
 }
 
 
