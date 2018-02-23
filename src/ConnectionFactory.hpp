@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "Connection.hpp"
+#include "config.hpp"
 #include "semaphore.hpp"
 
 
@@ -35,8 +36,10 @@ class ConnectionFactory
 {
     public:
         ConnectionFactory(std::shared_ptr<Filter> filter, bool mirror = false);
-        std::unique_ptr<C> get();
-        bool wait_for_packet(const std::chrono::nanoseconds &timeout);
+        TEST_VIRTUAL ~ConnectionFactory() = default;
+        TEST_VIRTUAL std::unique_ptr<C> get();
+        TEST_VIRTUAL bool wait_for_packet(
+            const std::chrono::nanoseconds &timeout);
 
     private:
         std::shared_ptr<Filter> filter_;

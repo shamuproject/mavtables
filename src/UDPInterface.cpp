@@ -76,6 +76,21 @@ UDPInterface::UDPInterface(
       connection_factory_(std::move(connection_factory)),
       last_ip_address_(IPAddress(0))
 {
+    if (socket_ == nullptr)
+    {
+        throw std::invalid_argument("Given socket pointer is null.");
+    }
+
+    if (connection_pool_ == nullptr)
+    {
+        throw std::invalid_argument("Given connection pool pointer is null.");
+    }
+
+    if (connection_factory_ == nullptr)
+    {
+        throw std::invalid_argument(
+            "Given connection factory pointer is null.");
+    }
 }
 
 
