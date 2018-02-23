@@ -41,7 +41,9 @@ TEST_CASE("PacketQueue's can be constructed.", "[AddressPool]")
     }
     SECTION("With a push callback.")
     {
-        REQUIRE_NOTHROW(PacketQueue([]() {}));
+        PacketQueue pq([]() {});
+        auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+        pq.push(ping);
     }
 }
 
