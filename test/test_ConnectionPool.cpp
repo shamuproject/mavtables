@@ -101,3 +101,30 @@ TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
         return *a == *packet;
     })).Exactly(2);
 }
+
+
+TEST_CASE("ConnectionPool's 'send' method connections that have expired.",
+          "[ConnectionPool]")
+{
+    auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
+    fakeit::Mock<Connection> mock1;
+    fakeit::Mock<Connection> mock2;
+    fakeit::Fake(Method(mock1, send));
+    fakeit::Fake(Method(mock2, send));
+    std::shared_ptr<Connection> connection1 = mock_shared(mock1);
+    std::shared_ptr<Connection> connection2 = mock_shared(mock2);
+    ConnectionPool pool;
+    pool.add(connection1);
+    pool.add(connection2);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
+    connection1.reset();
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
+    fakeit::Verify(Method(mock1, send).Matching([&](auto a)
+    {
+        return *a == *packet;
+    })).Once();
+    fakeit::Verify(Method(mock2, send).Matching([&](auto a)
+    {
+        return *a == *packet;
+    })).Exactly(2);
+}
