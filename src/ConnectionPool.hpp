@@ -36,15 +36,16 @@
 class ConnectionPool
 {
     private:
-        std::set<std::shared_ptr<Connection>> connections_;
+        std::set<std::weak_ptr<Connection>,
+            std::owner_less<std::weak_ptr<Connection>>> connections_;
         std::shared_mutex mutex_;
 
     public:
         // LCOV_EXCL_START
         TEST_VIRTUAL ~ConnectionPool() = default;
         // LCOV_EXCL_STOP
-        TEST_VIRTUAL void add(std::shared_ptr<Connection> connection);
-        TEST_VIRTUAL void remove(const std::shared_ptr<Connection> &connection);
+        TEST_VIRTUAL void add(std::weak_ptr<Connection> connection);
+        TEST_VIRTUAL void remove(const std::weak_ptr<Connection> &connection);
         TEST_VIRTUAL void send(std::unique_ptr<const Packet> packet);
 };
 

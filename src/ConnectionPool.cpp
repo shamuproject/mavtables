@@ -31,12 +31,12 @@
  *  \param connection The connection to add.
  *  \throws std::invalid_argument if the given connection pointer is nullptr.
  */
-void ConnectionPool::add(std::shared_ptr<Connection> connection)
+void ConnectionPool::add(std::weak_ptr<Connection> connection)
 {
-    if (connection == nullptr)
-    {
-        throw std::invalid_argument("Given Connection pointer is null.");
-    }
+    // if (connection == nullptr)
+    // {
+    //     throw std::invalid_argument("Given Connection pointer is null.");
+    // }
 
     std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.insert(std::move(connection));
@@ -47,7 +47,7 @@ void ConnectionPool::add(std::shared_ptr<Connection> connection)
  *
  *  \param connection The connection to remove.
  */
-void ConnectionPool::remove(const std::shared_ptr<Connection> &connection)
+void ConnectionPool::remove(const std::weak_ptr<Connection> &connection)
 {
     std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.erase(connection);
@@ -68,6 +68,9 @@ void ConnectionPool::send(std::unique_ptr<const Packet> packet)
 
     for (auto i : connections_)
     {
-        i->send(shared);
+        if (auto connection = i.lock())
+        {
+            connection->send(shared);
+        }
     }
 }

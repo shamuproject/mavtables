@@ -34,15 +34,6 @@ TEST_CASE("ConnectionPool's can be constructed.", "[ConnectionPool]")
 }
 
 
-TEST_CASE("ConnectionPool's 'add' method ensures the given connection is not "
-          "nullptr.", "[ConnectionPool]")
-{
-    REQUIRE_THROWS_AS(ConnectionPool().add(nullptr), std::invalid_argument);
-    REQUIRE_THROWS_WITH(
-        ConnectionPool().add(nullptr), "Given Connection pointer is null.");
-}
-
-
 TEST_CASE("ConnectionPool's can store at least one connection and send a "
           "packet over it.", "[ConnectionPool]")
 {
