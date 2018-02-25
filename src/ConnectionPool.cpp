@@ -37,7 +37,6 @@ void ConnectionPool::add(std::weak_ptr<Connection> connection)
     // {
     //     throw std::invalid_argument("Given Connection pointer is null.");
     // }
-
     std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.insert(std::move(connection));
 }

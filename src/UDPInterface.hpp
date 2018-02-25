@@ -44,11 +44,11 @@ class UDPInterface : public Interface
             std::shared_ptr<ConnectionPool> connection_pool,
             std::unique_ptr<ConnectionFactory<>> connection_factory);
         void send_packet(
-            const std::chrono::microseconds &timeout =
-                std::chrono::microseconds(100000)) final;
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) final;
         void receive_packet(
-            const std::chrono::microseconds &timeout =
-                std::chrono::microseconds(100000)) final;
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) final;
 
     private:
         // Variables.

@@ -54,15 +54,15 @@ namespace
             {
             }
             void send_packet(
-                const std::chrono::microseconds &timeout =
-                    std::chrono::microseconds(100000)) final
+                const std::chrono::nanoseconds &timeout =
+                    std::chrono::nanoseconds(100000)) final
             {
                 std::this_thread::sleep_for(timeout);
                 ++tx_counter;
             }
             void receive_packet(
-                const std::chrono::microseconds &timeout =
-                    std::chrono::microseconds(100000)) final
+                const std::chrono::nanoseconds &timeout =
+                    std::chrono::nanoseconds(100000)) final
             {
                 std::this_thread::sleep_for(timeout);
                 ++rx_counter;

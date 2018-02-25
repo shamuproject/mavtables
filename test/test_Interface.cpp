@@ -53,14 +53,14 @@ namespace
             ~InterfaceTestClass() = default;
             // LCOV_EXCL_STOP
             void send_packet(
-                const std::chrono::microseconds &timeout =
-                    std::chrono::microseconds(100000)) final
+                const std::chrono::nanoseconds &timeout =
+                    std::chrono::nanoseconds(100000)) final
             {
                 (void)timeout;
             }
             void receive_packet(
-                const std::chrono::microseconds &timeout =
-                    std::chrono::microseconds(100000)) final
+                const std::chrono::nanoseconds &timeout =
+                    std::chrono::nanoseconds(100000)) final
             {
                 (void)timeout;
                 connection_pool_->send(

@@ -42,7 +42,8 @@ class UDPSocket
          */
         UDPSocket(unsigned int port, std::optional<IPAddress> address = {});
         virtual ~UDPSocket();
-        void send(const std::vector<uint8_t> &data, const IPAddress &address);
+        void send(
+            const std::vector<uint8_t> &data, const IPAddress &address);
         /** Send data on the socket to the given address.
          *
          *  \param first Iterator to first byte in range to send.
