@@ -42,7 +42,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t seq = 0xFE; // test internal magic byte
         uint8_t sysid = 127;
-        uint8_t compid = 0;
+        uint8_t compid = 1;
         uint8_t msgid = 0;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -56,8 +56,8 @@ namespace
         {
             uint64_t time_usec = 295128000000000;
             uint32_t seq = 0xBA5EBA11;
-            uint8_t target_system = 255;
-            uint8_t target_component = 64;
+            uint8_t target_system = 127;
+            uint8_t target_component = 1;
         };
         uint8_t magic = 0xFE;
         uint8_t len = sizeof(payload);
@@ -83,7 +83,7 @@ namespace
         uint8_t len = sizeof(payload);
         uint8_t seq = 0xFE; // test internal magic byte
         uint8_t sysid = 172;
-        uint8_t compid = 16;
+        uint8_t compid = 0;
         uint8_t msgid = 11;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -160,7 +160,7 @@ namespace
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 127;
-        uint8_t compid = 0;
+        uint8_t compid = 1;
         uint32_t msgid : 24;
         payload payload;
         uint16_t checksum = 0xFACE;
@@ -175,8 +175,8 @@ namespace
         {
             uint64_t time_usec = 295128000000000;
             uint32_t seq = 0xBA5EBA11;
-            uint8_t target_system = 255;
-            uint8_t target_component = 64;
+            uint8_t target_system = 127;
+            uint8_t target_component = 1;
         };
         uint8_t magic = 0xFD;
         uint8_t len = sizeof(payload);
@@ -207,7 +207,7 @@ namespace
         uint8_t compat_flags = 0;
         uint8_t seq = 0xFD; // test internal magic byte
         uint8_t sysid = 172;
-        uint8_t compid = 16;
+        uint8_t compid = 0;
         uint32_t msgid : 24;
         payload payload;
         uint16_t checksum = 0xFACE;

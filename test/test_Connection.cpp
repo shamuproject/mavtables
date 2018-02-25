@@ -229,9 +229,9 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         REQUIRE(will_accept_packets.size() == 1);
         REQUIRE(will_accept_packets[0] == *ping);
         REQUIRE(will_accept_addresses.size() == 1);
-        REQUIRE(will_accept_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(will_accept_addresses[0] == MAVAddress("127.1"));
         REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(contains_addresses[0] == MAVAddress("127.1"));
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
         {
@@ -261,9 +261,9 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         REQUIRE(will_accept_packets.size() == 1);
         REQUIRE(will_accept_packets[0] == *ping);
         REQUIRE(will_accept_addresses.size() == 1);
-        REQUIRE(will_accept_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(will_accept_addresses[0] == MAVAddress("127.1"));
         REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(contains_addresses[0] == MAVAddress("127.1"));
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         fakeit::Verify(Method(mock_pool, contains)).Once();
@@ -280,7 +280,7 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         });
         conn.send(ping);
         REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(contains_addresses[0] == MAVAddress("127.1"));
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(0);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         fakeit::Verify(Method(mock_pool, contains)).Once();

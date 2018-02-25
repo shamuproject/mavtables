@@ -22,6 +22,7 @@
 #include <vector>
 #include <utility>
 #include <set>
+#include <cstdint>
 
 #include <catch.hpp>
 
@@ -95,16 +96,18 @@ TEST_CASE("UDPInterface's can be constructed.", "[UPDInterface]")
 
 TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
 {
+    // MAVLink packets.
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     auto encapsulated_data =
         std::make_shared<packet_v2::Packet>(to_vector(EncapsulatedDataV2()));
+    // Connection pool
     ConnectionPool pool_obj;
     fakeit::Mock<ConnectionPool> spy_pool(pool_obj);
     fakeit::Spy(Method(spy_pool, add));
     auto pool = mock_shared(spy_pool);
-    // auto pool = std::make_shared<ConnectionPool>();
-    // Vectors for capturing reference arguments.
+    // Filter
+    fakeit::Mock<Filter> mock_filter;
     std::multiset<packet_v2::Packet,
         bool(*)(packet_v2::Packet, packet_v2::Packet)>
         will_accept_packets([](auto a, auto b)
@@ -112,13 +115,6 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         return a.data() < b.data();
     });
     std::multiset<MAVAddress> will_accept_addresses;
-    using receive_type =
-        IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
-                  const std::chrono::nanoseconds &);
-    fakeit::Mock<Filter> mock_filter;
-    fakeit::Mock<UDPSocket> mock_socket;
-    auto filter = mock_shared(mock_filter);
-    auto socket = mock_unique(mock_socket);
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
         [&](auto & a, auto & b)
     {
@@ -126,18 +122,29 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         will_accept_packets.insert(
             dynamic_cast<const packet_v2::Packet &>(a));
         will_accept_addresses.insert(b);
-        return std::pair<bool, int>(true, 2);
+        return std::pair<bool, int>(true, 0);
     });
-    std::chrono::nanoseconds timeout = 250ms;
+    auto filter = mock_shared(mock_filter);
+    // Socket
+    using receive_type =
+        IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
+                  const std::chrono::nanoseconds &);
+    fakeit::Mock<UDPSocket> mock_socket;
+    auto socket = mock_unique(mock_socket);
+    // Interface
     UDPInterface udp(
         std::move(socket), pool,
         std::make_unique<ConnectionFactory<>>(filter));
+    std::chrono::nanoseconds timeout = 250ms;
     SECTION("No packet received.")
     {
+        // Mocks
         fakeit::When(
             OverloadedMethod(
                 mock_socket, receive, receive_type)).AlwaysReturn(IPAddress(0));
+        // Test
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -150,6 +157,7 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     }
     SECTION("Partial packet received.")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).AlwaysDo([](auto a, auto b)
         {
@@ -158,7 +166,9 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             std::copy(vec.begin(), vec.end() - 1, a);
             return IPAddress("127.0.0.1:4000");
         });
+        // Test
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -171,6 +181,7 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     }
     SECTION("Full packet received.")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).AlwaysDo([](auto a, auto b)
         {
@@ -179,7 +190,9 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         });
+        // Test
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -189,11 +202,12 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         })).Once();
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         REQUIRE(will_accept_packets.count(*heartbeat) == 1);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.0")) == 1);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Once();
     }
     SECTION("Multiple packets received (same IP and MAVLink addresses).")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).AlwaysDo([](auto a, auto b)
         {
@@ -202,8 +216,10 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         });
+        // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -213,11 +229,12 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         })).Exactly(2);
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(2);
         REQUIRE(will_accept_packets.count(*heartbeat) == 2);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.0")) == 2);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
         fakeit::Verify(Method(spy_pool, add)).Once();
     }
     SECTION("Multiple packets received (same IP, different MAVLink addresses).")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
@@ -232,8 +249,10 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         });
+        // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -244,12 +263,13 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(3);
         REQUIRE(will_accept_packets.count(*heartbeat) == 1);
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 2);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.0")) == 2);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
         REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Once();
     }
     SECTION("Multiple packets received (different IP and MAVLink addresses).")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
@@ -264,8 +284,10 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4001");
         });
+        // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -277,28 +299,31 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
         REQUIRE(will_accept_packets.count(*heartbeat) == 2);
         REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 2);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.0")) == 1);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Exactly(2);
     }
     SECTION("Partial packets with same IP address should be combined and "
             "parsed.")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
-            std::copy(vec.begin(), vec.end()-10, a);
+            std::copy(vec.begin(), vec.end() - 10, a);
             return IPAddress("127.0.0.1:4000");
         }).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
-            std::copy(vec.end()-10, vec.end(), a);
+            std::copy(vec.end() - 10, vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         });
+        // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -313,22 +338,25 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     }
     SECTION("Partial packets with different IP addresses should be dropped.")
     {
+        // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
-            std::copy(vec.begin(), vec.end()-10, a);
+            std::copy(vec.begin(), vec.end() - 10, a);
             return IPAddress("127.0.0.1:4000");
         }).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
-            std::copy(vec.end()-10, vec.end(), a);
+            std::copy(vec.end() - 10, vec.end(), a);
             return IPAddress("127.0.0.1:4001");
         });
+        // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -342,20 +370,281 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
 }
 
 
-
-
-// Check receive_packet via filter mock
-// No packet
-// Single packet.
-// Multiple packets same MAVLink address and same IP address.
-// Multiple packets different MAVLink addresses, but same IP address.
-// Multiple packets different MAVLink addresses and different IP address.
-// Partial packets with same IP address should be combined and parsed.
-// Partial packets with different IP addresses should be dropped.
-//
-// Then check send_packet by using all the same setups, but validating the
-// socket mock.
-
+TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
+{
+    // MAVLink packets.
+    auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    auto heartbeat =
+        std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
+    auto encapsulated_data =
+        std::make_shared<packet_v2::Packet>(to_vector(EncapsulatedDataV2()));
+    // Filter
+    fakeit::Mock<Filter> mock_filter;
+    fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+        [&](auto & a, auto & b)
+    {
+        std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
+        return std::pair<bool, int>(true, 0);
+    });
+    auto filter = mock_shared(mock_filter);
+    // Socket
+    std::multiset<std::vector<uint8_t>> send_bytes;
+    std::multiset<IPAddress> send_addresses;
+    using receive_type =
+        IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
+                  const std::chrono::nanoseconds &);
+    using send_type =
+        void(std::vector<uint8_t>::const_iterator,
+             std::vector<uint8_t>::const_iterator,
+             const IPAddress &);
+    fakeit::Mock<UDPSocket> mock_socket;
+    fakeit::When(OverloadedMethod(mock_socket, send, send_type)
+            ).AlwaysDo([&](auto a, auto b, auto c)
+    {   
+        std::vector<uint8_t> vec;
+        std::copy(a, b, std::back_inserter(vec));
+        send_bytes.insert(vec);
+        send_addresses.insert(c);
+    });
+    auto socket = mock_unique(mock_socket);
+    // Connection Factory
+    ConnectionFactory<> factory_obj(filter);
+    fakeit::Mock<ConnectionFactory<>> spy_factory(factory_obj);
+    fakeit::Spy(Method(spy_factory, wait_for_packet));
+    // Interface
+    UDPInterface udp(
+        std::move(socket),
+        std::make_shared<ConnectionPool>(),
+        mock_unique(spy_factory));
+    std::chrono::nanoseconds timeout = 1ms;
+    SECTION("No packets, timeout.")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).AlwaysDo([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        });
+        // Test
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(0);
+    }
+    SECTION("Single connection, single packet.")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).AlwaysDo([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(OverloadedMethod(mock_socket, send, send_type)).Once();
+        REQUIRE(send_bytes.size() == 1);
+        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
+    }
+    SECTION("Single connection, multiple packets.")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(OverloadedMethod(mock_socket, send, send_type)).Once();
+        REQUIRE(send_bytes.size() == 1);
+        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
+        // Test
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(
+            Method(spy_factory, wait_for_packet).Using(1ms)).Exactly(2);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
+        REQUIRE(send_bytes.size() == 2);
+        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 2);
+    }
+    SECTION("Multiple connections, multiple packets.")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4001");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(2);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
+        REQUIRE(send_bytes.size() == 2);
+        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4001")) == 1);
+        // Test
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(
+            Method(spy_factory, wait_for_packet).Using(1ms)).Exactly(2);
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(3);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(3);
+        REQUIRE(send_bytes.size() == 3);
+        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 2);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 2);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4001")) == 1);
+    }
+    SECTION("Multiple connections with broadcast packet.")
+    {
+        // Mocks
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
+            if (a.name() == "ENCAPSULATED_DATA")
+            {
+                return std::pair<bool, int>(true, 0);
+            }
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4001");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(2);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
+        REQUIRE(send_bytes.size() == 2);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 2);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4001")) == 1);
+        // Test
+        udp.send_packet(timeout);
+        // Verification (no futher operations)
+        fakeit::Verify(
+            Method(spy_factory, wait_for_packet).Using(1ms)).Exactly(2);
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(3);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
+    }
+    SECTION("Multiple connections with targeted packet.")
+    {
+        // Mocks
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
+            if (a.name() == "PING")
+            {
+                return std::pair<bool, int>(true, 0);
+            }
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4001");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(PingV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4002");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(1);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(1);
+        REQUIRE(send_bytes.size() == 1);
+        REQUIRE(send_bytes.count(to_vector(PingV2())) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
+        // Test
+        udp.send_packet(timeout);
+        // Verification (no futher operations)
+        fakeit::Verify(
+            Method(spy_factory, wait_for_packet).Using(1ms)).Exactly(2);
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(2);
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, send, send_type)).Exactly(1);
+    }
+}
 
 
 // The tests below are from attempts to test the UDPInterface class in different

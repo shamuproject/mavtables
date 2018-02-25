@@ -219,14 +219,14 @@ TEST_CASE("QueuedPacket's are printable.", "[QueuedPacket]")
     auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     REQUIRE(
         str(QueuedPacket(packet, -10, 1)) ==
-        "PING (#4) from 192.168 to 255.64 (v2.0) with priority -10");
+        "PING (#4) from 192.168 to 127.1 (v2.0) with priority -10");
     REQUIRE(
         str(QueuedPacket(packet, 0, 1)) ==
-        "PING (#4) from 192.168 to 255.64 (v2.0) with priority 0");
+        "PING (#4) from 192.168 to 127.1 (v2.0) with priority 0");
     REQUIRE(
         str(QueuedPacket(packet, 3, 10)) ==
-        "PING (#4) from 192.168 to 255.64 (v2.0) with priority 3");
+        "PING (#4) from 192.168 to 127.1 (v2.0) with priority 3");
     REQUIRE(
         str(QueuedPacket(packet, 10, 3)) ==
-        "PING (#4) from 192.168 to 255.64 (v2.0) with priority 10");
+        "PING (#4) from 192.168 to 127.1 (v2.0) with priority 10");
 }

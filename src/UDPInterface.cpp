@@ -105,6 +105,9 @@ UDPInterface::UDPInterface(
  */
 void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
 {
+    std::cout << "\nsend_packet("
+              << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()
+              << "ms)" << std::endl;
     bool not_first = false;
 
     // Wait for a packet on any of the interface's connections.
@@ -117,6 +120,8 @@ void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
             // If connection has a packet send it.
             if (packet != nullptr)
             {
+                std::cout << "send(" << *packet << ", " 
+                    << conn.first << ")" << std::endl;
                 socket_->send(packet->data(), conn.first);
 
                 if (not_first)

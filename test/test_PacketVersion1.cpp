@@ -109,9 +109,9 @@ TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
     }
     SECTION("Header has a component ID.")
     {
-        REQUIRE(packet_v1::header(heartbeat)->compid == 0);
+        REQUIRE(packet_v1::header(heartbeat)->compid == 1);
         REQUIRE(packet_v1::header(ping)->compid == 168);
-        REQUIRE(packet_v1::header(set_mode)->compid == 16);
+        REQUIRE(packet_v1::header(set_mode)->compid == 0);
         REQUIRE(packet_v1::header(encapsulated_data)->compid == 255);
     }
     SECTION("Header has a message ID.")
@@ -394,9 +394,9 @@ TEST_CASE("packet_v1::Packet's have a source address.", "[packet_v1::Packet]")
     auto ping = to_vector(PingV1());
     auto set_mode = to_vector(SetModeV1());
     auto encapsulated_data = to_vector(EncapsulatedDataV1());
-    REQUIRE(packet_v1::Packet(heartbeat).source() == MAVAddress("127.0"));
+    REQUIRE(packet_v1::Packet(heartbeat).source() == MAVAddress("127.1"));
     REQUIRE(packet_v1::Packet(ping).source() == MAVAddress("192.168"));
-    REQUIRE(packet_v1::Packet(set_mode).source() == MAVAddress("172.16"));
+    REQUIRE(packet_v1::Packet(set_mode).source() == MAVAddress("172.0"));
     REQUIRE(
         packet_v1::Packet(encapsulated_data).source() == MAVAddress("224.255"));
 }
@@ -411,7 +411,7 @@ TEST_CASE("packet_v1::Packet's optionally have a destination address.",
     auto encapsulated_data = to_vector(EncapsulatedDataV1());
     REQUIRE_THROWS_AS(
         packet_v1::Packet(heartbeat).dest().value(), std::bad_optional_access);
-    REQUIRE(packet_v1::Packet(ping).dest().value() == MAVAddress("255.64"));
+    REQUIRE(packet_v1::Packet(ping).dest().value() == MAVAddress("127.1"));
     REQUIRE(packet_v1::Packet(set_mode).dest().value() == MAVAddress("123.0"));
     REQUIRE_THROWS_AS(
         packet_v1::Packet(encapsulated_data).dest().value(),
@@ -427,13 +427,13 @@ TEST_CASE("packet_v1::Packet's are printable.", "[packet_v1::Packet]")
     auto encapsulated_data = to_vector(EncapsulatedDataV1());
     REQUIRE(
         str(packet_v1::Packet(heartbeat)) ==
-        "HEARTBEAT (#0) from 127.0 (v1.0)");
+        "HEARTBEAT (#0) from 127.1 (v1.0)");
     REQUIRE(
         str(packet_v1::Packet(ping)) ==
-        "PING (#4) from 192.168 to 255.64 (v1.0)");
+        "PING (#4) from 192.168 to 127.1 (v1.0)");
     REQUIRE(
         str(packet_v1::Packet(set_mode)) ==
-        "SET_MODE (#11) from 172.16 to 123.0 (v1.0)");
+        "SET_MODE (#11) from 172.0 to 123.0 (v1.0)");
     REQUIRE(
         str(packet_v1::Packet(encapsulated_data)) ==
         "ENCAPSULATED_DATA (#131) from 224.255 (v1.0)");
