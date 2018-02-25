@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
-#include <thread>
 
 #include <chrono>
 #include <condition_variable>
@@ -48,13 +46,10 @@ using namespace std::chrono_literals;
 void UDPInterface::update_connections_(
     const MAVAddress &mav_address, const IPAddress &ip_address)
 {
-    std::cout << "update_connection(" << mav_address << ", " <<
-              ip_address << ")" << std::endl;
     auto it = connections_.find(ip_address);
 
     if (it == connections_.end())
     {
-        std::cout << "NEW CONNECTION" << std::endl;
         it = connections_.insert(
         {ip_address, connection_factory_->get()}).first;
         connection_pool_->add(it->second);
@@ -105,9 +100,6 @@ UDPInterface::UDPInterface(
  */
 void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
 {
-    std::cout << "\nsend_packet("
-              << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()
-              << "ms)" << std::endl;
     bool not_first = false;
 
     // Wait for a packet on any of the interface's connections.
@@ -120,8 +112,6 @@ void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
             // If connection has a packet send it.
             if (packet != nullptr)
             {
-                std::cout << "send(" << *packet << ", " 
-                    << conn.first << ")" << std::endl;
                 socket_->send(packet->data(), conn.first);
 
                 if (not_first)
@@ -144,12 +134,7 @@ void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
  */
 void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
 {
-    std::cout << "\nreceive_packet("
-              << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()
-              << "ms)" << std::endl;
     auto [buffer, ip_address] = socket_->receive(timeout);
-    std::cout << "buffer of length " << buffer.size() << " bytes from " <<
-              ip_address << std::endl;
 
     if (!buffer.empty())
     {
@@ -157,7 +142,6 @@ void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
         // packet received (we want complete MAVLink packets).
         if (ip_address != last_ip_address_)
         {
-            std::cout << "Different IP address, clearing parser." << std::endl;
             parser_.clear();
             last_ip_address_ = ip_address;
         }
@@ -170,10 +154,7 @@ void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
             if (packet != nullptr)
             {
                 update_connections_(packet->source(), ip_address);
-                std::cout << "send(" << *packet << ")" << std::endl;
                 connection_pool_->send(std::move(packet));
-                // std::cout << "send()" << std::endl;
-                // std::this_thread::sleep_for(5s);
             }
         }
     }

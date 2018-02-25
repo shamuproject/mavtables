@@ -43,6 +43,9 @@ class UDPInterface : public Interface
             std::unique_ptr<UDPSocket> socket,
             std::shared_ptr<ConnectionPool> connection_pool,
             std::unique_ptr<ConnectionFactory<>> connection_factory);
+        // LCOV_EXCL_START
+        ~UDPInterface() = default;
+        // LCOV_EXCL_STOP
         void send_packet(
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds(100000)) final;

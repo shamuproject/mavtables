@@ -17,34 +17,29 @@
 
 #include <algorithm>
 #include <chrono>
-#include <memory>
-#include <stdexcept>
-#include <vector>
-#include <utility>
-#include <set>
 #include <cstdint>
+#include <memory>
+#include <set>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
 #include <catch.hpp>
 
 #include "ConnectionFactory.hpp"
 #include "ConnectionPool.hpp"
+#include "Filter.hpp"
+#include "IPAddress.hpp"
+#include "Packet.hpp"
+#include "PacketVersion2.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
-#include "Packet.hpp"
-#include "PacketVersion1.hpp"
-#include "PacketVersion2.hpp"
-#include "IPAddress.hpp"
-#include "Filter.hpp"
-#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
 
 
 using namespace std::chrono_literals;
-
-#include <iostream>
-
 
 
 TEST_CASE("UDPInterface's can be constructed.", "[UPDInterface]")
@@ -118,7 +113,6 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
         [&](auto & a, auto & b)
     {
-        std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
         will_accept_packets.insert(
             dynamic_cast<const packet_v2::Packet &>(a));
         will_accept_addresses.insert(b);
@@ -383,7 +377,8 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
         [&](auto & a, auto & b)
     {
-        std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
+        (void)a;
+        (void)b;
         return std::pair<bool, int>(true, 0);
     });
     auto filter = mock_shared(mock_filter);
@@ -419,15 +414,6 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
     std::chrono::nanoseconds timeout = 1ms;
     SECTION("No packets, timeout.")
     {
-        // Mocks
-        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
-                    ).AlwaysDo([](auto a, auto b)
-        {
-            (void)b;
-            auto vec = to_vector(HeartbeatV2());
-            std::copy(vec.begin(), vec.end(), a);
-            return IPAddress("127.0.0.1:4000");
-        });
         // Test
         udp.send_packet(timeout);
         // Verification
@@ -546,7 +532,7 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
-            std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
+            (void)b;
             if (a.name() == "ENCAPSULATED_DATA")
             {
                 return std::pair<bool, int>(true, 0);
@@ -595,7 +581,7 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
-            std::cout << "will_accept(" << a << ", " << b << ")" << std::endl;
+            (void)b;
             if (a.name() == "PING")
             {
                 return std::pair<bool, int>(true, 0);
