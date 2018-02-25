@@ -28,17 +28,6 @@
 
 class InterfaceThreader
 {
-    private:
-        // Variables
-        std::shared_ptr<Interface> interface_;
-        std::thread tx_thread_;
-        std::thread rx_thread_;
-        std::chrono::microseconds timeout_;
-        std::atomic<bool> running_;
-        // Methods
-        void tx_runner_();
-        void rx_runner_();
-
     public:
         enum Threads
         {
@@ -56,6 +45,17 @@ class InterfaceThreader
         void shutdown();
         InterfaceThreader &operator=(const InterfaceThreader &other) = delete;
         InterfaceThreader &operator=(InterfaceThreader &&other) = delete;
+
+    private:
+        // Variables
+        std::shared_ptr<Interface> interface_;
+        std::thread tx_thread_;
+        std::thread rx_thread_;
+        std::chrono::microseconds timeout_;
+        std::atomic<bool> running_;
+        // Methods
+        void tx_runner_();
+        void rx_runner_();
 };
 
 

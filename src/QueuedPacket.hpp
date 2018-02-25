@@ -34,11 +34,6 @@
  */
 class QueuedPacket
 {
-    private:
-        std::shared_ptr<const Packet> packet_;
-        int priority_;
-        unsigned long long ticket_number_;
-
     public:
         /** Copy constructor.
          *
@@ -80,6 +75,10 @@ class QueuedPacket
         friend std::ostream &operator<<(
             std::ostream &os, const QueuedPacket &queued_packet);
 
+    private:
+        std::shared_ptr<const Packet> packet_;
+        int priority_;
+        unsigned long long ticket_number_;
 };
 
 bool operator==(const QueuedPacket &lhs, const QueuedPacket &rhs);

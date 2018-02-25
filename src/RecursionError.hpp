@@ -27,12 +27,12 @@
  */
 class RecursionError : public std::exception
 {
-    private:
-        std::string message_;
-
     public:
         RecursionError(std::string message);
         const char *what() const noexcept;
+
+    private:
+        std::string message_;
 };
 
 

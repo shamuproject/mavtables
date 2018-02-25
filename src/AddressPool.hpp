@@ -33,11 +33,6 @@
 template <class TC = std::chrono::steady_clock>
 class AddressPool
 {
-    private:
-        std::map<MAVAddress, std::chrono::time_point<TC>> addresses_;
-        std::chrono::milliseconds timeout_;
-        std::mutex mutex_;
-
     public:
         AddressPool(std::chrono::milliseconds timeout =
                         std::chrono::milliseconds(120000));
@@ -47,6 +42,11 @@ class AddressPool
         TEST_VIRTUAL void add(MAVAddress address);
         TEST_VIRTUAL std::vector<MAVAddress> addresses();
         TEST_VIRTUAL bool contains(const MAVAddress &address);
+
+    private:
+        std::map<MAVAddress, std::chrono::time_point<TC>> addresses_;
+        std::chrono::milliseconds timeout_;
+        std::mutex mutex_;
 };
 
 

@@ -37,9 +37,6 @@
  */
 class Packet
 {
-    private:
-        std::vector<uint8_t> data_;
-
     public:
         enum Version {V1 = 0x0100, V2 = 0x0200};
 
@@ -100,6 +97,8 @@ class Packet
          */
         Packet &operator=(Packet &&other) = default;
 
+    private:
+        std::vector<uint8_t> data_;
 };
 
 

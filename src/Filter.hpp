@@ -37,10 +37,6 @@
  */
 class Filter
 {
-    private:
-        Chain default_chain_;
-        bool accept_by_default_;
-
     public:
         /** Copy constructor.
          *
@@ -71,6 +67,10 @@ class Filter
 
         friend bool operator==(const Filter &lhs, const Filter &rhs);
         friend bool operator!=(const Filter &lhs, const Filter &rhs);
+
+    private:
+        Chain default_chain_;
+        bool accept_by_default_;
 };
 
 

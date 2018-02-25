@@ -29,11 +29,6 @@
  */
 class IPAddress
 {
-    private:
-        unsigned long address_;
-        unsigned int port_;
-        void construct_(unsigned long address, unsigned int port);
-
     public:
         /** Copy constructor.
          *
@@ -63,6 +58,11 @@ class IPAddress
 
         friend std::ostream &operator<<(
             std::ostream &os, const IPAddress &ipaddress);
+
+    private:
+        unsigned long address_;
+        unsigned int port_;
+        void construct_(unsigned long address, unsigned int port);
 };
 
 

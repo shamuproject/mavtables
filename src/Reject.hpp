@@ -34,9 +34,6 @@
  */
 class Reject : public Rule
 {
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
     public:
         Reject(std::optional<If> condition = {});
         virtual Action action(
@@ -44,6 +41,9 @@ class Reject : public Rule
         virtual std::unique_ptr<Rule> clone() const;
         virtual bool operator==(const Rule &other) const;
         virtual bool operator!=(const Rule &other) const;
+
+    protected:
+        virtual std::ostream &print_(std::ostream &os) const;
 };
 
 

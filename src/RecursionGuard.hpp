@@ -58,12 +58,12 @@
  */
 class RecursionGuard
 {
-    private:
-        RecursionData &data_;
-
     public:
         RecursionGuard(RecursionData &data);
         ~RecursionGuard();
+
+    private:
+        RecursionData &data_;
 };
 
 

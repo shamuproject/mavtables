@@ -35,11 +35,6 @@
  */
 class If
 {
-    private:
-        std::optional<unsigned long> id_;
-        std::optional<MAVSubnet> source_;
-        std::optional<MAVSubnet> dest_;
-
     public:
         If(std::optional<unsigned long> id = {},
            std::optional<MAVSubnet> source = {},
@@ -76,6 +71,11 @@ class If
         friend bool operator!=(const If &lhs, const If &rhs);
         friend std::ostream &operator<<(
             std::ostream &os, const If &if_);
+
+    private:
+        std::optional<unsigned long> id_;
+        std::optional<MAVSubnet> source_;
+        std::optional<MAVSubnet> dest_;
 };
 
 

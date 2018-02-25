@@ -18,6 +18,7 @@
 #ifndef CHAIN_HPP_
 #define CHAIN_HPP_
 
+
 #include <memory>
 #include <ostream>
 #include <string>
@@ -35,11 +36,6 @@
  */
 class Chain
 {
-    private:
-        std::string name_;
-        std::vector<std::unique_ptr<Rule>> rules_;
-        RecursionData recursion_data_;
-
     public:
         Chain(const Chain &other);
         /** Move constructor.
@@ -64,6 +60,11 @@ class Chain
         friend bool operator==(const Chain &lhs, const Chain &rhs);
         friend bool operator!=(const Chain &lhs, const Chain &rhs);
         friend std::ostream &operator<<(std::ostream &os, const Chain &chain);
+
+    private:
+        std::string name_;
+        std::vector<std::unique_ptr<Rule>> rules_;
+        RecursionData recursion_data_;
 };
 
 
