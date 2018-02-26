@@ -394,8 +394,8 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
              const IPAddress &);
     fakeit::Mock<UDPSocket> mock_socket;
     fakeit::When(OverloadedMethod(mock_socket, send, send_type)
-            ).AlwaysDo([&](auto a, auto b, auto c)
-    {   
+                ).AlwaysDo([&](auto a, auto b, auto c)
+    {
         std::vector<uint8_t> vec;
         std::copy(a, b, std::back_inserter(vec));
         send_bytes.insert(vec);
@@ -533,10 +533,12 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
             [&](auto & a, auto & b)
         {
             (void)b;
+
             if (a.name() == "ENCAPSULATED_DATA")
             {
                 return std::pair<bool, int>(true, 0);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
@@ -582,10 +584,12 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
             [&](auto & a, auto & b)
         {
             (void)b;
+
             if (a.name() == "PING")
             {
                 return std::pair<bool, int>(true, 0);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)

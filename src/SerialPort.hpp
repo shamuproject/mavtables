@@ -30,7 +30,8 @@ class SerialPort
     public:
         /** Parity.
          */
-        enum Parity {
+        enum Parity
+        {
             NONE,   //!< No parity.
             ODD,    //!< Odd parity, must have odd number of set bits.
             EVEN,   //!< Even parity, must have even number of set bits.
@@ -39,9 +40,10 @@ class SerialPort
         };
         /** Feature bitflags.
          */
-        enum Feature {
+        enum Feature
+        {
             DEFAULT = 0,        //!< No special features.
-            FLOW_CONTROL = 1<<0 //!< Enable flow control.
+            FLOW_CONTROL = 1 << 0 //!< Enable flow control.
         };
         /** Construct a serial port.
          *

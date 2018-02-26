@@ -37,7 +37,7 @@
  */
 class RecursionData
 {
-    friend class RecursionGuard;
+        friend class RecursionGuard;
 
     public:
         RecursionData() = default;
