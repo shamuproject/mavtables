@@ -16,11 +16,8 @@
 
 
 #include <chrono>
-#include <condition_variable>
-#include <cstdint>
-#include <map>
 #include <memory>
-#include <iterator>
+#include <stdexcept>
 
 #include "Connection.hpp"
 #include "ConnectionFactory.hpp"
@@ -96,7 +93,8 @@ UDPInterface::UDPInterface(
 
 /** \copydoc Interface::send_packet(const std::chrono::nanoseconds &)
  *
- *  Sends up to one packet from each connection belonging to the interface.
+ *  Sends up to one packet from each connection belonging to the interface over
+ *  the UDP socket.
  */
 void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
 {
