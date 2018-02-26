@@ -56,18 +56,19 @@ class UDPSocket
             const IPAddress &address) = 0;
         std::pair<std::vector<uint8_t>, IPAddress> receive(
             const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds(100000));
+                std::chrono::nanoseconds::zero());
         /** Receive data on the socket.
          *
          *  \param it A back insert iterator to read bytes into.
          *  \param timeout How long to wait for data to arrive on the socket.
+         *      The default is to not wait.
          *  \returns The IP address the data was sent from, this is where a
          *      reply should be sent to.
          */
         virtual IPAddress receive(
             std::back_insert_iterator<std::vector<uint8_t>> it,
             const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds(100000)) = 0;
+                std::chrono::nanoseconds::zero()) = 0;
 };
 
 
