@@ -78,7 +78,6 @@ class SerialPort
             std::back_insert_iterator<std::vector<uint8_t>> it,
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds::zero()) = 0;
-        // write
         void write(const std::vector<uint8_t> &data);
         /** Write data to the serial port.
          *
