@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <catch.hpp>
+#include <fakeit.hpp>
 
 #include "ConnectionFactory.hpp"
 #include "ConnectionPool.hpp"

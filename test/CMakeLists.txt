@@ -29,6 +29,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_Rule.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Rule_comparison.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_semaphore.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_SerialInterface.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_SerialPort.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_UDPInterface.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_UDPSocket.cpp"

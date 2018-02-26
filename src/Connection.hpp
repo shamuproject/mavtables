@@ -47,8 +47,8 @@ class Connection
         // LCOV_EXCL_START
         TEST_VIRTUAL ~Connection() = default;
         // LCOV_EXCL_STOP
-        void add_address(MAVAddress address);
-        std::shared_ptr<const Packet> next_packet(
+        TEST_VIRTUAL void add_address(MAVAddress address);
+        TEST_VIRTUAL std::shared_ptr<const Packet> next_packet(
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds(0));
         TEST_VIRTUAL void send(std::shared_ptr<const Packet> packet);

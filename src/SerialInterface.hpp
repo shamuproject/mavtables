@@ -45,7 +45,7 @@ class SerialInterface : public Interface
     private:
         std::unique_ptr<SerialPort> port_;
         std::shared_ptr<ConnectionPool> connection_pool_;
-        std::unique_ptr<Connection> connection_;
+        std::shared_ptr<Connection> connection_;
         PacketParser parser_;
 };
 

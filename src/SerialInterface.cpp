@@ -55,6 +55,8 @@ SerialInterface::SerialInterface(
     {
         throw std::invalid_argument("Given connection pointer is null.");
     }
+
+    connection_pool_->add(connection_);
 }
 
 
@@ -91,6 +93,7 @@ void SerialInterface::receive_packet(const std::chrono::nanoseconds &timeout)
 
             if (packet != nullptr)
             {
+                connection_->add_address(packet->source());
                 connection_pool_->send(std::move(packet));
             }
         }
