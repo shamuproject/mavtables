@@ -24,6 +24,7 @@
 #include <catch.hpp>
 #include <fakeit.hpp>
 
+#include "IPAddress.hpp"
 #include "UDPSocket.hpp"
 
 

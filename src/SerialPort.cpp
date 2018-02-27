@@ -21,38 +21,36 @@
 #include <utility>
 #include <vector>
 
-#include "IPAddress.hpp"
-#include "UDPSocket.hpp"
+#include "SerialPort.hpp"
 
 
 // Placed here to avoid weak-vtables error.
 // LCOV_EXCL_START
-UDPSocket::~UDPSocket()
+SerialPort::~SerialPort()
 {
 }
 // LCOV_EXCL_STOP
 
 
-/** Send data on the socket to the given address.
+/** Read data from the serial port.
  *
- *  \param data The bytes to send.
- *  \param address The address/port to send the bytes to over UDP.
+ *  \param timeout How long to wait for data to arrive on the serial
+ *      port.  The default is to not wait.
+ *  \returns The data read from the serial port.
  */
-void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
+std::vector<uint8_t> SerialPort::read(const std::chrono::nanoseconds &timeout)
 {
-    send(data.begin(), data.end(), address);
+    std::vector<uint8_t> vec;
+    read(std::back_inserter(vec), timeout);
+    return vec;
 }
 
 
-/** Receive data on the socket.
+/** Write data to the serial port.
  *
- *  \param timeout How long to wait for data to arrive on the socket.  The
- *      default is to not wait.
- *  \returns The data read from the socket and the IP address it was sent from.
+ *  \param data The bytes to send.
  */
-std::pair<std::vector<uint8_t>, IPAddress> UDPSocket::receive(
-    const std::chrono::nanoseconds &timeout)
+void SerialPort::write(const std::vector<uint8_t> &data)
 {
-    std::vector<uint8_t> vec;
-    return {vec, receive(std::back_inserter(vec), timeout)};
+    write(data.begin(), data.end());
 }
