@@ -59,6 +59,11 @@ class UDPSocket
                 std::chrono::nanoseconds::zero());
         /** Receive data on the socket.
          *
+         *  \note The \p timeout is not guaranteed to be up to nanosecond
+         *      precision, the actual precision is up to the operating system's
+         *      implementation but is guaranteed to be have at least millisecond
+         *      precision.
+         *
          *  \param it A back insert iterator to read bytes into.
          *  \param timeout How long to wait for data to arrive on the socket.
          *      The default is to not wait.

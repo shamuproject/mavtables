@@ -46,6 +46,11 @@ void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
 
 /** Receive data on the socket.
  *
+ *  \note The \p timeout is not guaranteed to be up to nanosecond
+ *      precision, the actual precision is up to the operating system's
+ *      implementation but is guaranteed to be have at least millisecond
+ *      precision.
+ *
  *  \param timeout How long to wait for data to arrive on the socket.  The
  *      default is to not wait.
  *  \returns The data read from the socket and the IP address it was sent from.
