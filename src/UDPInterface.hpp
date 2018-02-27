@@ -46,12 +46,8 @@ class UDPInterface : public Interface
         // LCOV_EXCL_START
         ~UDPInterface() = default;
         // LCOV_EXCL_STOP
-        void send_packet(
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds(100000)) final;
-        void receive_packet(
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds(100000)) final;
+        void send_packet(const std::chrono::nanoseconds &timeout) final;
+        void receive_packet(const std::chrono::nanoseconds &timeout) final;
 
     private:
         // Variables.
@@ -64,7 +60,6 @@ class UDPInterface : public Interface
         // Methods
         void update_connections_(
             const MAVAddress &mav_address, const IPAddress &ip_address);
-
 };
 
 
