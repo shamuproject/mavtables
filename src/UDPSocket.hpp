@@ -42,7 +42,8 @@ class UDPSocket
          */
         UDPSocket(unsigned int port, std::optional<IPAddress> address = {});
         virtual ~UDPSocket();
-        void send(const std::vector<uint8_t> &data, const IPAddress &address);
+        void send(
+            const std::vector<uint8_t> &data, const IPAddress &address);
         /** Send data on the socket to the given address.
          *
          *  \param first Iterator to first byte in range to send.
@@ -54,8 +55,8 @@ class UDPSocket
             std::vector<uint8_t>::const_iterator last,
             const IPAddress &address) = 0;
         std::pair<std::vector<uint8_t>, IPAddress> receive(
-            const std::chrono::microseconds &timeout =
-                std::chrono::microseconds(100000));
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000));
         /** Receive data on the socket.
          *
          *  \param it A back insert iterator to read bytes into.
@@ -65,8 +66,8 @@ class UDPSocket
          */
         virtual IPAddress receive(
             std::back_insert_iterator<std::vector<uint8_t>> it,
-            const std::chrono::microseconds &timeout =
-                std::chrono::microseconds(100000)) = 0;
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) = 0;
 };
 
 

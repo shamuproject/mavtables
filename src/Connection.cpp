@@ -111,8 +111,9 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
  *      then the connection will also be threadsafe.
  */
 Connection::Connection(
-    std::shared_ptr<Filter> filter, std::unique_ptr<AddressPool<>> pool,
-    std::unique_ptr<PacketQueue> queue, bool mirror)
+    std::shared_ptr<Filter> filter, bool mirror,
+    std::unique_ptr<AddressPool<>> pool,
+    std::unique_ptr<PacketQueue> queue)
     : filter_(std::move(filter)), pool_(std::move(pool)),
       queue_(std::move(queue)), mirror_(mirror)
 {
@@ -150,20 +151,21 @@ void Connection::add_address(MAVAddress address)
 }
 
 
+
 /** Get next packet to send.
  *
- *  Blocks until a packet is ready to be sent or the connection is shut down.
+ *  Blocks until a packet is ready to be sent or the \p timeout expires.
  *  Returns nullptr in the later case.
  *
- *  \note If the connection is \ref shutdown then a nullptr is returned
- *      immediately.
- *
- *  \returns The next packet to send.  Or nullptr if the connection was
- *      shutdown.
+ *  \param timeout How long to block waiting for a packet.  Set to 0s for non
+ *      blocking.
+ *  \returns The next packet to send.  Or nullptr if the call times out waiting
+ *      on a packet.
  */
-std::shared_ptr<const Packet> Connection::next_packet()
+std::shared_ptr<const Packet> Connection::next_packet(
+    const std::chrono::nanoseconds &timeout)
 {
-    return queue_->pop(true);
+    return queue_->pop(timeout);
 }
 
 
@@ -200,15 +202,4 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     {
         send_to_all_(std::move(packet));
     }
-}
-
-
-/** Shutdown the connection.
- *
- *  This releases any blocking calls.  In particular the \ref next_packet
- *  method.
- */
-void Connection::shutdown()
-{
-    queue_->shutdown();
 }

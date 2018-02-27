@@ -40,16 +40,16 @@ class Interface
          *      available for sending.  The default value is 100000 us (100 ms).
          */
         virtual void send_packet(
-            const std::chrono::microseconds &timeout =
-                std::chrono::microseconds(100000)) = 0;
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) = 0;
         /** Receive a packet on the interface.
          *
          *  \param timeout The maximum amount of time to wait for incoming data.
          *      The default value is 100000 us (100 ms).
          */
         virtual void receive_packet(
-            const std::chrono::microseconds &timeout =
-                std::chrono::microseconds(100000)) = 0;
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) = 0;
 };
 
 

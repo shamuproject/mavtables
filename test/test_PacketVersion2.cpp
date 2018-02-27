@@ -157,9 +157,9 @@ TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
     }
     SECTION("Header has a component ID.")
     {
-        REQUIRE(packet_v2::header(heartbeat)->compid == 0);
+        REQUIRE(packet_v2::header(heartbeat)->compid == 1);
         REQUIRE(packet_v2::header(ping)->compid == 168);
-        REQUIRE(packet_v2::header(set_mode)->compid == 16);
+        REQUIRE(packet_v2::header(set_mode)->compid == 0);
         REQUIRE(packet_v2::header(mission_set_current)->compid == 0);
         REQUIRE(packet_v2::header(encapsulated_data)->compid == 255);
         REQUIRE(packet_v2::header(param_ext_request_list)->compid == 255);
@@ -653,9 +653,9 @@ TEST_CASE("packet_v2::Packet's have a source address.", "[packet_v2::Packet]")
     auto mission_set_current = to_vector(MissionSetCurrentV2());
     auto encapsulated_data = to_vector_with_sig(EncapsulatedDataV2());
     auto param_ext_request_list = to_vector(ParamExtRequestListV2());
-    REQUIRE(packet_v2::Packet(heartbeat).source() == MAVAddress("127.0"));
+    REQUIRE(packet_v2::Packet(heartbeat).source() == MAVAddress("127.1"));
     REQUIRE(packet_v2::Packet(ping).source() == MAVAddress("192.168"));
-    REQUIRE(packet_v2::Packet(set_mode).source() == MAVAddress("172.16"));
+    REQUIRE(packet_v2::Packet(set_mode).source() == MAVAddress("172.0"));
     REQUIRE(
         packet_v2::Packet(mission_set_current).source() == MAVAddress("255.0"));
     REQUIRE(
@@ -677,7 +677,7 @@ TEST_CASE("packet_v2::Packet's optionally have a destination address.",
     auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     REQUIRE_THROWS_AS(
         packet_v2::Packet(heartbeat).dest().value(), std::bad_optional_access);
-    REQUIRE(packet_v2::Packet(ping).dest().value() == MAVAddress("255.64"));
+    REQUIRE(packet_v2::Packet(ping).dest().value() == MAVAddress("127.1"));
     REQUIRE(packet_v2::Packet(set_mode).dest().value() == MAVAddress("123.0"));
     REQUIRE(
         packet_v2::Packet(mission_set_current).dest().value() ==
@@ -701,13 +701,13 @@ TEST_CASE("packet_v2::Packet's are printable.", "[packet_v2::Packet]")
     auto param_ext_request_list = to_vector(ParamExtRequestListV2());
     REQUIRE(
         str(packet_v2::Packet(heartbeat)) ==
-        "HEARTBEAT (#0) from 127.0 (v2.0)");
+        "HEARTBEAT (#0) from 127.1 (v2.0)");
     REQUIRE(
         str(packet_v2::Packet(ping)) ==
-        "PING (#4) from 192.168 to 255.64 (v2.0)");
+        "PING (#4) from 192.168 to 127.1 (v2.0)");
     REQUIRE(
         str(packet_v2::Packet(set_mode)) ==
-        "SET_MODE (#11) from 172.16 to 123.0 (v2.0)");
+        "SET_MODE (#11) from 172.0 to 123.0 (v2.0)");
     REQUIRE(
         str(packet_v2::Packet(mission_set_current)) ==
         "MISSION_SET_CURRENT (#41) from 255.0 to 0.0 (v2.0)");

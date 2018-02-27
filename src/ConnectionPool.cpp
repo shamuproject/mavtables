@@ -17,7 +17,6 @@
 
 #include <memory>
 #include <mutex>
-#include <set>
 #include <shared_mutex>
 #include <stdexcept>
 #include <utility>
@@ -32,13 +31,12 @@
  *  \param connection The connection to add.
  *  \throws std::invalid_argument if the given connection pointer is nullptr.
  */
-void ConnectionPool::add(std::shared_ptr<Connection> connection)
+void ConnectionPool::add(std::weak_ptr<Connection> connection)
 {
-    if (connection == nullptr)
-    {
-        throw std::invalid_argument("Given Connection pointer is null.");
-    }
-
+    // if (connection == nullptr)
+    // {
+    //     throw std::invalid_argument("Given Connection pointer is null.");
+    // }
     std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.insert(std::move(connection));
 }
@@ -48,7 +46,7 @@ void ConnectionPool::add(std::shared_ptr<Connection> connection)
  *
  *  \param connection The connection to remove.
  */
-void ConnectionPool::remove(const std::shared_ptr<Connection> &connection)
+void ConnectionPool::remove(const std::weak_ptr<Connection> &connection)
 {
     std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.erase(connection);
@@ -67,8 +65,18 @@ void ConnectionPool::send(std::unique_ptr<const Packet> packet)
     std::shared_lock<std::shared_mutex> lock(mutex_);
     std::shared_ptr<const Packet> shared = std::move(packet);
 
-    for (auto i : connections_)
+    for (auto it = connections_.begin(); it != connections_.end();)
     {
-        i->send(shared);
+        // Send packet on connection.
+        if (auto connection = it->lock())
+        {
+            connection->send(shared);
+            ++it;
+        }
+        // Remove connection.
+        else
+        {
+            it = connections_.erase(it);
+        }
     }
 }

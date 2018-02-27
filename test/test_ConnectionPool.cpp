@@ -34,15 +34,6 @@ TEST_CASE("ConnectionPool's can be constructed.", "[ConnectionPool]")
 }
 
 
-TEST_CASE("ConnectionPool's 'add' method ensures the given connection is not "
-          "nullptr.", "[ConnectionPool]")
-{
-    REQUIRE_THROWS_AS(ConnectionPool().add(nullptr), std::invalid_argument);
-    REQUIRE_THROWS_WITH(
-        ConnectionPool().add(nullptr), "Given Connection pointer is null.");
-}
-
-
 TEST_CASE("ConnectionPool's can store at least one connection and send a "
           "packet over it.", "[ConnectionPool]")
 {
@@ -100,6 +91,33 @@ TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
     pool.add(connection2);
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     pool.remove(connection1);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
+    fakeit::Verify(Method(mock1, send).Matching([&](auto a)
+    {
+        return *a == *packet;
+    })).Once();
+    fakeit::Verify(Method(mock2, send).Matching([&](auto a)
+    {
+        return *a == *packet;
+    })).Exactly(2);
+}
+
+
+TEST_CASE("ConnectionPool's 'send' method connections that have expired.",
+          "[ConnectionPool]")
+{
+    auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
+    fakeit::Mock<Connection> mock1;
+    fakeit::Mock<Connection> mock2;
+    fakeit::Fake(Method(mock1, send));
+    fakeit::Fake(Method(mock2, send));
+    std::shared_ptr<Connection> connection1 = mock_shared(mock1);
+    std::shared_ptr<Connection> connection2 = mock_shared(mock2);
+    ConnectionPool pool;
+    pool.add(connection1);
+    pool.add(connection2);
+    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
+    connection1.reset();
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     fakeit::Verify(Method(mock1, send).Matching([&](auto a)
     {

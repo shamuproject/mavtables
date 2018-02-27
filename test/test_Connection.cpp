@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <chrono>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -50,44 +51,49 @@ TEST_CASE("Connection's can be constructed.", "[Connection]")
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
+    SECTION("With default arguments.")
+    {
+        REQUIRE_NOTHROW(Connection(filter));
+    }
     SECTION("As a regular connection.")
     {
-        REQUIRE_NOTHROW(Connection(filter, std::move(pool), std::move(queue)));
+        REQUIRE_NOTHROW(Connection(
+                            filter, false, std::move(pool), std::move(queue)));
     }
     SECTION("As a mirror connection.")
     {
         REQUIRE_NOTHROW(
-            Connection(filter, std::move(pool), std::move(queue), true));
+            Connection(filter, true, std::move(pool), std::move(queue)));
     }
     SECTION("Ensures the filter pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(nullptr, std::move(pool), std::move(queue)),
+            Connection(nullptr, false, std::move(pool), std::move(queue)),
             std::invalid_argument);
         pool = mock_unique(mock_pool);
         queue = mock_unique(mock_queue);
         REQUIRE_THROWS_WITH(
-            Connection(nullptr, std::move(pool), std::move(queue)),
+            Connection(nullptr, false, std::move(pool), std::move(queue)),
             "Given filter pointer is null.");
     }
     SECTION("Ensures the pool pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(filter, nullptr, std::move(queue)),
+            Connection(filter, false, nullptr, std::move(queue)),
             std::invalid_argument);
         queue = mock_unique(mock_queue);
         REQUIRE_THROWS_WITH(
-            Connection(filter, nullptr, std::move(queue)),
+            Connection(filter, false, nullptr, std::move(queue)),
             "Given pool pointer is null.");
     }
     SECTION("Ensures the queue pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(filter, std::move(pool), nullptr),
+            Connection(filter, false, std::move(pool), nullptr),
             std::invalid_argument);
         pool = mock_unique(mock_pool);
         REQUIRE_THROWS_WITH(
-            Connection(filter, std::move(pool), nullptr),
+            Connection(filter, false, std::move(pool), nullptr),
             "Given queue pointer is null.");
     }
 }
@@ -103,7 +109,7 @@ TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, std::move(pool), std::move(queue));
+    Connection conn(filter, false, std::move(pool), std::move(queue));
     conn.add_address(MAVAddress("192.168"));
     fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
     {
@@ -121,26 +127,43 @@ TEST_CASE("Connection's 'next_packet' method.", "[Connection]")
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, std::move(pool), std::move(queue));
+    Connection conn(filter, false, std::move(pool), std::move(queue));
     SECTION("Returns the next packet.")
     {
-        fakeit::When(Method(mock_queue, pop)).Return(ping);
-        auto packet = conn.next_packet();
+        fakeit::When(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &))).Return(ping);
+        std::chrono::nanoseconds timeout = 1ms;
+        auto packet = conn.next_packet(timeout);
         REQUIRE(packet != nullptr);
         REQUIRE(*packet == *ping);
-        fakeit::Verify(Method(mock_queue, pop).Matching([](auto a)
+        fakeit::Verify(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &)).Matching([](auto a)
         {
-            return a == true; // blocking
+            return a == 1ms;
         })).Once();
     }
-    SECTION("Returns nullptr if the connection is shutdown.")
+    SECTION("Or times out and returns nullptr.")
     {
-        fakeit::When(Method(mock_queue, pop)).Return(nullptr);
-        auto packet = conn.next_packet();
-        REQUIRE(packet == nullptr);
-        fakeit::Verify(Method(mock_queue, pop).Matching([](auto a)
+        fakeit::When(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &))).Return(nullptr);
+        std::chrono::nanoseconds timeout = 0ms;
+        REQUIRE(conn.next_packet(timeout) == nullptr);
+        fakeit::Verify(
+            OverloadedMethod(
+                mock_queue, pop,
+                std::shared_ptr<const Packet>(
+                    const std::chrono::nanoseconds &)).Matching([](auto a)
         {
-            return a == true; // blocking
+            return a == 0ms;
         })).Once();
     }
 }
@@ -155,7 +178,7 @@ TEST_CASE("Connection's 'send' method ensures the given packet is not "
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, std::move(pool), std::move(queue));
+    Connection conn(filter, false, std::move(pool), std::move(queue));
     SECTION("Ensures the given packet is not nullptr.")
     {
         REQUIRE_THROWS_AS(conn.send(nullptr), std::invalid_argument);
@@ -182,7 +205,7 @@ TEST_CASE("Connection's 'send' method (with destination address).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, std::move(pool), std::move(queue));
+    Connection conn(filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the destination can be "
             "reached on this connection.")
     {
@@ -206,9 +229,9 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         REQUIRE(will_accept_packets.size() == 1);
         REQUIRE(will_accept_packets[0] == *ping);
         REQUIRE(will_accept_addresses.size() == 1);
-        REQUIRE(will_accept_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(will_accept_addresses[0] == MAVAddress("127.1"));
         REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(contains_addresses[0] == MAVAddress("127.1"));
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
         {
@@ -238,9 +261,9 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         REQUIRE(will_accept_packets.size() == 1);
         REQUIRE(will_accept_packets[0] == *ping);
         REQUIRE(will_accept_addresses.size() == 1);
-        REQUIRE(will_accept_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(will_accept_addresses[0] == MAVAddress("127.1"));
         REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(contains_addresses[0] == MAVAddress("127.1"));
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         fakeit::Verify(Method(mock_pool, contains)).Once();
@@ -257,7 +280,7 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         });
         conn.send(ping);
         REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses[0] == MAVAddress("255.64"));
+        REQUIRE(contains_addresses[0] == MAVAddress("127.1"));
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(0);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         fakeit::Verify(Method(mock_pool, contains)).Once();
@@ -282,7 +305,7 @@ TEST_CASE("Connection's 'send' method (without destination address).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, std::move(pool), std::move(queue));
+    Connection conn(filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
             "(increasing priority).")
@@ -444,7 +467,7 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, std::move(pool), std::move(queue));
+    Connection conn(filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
             "(increasing priority).")
@@ -586,21 +609,4 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         fakeit::Verify(Method(mock_pool, addresses)).Once();
     }
-}
-
-
-TEST_CASE("Connection's 'shutdown' method shutdown the contained threadsafe "
-          " PacketQueue.", "[Connection]")
-{
-    fakeit::Mock<Filter> mock_filter;
-    fakeit::Mock<AddressPool<>> mock_pool;
-    fakeit::Mock<PacketQueue> mock_queue;
-    fakeit::Fake(Method(mock_pool, add));
-    auto filter = mock_shared(mock_filter);
-    auto pool = mock_unique(mock_pool);
-    auto queue = mock_unique(mock_queue);
-    fakeit::Fake(Method(mock_queue, shutdown));
-    Connection conn(filter, std::move(pool), std::move(queue));
-    conn.shutdown();
-    fakeit::Verify(Method(mock_queue, shutdown)).Once();
 }

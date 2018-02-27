@@ -18,6 +18,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <stdexcept>
 #include <utility>
@@ -27,40 +28,15 @@
 #include "QueuedPacket.hpp"
 
 
-/** Construct a packet queue.
- */
-PacketQueue::PacketQueue()
-    : ticket_(0), running_(true)
-{
-}
-
-
-/** Remove and return the packet at the front of the queue.
+/** Get packet from queue.
  *
- *  \param blocking
- *      * **true** %If the queue is empty the call will block until a packet is
- *          available or the queue is shutdown.  In the latter case a null
- *          pointer is returned.
- *      * **false** %If the queue is empty (or shutdown) a null pointer is
- *          returned.  This is the default.
- *   \returns The packet that was at the front of the queue.
- *  \remarks
- *      Threadsafe (locking).
+ *  \note The mutex must be locked.
+ *
+ *  \returns The next packet or nullptr if the queue has been closed or is
+ *      empty.
  */
-std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
+std::shared_ptr<const Packet> PacketQueue::get_packet_()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-
-    if (blocking)
-    {
-        // Wait for available packet (or shutdown).
-        cv_.wait(lock, [this]()
-        {
-            return !running_ || !queue_.empty();
-        });
-    }
-
-    // Return the packet if connection is running and queue is not empty.
     if (running_ && !queue_.empty())
     {
         std::shared_ptr<const Packet> packet = queue_.top().packet();
@@ -69,6 +45,102 @@ std::shared_ptr<const Packet> PacketQueue::pop(bool blocking)
     }
 
     return nullptr;
+}
+
+
+/** Construct a packet queue.
+ *
+ *  \param callback A function to call whenever a new packet is added to the
+ *      queue.  This allows the queue to signal when it has become non empty.
+ *      The default is no callback {}.
+ */
+PacketQueue::PacketQueue(std::optional<std::function<void(void)>> callback)
+    : callback_(std::move(callback)), ticket_(0), running_(true)
+{
+}
+
+
+/** Close the queue.
+ *
+ *  This will release any blocking calls to \ref pop.
+ *  \remarks
+ *      Threadsafe (locking).
+ */
+void PacketQueue::close()
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        running_ = false;
+    }
+    cv_.notify_all();
+}
+
+
+/** Determine if the packet queue is empty or not.
+ *
+ *  retval true There are no packets in the queue.
+ *  retval false There is at least one packet in the queue.
+ */
+bool PacketQueue::empty()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return queue_.empty();
+}
+
+
+/** Remove and return the packet at the front of the queue.
+ *
+ *  This version will block on an empty queue and will not return until the
+ *  queue becomes non empty or is closed with \ref close.
+ *
+ *  \returns The packet that was at the front of the queue, or nullptr if the
+ *      queue was closed.
+ *  \remarks
+ *      Threadsafe (locking).
+ *  \sa pop(const std::chrono::nanoseconds &)
+ */
+std::shared_ptr<const Packet> PacketQueue::pop()
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    // Wait for available packet.
+    cv_.wait(lock, [this]()
+    {
+        return !running_ || !queue_.empty();
+    });
+    // Return the packet if the queue is running and is not empty.
+    return get_packet_();
+}
+
+
+/** Remove and return the packet at the front of the queue.
+ *
+ *  This version will block on an empty queue and will not return until the
+ *  queue becomes non empty, is closed with \ref close, or the timeout has
+ *  expired.
+ *
+ *  \param timeout How long to block waiting for an empty queue.  Set to 0s for
+ *      non blocking.
+ *  \returns The packet that was at the front of the queue, or nullptr if the
+ *      queue was closed or the timeout expired.
+ *  \remarks
+ *      Threadsafe (locking).
+ */
+std::shared_ptr<const Packet> PacketQueue::pop(
+    const std::chrono::nanoseconds &timeout)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    if (timeout > std::chrono::nanoseconds::zero())
+    {
+        // Wait for available packet (or the queue to be closed).
+        cv_.wait_for(lock, timeout, [this]()
+        {
+            return !running_ || !queue_.empty();
+        });
+    }
+
+    // Return the packet if the queue is running and is not empty.
+    return get_packet_();
 }
 
 
@@ -92,23 +164,17 @@ void PacketQueue::push(std::shared_ptr<const Packet> packet, int priority)
         throw std::invalid_argument("Given packet pointer is null.");
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
-    queue_.emplace(std::move(packet), priority, ticket_++);
-    cv_.notify_one();
-}
-
-
-/** Shutdown the queue.
- *
- *  This will release any blocking calls to \ref pop.
- *  \remarks
- *      Threadsafe (locking).
- */
-void PacketQueue::shutdown()
-{
+    // Add the packet to the queue.
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        running_ = false;
+        queue_.emplace(std::move(packet), priority, ticket_++);
     }
-    cv_.notify_all();
+    // Notify a waiting pop.
+    cv_.notify_one();
+
+    // Trigger the callback.
+    if (callback_)
+    {
+        (*callback_)();
+    }
 }

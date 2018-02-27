@@ -49,13 +49,13 @@ class InterfaceThreader
             std::shared_ptr<Interface> interface,
             std::chrono::microseconds = std::chrono::microseconds(100000),
             Threads start_threads = InterfaceThreader::START);
-        InterfaceThreader(const InterfaceThreader &other) = default;
-        InterfaceThreader(InterfaceThreader &&other) = default;
+        InterfaceThreader(const InterfaceThreader &other) = delete;
+        InterfaceThreader(InterfaceThreader &&other) = delete;
         ~InterfaceThreader();
         void start();
         void shutdown();
-        InterfaceThreader &operator=(const InterfaceThreader &other) = default;
-        InterfaceThreader &operator=(InterfaceThreader &&other) = default;
+        InterfaceThreader &operator=(const InterfaceThreader &other) = delete;
+        InterfaceThreader &operator=(InterfaceThreader &&other) = delete;
 };
 
 
