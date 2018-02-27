@@ -15,48 +15,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef UDPINTERFACE_HPP_
-#define UDPINTERFACE_HPP_
+#ifndef SERIALINTERFACE_HPP_
+#define SERIALINTERFACE_HPP_
 
 
 #include <chrono>
-#include <map>
 #include <memory>
 
 #include "Connection.hpp"
-#include "ConnectionFactory.hpp"
 #include "ConnectionPool.hpp"
 #include "Interface.hpp"
-#include "IPAddress.hpp"
+#include "SerialPort.hpp"
 #include "PacketParser.hpp"
-#include "UDPSocket.hpp"
 
 
-class UDPInterface : public Interface
+class SerialInterface : public Interface
 {
     public:
-        UDPInterface(
-            std::unique_ptr<UDPSocket> socket,
+        SerialInterface(
+            std::unique_ptr<SerialPort> port,
             std::shared_ptr<ConnectionPool> connection_pool,
-            std::unique_ptr<ConnectionFactory<>> connection_factory);
+            std::unique_ptr<Connection> connection);
         // LCOV_EXCL_START
-        ~UDPInterface() = default;
+        ~SerialInterface() = default;
         // LCOV_EXCL_STOP
         void send_packet(const std::chrono::nanoseconds &timeout) final;
         void receive_packet(const std::chrono::nanoseconds &timeout) final;
 
     private:
-        // Variables.
-        std::unique_ptr<UDPSocket> socket_;
+        std::unique_ptr<SerialPort> port_;
         std::shared_ptr<ConnectionPool> connection_pool_;
-        std::unique_ptr<ConnectionFactory<>> connection_factory_;
-        IPAddress last_ip_address_;
-        std::map<IPAddress, std::shared_ptr<Connection>> connections_;
+        std::shared_ptr<Connection> connection_;
         PacketParser parser_;
-        // Methods
-        void update_connections_(
-            const MAVAddress &mav_address, const IPAddress &ip_address);
 };
 
 
-#endif // UDPINTERFACE_HPP_
+#endif // SERIALINTERFACE_HPP_
