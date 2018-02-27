@@ -39,18 +39,9 @@ class Action
             CONTINUE, //!< Continue evaluating rules.
             DEFAULT   //!< Use the default rule.
         };
+        // Variables
         Action::Option action_;
-
-    private:
-        // Note: The reason this is optional is because there is a difference
-        //       between {} and 0.  This is because a priority of {} can still
-        //       be set to something other than 0 by a higher level rule (see
-        //       \ref Call or \ref GoTo) while if the priority has been set to 0
-        //       it cannot be set again.
-        std::optional<int> priority_;
-        Action(Action::Option action, std::optional<int> priority = {});
-
-    public:
+        // Methods
         /** Copy constructor.
          *
          *  \param other Action to copy.
@@ -80,6 +71,14 @@ class Action
         static Action make_continue();
         static Action make_default();
 
+    private:
+        // Note: The reason this is optional is because there is a difference
+        //       between {} and 0.  This is because a priority of {} can still
+        //       be set to something other than 0 by a higher level rule (see
+        //       \ref Call or \ref GoTo) while if the priority has been set to 0
+        //       it cannot be set again.
+        std::optional<int> priority_;
+        Action(Action::Option action, std::optional<int> priority = {});
 };
 
 

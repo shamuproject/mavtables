@@ -42,13 +42,6 @@ class Chain;
  */
 class Call : public Rule
 {
-    private:
-        std::shared_ptr<Chain> chain_;
-        std::optional<int> priority_;
-
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
     public:
         Call(std::shared_ptr<Chain> chain,
              std::optional<If> condition = {});
@@ -59,6 +52,13 @@ class Call : public Rule
         virtual std::unique_ptr<Rule> clone() const;
         virtual bool operator==(const Rule &other) const;
         virtual bool operator!=(const Rule &other) const;
+
+    protected:
+        virtual std::ostream &print_(std::ostream &os) const;
+
+    private:
+        std::shared_ptr<Chain> chain_;
+        std::optional<int> priority_;
 };
 
 

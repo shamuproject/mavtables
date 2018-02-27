@@ -36,10 +36,6 @@
  */
 class MAVAddress
 {
-    private:
-        unsigned int address_;
-        void construct_(unsigned int system, unsigned int component);
-
     public:
         /** Copy constructor.
          *
@@ -67,6 +63,10 @@ class MAVAddress
          * \param other MAVLink address to move from.
          */
         MAVAddress &operator=(MAVAddress &&other) = default;
+
+    private:
+        unsigned int address_;
+        void construct_(unsigned int system, unsigned int component);
 };
 
 

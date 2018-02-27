@@ -27,12 +27,12 @@
  */
 class DNSLookupError : public std::exception
 {
-    private:
-        std::string message_;
-
     public:
         DNSLookupError(std::string url);
         const char *what() const noexcept;
+
+    private:
+        std::string message_;
 };
 
 

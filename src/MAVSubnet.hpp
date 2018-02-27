@@ -35,10 +35,6 @@
  */
 class MAVSubnet
 {
-    private:
-        MAVAddress address_;
-        unsigned int mask_;
-
     public:
         /** Copy constructor.
          *
@@ -70,6 +66,10 @@ class MAVSubnet
         friend bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs);
         friend std::ostream &operator<<(std::ostream &os,
                                         const MAVSubnet &mavsubnet);
+
+    private:
+        MAVAddress address_;
+        unsigned int mask_;
 };
 
 

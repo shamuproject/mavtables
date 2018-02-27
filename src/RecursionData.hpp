@@ -37,11 +37,8 @@
  */
 class RecursionData
 {
-        friend class RecursionGuard;
+    friend class RecursionGuard;
 
-    private:
-        std::set<std::thread::id> calling_threads_;
-        std::mutex mutex_;
     public:
         RecursionData() = default;
         RecursionData(const RecursionData &other)
@@ -64,6 +61,10 @@ class RecursionData
             calling_threads_.clear();
             return *this;
         }
+
+    private:
+        std::set<std::thread::id> calling_threads_;
+        std::mutex mutex_;
 };
 
 

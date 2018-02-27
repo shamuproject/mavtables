@@ -34,12 +34,6 @@
  */
 class Accept : public Rule
 {
-    private:
-        std::optional<int> priority_;
-
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
-
     public:
         Accept(std::optional<If> condition = {});
         Accept(int priority, std::optional<If> condition = {});
@@ -48,6 +42,12 @@ class Accept : public Rule
         virtual std::unique_ptr<Rule> clone() const;
         virtual bool operator==(const Rule &other) const;
         virtual bool operator!=(const Rule &other) const;
+
+    protected:
+        virtual std::ostream &print_(std::ostream &os) const;
+
+    private:
+        std::optional<int> priority_;
 };
 
 

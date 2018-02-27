@@ -60,9 +60,6 @@ namespace packet_v2
      */
     class Packet : public ::Packet
     {
-        private:
-            const struct mavlink_packet_version2_header *header_() const;
-
         public:
             /** Copy constructor.
              *

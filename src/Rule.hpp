@@ -37,15 +37,6 @@
  */
 class Rule
 {
-    protected:
-        std::optional<If> condition_;
-        /** Print the rule to the given output stream.
-         *
-         *  \param os The output stream to print to.
-         *  \return The output stream.
-         */
-        virtual std::ostream &print_(std::ostream &os) const = 0;
-
     public:
         Rule(std::optional<If> condition = {});
         virtual ~Rule();  // Clang does not like pure virtual destructors.
@@ -88,6 +79,15 @@ class Rule
         virtual bool operator!=(const Rule &other) const = 0;
 
         friend std::ostream &operator<<(std::ostream &os, const Rule &action);
+
+    protected:
+        std::optional<If> condition_;
+        /** Print the rule to the given output stream.
+         *
+         *  \param os The output stream to print to.
+         *  \return The output stream.
+         */
+        virtual std::ostream &print_(std::ostream &os) const = 0;
 };
 
 

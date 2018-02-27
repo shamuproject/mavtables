@@ -18,6 +18,7 @@
 #ifndef PACKETPARSER_HPP_
 #define PACKETPARSER_HPP_
 
+
 #include <memory>
 
 #include "Packet.hpp"
@@ -31,6 +32,16 @@
  */
 class PacketParser
 {
+    public:
+        PacketParser();
+        PacketParser(const PacketParser &other) = delete;
+        PacketParser(PacketParser &&other) = delete;
+        size_t bytes_parsed() const;
+        void clear();
+        std::unique_ptr<Packet> parse_byte(uint8_t byte);
+        PacketParser &operator=(const PacketParser &other) = delete;
+        PacketParser &operator=(PacketParser &&other) = delete;
+
     private:
         // Types
         /** Packet parser states.
@@ -50,16 +61,6 @@ class PacketParser
         void waiting_for_start_byte_(uint8_t byte);
         void waiting_for_header_(uint8_t byte);
         std::unique_ptr<Packet> waiting_for_packet_(uint8_t byte);
-
-    public:
-        PacketParser();
-        PacketParser(const PacketParser &other) = delete;
-        PacketParser(PacketParser &&other) = delete;
-        size_t bytes_parsed() const;
-        void clear();
-        std::unique_ptr<Packet> parse_byte(uint8_t byte);
-        PacketParser &operator=(const PacketParser &other) = delete;
-        PacketParser &operator=(PacketParser &&other) = delete;
 };
 
 
