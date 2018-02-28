@@ -4,6 +4,7 @@ matrix:
   include:
     - os: linux
       dist: trusty
+      env: COMPILER_NAME
       addons:
         apt:
           sources:
@@ -14,6 +15,9 @@ matrix:
             - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - COMPILER_NAME=gcc
+        - CC=gcc-7
+        - CXX=g++-7
     - os: linux
       dist: trusty
       addons:
@@ -26,6 +30,9 @@ matrix:
             - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - COMPILER_NAME=clang
+        - CC=clang-5.0
+        - CXX=clang++-5.0
 
 before_install:
     - eval "${MATRIX_EVAL}"
