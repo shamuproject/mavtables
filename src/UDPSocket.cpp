@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <iterator>
@@ -44,6 +45,23 @@ void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
 }
 
 
+/** Send data on the socket to the given address.
+ *
+ *  \param first Iterator to first byte in range to send.
+ *  \param last Iterator to one past the last byte to send.
+ *  \param address IP address (with port number) to send the bytes to.
+ */
+void UDPSocket::send(
+    std::vector<uint8_t>::const_iterator first,
+    std::vector<uint8_t>::const_iterator last,
+    const IPAddress &address)
+{
+    std::vector<uint8_t> vec;
+    std::copy(first, last, std::back_inserter(vec));
+    send(vec, address);
+}
+
+
 /** Receive data on the socket.
  *
  *  \note The \p timeout is not guaranteed to be up to nanosecond
@@ -60,4 +78,27 @@ std::pair<std::vector<uint8_t>, IPAddress> UDPSocket::receive(
 {
     std::vector<uint8_t> vec;
     return {vec, receive(std::back_inserter(vec), timeout)};
+}
+
+
+/** Receive data on the socket.
+ *
+ *  \note The \p timeout is not guaranteed to be up to nanosecond
+ *      precision, the actual precision is up to the operating system's
+ *      implementation but is guaranteed to be have at least millisecond
+ *      precision.
+ *
+ *  \param it A back insert iterator to read bytes into.
+ *  \param timeout How long to wait for data to arrive on the socket.
+ *      The default is to not wait.
+ *  \returns The IP address the data was sent from, this is where a
+ *      reply should be sent to.
+ */
+IPAddress UDPSocket::receive(
+    std::back_insert_iterator<std::vector<uint8_t>> it,
+    const std::chrono::nanoseconds &timeout)
+{
+    auto [vec, address] = receive(timeout);
+    std::copy(vec.begin(), vec.end(), it);
+    return address;
 }
