@@ -30,45 +30,29 @@
 
 
 /** A UDP socket, listening on a port/address combination.
+ *
+ *  One of the \ref send methods and one of the \ref receive methods must be
+ *  implemented in derived classes to avoid infinite recursion because this is
+ *  technically and abstract class.  The other send and receive methods will be
+ *  defaulted.
  */
 class UDPSocket
 {
     public:
-        /** Construct a UDP socket.
-         *
-         *  \param port The port number to listen on.
-         *  \param address The address to listen on.  The default is to listen
-         *      on any address.
-         */
-        UDPSocket(unsigned int port, std::optional<IPAddress> address = {});
         virtual ~UDPSocket();
-        void send(
+        virtual void send(
             const std::vector<uint8_t> &data, const IPAddress &address);
-        /** Send data on the socket to the given address.
-         *
-         *  \param first Iterator to first byte in range to send.
-         *  \param last Iterator to one past the last byte to send.
-         *  \param address IP address (with port number) to send the bytes to.
-         */
         virtual void send(
             std::vector<uint8_t>::const_iterator first,
             std::vector<uint8_t>::const_iterator last,
-            const IPAddress &address) = 0;
-        std::pair<std::vector<uint8_t>, IPAddress> receive(
+            const IPAddress &address);
+        virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds::zero());
-        /** Receive data on the socket.
-         *
-         *  \param it A back insert iterator to read bytes into.
-         *  \param timeout How long to wait for data to arrive on the socket.
-         *      The default is to not wait.
-         *  \returns The IP address the data was sent from, this is where a
-         *      reply should be sent to.
-         */
         virtual IPAddress receive(
             std::back_insert_iterator<std::vector<uint8_t>> it,
             const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero()) = 0;
+                std::chrono::nanoseconds::zero());
 };
 
 
