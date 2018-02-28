@@ -36,3 +36,4 @@ matrix:
 
 before_install:
     - eval "${MATRIX_EVAL}"
+    - $CXX --version
