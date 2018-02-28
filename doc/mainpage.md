@@ -28,8 +28,8 @@ addressed and can be filtered based on source system/component and message type.
 In order to compile you will need the following packages:
 
 * GCC 7+ or Clang 5+ (needed for C++17 support)
-* [CMake](https://cmake.org/)
-* [Boost](https://www.boost.org/)
+* [CMake v3.3+](https://cmake.org/)
+* [Boost v1.54+](https://www.boost.org/)
 
 `mavtables` can be easily installed using the standard procedure of
 ```

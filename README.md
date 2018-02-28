@@ -21,8 +21,8 @@ addressed and can be filtered based on source system/component and message type.
 In order to compile you will need the following packages:
 
 * GCC 7+ or Clang 5+ (needed for C++17 support)
-* [CMake](https://cmake.org/)
-* [Boost](https://www.boost.org/)
+* [CMake v3.3+](https://cmake.org/)
+* [Boost v1.54+](https://www.boost.org/)
 
 __Clang is recommended when contributing to mavtables as it's warnings are
 more comprehensive.  However, GCC must be used when generating code coverage
