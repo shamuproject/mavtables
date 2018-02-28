@@ -11,7 +11,7 @@ matrix:
           packages:
             - g++-7
             - cmake
-            - boost
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
     - os: linux
@@ -23,7 +23,7 @@ matrix:
           packages:
             - clang-5.0
             - cmake
-            - boost
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
