@@ -17,12 +17,12 @@ jobs:
       env:
         - NAME="GCC v7.0 on Linux"
       script: make COVERAGE=On test
-      befor_install:
+      before_install:
         - CC=gcc-7
         - CXX=g++-7
         - pip install --user cpp-coveralls
       after_success:
-        - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
+        - coveralls --exclude lib --exclude test --gcov-options '\-lp'
 
     - os: linux
       dist: trusty
@@ -37,15 +37,16 @@ jobs:
             - cmake
             - libboost-all-dev
       env:
-        - NAME="GCC v7.0 on Linux"
+        - NAME="LLVM Clang v5.0 on Linux"
       script: make test
-      befor_install:
+      before_install:
         - CC=clagn-5.0
         - CXX=clang++-5.0
+
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.3beta
       script: make test
       env:
         - NAME="OS X"
-      befor_install:
+      before_install:
         - brew update && brew install ctags
