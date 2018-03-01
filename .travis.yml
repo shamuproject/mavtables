@@ -51,4 +51,5 @@ jobs:
       before_install:
         - brew update
         - brew install ctags
-        - brew install gcc || brew link --overwrite gcc
+        - brew install gcc || true
+        - brew link --overwrite gcc
