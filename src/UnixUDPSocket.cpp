@@ -61,16 +61,27 @@ UnixUDPSocket::~UnixUDPSocket()
 }
 
 
-/** \copydoc UDPSocket::send(std::vector<uint8_t>::const_iterator,std::vector<uint8_t>::const_iterator,const IPAddress &)
+/** \copydoc UDPSocket::send(const std::vector<uint8_t> &, const IPAddress &)
  */
 void UnixUDPSocket::send(
-    std::vector<uint8_t>::const_iterator first,
-    std::vector<uint8_t>::const_iterator last,
-    const IPAddress &address)
+    const std::vector<uint8_t> &data, const IPAddress &address)
 {
-    (void)first;
-    (void)last;
-    (void)address;
+    // Destination address structure.
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(static_cast<uint16_t>(address.port()));
+    addr.sin_addr.s_addr =
+        htonl(static_cast<uint32_t>(address.address()));
+    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
+    // Send the packet.
+    auto err = syscalls_->sendto(
+                   socket_, data.data(), data.size(), 0,
+                   reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
+
+    if (err < 0)
+    {
+        throw std::system_error(std::error_code(errno, std::system_category()));
+    }
 }
 
 
@@ -159,7 +170,7 @@ void UnixUDPSocket::create_socket_()
  */
 std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
 {
-    // Get size of buffer required and create it.
+    // Get needed buffer size.
     int packet_size;
 
     if ((syscalls_->ioctl(socket_, FIONREAD, &packet_size)) < 0)
@@ -167,14 +178,16 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
 
+    // Read datagram.
     std::vector<uint8_t> buffer;
     buffer.resize(static_cast<size_t>(packet_size));
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof(addr);
     auto size = syscalls_->recvfrom(
-               socket_, buffer.data(), buffer.size(), 0,
-               reinterpret_cast<struct sockaddr *>(&addr), &addrlen);
+                    socket_, buffer.data(), buffer.size(), 0,
+                    reinterpret_cast<struct sockaddr *>(&addr), &addrlen);
 
+    // Handle errors and extract IP address.
     if (size < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
@@ -189,6 +202,7 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
         }
     }
 
+    // Failed to read datagram.
     return {std::vector<uint8_t>(), IPAddress(0)};
 }
 

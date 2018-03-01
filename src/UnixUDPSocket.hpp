@@ -42,12 +42,10 @@ class UnixUDPSocket : public UDPSocket
                 std::make_unique<UnixSyscalls>());
         virtual ~UnixUDPSocket();
         virtual void send(
-            std::vector<uint8_t>::const_iterator first,
-            std::vector<uint8_t>::const_iterator last,
-            const IPAddress &address) final;
+            const std::vector<uint8_t> &data, const IPAddress &address) final;
         virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
             const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero());
+                std::chrono::nanoseconds::zero()) final;
 
     private:
         // Variables
