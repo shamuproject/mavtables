@@ -263,7 +263,7 @@ TEST_CASE("PacketQueue's 'pop' method optionally has a timeout.",
         });
         auto status = future.wait_for(0s);
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(2ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE(future.get() == nullptr);
     }
     SECTION("And will be released when the 'close' method is called.")

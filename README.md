@@ -1,6 +1,8 @@
 mavtables {#readme}
 ===================
 
+[![Build Status](https://travis-ci.org/shamuproject/mavtables.svg?branch=master)](https://travis-ci.org/shamuproject/mavtables) [![Coverage Status](https://coveralls.io/repos/github/shamuproject/mavtables/badge.svg?branch=master)](https://coveralls.io/github/shamuproject/mavtables?branch=master)
+
 A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
 more MAVLink endpoints such as autopilots, ground control software, loggers,
 image capture systems, etc.  MAVLink packets will be routed when they are
@@ -21,8 +23,8 @@ addressed and can be filtered based on source system/component and message type.
 In order to compile you will need the following packages:
 
 * GCC 7+ or Clang 5+ (needed for C++17 support)
-* [CMake](https://cmake.org/)
-* [Boost](https://www.boost.org/)
+* [CMake v3.3+](https://cmake.org/)
+* [Boost v1.54+](https://www.boost.org/)
 
 __Clang is recommended when contributing to mavtables as it's warnings are
 more comprehensive.  However, GCC must be used when generating code coverage

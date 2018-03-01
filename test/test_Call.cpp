@@ -153,7 +153,8 @@ TEST_CASE("Call's 'action' method determines what to do with a "
         fakeit::Mock<Chain> mock;
         fakeit::When(Method(mock, action)).AlwaysReturn(Action::make_accept());
         std::shared_ptr<Chain> chain = mock_shared(mock);
-        Call(chain).action(ping, MAVAddress("192.168"));
+        MAVAddress address("192.168");
+        Call(chain).action(ping, address);
         fakeit::Verify(
             Method(mock, action).Matching([&](auto & a, auto & b)
         {

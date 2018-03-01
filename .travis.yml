@@ -1,0 +1,56 @@
+language: cpp
+jobs:
+  include:
+
+    - os: linux
+      env:
+        - NAME="GCC v7.0 on Linux"
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - lcov
+            - cmake
+            - libboost-all-dev
+      script: make COVERAGE=On test
+      before_install:
+        - CC=gcc-7
+        - CXX=g++-7
+        - pip install --user cpp-coveralls
+      after_success:
+        - coveralls --exclude lib --exclude test  --exclude cmake --gcov-options '\-lp'
+
+    - os: linux
+      env:
+        - NAME="LLVM Clang v5.0 on Linux"
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - clang-5.0
+            - cmake
+            - libboost-all-dev
+      script: make test
+      before_install:
+        - CC=clang-5.0
+        - CXX=clang++-5.0
+
+    - os: osx
+      env:
+        - NAME="OS X"
+      osx_image: xcode9.2
+      script: make test
+      before_install:
+        - brew update
+        - brew install ctags
+        - brew install gcc || true
+        - brew link --overwrite gcc
+        - CC=gcc-7
+        - CXX=g++-7

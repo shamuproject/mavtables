@@ -1,10 +1,10 @@
-cmake_minimum_required (VERSION 3.3)
+cmake_minimum_required (VERSION 3.8.2) # required for C++17
 
 # project
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 22)
+set (VERSION_PATCH 23)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -33,7 +33,7 @@ endif ()
 add_subdirectory (cmake)
 find_package (Threads)
 find_package (codecov)
-find_package (Boost 1.56 REQUIRED COMPONENTS)
+find_package (Boost 1.54 REQUIRED COMPONENTS)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 # libraries

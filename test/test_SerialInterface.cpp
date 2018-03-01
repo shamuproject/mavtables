@@ -106,7 +106,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     auto port = mock_unique(mock_port);
     using read_type =
         void(std::back_insert_iterator<std::vector<uint8_t>>,
-                  const std::chrono::nanoseconds &);
+             const std::chrono::nanoseconds &);
     // Pool
     fakeit::Mock<ConnectionPool> mock_pool;
     auto pool = mock_shared(mock_pool);
@@ -117,12 +117,13 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         return a.data() < b.data();
     });
-    fakeit::When(Method(mock_pool, send)).AlwaysDo([&](auto &a)
+    fakeit::When(Method(mock_pool, send)).AlwaysDo([&](auto & a)
     {
         // std::make_shared<packet_v2::Packet>*a
         const Packet *packet = a.get();
-        send_packets.insert(packet_v2::Packet(
-                    *dynamic_cast<const packet_v2::Packet *>(packet)));
+        send_packets.insert(
+            packet_v2::Packet(
+                *dynamic_cast<const packet_v2::Packet *>(packet)));
     });
     // Connection
     fakeit::Mock<Connection> mock_connection;
@@ -135,7 +136,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_port, read, read_type)
-                ).AlwaysDo([](auto a, auto b)
+                    ).AlwaysDo([](auto a, auto b)
         {
             (void)a;
             (void)b;
@@ -144,7 +145,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
         serial.receive_packet(timeout);
         // Verification
         fakeit::Verify(OverloadedMethod(mock_port, read, read_type).Matching(
-                [&](auto a, auto b)
+                           [&](auto a, auto b)
         {
             (void)a;
             return b == 250ms;
@@ -156,7 +157,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_port, read, read_type)
-                ).AlwaysDo([](auto a, auto b)
+                    ).AlwaysDo([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(HeartbeatV2());
@@ -166,7 +167,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
         serial.receive_packet(timeout);
         // Verification
         fakeit::Verify(OverloadedMethod(mock_port, read, read_type).Matching(
-                [&](auto a, auto b)
+                           [&](auto a, auto b)
         {
             (void)a;
             return b == 250ms;
@@ -178,7 +179,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_port, read, read_type)
-                ).AlwaysDo([](auto a, auto b)
+                    ).AlwaysDo([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(HeartbeatV2());
@@ -188,13 +189,13 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
         serial.receive_packet(timeout);
         // Verification
         fakeit::Verify(OverloadedMethod(mock_port, read, read_type).Matching(
-                [&](auto a, auto b)
+                           [&](auto a, auto b)
         {
             (void)a;
             return b == 250ms;
         })).Once();
         fakeit::Verify(Method(mock_connection, add_address
-                    ).Using(MAVAddress("127.1"))).Exactly(1);
+                             ).Using(MAVAddress("127.1"))).Exactly(1);
         fakeit::Verify(Method(mock_pool, send)).Exactly(1);
         REQUIRE(send_packets.count(*heartbeat) == 1);
     }
@@ -202,7 +203,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_port, read, read_type)
-                ).AlwaysDo([](auto a, auto b)
+                    ).AlwaysDo([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(HeartbeatV2());
@@ -213,13 +214,13 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
         serial.receive_packet(timeout);
         // Verification
         fakeit::Verify(OverloadedMethod(mock_port, read, read_type).Matching(
-                [&](auto a, auto b)
+                           [&](auto a, auto b)
         {
             (void)a;
             return b == 250ms;
         })).Exactly(2);
         fakeit::Verify(Method(mock_connection, add_address
-                    ).Using(MAVAddress("127.1"))).Exactly(2);
+                             ).Using(MAVAddress("127.1"))).Exactly(2);
         fakeit::Verify(Method(mock_pool, send)).Exactly(2);
         REQUIRE(send_packets.count(*heartbeat) == 2);
     }
@@ -227,7 +228,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_port, read, read_type)
-                ).Do([](auto a, auto b)
+                    ).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(HeartbeatV2());
@@ -243,15 +244,15 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
         serial.receive_packet(timeout);
         // Verification
         fakeit::Verify(OverloadedMethod(mock_port, read, read_type).Matching(
-                [&](auto a, auto b)
+                           [&](auto a, auto b)
         {
             (void)a;
             return b == 250ms;
         })).Exactly(2);
         fakeit::Verify(Method(mock_connection, add_address
-                    ).Using(MAVAddress("127.1"))).Exactly(1);
+                             ).Using(MAVAddress("127.1"))).Exactly(1);
         fakeit::Verify(Method(mock_connection, add_address
-                    ).Using(MAVAddress("224.255"))).Exactly(1);
+                             ).Using(MAVAddress("224.255"))).Exactly(1);
         fakeit::Verify(Method(mock_pool, send)).Exactly(2);
         REQUIRE(send_packets.count(*heartbeat) == 1);
         REQUIRE(send_packets.count(*encapsulated_data) == 1);
@@ -260,7 +261,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_port, read, read_type)
-                ).Do([](auto a, auto b)
+                    ).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
@@ -276,13 +277,13 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
         serial.receive_packet(timeout);
         // Verification
         fakeit::Verify(OverloadedMethod(mock_port, read, read_type).Matching(
-                [&](auto a, auto b)
+                           [&](auto a, auto b)
         {
             (void)a;
             return b == 250ms;
         })).Exactly(2);
         fakeit::Verify(Method(mock_connection, add_address
-                    ).Using(MAVAddress("224.255"))).Exactly(1);
+                             ).Using(MAVAddress("224.255"))).Exactly(1);
         fakeit::Verify(Method(mock_pool, send)).Exactly(1);
         REQUIRE(send_packets.count(*encapsulated_data) == 1);
     }
@@ -304,7 +305,7 @@ TEST_CASE("SerialInterace's 'send_packet' method.", "[UPDInterface]")
              std::vector<uint8_t>::const_iterator last);
     std::multiset<std::vector<uint8_t>> write_bytes;
     fakeit::When(OverloadedMethod(mock_port, write, write_type)).AlwaysDo(
-            [&](auto a, auto b)
+        [&](auto a, auto b)
     {
         std::vector<uint8_t> vec;
         std::copy(a, b, std::back_inserter(vec));
@@ -349,7 +350,7 @@ TEST_CASE("SerialInterace's 'send_packet' method.", "[UPDInterface]")
     {
         // Mocks
         fakeit::When(Method(mock_connection, next_packet)
-                ).Return(heartbeat).Return(encapsulated_data);
+                    ).Return(heartbeat).Return(encapsulated_data);
         // Test
         serial.send_packet(timeout);
         // Verification

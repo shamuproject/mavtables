@@ -124,7 +124,8 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     using receive_type =
         IPAddress(std::back_insert_iterator<std::vector<uint8_t>>,
                   const std::chrono::nanoseconds &);
-    fakeit::Mock<UDPSocket> mock_socket;
+    UDPSocket udp_socket;
+    fakeit::Mock<UDPSocket> mock_socket(udp_socket);
     auto socket = mock_unique(mock_socket);
     // Interface
     UDPInterface udp(
@@ -393,7 +394,8 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         void(std::vector<uint8_t>::const_iterator,
              std::vector<uint8_t>::const_iterator,
              const IPAddress &);
-    fakeit::Mock<UDPSocket> mock_socket;
+    UDPSocket udp_socket;
+    fakeit::Mock<UDPSocket> mock_socket(udp_socket);
     fakeit::When(OverloadedMethod(mock_socket, send, send_type)
                 ).AlwaysDo([&](auto a, auto b, auto c)
     {
@@ -652,7 +654,8 @@ TEST_CASE("OLD TEST: UDPInterface's tests.", "[UPDInterface]")
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;
-    fakeit::Mock<UDPSocket> mock_socket;
+    UDPSocket udp_socket;
+    fakeit::Mock<UDPSocket> mock_socket(udp_socket);
     auto filter = mock_shared(mock_filter);
     auto socket = mock_unique(mock_socket);
     auto pool = std::make_shared<ConnectionPool>();
@@ -664,8 +667,8 @@ TEST_CASE("OLD TEST: UDPInterface's tests.", "[UPDInterface]")
         UDPInterface udp(
             std::move(socket), pool,
             std::make_unique<ConnectionFactory<>>(filter));
-        std::chrono::nanoseconds delay = 250ms;
-        udp.receive_packet(250ms);
+        std::chrono::nanoseconds timeout = 250ms;
+        udp.receive_packet(timeout);
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
@@ -686,7 +689,8 @@ TEST_CASE("OLD TEST: UDPInterface's 'receive_packet' method receives one or "
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;
-    fakeit::Mock<UDPSocket> mock_socket;
+    UDPSocket udp_socket;
+    fakeit::Mock<UDPSocket> mock_socket(udp_socket);
     fakeit::Mock<ConnectionPool> mock_pool;
     fakeit::Mock<ConnectionFactory<>> mock_factory;
     auto filter = mock_shared(mock_filter);
@@ -731,7 +735,8 @@ TEST_CASE("OLD TEST: UDPInterface's 'receive_packet' method receives one or "
 TEST_CASE("OLD TEST: UDPInterface's 'send_packet' method sends one or more "
           " MAVLink packets.", "[UPDInterface]")
 {
-    fakeit::Mock<UDPSocket> mock_socket;
+    UDPSocket udp_socket;
+    fakeit::Mock<UDPSocket> mock_socket(udp_socket);
     fakeit::Mock<ConnectionPool> mock_pool;
     fakeit::Mock<ConnectionFactory<>> mock_factory;
     auto socket = mock_unique(mock_socket);
