@@ -1,6 +1,8 @@
 mavtables {#readme}
 ===================
 
+[![Build Status](https://travis-ci.org/shamuproject/mavtables.svg?branch=master)](https://travis-ci.org/shamuproject/mavtables) [![Coverage Status](https://coveralls.io/repos/github/shamuproject/mavtables/badge.svg?branch=master)](https://coveralls.io/github/shamuproject/mavtables?branch=master)
+
 A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
 more MAVLink endpoints such as autopilots, ground control software, loggers,
 image capture systems, etc.  MAVLink packets will be routed when they are

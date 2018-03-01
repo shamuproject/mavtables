@@ -1,6 +1,9 @@
 mavtables {#mainpage}
 =====================
 
+* [Build Status](https://travis-ci.org/shamuproject/mavtables) ![Build Status](https://travis-ci.org/shamuproject/mavtables.svg?branch=master) 
+* [Coverage Status](https://coveralls.io/github/shamuproject/mavtables?branch=master) ![Coverage Status](https://coveralls.io/repos/github/shamuproject/mavtables/badge.svg?branch=master)
+
 ## Introduction
 
 A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
