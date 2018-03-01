@@ -126,7 +126,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Single wait (timeout).")
@@ -134,10 +134,10 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_for(10ms);
+            return sp.wait_for(1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(20ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
     SECTION("Multiple wait (no timeout).")
@@ -149,9 +149,9 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(10ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Multiple wait (timeout).")
@@ -159,10 +159,10 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_for(10ms) && sp.wait_for(10ms);
+            return sp.wait_for(1ms) && sp.wait_for(1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(30ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
 }
@@ -189,10 +189,10 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_until(std::chrono::steady_clock::now() + 10ms);
+            return sp.wait_until(std::chrono::steady_clock::now() + 1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(20ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
     SECTION("Multiple wait (no timeout).")
@@ -205,9 +205,9 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(10ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Multiple wait (timeout).")
@@ -215,11 +215,11 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_until(std::chrono::steady_clock::now() + 10ms) &&
-                   sp.wait_until(std::chrono::steady_clock::now() + 10ms);
+            return sp.wait_until(std::chrono::steady_clock::now() + 1ms) &&
+                   sp.wait_until(std::chrono::steady_clock::now() + 1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(30ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
 }
