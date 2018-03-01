@@ -1,13 +1,6 @@
 language: cpp
-matrix:
+jobs:
   include:
-    - os: osx
-      osx_image: xcode9
-      env:
-        - MATRIX_EVAL=""
-      script: make test
-      env:
-        - MATRIX_EVAL="brew update && brew install ctags"
     - os: linux
       dist: trusty
       env: COMPILER_NAME
@@ -21,10 +14,10 @@ matrix:
             - cmake
             - libboost-all-dev
       env:
-        - MATRIX_EVAL="pip install --user cpp-coveralls && sCC=gcc-7 && CXX=g++-7"
+        - COMPILER="CC=gcc-7 && CXX=g++-7"
+        - BEFORE_INSTALL="pip install --user cpp-coveralls"
+        - AFTER_SUCCESS="coveralls --exclude lib --exclude tests --gcov-options \'\-lp\'"
       script: make COVERAGE=On test
-      after_success:
-        - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
     - os: linux
       dist: trusty
       addons:
@@ -38,9 +31,23 @@ matrix:
             - cmake
             - libboost-all-dev
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - COMPILER="CC=clang-5.0 && CXX=clang++-5.0"
+        - BEFORE_INSTALL=""
+        - AFTER_SUCCESS=""
       script: make test
+    - os: osx
+      osx_image: xcode9
+      script: make test
+      env:
+        - COMPILER=""
+        - BEFOR_INSTALL="brew update && brew install ctags"
+        - AFTER_SUCCESS=""
+
 
 before_install:
-    - eval "${MATRIX_EVAL}"
+    - eval "${BEFORE_INSTALL}"
+    - eval "${COMPILER}"
     - $CXX --version
+
+after_success:
+    - eval "${AFTER_SUCCESS}"
