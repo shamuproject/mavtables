@@ -40,7 +40,7 @@ jobs:
         - NAME="LLVM Clang v5.0 on Linux"
       script: make test
       before_install:
-        - CC=clagn-5.0
+        - CC=clang-5.0
         - CXX=clang++-5.0
 
     - os: osx
@@ -53,3 +53,5 @@ jobs:
         - brew install ctags
         - brew install gcc || true
         - brew link --overwrite gcc
+        - CC=gcc-7
+        - CXX=g++-7
