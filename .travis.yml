@@ -49,4 +49,6 @@ jobs:
       env:
         - NAME="OS X"
       before_install:
-        - brew update && brew install ctags
+        - brew update
+        - brew install ctags
+        - brew install gcc
