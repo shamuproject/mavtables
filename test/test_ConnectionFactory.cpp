@@ -125,7 +125,7 @@ TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
             return connection_factory.wait_for_packet(1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(2ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
 }
