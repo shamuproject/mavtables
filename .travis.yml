@@ -1,6 +1,7 @@
 language: cpp
 jobs:
   include:
+
     - os: linux
       dist: trusty
       env: COMPILER_NAME
@@ -14,10 +15,15 @@ jobs:
             - cmake
             - libboost-all-dev
       env:
-        - COMPILER="CC=gcc-7 && CXX=g++-7"
-        - BEFORE_INSTALL="pip install --user cpp-coveralls"
-        - AFTER_SUCCESS="coveralls --exclude lib --exclude tests --gcov-options \'\-lp\'"
+        - NAME="GCC v7.0 on Linux"
       script: make COVERAGE=On test
+      befor_install:
+        - CC=gcc-7
+        - CXX=g++-7
+        - pip install --user cpp-coveralls
+      after_success:
+        - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
+
     - os: linux
       dist: trusty
       addons:
@@ -31,23 +37,15 @@ jobs:
             - cmake
             - libboost-all-dev
       env:
-        - COMPILER="CC=clang-5.0 && CXX=clang++-5.0"
-        - BEFORE_INSTALL=""
-        - AFTER_SUCCESS=""
+        - NAME="GCC v7.0 on Linux"
       script: make test
+      befor_install:
+        - CC=clagn-5.0
+        - CXX=clang++-5.0
     - os: osx
       osx_image: xcode9
       script: make test
       env:
-        - COMPILER=""
-        - BEFOR_INSTALL="brew update && brew install ctags"
-        - AFTER_SUCCESS=""
-
-
-before_install:
-    - eval "${BEFORE_INSTALL}"
-    - eval "${COMPILER}"
-    - $CXX --version
-
-after_success:
-    - eval "${AFTER_SUCCESS}"
+        - NAME="OS X"
+      befor_install:
+        - brew update && brew install ctags
