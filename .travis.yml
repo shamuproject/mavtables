@@ -2,7 +2,7 @@ language: cpp
 matrix:
   include:
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode9
       env:
         - MATRIX_EVAL="brew update && brew install gcc ctags && CC=gcc-7 && CXX=g++-7"
       script: make test
@@ -18,10 +18,8 @@ matrix:
             - lcov
             - cmake
             - libboost-all-dev
-      befor_install:
-        - pip install --user cpp-coveralls
       env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="pip install --user cpp-coverall && sCC=gcc-7 && CXX=g++-7"
       script: make COVERAGE=On test
       after_success:
         - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
