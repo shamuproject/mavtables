@@ -21,7 +21,7 @@ jobs:
         - CXX=g++-7
         - pip install --user cpp-coveralls
       after_success:
-        - coveralls --exclude lib --exclude test --exclude build --exclude cmake --gcov-options '\-lp'
+        - coveralls --exclude lib --exclude test  --exclude cmake --gcov-options '\-lp'
 
     - os: linux
       env:
