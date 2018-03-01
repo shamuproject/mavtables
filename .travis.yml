@@ -3,8 +3,9 @@ jobs:
   include:
 
     - os: linux
+      env:
+        - NAME="GCC v7.0 on Linux"
       dist: trusty
-      env: COMPILER_NAME
       addons:
         apt:
           sources:
@@ -14,8 +15,6 @@ jobs:
             - lcov
             - cmake
             - libboost-all-dev
-      env:
-        - NAME="GCC v7.0 on Linux"
       script: make COVERAGE=On test
       before_install:
         - CC=gcc-7
@@ -25,6 +24,8 @@ jobs:
         - coveralls -e lib -e test -e build -e cmake --gcov-options '\-lp'
 
     - os: linux
+      env:
+        - NAME="LLVM Clang v5.0 on Linux"
       dist: trusty
       addons:
         apt:
@@ -36,18 +37,16 @@ jobs:
             - clang-5.0
             - cmake
             - libboost-all-dev
-      env:
-        - NAME="LLVM Clang v5.0 on Linux"
       script: make test
       before_install:
         - CC=clang-5.0
         - CXX=clang++-5.0
 
     - os: osx
-      osx_image: xcode9.3beta
-      script: make test
       env:
         - NAME="OS X"
+      osx_image: xcode9.2
+      script: make test
       before_install:
         - brew update
         - brew install ctags
