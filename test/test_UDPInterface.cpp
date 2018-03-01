@@ -667,8 +667,8 @@ TEST_CASE("OLD TEST: UDPInterface's tests.", "[UPDInterface]")
         UDPInterface udp(
             std::move(socket), pool,
             std::make_unique<ConnectionFactory<>>(filter));
-        std::chrono::nanoseconds delay = 250ms;
-        udp.receive_packet(250ms);
+        std::chrono::nanoseconds timeout = 250ms;
+        udp.receive_packet(timeout);
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
                 [&](auto a, auto b)
