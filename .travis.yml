@@ -52,3 +52,4 @@ jobs:
         - brew update
         - brew install ctags
         - brew install gcc
+        - brew link --overwrite gcc
