@@ -6,6 +6,8 @@ matrix:
       env:
         - MATRIX_EVAL=""
       script: make test
+      env:
+        - MATRIX_EVAL="brew update && brew install ctags"
     - os: linux
       dist: trusty
       env: COMPILER_NAME
