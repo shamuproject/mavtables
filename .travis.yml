@@ -20,15 +20,14 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
           packages:
-            - libstdc++-7
+            - libc++-dev
             - clang-5.0
             - cmake
             - libboost-all-dev
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL='CC=clang-5.0 && CXX="clang++-5.0 -stdlib=libc++"'
 
 before_install:
     - eval "${MATRIX_EVAL}"
