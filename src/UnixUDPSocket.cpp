@@ -48,6 +48,7 @@ UnixUDPSocket::UnixUDPSocket(
     : port_(port), address_(std::move(address)),
       syscalls_(std::move(syscalls)), socket_(-1)
 {
+    create_socket_();
 }
 
 

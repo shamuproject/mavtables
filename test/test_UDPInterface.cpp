@@ -327,10 +327,10 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             (void)a;
             return b == 250ms;
         })).Exactly(2);
-        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(1);
+        fakeit::Verify(Method(mock_filter, will_accept)).Once();
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
         REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 1);
-        fakeit::Verify(Method(spy_pool, add)).Exactly(1);
+        fakeit::Verify(Method(spy_pool, add)).Once();
     }
     SECTION("Partial packets with different IP addresses should be dropped.")
     {
@@ -622,9 +622,9 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         udp.send_packet(timeout);
         // Verification
         fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
-        fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(1);
+        fakeit::Verify(Method(spy_factory, wait_for_packet)).Once();
         fakeit::Verify(
-            OverloadedMethod(mock_socket, send, send_type)).Exactly(1);
+            OverloadedMethod(mock_socket, send, send_type)).Once();
         REQUIRE(send_bytes.size() == 1);
         REQUIRE(send_bytes.count(to_vector(PingV2())) == 1);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
@@ -635,7 +635,7 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
             Method(spy_factory, wait_for_packet).Using(1ms)).Exactly(2);
         fakeit::Verify(Method(spy_factory, wait_for_packet)).Exactly(2);
         fakeit::Verify(
-            OverloadedMethod(mock_socket, send, send_type)).Exactly(1);
+            OverloadedMethod(mock_socket, send, send_type)).Once();
     }
 }
 
