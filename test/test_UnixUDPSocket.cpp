@@ -221,7 +221,6 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
     SECTION("Emmits errors from 'sendto' system call.")
     {
         std::vector<uint8_t> vec_compare;
-        struct sockaddr_in address;
         fakeit::When(Method(mock_sys, sendto)).AlwaysReturn(-1);
         std::array<int, 18> errors{{
                 EACCES,
