@@ -18,9 +18,9 @@
 #ifndef UNIXSYSCALLS_HPP_
 #define UNIXSYSCALLS_HPP_
 
-
 #include <fcntl.h>      // open, fnctl
 #include <netinet/in.h> // sockaddr_in
+#include <sys/ioctl.h>  // ioctl
 #include <sys/poll.h>   // poll
 #include <sys/socket.h> // socket, bind, sendto, recvfrom
 #include <sys/stat.h>   // fstat
@@ -39,6 +39,7 @@
  *  * [man 2 bind](http://man7.org/linux/man-pages/man2/bind.2.html)
  *  * [man 2 close](http://man7.org/linux/man-pages/man2/close.2.html)
  *  * [man 2 socket](http://man7.org/linux/man-pages/man2/socket.2.html)
+ *  * [man 2 ioctl](http://man7.org/linux/man-pages/man2/ioctl.2.html)
  *  * [man 7 ip](http://man7.org/linux/man-pages/man7/ip.7.html)
  *  * [man 2 open](http://man7.org/linux/man-pages/man2/open.2.html)
  *  * [man 2 poll](http://man7.org/linux/man-pages/man2/poll.2.html)
@@ -60,6 +61,7 @@ class UnixSyscalls
         TEST_VIRTUAL int cfsetispeed(struct termios *termios_p, speed_t speed);
         TEST_VIRTUAL int cfsetospeed(struct termios *termios_p, speed_t speed);
         TEST_VIRTUAL int close(int fd);
+        TEST_VIRTUAL int ioctl(int fd, unsigned long request, void *argp);
         TEST_VIRTUAL int open(const char *pathname, int flags);
         TEST_VIRTUAL int poll(struct pollfd *fds, nfds_t nfds, int timeout);
         TEST_VIRTUAL ssize_t read(int fd, void *buf, size_t count);

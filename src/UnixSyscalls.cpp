@@ -15,14 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <termios.h> // terminal control
-#include <sys/poll.h> // poll
-#include <sys/stat.h> // fstat
-#include <fcntl.h> // open, fcntl
-#include <unistd.h>     // close
-#include <sys/types.h>  // socklen_t type on old BSD systems
-#include <sys/socket.h> // socket, bind, sendto, recvfrom
+#include <fcntl.h>      // open, fnctl
 #include <netinet/in.h> // sockaddr_in
+#include <sys/ioctl.h>  // ioctl
+#include <sys/poll.h>   // poll
+#include <sys/socket.h> // socket, bind, sendto, recvfrom
+#include <sys/stat.h>   // fstat
+#include <sys/types.h>  // socklen_t type on old BSD systems
+#include <termios.h>    // terminal control
+#include <unistd.h>     // read, write, close
 
 #include "UnixSyscalls.hpp"
 
@@ -31,6 +32,10 @@
  *
  *  See [man 2 bind](http://man7.org/linux/man-pages/man2/bind.2.html) for
  *  documentation.
+ *
+ *  \param sockfd Socket file descriptor.
+ *  \param addr Address to assign to socket.
+ *  \param addrlen Size of address structure in bytes.
  */
 int UnixSyscalls::bind(
     int sockfd, const struct sockaddr *addr, socklen_t addrlen)
@@ -87,10 +92,27 @@ int UnixSyscalls::cfsetospeed(struct termios *termios_p, speed_t speed)
  *
  *  See [man 2 close](http://man7.org/linux/man-pages/man2/close.2.html) for
  *  documentation.
+ *
+ *  \param fd The file descriptor to close.
  */
 int UnixSyscalls::close(int fd)
 {
     return ::close(fd);
+}
+
+
+/** Control device.
+ *
+ *  See [man 2 ioctl](http://man7.org/linux/man-pages/man2/ioctl.2.html) for
+ *  documentation.
+ *
+ *  \param fd The file descriptor to control.
+ *  \param request Request code, defined in <sys/ioctl.h>
+ *  \param argp Pointer to input/output, dependent on request code.
+ */
+int UnixSyscalls::ioctl(int fd, unsigned long request, void *argp)
+{
+    return ::ioctl(fd, request, argp);
 }
 
 
@@ -109,6 +131,10 @@ int UnixSyscalls::open(const char *pathname, int flags)
  *
  *  See [man 2 poll](http://man7.org/linux/man-pages/man2/poll.2.html) for
  *  documentation.
+ *
+ *  \param fds File descriptor event structures.
+ *  \param nfds Number of file descriptor event structures.
+ *  \param timeout The timeout in milliseconds.
  */
 int UnixSyscalls::poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
@@ -131,6 +157,15 @@ ssize_t UnixSyscalls::read(int fd, void *buf, size_t count)
  *
  *  See [man 2 recvfrom](http://man7.org/linux/man-pages/man2/recv.2.html) for
  *  documentation.
+ *
+ *  \param sockfd Socket file descriptor to receive data on.
+ *  \param buf The buffer to write the data into.
+ *  \param len The length of the buffer.
+ *  \param flags Option flags.
+ *  \param src_addr Source address buffer.
+ *  \param addrlen Before call, length of source address buffer.  After call,
+ *      actual length of address data.
+ *  \returns The number of bytes written to \p or -1 if an error occurred.
  */
 ssize_t UnixSyscalls::recvfrom(
     int sockfd, void *buf, size_t len, int flags,
@@ -157,6 +192,10 @@ ssize_t UnixSyscalls::sendto(
  *
  *  See [man 2 socket](http://man7.org/linux/man-pages/man2/socket.2.html) for
  *  documentation.
+ *
+ *  \param domain Protocol family to use for communication.
+ *  \param type Socket type.
+ *  \param protocol Protocol to use for socket.
  */
 int UnixSyscalls::socket(int domain, int type, int protocol)
 {
