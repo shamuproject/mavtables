@@ -56,10 +56,12 @@ UnixUDPSocket::UnixUDPSocket(
  *
  *  This closes the underlying file descriptor.
  */
+// LCOV_EXCL_START
 UnixUDPSocket::~UnixUDPSocket()
 {
     syscalls_->close(socket_);
 }
+// LCOV_EXCL_STOP
 
 
 /** \copydoc UDPSocket::send(const std::vector<uint8_t> &, const IPAddress &)
@@ -73,7 +75,7 @@ void UnixUDPSocket::send(
     addr.sin_port = htons(static_cast<uint16_t>(address.port()));
     addr.sin_addr.s_addr =
         htonl(static_cast<uint32_t>(address.address()));
-    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
+    memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
     // Send the packet.
     auto err = syscalls_->sendto(
                    socket_, data.data(), data.size(), 0,
@@ -95,8 +97,9 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive(
 {
     std::chrono::milliseconds timeout_ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(timeout);
-    struct pollfd fd = {socket_, POLLIN, 0};
-    auto result = syscalls_->poll(&fd, 1, static_cast<int>(timeout_ms.count()));
+    struct pollfd fds = {socket_, POLLIN, 0};
+    auto result = syscalls_->poll(
+                      &fds, 1, static_cast<int>(timeout_ms.count()));
 
     // Poll error
     if (result < 0)
@@ -107,14 +110,14 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive(
     else if (result > 0)
     {
         // Socket error
-        if (fd.revents & POLLERR)
+        if (fds.revents & POLLERR)
         {
-            close(socket_);
+            syscalls_->close(socket_);
             create_socket_();
             return {std::vector<uint8_t>(), IPAddress(0)};
         }
         // Datagram available for reading.
-        else if (fd.revents & POLLIN)
+        else if (fds.revents & POLLIN)
         {
             return receive_();
         }
