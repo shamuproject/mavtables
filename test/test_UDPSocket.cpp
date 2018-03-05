@@ -31,7 +31,7 @@
 using namespace std::chrono_literals;
 
 
-TEST_CASE("UDPSocket's 'send' method accepts a vector and an address.",
+TEST_CASE("UDPSocket's 'send' method accepts a vector of bytes and an address.",
           "[UDPSocket]")
 {
     // This test ensures that one send method calls the other.
@@ -125,9 +125,9 @@ TEST_CASE("UDPSocket's 'receive' method takes a timeout and returns a vector "
 }
 
 
-TEST_CASE("UDPSocket's 'receive' method takes back iterator and a timeout "
+TEST_CASE("UDPSocket's 'receive' method takes a back inserter and a timeout "
           "and returns the IP address that sent the bytes written to the "
-          "back iterator.", "[UDPSocket]")
+          "back inserter.", "[UDPSocket]")
 {
     // This test ensures that one receive method calls the other.
     using receive_type = std::pair<std::vector<uint8_t>, IPAddress>(
