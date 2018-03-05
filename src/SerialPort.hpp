@@ -19,7 +19,10 @@
 #define SERIALPORT_HPP_
 
 
+#include <chrono>
+#include <iterator>
 #include <string>
+#include <vector>
 
 
 /** A serial port.

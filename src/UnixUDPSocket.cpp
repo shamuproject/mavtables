@@ -209,4 +209,3 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
     // Failed to read datagram.
     return {std::vector<uint8_t>(), IPAddress(0)};
 }
-
