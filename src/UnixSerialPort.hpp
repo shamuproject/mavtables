@@ -21,6 +21,7 @@
 
 #include <chrono>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,7 +40,7 @@ class UnixSerialPort : public SerialPort
             SerialPort::Feature features = SerialPort::DEFAULT,
             std::unique_ptr<UnixSyscalls> syscalls =
                 std::make_unique<UnixSyscalls>());
-        virtual ~SerialPort();
+        virtual ~UnixSerialPort();
         virtual std::vector<uint8_t> read(
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds::zero()) final;
@@ -47,6 +48,7 @@ class UnixSerialPort : public SerialPort
 
     private:
         // Variables
+        std::unique_ptr<UnixSyscalls> syscalls_;
         int port_;
         // Methods
         void configure_port_(

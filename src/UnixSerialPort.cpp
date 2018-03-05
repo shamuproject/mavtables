@@ -19,12 +19,13 @@
 #include <chrono>
 #include <cstdint>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
 
-#include "SerialPort.hpp"
+#include "UnixSerialPort.hpp"
 #include "UnixSyscalls.hpp"
 
 
@@ -44,9 +45,10 @@ UnixSerialPort::UnixSerialPort(
     : syscalls_(std::move(syscalls)), port_(-1)
 {
     port_ = -1;
-
     // Open serial port.
-    if ((port_ = syscalls_->open(device, O_RDWR | O_NOCTTY | O_SYNC)) < 0)
+    port_ = syscalls_->open(device.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+
+    if (port_ < 0)
     {
         throw std::system_error(
             std::error_code(errno, std::system_category()),
@@ -82,8 +84,11 @@ UnixSerialPort::~UnixSerialPort()
  *
  *  \note The timeout precision of this implementation is 1 millisecond.
  */
-std::vector<uint8_t> UnixSerialPort::read(const std::chrono::nanoseconds &timeout)
+std::vector<uint8_t> UnixSerialPort::read(
+    const std::chrono::nanoseconds &timeout)
 {
+    (void)timeout;
+    return {};
 }
 
 
@@ -91,6 +96,20 @@ std::vector<uint8_t> UnixSerialPort::read(const std::chrono::nanoseconds &timeou
  */
 void UnixSerialPort::write(const std::vector<uint8_t> &data)
 {
+    // Write the data.
+    auto err = syscalls_->write(port_, data.data(), data.size());
+
+    if (err < 0)
+    {
+        throw std::system_error(std::error_code(errno, std::system_category()));
+    }
+
+    if (static_cast<size_t>(err) < data.size())
+    {
+        throw std::runtime_error(
+            "Could only write " + std::to_string(err) + " of " +
+            std::to_string(data.size()) + " bytes.");
+    }
 }
 
 
@@ -107,6 +126,7 @@ void UnixSerialPort::configure_port_(
 {
     // Get attribute structure.
     struct termios tty;
+
     if (syscalls_->tcgetattr(port_, &tty) < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
@@ -114,42 +134,40 @@ void UnixSerialPort::configure_port_(
 
     // Set baud rate.
     speed_t speed = speed_constant_(buad_rate);
+
     if (cfsetispeed(&tty, speed) < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
+
     if (cfsetospeed(&tty, speed) < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
 
     // Enable receiver and set local mode.
-    tty.c_cflag | = (CLOCAL | CREAD);
-
+    tty.c_cflag |= static_cast<tcflag_t>(CLOCAL | CREAD);
     // Use 8N1 mode (8 data bits, no parity, 1 stop bit).
-    tty.c_flag &= ~PARENB;
-    tty.c_flag &= ~CSTOPB;
-    tty.c_flag &= ~CSIZE;
+    tty.c_cflag &= static_cast<tcflag_t>(~PARENB);
+    tty.c_cflag &= static_cast<tcflag_t>(~CSTOPB);
+    tty.c_cflag &= static_cast<tcflag_t>(~CSIZE);
 
     // Enable/disable hardware flow control.
     if (features & SerialPort::FLOW_CONTROL)
     {
-        tty.c_flag |= CRTSCTS;
+        tty.c_cflag |= static_cast<tcflag_t>(CRTSCTS);
     }
     else
     {
-        tty.c_flag &= ~CRTSCTS;
+        tty.c_cflag &= static_cast<tcflag_t>(~CRTSCTS);
     }
 
     // Use raw input.
-    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-
+    tty.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO | ECHOE | ISIG));
     // Disable software flow control.
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
-
+    tty.c_iflag &= static_cast<tcflag_t>(~(IXON | IXOFF | IXANY));
     // Use raw output.
-    tty.c_oflag &= ~OPOST;
-
+    tty.c_oflag &= static_cast<tcflag_t>(~OPOST);
     // Non blocking mode, using poll.
     // See: http://unixwiz.net/techtips/termios-vmin-vtime.html
     tty.c_cc[VMIN] = 0;
@@ -167,53 +185,72 @@ void UnixSerialPort::configure_port_(
  *
  *  See \ref UnixSerialPort::UnixSerialPort for valid baud rates.
  *
- *  \param buad_rate The baud rate to convert.
+ *  \param baud_rate The baud rate to convert.
  *  \returns The baud rate constant.
  *  \throws std::invalid_argument if the given buad rate is not supported.
  */
-speed_t speed_constant_(unsigned long buad_rate)
+speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
 {
-    switch (buad_rate)
+    switch (baud_rate)
     {
         case 0:
             return B0;
+
         case 50:
             return B50;
+
         case 75:
             return B75;
+
         case 110:
             return B110;
+
         case 134: // actually 134.5
         case 135: // actually 134.5
             return B134;
+
         case 150:
             return B150;
+
         case 200:
             return B200;
+
         case 300:
             return B300;
+
         case 600:
             return B600;
+
         case 1200:
             return B1200;
+
         case 1800:
             return B1800;
+
         case 2400:
             return B2400;
+
         case 4800:
             return B4800;
+
         case 9600:
             return B9600;
+
         case 19200:
             return B19200;
+
         case 38400:
             return B38400;
+
         case 57600:
             return B57600;
+
         case 76800:
             return B57600;
+
         case 115200:
             return B115200;
+
         default:
             throw std::invalid_argument(
                 std::to_string(baud_rate) + "bps is not a valid baud rate.");
