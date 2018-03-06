@@ -36,7 +36,7 @@ class UnixSerialPort : public SerialPort
     public:
         UnixSerialPort(
             std::string device,
-            unsigned long buad_rate = 9600,
+            unsigned long baud_rate = 9600,
             SerialPort::Feature features = SerialPort::DEFAULT,
             std::unique_ptr<UnixSyscalls> syscalls =
                 std::make_unique<UnixSyscalls>());
@@ -48,11 +48,16 @@ class UnixSerialPort : public SerialPort
 
     private:
         // Variables
+        std::string device_;
+        unsigned long baud_rate_;
+        SerialPort::Feature features_;
         std::unique_ptr<UnixSyscalls> syscalls_;
         int port_;
         // Methods
         void configure_port_(
             unsigned long buad_rate, SerialPort::Feature features);
+        void open_port_();
+        std::vector<uint8_t> read_();
         speed_t speed_constant_(unsigned long buad_rate);
 };
 

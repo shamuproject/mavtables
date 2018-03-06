@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iterator>
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <system_error>

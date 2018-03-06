@@ -33,38 +33,19 @@
  *
  *  \param device The string representing the serial port.  For example
  *      "/dev/ttyUSB0".
- *  \param buad_rate Bits per second, the default value is 9600 bps.
+ *  \param baud_rate Bits per second, the default value is 9600 bps.
  *  \param features A bitflag of the features to enable, default is not
  *      to enable any features.  See \ref SerialPort::Feature for flags.
  */
 UnixSerialPort::UnixSerialPort(
     std::string device,
-    unsigned long buad_rate,
+    unsigned long baud_rate,
     SerialPort::Feature features,
     std::unique_ptr<UnixSyscalls> syscalls)
-    : syscalls_(std::move(syscalls)), port_(-1)
+    : device_(std::move(device)), baud_rate_(baud_rate),
+      features_(features), syscalls_(std::move(syscalls)), port_(-1)
 {
-    port_ = -1;
-    // Open serial port.
-    port_ = syscalls_->open(device.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
-
-    if (port_ < 0)
-    {
-        throw std::system_error(
-            std::error_code(errno, std::system_category()),
-            "Failed to open \"" + device + "\".");
-    }
-
-    // Configure serial port.
-    try
-    {
-        configure_port_(buad_rate, features);
-    }
-    catch (...)
-    {
-        syscalls_->close(port_);
-        throw;
-    }
+    open_port_();
 }
 
 
@@ -87,8 +68,36 @@ UnixSerialPort::~UnixSerialPort()
 std::vector<uint8_t> UnixSerialPort::read(
     const std::chrono::nanoseconds &timeout)
 {
-    (void)timeout;
-    return {};
+    std::chrono::milliseconds timeout_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(timeout);
+    struct pollfd fds = {port_, POLLIN, 0};
+    auto result = syscalls_->poll(
+                      &fds, 1, static_cast<int>(timeout_ms.count()));
+
+    // Poll error
+    if (result < 0)
+    {
+        throw std::system_error(std::error_code(errno, std::system_category()));
+    }
+    // Success
+    else if (result > 0)
+    {
+        // Port error
+        if (fds.revents & POLLERR)
+        {
+            syscalls_->close(port_);
+            open_port_();
+            return std::vector<uint8_t>();
+        }
+        // Data available for reading.
+        else if (fds.revents & POLLIN)
+        {
+            return read_();
+        }
+    }
+
+    // Timed out
+    return std::vector<uint8_t>();
 }
 
 
@@ -99,11 +108,13 @@ void UnixSerialPort::write(const std::vector<uint8_t> &data)
     // Write the data.
     auto err = syscalls_->write(port_, data.data(), data.size());
 
+    // Handle system call errors.
     if (err < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
 
+    // Could not write all data.
     if (static_cast<size_t>(err) < data.size())
     {
         throw std::runtime_error(
@@ -178,6 +189,57 @@ void UnixSerialPort::configure_port_(
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
+}
+
+
+/** Open the serial port.
+ */
+void UnixSerialPort::open_port_()
+{
+    port_ = -1;
+    // Open serial port.
+    port_ = syscalls_->open(device_.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+
+    if (port_ < 0)
+    {
+        throw std::system_error(
+            std::error_code(errno, std::system_category()),
+            "Failed to open \"" + device_ + "\".");
+    }
+
+    // Configure serial port.
+    try
+    {
+        configure_port_(baud_rate_, features_);
+    }
+    catch (...)
+    {
+        syscalls_->close(port_);
+        throw;
+    }
+}
+
+
+/** Read data from serial port.
+ *
+ *  \note There must be data to read, otherwise calling this method is
+ *      undefined.
+ *
+ *  \returns The data read from the port.
+ */
+std::vector<uint8_t> UnixSerialPort::read_()
+{
+    std::vector<uint8_t> buffer;
+    buffer.resize(1024);
+    auto size = syscalls_->read(port_, buffer.data(), buffer.size());
+
+    if (size < 0)
+    {
+        throw std::system_error(std::error_code(errno, std::system_category()));
+    }
+
+    buffer.resize(static_cast<size_t>(size));
+    return buffer;
 }
 
 
