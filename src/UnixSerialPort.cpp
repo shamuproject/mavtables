@@ -36,6 +36,8 @@
  *  \param baud_rate Bits per second, the default value is 9600 bps.
  *  \param features A bitflag of the features to enable, default is not
  *      to enable any features.  See \ref SerialPort::Feature for flags.
+ *  \param syscalls The object to use for Unix system calls.  It is default
+ *      constructed to the production implementation.
  */
 UnixSerialPort::UnixSerialPort(
     std::string device,
@@ -162,6 +164,7 @@ void UnixSerialPort::configure_port_(
     tty.c_cflag &= static_cast<tcflag_t>(~PARENB);
     tty.c_cflag &= static_cast<tcflag_t>(~CSTOPB);
     tty.c_cflag &= static_cast<tcflag_t>(~CSIZE);
+    tty.c_cflag |= static_cast<tcflag_t>(CS8);
 
     // Enable/disable hardware flow control.
     if (features & SerialPort::FLOW_CONTROL)
@@ -313,8 +316,11 @@ speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
         case 115200:
             return B115200;
 
+        case 230400:
+            return B230400;
+
         default:
             throw std::invalid_argument(
-                std::to_string(baud_rate) + "bps is not a valid baud rate.");
+                std::to_string(baud_rate) + " bps is not a valid baud rate.");
     }
 }

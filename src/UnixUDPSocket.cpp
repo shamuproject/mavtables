@@ -76,7 +76,7 @@ void UnixUDPSocket::send(
     addr.sin_port = htons(static_cast<uint16_t>(address.port()));
     addr.sin_addr.s_addr =
         htonl(static_cast<uint32_t>(address.address()));
-    memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
+    std::memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
     // Send the packet.
     auto err = syscalls_->sendto(
                    socket_, data.data(), data.size(), 0,
@@ -156,7 +156,7 @@ void UnixUDPSocket::create_socket_()
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
     }
 
-    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
+    std::memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
 
     if ((syscalls_->bind(socket_, reinterpret_cast<struct sockaddr *>(&addr),
                          sizeof(addr))) < 0)

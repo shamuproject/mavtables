@@ -27,7 +27,6 @@
 
 #include "UnixSyscalls.hpp"
 #include "UnixUDPSocket.hpp"
-#include "util.hpp"
 
 #include "common.hpp"
 
@@ -40,8 +39,11 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
 {
     SECTION("Without a specific IP address (no errors).")
     {
+        // Mock system calls.
         fakeit::Mock<UnixSyscalls> mock_sys;
+        // Mock 'socket'.
         fakeit::When(Method(mock_sys, socket)).Return(3);
+        // Mock 'bind'.
         struct sockaddr_in address;
         fakeit::When(Method(mock_sys, bind)).Do(
             [&](auto fd, auto addr, auto addrlen)
@@ -50,8 +52,10 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
             std::memcpy(&address, addr, addrlen);
             return 0;
         });
+        // Mock 'close'.
         fakeit::When(Method(mock_sys, close)).Return(0);
         {
+            // Construct socket.
             UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
             fakeit::Verify(Method(mock_sys, socket).Matching(
                                [&](auto family, auto type, auto protocol)
