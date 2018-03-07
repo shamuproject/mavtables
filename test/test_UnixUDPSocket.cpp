@@ -264,13 +264,19 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
 TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
           "[UnixUDPSocket]")
 {
+    // Mock system calls.
     fakeit::Mock<UnixSyscalls> mock_sys;
+    // Mock 'socket'.
     fakeit::When(Method(mock_sys, socket)).AlwaysReturn(3);
+    // Mock 'bind'.
     fakeit::When(Method(mock_sys, bind)).AlwaysReturn(0);
+    // Mock 'close'.
     fakeit::When(Method(mock_sys, close)).AlwaysReturn(0);
+    // Construct socket.
     UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
     SECTION("Timeout, no packet (no errors).")
     {
+        // Mock 'poll'.
         struct pollfd fds;
         fakeit::When(Method(mock_sys, poll)).Do(
             [&](auto fds_, auto nfds, auto timeout)
@@ -279,9 +285,11 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             std::memcpy(&fds, fds_, nfds * sizeof(fds));
             return 0;
         });
+        // Test.
         REQUIRE(
             socket.receive(250ms) ==
             std::pair<std::vector<uint8_t>, IPAddress>({}, IPAddress(0)));
+        // Verify 'poll'.
         fakeit::Verify(Method(mock_sys, poll).Matching(
                            [](auto fds_, auto nfds, auto timeout)
         {
@@ -294,7 +302,7 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
     }
     SECTION("Poll error, close and restart the socket (no other errors).")
     {
-        struct pollfd fds;
+        // Mock 'bind'.
         struct sockaddr_in address;
         fakeit::When(Method(mock_sys, bind)).Do(
             [&](auto fd, auto addr, auto addrlen)
@@ -303,6 +311,8 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             std::memcpy(&address, addr, addrlen);
             return 0;
         });
+        // Mock 'poll'.
+        struct pollfd fds;
         fakeit::When(Method(mock_sys, poll)).Do(
             [&](auto fds_, auto nfds, auto timeout)
         {
@@ -311,7 +321,11 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             fds_->revents = POLLERR;
             return 1;
         });
-        socket.receive(250ms);
+        // Test
+        REQUIRE(
+            socket.receive(250ms) ==
+            std::pair<std::vector<uint8_t>, IPAddress>({}, IPAddress(0)));
+        // Verify 'poll'.
         fakeit::Verify(Method(mock_sys, poll).Matching(
                            [](auto fds_, auto nfds, auto timeout)
         {
@@ -321,11 +335,13 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
         REQUIRE(fds.fd == 3);
         REQUIRE(fds.events == POLLIN);
         REQUIRE(fds.revents == 0);
+        // Verify 'socket'.
         fakeit::Verify(Method(mock_sys, socket).Matching(
                            [&](auto family, auto type, auto protocol)
         {
             return family == AF_INET && type == SOCK_DGRAM && protocol == 0;
         })).Exactly(2);
+        // Verify 'bind'.
         fakeit::Verify(Method(mock_sys, bind).Matching(
                            [&](auto fd, auto addr, auto addrlen)
         {
@@ -341,11 +357,12 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             REQUIRE(address.sin_zero[i] == '\0');
         }
 
+        // Verify 'close'.
         fakeit::Verify(Method(mock_sys, close).Using(3)).Once();
     }
     SECTION("Packet available (no errors).")
     {
-        // Mock poll system call.
+        // Mock 'poll'.
         struct pollfd fds;
         fakeit::When(Method(mock_sys, poll)).Do(
             [&](auto fds_, auto nfds, auto timeout)
@@ -355,7 +372,7 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             fds_->revents = POLLIN;
             return 1;
         });
-        // Mock ioctl system call.
+        // Mock 'ioctl'.
         fakeit::When(Method(mock_sys, ioctl)).Do(
             [](auto fd, auto request, auto size)
         {
@@ -364,7 +381,7 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             *reinterpret_cast<int *>(size) = 4;
             return 0;
         });
-        // Mock recvfrom.
+        // Mock 'recvfrom'.
         socklen_t address_length = 0;
         fakeit::When(Method(mock_sys, recvfrom)).Do(
             [&](auto fd, auto buf, auto len, auto flags,
@@ -395,7 +412,7 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
         auto [data, ip] = socket.receive(250ms);
         REQUIRE(data == std::vector<uint8_t>({1, 3, 3, 7}));
         REQUIRE(ip == IPAddress(1234567890, 5000));
-        // Verify poll system call.
+        // Verify 'poll'.
         fakeit::Verify(Method(mock_sys, poll).Matching(
                            [](auto fds_, auto nfds, auto timeout)
         {
@@ -405,14 +422,14 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
         REQUIRE(fds.fd == 3);
         REQUIRE(fds.events == POLLIN);
         REQUIRE(fds.revents == 0);
-        // Verify ioctl system call.
+        // Verify 'ioctl'.
         fakeit::Verify(Method(mock_sys, ioctl).Matching(
                            [](auto fd, auto request, auto size)
         {
             (void)size;
             return fd == 3 && request == FIONREAD;
         })).Once();
-        // Verify recvfrom.
+        // Verify 'recvfrom'.
         fakeit::Verify(Method(mock_sys, recvfrom).Matching(
                            [](auto fd, auto buf, auto len, auto flags,
                               auto addr, auto addrlen)

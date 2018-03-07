@@ -43,9 +43,9 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
         // Mock system calls.
         fakeit::Mock<UnixSyscalls> mock_sys;
         // Mock 'open'.
-        fakeit::When(Method(mock_sys, open)).Return(3);
+        fakeit::When(Method(mock_sys, open)).AlwaysReturn(3);
         // Mock 'tcgetattr'.
-        fakeit::When(Method(mock_sys, tcgetattr)).Do(
+        fakeit::When(Method(mock_sys, tcgetattr)).AlwaysDo(
             [&](auto fd, auto termios_p)
         {
             (void)fd;
@@ -54,7 +54,7 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
         });
         // Mock 'tcsetattr'.
         struct termios tty;
-        fakeit::When(Method(mock_sys, tcsetattr)).Do(
+        fakeit::When(Method(mock_sys, tcsetattr)).AlwaysDo(
             [&](auto fd, auto action, auto termios_p)
         {
             (void)fd;
@@ -63,7 +63,7 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
             return 0;
         });
         // Mock 'close'.
-        fakeit::When(Method(mock_sys, close)).Return(0);
+        fakeit::When(Method(mock_sys, close)).AlwaysReturn(0);
         {
             // Construct port.
             UnixSerialPort port(
@@ -501,6 +501,217 @@ TEST_CASE("UnixSerialPort's open method configures the baud rate.",
             UnixSerialPort(
                 "/dev/ttyUSB0", 9601, SerialPort::DEFAULT,
                 mock_unique(mock_sys)), "9601 bps is not a valid baud rate.");
+    }
+}
+
+
+TEST_CASE("UnixSerialPort's 'read' method receives data on the socket.",
+          "[UnixSerialPort]")
+{
+    // Mock system calls.
+    fakeit::Mock<UnixSyscalls> mock_sys;
+    // Mock 'open'.
+    fakeit::When(Method(mock_sys, open)).AlwaysReturn(3);
+    // Mock 'tcgetattr'.
+    fakeit::When(Method(mock_sys, tcgetattr)).AlwaysReturn(0);
+    // Mock 'tcsetattr'.
+    fakeit::When(Method(mock_sys, tcsetattr)).AlwaysReturn(0);
+    // Mock 'close'.
+    fakeit::When(Method(mock_sys, close)).AlwaysReturn(0);
+    // Construct port.
+    UnixSerialPort port(
+        "/dev/ttyUSB0", 9600,
+        SerialPort::DEFAULT,
+        mock_unique(mock_sys));
+    SECTION("Timeout, no data (no errors).")
+    {
+        // Mock 'poll'.
+        struct pollfd fds;
+        fakeit::When(Method(mock_sys, poll)).Do(
+            [&](auto fds_, auto nfds, auto timeout)
+        {
+            (void)timeout;
+            std::memcpy(&fds, fds_, nfds * sizeof(fds));
+            return 0;
+        });
+        // Test.
+        REQUIRE(port.read(250ms) == std::vector<uint8_t>());
+        // Verify 'poll'.
+        fakeit::Verify(Method(mock_sys, poll).Matching(
+                           [](auto fds_, auto nfds, auto timeout)
+        {
+            (void)fds_;
+            return nfds == 1 && timeout == 250;
+        })).Once();
+        REQUIRE(fds.fd == 3);
+        REQUIRE(fds.events == POLLIN);
+        REQUIRE(fds.revents == 0);
+    }
+    SECTION("Poll error, close and reopen the serial port (no other errors).")
+    {
+        // Mock 'tcgetattr'.
+        fakeit::When(Method(mock_sys, tcgetattr)).AlwaysDo(
+            [&](auto fd, auto termios_p)
+        {
+            (void)fd;
+            std::memset(termios_p, '\0', sizeof(struct termios));
+            return 0;
+        });
+        // Mock 'tcsetattr'.
+        struct termios tty;
+        fakeit::When(Method(mock_sys, tcsetattr)).AlwaysDo(
+            [&](auto fd, auto action, auto termios_p)
+        {
+            (void)fd;
+            (void)action;
+            std::memcpy(&tty, termios_p, sizeof(struct termios));
+            return 0;
+        });
+        // Mock 'poll'.
+        struct pollfd fds;
+        fakeit::When(Method(mock_sys, poll)).AlwaysDo(
+            [&](auto fds_, auto nfds, auto timeout)
+        {
+            (void)timeout;
+            std::memcpy(&fds, fds_, nfds * sizeof(fds));
+            fds_->revents = POLLERR;
+            return 1;
+        });
+        // Test
+        REQUIRE(port.read(250ms) == std::vector<uint8_t>());
+        // Verify 'open' system call.
+        fakeit::Verify(Method(mock_sys, open).Matching(
+                           [](auto path, auto flags)
+        {
+            return std::string(path) == "/dev/ttyUSB0" &&
+                   flags == (O_RDWR | O_NOCTTY | O_SYNC);
+        })).Exactly(2);
+        // Verify 'tcgetattr'.
+        fakeit::Verify(Method(mock_sys, tcgetattr).Matching(
+                           [&](auto fd, auto termios_p)
+        {
+            (void)termios_p;
+            return fd == 3;
+        })).Exactly(2);
+        // Verify 'tcsetattr'.
+        fakeit::Verify(Method(mock_sys, tcsetattr).Matching(
+                           [](auto fd, auto action, auto termios_p)
+        {
+            (void)termios_p;
+            return fd == 3 && action == TCSANOW;
+        })).Exactly(2);
+        REQUIRE(cfgetispeed(&tty) == B9600);
+        REQUIRE(cfgetospeed(&tty) == B9600);
+        REQUIRE((tty.c_cflag & CLOCAL) != 0);
+        REQUIRE((tty.c_cflag & CREAD) != 0);
+        REQUIRE((tty.c_cflag & PARENB) == 0);
+        REQUIRE((tty.c_cflag & CSTOPB) == 0);
+        REQUIRE((tty.c_cflag & CS8) != 0);
+        REQUIRE((tty.c_cflag & CRTSCTS) == 0);
+        REQUIRE((tty.c_lflag & ICANON) == 0);
+        REQUIRE((tty.c_lflag & ECHO) == 0);
+        REQUIRE((tty.c_lflag & ECHOE) == 0);
+        REQUIRE((tty.c_lflag & ISIG) == 0);
+        REQUIRE((tty.c_iflag & IXON) == 0);
+        REQUIRE((tty.c_iflag & IXOFF) == 0);
+        REQUIRE((tty.c_iflag & IXANY) == 0);
+        REQUIRE((tty.c_oflag & OPOST) == 0);
+        REQUIRE(tty.c_cc[VMIN] == 0);
+        REQUIRE(tty.c_cc[VTIME] == 0);
+        // Verify 'close'.
+        fakeit::Verify(Method(mock_sys, close).Using(3)).Exactly(1);
+    }
+    SECTION("Data available (no errors).")
+    {
+        // Mock 'poll'.
+        struct pollfd fds;
+        fakeit::When(Method(mock_sys, poll)).Do(
+            [&](auto fds_, auto nfds, auto timeout)
+        {
+            (void)timeout;
+            std::memcpy(&fds, fds_, nfds * sizeof(fds));
+            fds_->revents = POLLIN;
+            return 1;
+        });
+        // Mock 'read'.
+        fakeit::When(Method(mock_sys, read)).Do(
+            [](auto fd, auto buf, auto count)
+        {
+            (void)fd;
+            // Write to buffer.
+            std::vector<uint8_t> vec = {1, 3, 3, 7};
+            std::memcpy(buf, vec.data(), std::min(vec.size(), count));
+            // Return number of received bytes.
+            return std::min(vec.size(), count);
+        });
+        // Test.
+        REQUIRE(port.read(250ms) == std::vector<uint8_t>({1, 3, 3, 7}));
+        // Verify 'poll'.
+        fakeit::Verify(Method(mock_sys, poll).Matching(
+                           [](auto fds_, auto nfds, auto timeout)
+        {
+            (void)fds_;
+            return nfds == 1 && timeout == 250;
+        })).Once();
+        REQUIRE(fds.fd == 3);
+        REQUIRE(fds.events == POLLIN);
+        REQUIRE(fds.revents == 0);
+        // Verify 'read'.
+        fakeit::Verify(Method(mock_sys, read).Matching(
+                           [](auto fd, auto buf, auto count)
+        {
+            (void)buf;
+            return fd == 3 && count >= 1024;
+        }));
+    }
+    SECTION("Emmits errors from 'read' system call.")
+    {
+        // Mock 'poll'.
+        struct pollfd fds;
+        fakeit::When(Method(mock_sys, poll)).AlwaysDo(
+            [&](auto fds_, auto nfds, auto timeout)
+        {
+            (void)timeout;
+            std::memcpy(&fds, fds_, nfds * sizeof(fds));
+            fds_->revents = POLLIN;
+            return 1;
+        });
+        // Mock 'read'.
+        fakeit::When(Method(mock_sys, read)).AlwaysReturn(-1);
+        // Test
+        std::array<int, 7> errors{{
+                EAGAIN,
+                EBADF,
+                EFAULT,
+                EINTR,
+                EINVAL,
+                EIO,
+                EISDIR
+            }};
+
+        for (auto error : errors)
+        {
+            errno = error;
+            REQUIRE_THROWS_AS(port.read(250ms), std::system_error);
+        }
+    }
+    SECTION("Emmits errors from 'poll' system call.")
+    {
+        // Mock 'poll'.
+        fakeit::When(Method(mock_sys, poll)).AlwaysReturn(-1);
+        // Test
+        std::array<int, 4> errors{{
+                EFAULT,
+                EINTR,
+                EINVAL,
+                ENOMEM
+            }};
+
+        for (auto error : errors)
+        {
+            errno = error;
+            REQUIRE_THROWS_AS(port.read(250ms), std::system_error);
+        }
     }
 }
 

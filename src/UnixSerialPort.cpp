@@ -236,7 +236,7 @@ void UnixSerialPort::open_port_()
  *  \note There must be data to read, otherwise calling this method is
  *      undefined.
  *
- *  \returns The data read from the port.
+ *  \returns The data read from the port, up to 1024 bytes at a time.
  */
 std::vector<uint8_t> UnixSerialPort::read_()
 {
