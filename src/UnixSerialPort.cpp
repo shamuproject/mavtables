@@ -150,12 +150,20 @@ void UnixSerialPort::configure_port_(
 
     if (cfsetispeed(&tty, speed) < 0)
     {
+        // This is unreachable assuming the speed_constant_ method is properly
+        // written.
+        // LCOV_EXCL_START
         throw std::system_error(std::error_code(errno, std::system_category()));
+        // LCOV_EXCL_STOP
     }
 
     if (cfsetospeed(&tty, speed) < 0)
     {
+        // This is unreachable assuming the speed_constant_ method is properly
+        // written.
+        // LCOV_EXCL_START
         throw std::system_error(std::error_code(errno, std::system_category()));
+        // LCOV_EXCL_STOP
     }
 
     // Enable receiver and set local mode.
@@ -308,9 +316,6 @@ speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
             return B38400;
 
         case 57600:
-            return B57600;
-
-        case 76800:
             return B57600;
 
         case 115200:

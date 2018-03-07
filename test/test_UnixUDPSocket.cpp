@@ -178,14 +178,19 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
 TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
           "[UnixUDPSocket]")
 {
+    // Mock system calls.
     fakeit::Mock<UnixSyscalls> mock_sys;
+    // Mock 'socket'.
     fakeit::When(Method(mock_sys, socket)).Return(3);
+    // Mock 'bind'.
     fakeit::When(Method(mock_sys, bind)).Return(0);
+    // Mock 'close'.
     fakeit::When(Method(mock_sys, close)).Return(0);
     UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
     SECTION("Without error.")
     {
-        std::vector<uint8_t> vec_compare;
+        // Mock 'sendto'
+        std::vector<uint8_t> sent;
         struct sockaddr_in address;
         fakeit::When(Method(mock_sys, sendto)).Do(
             [&](auto fd, auto buf, auto len, auto flags,
@@ -193,28 +198,25 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
         {
             (void)fd;
             (void)flags;
-
-            for (size_t i = 0; i < len; ++i)
-            {
-                vec_compare.push_back(
-                    reinterpret_cast<const uint8_t *>(buf)[i]);
-            }
-
+            sent.resize(len);
+            std::memcpy(sent.data(), buf, len);
             std::memcpy(&address, addr, addrlen);
             return len;
         });
+        // Test
         std::vector<uint8_t> vec = {1, 3, 3, 7};
         socket.send(vec, IPAddress(1234567890, 14050));
+        // Verify 'sendto'.
         fakeit::Verify(Method(mock_sys, sendto).Matching(
-                           [&](auto fd, auto buf, auto len, auto flags,
-                               auto addr, auto addrlen)
+                           [](auto fd, auto buf, auto len, auto flags,
+                              auto addr, auto addrlen)
         {
             (void)buf;
             (void)addr;
             return fd == 3 && len == 4 && flags == 0 &&
                    addrlen == sizeof(address);
         })).Once();
-        REQUIRE(vec_compare == vec);
+        REQUIRE(sent == vec);
         REQUIRE(address.sin_family == AF_INET);
         REQUIRE(ntohs(address.sin_port) == 14050);
         REQUIRE(ntohl(address.sin_addr.s_addr) == 1234567890);
@@ -226,7 +228,6 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
     }
     SECTION("Emmits errors from 'sendto' system call.")
     {
-        std::vector<uint8_t> vec_compare;
         fakeit::When(Method(mock_sys, sendto)).AlwaysReturn(-1);
         std::array<int, 18> errors{{
                 EACCES,

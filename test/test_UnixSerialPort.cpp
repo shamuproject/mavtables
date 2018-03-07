@@ -15,9 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <string>
 #include <stdexcept>
+#include <system_error>
 
 #include <catch.hpp>
 #include <errno.h>
@@ -27,6 +30,9 @@
 #include "UnixSerialPort.hpp"
 
 #include "common.hpp"
+
+
+using namespace std::chrono_literals;
 
 
 TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
@@ -39,7 +45,6 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
         // Mock 'open'.
         fakeit::When(Method(mock_sys, open)).Return(3);
         // Mock 'tcgetattr'.
-        struct sockaddr_in address;
         fakeit::When(Method(mock_sys, tcgetattr)).Do(
             [&](auto fd, auto termios_p)
         {
@@ -50,7 +55,7 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
         // Mock 'tcsetattr'.
         struct termios tty;
         fakeit::When(Method(mock_sys, tcsetattr)).Do(
-                [&](auto fd, auto action, auto termios_p)
+            [&](auto fd, auto action, auto termios_p)
         {
             (void)fd;
             (void)action;
@@ -70,18 +75,18 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
                                [](auto path, auto flags)
             {
                 return std::string(path) == "/dev/ttyUSB0" &&
-                    flags == (O_RDWR | O_NOCTTY | O_SYNC);
+                       flags == (O_RDWR | O_NOCTTY | O_SYNC);
             })).Once();
             // Verify 'tcgetattr'.
             fakeit::Verify(Method(mock_sys, tcgetattr).Matching(
-                        [&](auto fd, auto termios_p)
+                               [&](auto fd, auto termios_p)
             {
                 (void)termios_p;
                 return fd == 3;
             })).Once();
             // Verify 'tcsetattr'.
             fakeit::Verify(Method(mock_sys, tcsetattr).Matching(
-                        [](auto fd, auto action, auto termios_p)
+                               [](auto fd, auto action, auto termios_p)
             {
                 (void)termios_p;
                 return fd == 3 && action == TCSANOW;
@@ -117,7 +122,6 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
         // Mock 'open'.
         fakeit::When(Method(mock_sys, open)).Return(3);
         // Mock 'tcgetattr'.
-        struct sockaddr_in address;
         fakeit::When(Method(mock_sys, tcgetattr)).Do(
             [&](auto fd, auto termios_p)
         {
@@ -128,7 +132,7 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
         // Mock 'tcsetattr'.
         struct termios tty;
         fakeit::When(Method(mock_sys, tcsetattr)).Do(
-                [&](auto fd, auto action, auto termios_p)
+            [&](auto fd, auto action, auto termios_p)
         {
             (void)fd;
             (void)action;
@@ -148,18 +152,18 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
                                [](auto path, auto flags)
             {
                 return std::string(path) == "/dev/ttyUSB0" &&
-                    flags == (O_RDWR | O_NOCTTY | O_SYNC);
+                       flags == (O_RDWR | O_NOCTTY | O_SYNC);
             })).Once();
             // Verify 'tcgetattr'.
             fakeit::Verify(Method(mock_sys, tcgetattr).Matching(
-                        [&](auto fd, auto termios_p)
+                               [&](auto fd, auto termios_p)
             {
                 (void)termios_p;
                 return fd == 3;
             })).Once();
             // Verify 'tcsetattr'.
             fakeit::Verify(Method(mock_sys, tcsetattr).Matching(
-                        [](auto fd, auto action, auto termios_p)
+                               [](auto fd, auto action, auto termios_p)
             {
                 (void)termios_p;
                 return fd == 3 && action == TCSANOW;
@@ -220,13 +224,15 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
                 EBADF,
                 ENOTDIR
             }};
+
         for (auto error : errors)
         {
             errno = error;
             REQUIRE_THROWS_AS(UnixSerialPort(
-                "/dev/ttyUSB0", 9600, SerialPort::DEFAULT,
-                mock_unique(mock_sys)), std::system_error);
+                                  "/dev/ttyUSB0", 9600, SerialPort::DEFAULT,
+                                  mock_unique(mock_sys)), std::system_error);
         }
+
         fakeit::Verify(Method(mock_sys, close).Using(3)).Exactly(0);
     }
     SECTION("Emmits errors from 'tcgetattr' system call, and closes the port.")
@@ -239,13 +245,15 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
                 EBADF,
                 ENOTTY
             }};
+
         for (auto error : errors)
         {
             errno = error;
             REQUIRE_THROWS_AS(UnixSerialPort(
-                "/dev/ttyUSB0", 9600, SerialPort::DEFAULT,
-                mock_unique(mock_sys)), std::system_error);
+                                  "/dev/ttyUSB0", 9600, SerialPort::DEFAULT,
+                                  mock_unique(mock_sys)), std::system_error);
         }
+
         fakeit::Verify(Method(mock_sys, close).Using(3)).Exactly(2);
     }
     SECTION("Emmits errors from 'tcsetattr' system call, and closes the port.")
@@ -262,13 +270,15 @@ TEST_CASE("UnixSerialPort's open and configure a serial port on construction"
                 ENOTTY,
                 EIO
             }};
+
         for (auto error : errors)
         {
             errno = error;
             REQUIRE_THROWS_AS(UnixSerialPort(
-                "/dev/ttyUSB0", 9600, SerialPort::DEFAULT,
-                mock_unique(mock_sys)), std::system_error);
+                                  "/dev/ttyUSB0", 9600, SerialPort::DEFAULT,
+                                  mock_unique(mock_sys)), std::system_error);
         }
+
         fakeit::Verify(Method(mock_sys, close).Using(3)).Exactly(5);
     }
 }
@@ -282,7 +292,6 @@ TEST_CASE("UnixSerialPort's open method configures the baud rate.",
     // Mock 'open'.
     fakeit::When(Method(mock_sys, open)).AlwaysReturn(3);
     // Mock 'tcgetattr'.
-    struct sockaddr_in address;
     fakeit::When(Method(mock_sys, tcgetattr)).AlwaysDo(
         [&](auto fd, auto termios_p)
     {
@@ -293,7 +302,7 @@ TEST_CASE("UnixSerialPort's open method configures the baud rate.",
     // Mock 'tcsetattr'.
     struct termios tty;
     fakeit::When(Method(mock_sys, tcsetattr)).AlwaysDo(
-            [&](auto fd, auto action, auto termios_p)
+        [&](auto fd, auto action, auto termios_p)
     {
         (void)fd;
         (void)action;
@@ -484,11 +493,90 @@ TEST_CASE("UnixSerialPort's open method configures the baud rate.",
     }
     SECTION("Throws error when given unsupported baud rate.")
     {
-        REQUIRE_THROWS_AS(UnixSerialPort(
-            "/dev/ttyUSB0", 9601, SerialPort::DEFAULT,
-            mock_unique(mock_sys)), std::invalid_argument);
-        REQUIRE_THROWS_WITH(UnixSerialPort(
-            "/dev/ttyUSB0", 9601, SerialPort::DEFAULT,
-            mock_unique(mock_sys)), "9601 bps is not a valid baud rate.");
+        REQUIRE_THROWS_AS(
+            UnixSerialPort(
+                "/dev/ttyUSB0", 9601, SerialPort::DEFAULT,
+                mock_unique(mock_sys)), std::invalid_argument);
+        REQUIRE_THROWS_WITH(
+            UnixSerialPort(
+                "/dev/ttyUSB0", 9601, SerialPort::DEFAULT,
+                mock_unique(mock_sys)), "9601 bps is not a valid baud rate.");
+    }
+}
+
+
+TEST_CASE("UnixSerialPort's 'write' method sends data over the serial port.",
+          "[UnixSerialPort]")
+{
+    // Mock system calls.
+    fakeit::Mock<UnixSyscalls> mock_sys;
+    // Mock 'open'.
+    fakeit::When(Method(mock_sys, open)).AlwaysReturn(3);
+    // Mock 'tcgetattr'.
+    fakeit::When(Method(mock_sys, tcgetattr)).AlwaysReturn(0);
+    // Mock 'tcsetattr'.
+    fakeit::When(Method(mock_sys, tcsetattr)).AlwaysReturn(0);
+    // Mock 'close'.
+    fakeit::When(Method(mock_sys, close)).Return(0);
+    // Construct port.
+    UnixSerialPort port(
+        "/dev/ttyUSB0", 9600,
+        SerialPort::DEFAULT,
+        mock_unique(mock_sys));
+    SECTION("Without error.")
+    {
+        // Mock 'write'.
+        std::vector<uint8_t> written;
+        fakeit::When(Method(mock_sys, write)).Do(
+            [&](auto fd, auto buf, auto count)
+        {
+            (void)fd;
+            written.resize(count);
+            std::memcpy(written.data(), buf, count);
+            return count;
+        });
+        // Test
+        std::vector<uint8_t> vec = {1, 3, 3, 7};
+        port.write(vec);
+        // Verify 'write'.
+        fakeit::Verify(Method(mock_sys, write).Matching(
+                           [](auto fd, auto buf, auto count)
+        {
+            (void)buf;
+            return fd == 3 && count == 4;
+        })).Once();
+        REQUIRE(written == vec);
+    }
+    SECTION("Could not write all data.")
+    {
+        // Mock 'write'.
+        fakeit::When(Method(mock_sys, write)).AlwaysReturn(3);
+        // Test
+        std::vector<uint8_t> vec = {1, 3, 3, 7};
+        REQUIRE_THROWS_AS(port.write(vec), std::runtime_error);
+        REQUIRE_THROWS_WITH(port.write(vec), "Could only write 3 of 4 bytes.");
+    }
+    SECTION("Emmits errors from 'write' system call.")
+    {
+        fakeit::When(Method(mock_sys, write)).AlwaysReturn(-1);
+        std::array<int, 11> errors{{
+                EAGAIN,
+                EBADF,
+                EDESTADDRREQ,
+                EDQUOT,
+                EFAULT,
+                EFBIG,
+                EINTR,
+                EINVAL,
+                EIO,
+                ENOSPC,
+                EPIPE
+            }};
+
+        for (auto error : errors)
+        {
+            errno = error;
+            REQUIRE_THROWS_AS(port.write({1, 3, 3, 7}), std::system_error);
+        }
     }
 }
