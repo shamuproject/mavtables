@@ -20,13 +20,13 @@
 #include <catch.hpp>
 #include <fakeit.hpp>
 
+#include "Accept.hpp"
+#include "Call.hpp"
 #include "Chain.hpp"
 #include "Filter.hpp"
-#include "PacketVersion2.hpp"
-#include "Accept.hpp"
-#include "Reject.hpp"
-#include "Call.hpp"
 #include "GoTo.hpp"
+#include "PacketVersion2.hpp"
+#include "Reject.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -35,14 +35,8 @@
 TEST_CASE("Filter's are constructable.", "[Filter]")
 {
     Chain chain("test_chain");
-    SECTION("Without default accept.")
-    {
-        REQUIRE_NOTHROW(Filter(chain));
-    }
-    SECTION("With default accept.")
-    {
-        REQUIRE_NOTHROW(Filter(chain, true));
-    }
+    SECTION("Without default accept.") { REQUIRE_NOTHROW(Filter(chain)); }
+    SECTION("With default accept.") { REQUIRE_NOTHROW(Filter(chain, true)); }
 }
 
 
@@ -110,8 +104,10 @@ TEST_CASE("Filter's are assignable (by move semantics).", "[Filter]")
 }
 
 
-TEST_CASE("Filter's 'will_accept' method determines whether to accept or "
-          "reject a packet/address combination.", "[Filter]")
+TEST_CASE(
+    "Filter's 'will_accept' method determines whether to accept or "
+    "reject a packet/address combination.",
+    "[Filter]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     SECTION("Accept packet, default priority.")

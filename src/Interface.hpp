@@ -32,21 +32,20 @@
  */
 class Interface
 {
-    public:
-        virtual ~Interface();
-        /** Send a packet from one of the interface's connections.
-         *
-         *  \param timeout The maximum amount of time to wait for a packet to be
-         *      available for sending.
-         */
-        virtual void send_packet(const std::chrono::nanoseconds &timeout) = 0;
-        /** Receive a packet on the interface.
-         *
-         *  \param timeout The maximum amount of time to wait for incoming data.
-         */
-        virtual void receive_packet(
-            const std::chrono::nanoseconds &timeout) = 0;
+  public:
+    virtual ~Interface();
+    /** Send a packet from one of the interface's connections.
+     *
+     *  \param timeout The maximum amount of time to wait for a packet to be
+     *      available for sending.
+     */
+    virtual void send_packet(const std::chrono::nanoseconds &timeout) = 0;
+    /** Receive a packet on the interface.
+     *
+     *  \param timeout The maximum amount of time to wait for incoming data.
+     */
+    virtual void receive_packet(const std::chrono::nanoseconds &timeout) = 0;
 };
 
 
-#endif // INTERFACE_HPP_
+#endif  // INTERFACE_HPP_

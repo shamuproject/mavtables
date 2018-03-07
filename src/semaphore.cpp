@@ -25,10 +25,7 @@
  *
  *  \param initial_value The initial value of the semaphore.
  */
-semaphore::semaphore(size_t initial_value)
-    : value_(initial_value)
-{
-}
+semaphore::semaphore(size_t initial_value) : value_(initial_value) {}
 
 
 /** Signal the semaphore.
@@ -48,9 +45,6 @@ void semaphore::notify()
 void semaphore::wait()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait(lock, [this]()
-    {
-        return value_ > 0;
-    });
+    cv_.wait(lock, [this]() { return value_ > 0; });
     --value_;
 }

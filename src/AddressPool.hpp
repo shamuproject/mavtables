@@ -24,8 +24,8 @@
 #include <mutex>
 #include <vector>
 
-#include "config.hpp"
 #include "MAVAddress.hpp"
+#include "config.hpp"
 
 
 /** A threadsafe container for addresses that expire after a given time.
@@ -33,20 +33,20 @@
 template <class TC = std::chrono::steady_clock>
 class AddressPool
 {
-    public:
-        AddressPool(std::chrono::milliseconds timeout =
-                        std::chrono::milliseconds(120000));
-        // LCOV_EXCL_START
-        TEST_VIRTUAL ~AddressPool() = default;
-        // LCOV_EXCL_STOP
-        TEST_VIRTUAL void add(MAVAddress address);
-        TEST_VIRTUAL std::vector<MAVAddress> addresses();
-        TEST_VIRTUAL bool contains(const MAVAddress &address);
+  public:
+    AddressPool(
+        std::chrono::milliseconds timeout = std::chrono::milliseconds(120000));
+    // LCOV_EXCL_START
+    TEST_VIRTUAL ~AddressPool() = default;
+    // LCOV_EXCL_STOP
+    TEST_VIRTUAL void add(MAVAddress address);
+    TEST_VIRTUAL std::vector<MAVAddress> addresses();
+    TEST_VIRTUAL bool contains(const MAVAddress &address);
 
-    private:
-        std::map<MAVAddress, std::chrono::time_point<TC>> addresses_;
-        std::chrono::milliseconds timeout_;
-        std::mutex mutex_;
+  private:
+    std::map<MAVAddress, std::chrono::time_point<TC>> addresses_;
+    std::chrono::milliseconds timeout_;
+    std::mutex mutex_;
 };
 
 
@@ -148,4 +148,4 @@ bool AddressPool<TC>::contains(const MAVAddress &address)
 }
 
 
-#endif // ADDRESSPOOL_HPP_
+#endif  // ADDRESSPOOL_HPP_

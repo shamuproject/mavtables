@@ -19,21 +19,21 @@
 #define RECURSIONERROR_HPP_
 
 
-#include <string>
 #include <exception>
+#include <string>
 
 
 /** Exception type emmited by a recursion guard.
  */
 class RecursionError : public std::exception
 {
-    public:
-        RecursionError(std::string message);
-        const char *what() const noexcept;
+  public:
+    RecursionError(std::string message);
+    const char *what() const noexcept;
 
-    private:
-        std::string message_;
+  private:
+    std::string message_;
 };
 
 
-#endif // RECURSIONERROR_HPP_
+#endif  // RECURSIONERROR_HPP_

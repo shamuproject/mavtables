@@ -29,56 +29,56 @@
  */
 class Action
 {
-    public:
-        /** Possible actions.
-         */
-        enum Option
-        {
-            ACCEPT,   //!< The packet has been accepted, possibly with priority.
-            REJECT,   //!< The packet has been rejected.
-            CONTINUE, //!< Continue evaluating rules.
-            DEFAULT   //!< Use the default rule.
-        };
-        // Variables
-        Action::Option action_;
-        // Methods
-        /** Copy constructor.
-         *
-         *  \param other Action to copy.
-         */
-        Action(const Action &other) = default;
-        /** Move constructor.
-         *
-         *  \param other Action to move from.
-         */
-        Action(Action &&other) = default;
-        Action::Option action() const;
-        void priority(int priority);
-        int priority() const;
-        /** Assignment operator.
-         *
-         * \param other Action to copy.
-         */
-        Action &operator=(const Action &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other Action to move from.
-         */
-        Action &operator=(Action &&other) = default;
+  public:
+    /** Possible actions.
+     */
+    enum Option
+    {
+        ACCEPT,    //!< The packet has been accepted, possibly with priority.
+        REJECT,    //!< The packet has been rejected.
+        CONTINUE,  //!< Continue evaluating rules.
+        DEFAULT    //!< Use the default rule.
+    };
+    // Variables
+    Action::Option action_;
+    // Methods
+    /** Copy constructor.
+     *
+     *  \param other Action to copy.
+     */
+    Action(const Action &other) = default;
+    /** Move constructor.
+     *
+     *  \param other Action to move from.
+     */
+    Action(Action &&other) = default;
+    Action::Option action() const;
+    void priority(int priority);
+    int priority() const;
+    /** Assignment operator.
+     *
+     * \param other Action to copy.
+     */
+    Action &operator=(const Action &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other Action to move from.
+     */
+    Action &operator=(Action &&other) = default;
 
-        static Action make_accept(std::optional<int> priority = {});
-        static Action make_reject();
-        static Action make_continue();
-        static Action make_default();
+    static Action make_accept(std::optional<int> priority = {});
+    static Action make_reject();
+    static Action make_continue();
+    static Action make_default();
 
-    private:
-        // Note: The reason this is optional is because there is a difference
-        //       between {} and 0.  This is because a priority of {} can still
-        //       be set to something other than 0 by a higher level rule (see
-        //       \ref Call or \ref GoTo) while if the priority has been set to 0
-        //       it cannot be set again.
-        std::optional<int> priority_;
-        Action(Action::Option action, std::optional<int> priority = {});
+  private:
+    // Note: The reason this is optional is because there is a difference
+    //       between {} and 0.  This is because a priority of {} can still
+    //       be set to something other than 0 by a higher level rule (see
+    //       \ref Call or \ref GoTo) while if the priority has been set to 0
+    //       it cannot be set again.
+    std::optional<int> priority_;
+    Action(Action::Option action, std::optional<int> priority = {});
 };
 
 
@@ -87,4 +87,4 @@ bool operator!=(const Action &lhs, const Action &rhs);
 std::ostream &operator<<(std::ostream &os, const Action &action);
 
 
-#endif // ACTION_HPP_
+#endif  // ACTION_HPP_

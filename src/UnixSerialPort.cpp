@@ -40,12 +40,10 @@
  *      constructed to the production implementation.
  */
 UnixSerialPort::UnixSerialPort(
-    std::string device,
-    unsigned long baud_rate,
-    SerialPort::Feature features,
+    std::string device, unsigned long baud_rate, SerialPort::Feature features,
     std::unique_ptr<UnixSyscalls> syscalls)
-    : device_(std::move(device)), baud_rate_(baud_rate),
-      features_(features), syscalls_(std::move(syscalls)), port_(-1)
+    : device_(std::move(device)), baud_rate_(baud_rate), features_(features),
+      syscalls_(std::move(syscalls)), port_(-1)
 {
     open_port_();
 }
@@ -56,10 +54,7 @@ UnixSerialPort::UnixSerialPort(
  *  This closes the underlying file descriptor.
  */
 // LCOV_EXCL_START
-UnixSerialPort::~UnixSerialPort()
-{
-    syscalls_->close(port_);
-}
+UnixSerialPort::~UnixSerialPort() { syscalls_->close(port_); }
 // LCOV_EXCL_STOP
 
 
@@ -67,14 +62,14 @@ UnixSerialPort::~UnixSerialPort()
  *
  *  \note The timeout precision of this implementation is 1 millisecond.
  */
-std::vector<uint8_t> UnixSerialPort::read(
-    const std::chrono::nanoseconds &timeout)
+std::vector<uint8_t>
+UnixSerialPort::read(const std::chrono::nanoseconds &timeout)
 {
     std::chrono::milliseconds timeout_ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(timeout);
     struct pollfd fds = {port_, POLLIN, 0};
-    auto result = syscalls_->poll(
-                      &fds, 1, static_cast<int>(timeout_ms.count()));
+    auto result =
+        syscalls_->poll(&fds, 1, static_cast<int>(timeout_ms.count()));
 
     // Poll error
     if (result < 0)
@@ -278,8 +273,8 @@ speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
         case 110:
             return B110;
 
-        case 134: // actually 134.5
-        case 135: // actually 134.5
+        case 134:  // actually 134.5
+        case 135:  // actually 134.5
             return B134;
 
         case 150:

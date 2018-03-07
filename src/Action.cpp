@@ -28,22 +28,17 @@
  *  \param priority The priority, only used with Action::ACCEPT.
  *  \sa Action::Option
  */
-Action::Action(
-    Action::Option action, std::optional<int> priority)
+Action::Action(Action::Option action, std::optional<int> priority)
     : action_(action), priority_(std::move(priority))
 {
 }
-
 
 
 /** Return the action that has been chosen.
  *
  *  \returns The Action::Option enum associated with this action.
  */
-Action::Option Action::action() const
-{
-    return action_;
-}
+Action::Option Action::action() const { return action_; }
 
 
 /** Set the priority of the action.
@@ -107,10 +102,7 @@ Action Action::make_accept(std::optional<int> priority)
  *
  *  \returns The new 'reject' action.
  */
-Action Action::make_reject()
-{
-    return Action(Action::REJECT);
-}
+Action Action::make_reject() { return Action(Action::REJECT); }
 
 
 /** Return a new action result with the Action::CONTINUE action.
@@ -120,10 +112,7 @@ Action Action::make_reject()
  *
  *  \returns The new 'continue' action.
  */
-Action Action::make_continue()
-{
-    return Action(Action::CONTINUE);
-}
+Action Action::make_continue() { return Action(Action::CONTINUE); }
 
 
 /** Return a new action result with the Action::DEFAULT action.
@@ -134,10 +123,7 @@ Action Action::make_continue()
  *
  *  \returns The new 'default' action.
  */
-Action Action::make_default()
-{
-    return Action(Action::DEFAULT);
-}
+Action Action::make_default() { return Action(Action::DEFAULT); }
 
 
 /** Equality comparison.

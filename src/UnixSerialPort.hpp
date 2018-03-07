@@ -33,33 +33,31 @@
  */
 class UnixSerialPort : public SerialPort
 {
-    public:
-        UnixSerialPort(
-            std::string device,
-            unsigned long baud_rate = 9600,
-            SerialPort::Feature features = SerialPort::DEFAULT,
-            std::unique_ptr<UnixSyscalls> syscalls =
-                std::make_unique<UnixSyscalls>());
-        virtual ~UnixSerialPort();
-        virtual std::vector<uint8_t> read(
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero()) final;
-        virtual void write(const std::vector<uint8_t> &data) final;
+  public:
+    UnixSerialPort(
+        std::string device, unsigned long baud_rate = 9600,
+        SerialPort::Feature features = SerialPort::DEFAULT,
+        std::unique_ptr<UnixSyscalls> syscalls =
+            std::make_unique<UnixSyscalls>());
+    virtual ~UnixSerialPort();
+    virtual std::vector<uint8_t> read(
+        const std::chrono::nanoseconds &timeout =
+            std::chrono::nanoseconds::zero()) final;
+    virtual void write(const std::vector<uint8_t> &data) final;
 
-    private:
-        // Variables
-        std::string device_;
-        unsigned long baud_rate_;
-        SerialPort::Feature features_;
-        std::unique_ptr<UnixSyscalls> syscalls_;
-        int port_;
-        // Methods
-        void configure_port_(
-            unsigned long buad_rate, SerialPort::Feature features);
-        void open_port_();
-        std::vector<uint8_t> read_();
-        speed_t speed_constant_(unsigned long buad_rate);
+  private:
+    // Variables
+    std::string device_;
+    unsigned long baud_rate_;
+    SerialPort::Feature features_;
+    std::unique_ptr<UnixSyscalls> syscalls_;
+    int port_;
+    // Methods
+    void configure_port_(unsigned long buad_rate, SerialPort::Feature features);
+    void open_port_();
+    std::vector<uint8_t> read_();
+    speed_t speed_constant_(unsigned long buad_rate);
 };
 
 
-#endif // UNIXSERIALPORT_HPP_
+#endif  // UNIXSERIALPORT_HPP_

@@ -23,15 +23,17 @@
 #include <catch.hpp>
 
 #include "MAVAddress.hpp"
-#include "mavlink.hpp"
 #include "PacketVersion2.hpp"
+#include "mavlink.hpp"
 #include "util.hpp"
 
 #include "common_Packet.hpp"
 
 
-TEST_CASE("'packet_v2::header_complete' determines whether the given bytes "
-          "at least represent a complete header.", "[packet_v2]")
+TEST_CASE(
+    "'packet_v2::header_complete' determines whether the given bytes "
+    "at least represent a complete header.",
+    "[packet_v2]")
 {
     auto heartbeat = to_vector_with_sig(HeartbeatV2());
     auto ping = to_vector(PingV2());
@@ -86,8 +88,10 @@ TEST_CASE("'packet_v2::header_complete' determines whether the given bytes "
 }
 
 
-TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
-          "header data.", "[packet_v2]")
+TEST_CASE(
+    "'packet_v2::header' returns a structure pointer to the given "
+    "header data.",
+    "[packet_v2]")
 {
     auto heartbeat = to_vector_with_sig(HeartbeatV2());
     auto ping = to_vector(PingV2());
@@ -115,18 +119,24 @@ TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
     }
     SECTION("Header has incompatibility flags.")
     {
-        REQUIRE((packet_v2::header(heartbeat)->incompat_flags &
-                 MAVLINK_IFLAG_SIGNED) == true);
-        REQUIRE((packet_v2::header(ping)->incompat_flags &
-                 MAVLINK_IFLAG_SIGNED) == false);
-        REQUIRE((packet_v2::header(set_mode)->incompat_flags &
-                 MAVLINK_IFLAG_SIGNED) == true);
-        REQUIRE((packet_v2::header(mission_set_current)->incompat_flags &
-                 MAVLINK_IFLAG_SIGNED) == false);
-        REQUIRE((packet_v2::header(encapsulated_data)->incompat_flags &
-                 MAVLINK_IFLAG_SIGNED) == true);
-        REQUIRE((packet_v2::header(param_ext_request_list)->incompat_flags &
-                 MAVLINK_IFLAG_SIGNED) == false);
+        REQUIRE(
+            (packet_v2::header(heartbeat)->incompat_flags &
+             MAVLINK_IFLAG_SIGNED) == true);
+        REQUIRE(
+            (packet_v2::header(ping)->incompat_flags & MAVLINK_IFLAG_SIGNED) ==
+            false);
+        REQUIRE(
+            (packet_v2::header(set_mode)->incompat_flags &
+             MAVLINK_IFLAG_SIGNED) == true);
+        REQUIRE(
+            (packet_v2::header(mission_set_current)->incompat_flags &
+             MAVLINK_IFLAG_SIGNED) == false);
+        REQUIRE(
+            (packet_v2::header(encapsulated_data)->incompat_flags &
+             MAVLINK_IFLAG_SIGNED) == true);
+        REQUIRE(
+            (packet_v2::header(param_ext_request_list)->incompat_flags &
+             MAVLINK_IFLAG_SIGNED) == false);
     }
     SECTION("Header has compatibility flags.")
     {
@@ -206,8 +216,10 @@ TEST_CASE("'packet_v2::header' returns a structure pointer to the given "
 }
 
 
-TEST_CASE("'packet_v2::packet_complete' determines whether the given bytes "
-          "represent a complete packet.", "[packet_v2]")
+TEST_CASE(
+    "'packet_v2::packet_complete' determines whether the given bytes "
+    "represent a complete packet.",
+    "[packet_v2]")
 {
     auto heartbeat = to_vector_with_sig(HeartbeatV2());
     auto ping = to_vector(PingV2());
@@ -272,8 +284,10 @@ TEST_CASE("'packet_v2::packet_complete' determines whether the given bytes "
 }
 
 
-TEST_CASE("'packet_v2::is_signed' determines whether the given bytes "
-          "represent a signed packet.", "[packet_v2]")
+TEST_CASE(
+    "'packet_v2::is_signed' determines whether the given bytes "
+    "represent a signed packet.",
+    "[packet_v2]")
 {
     auto heartbeat = to_vector_with_sig(HeartbeatV2());
     auto ping = to_vector(PingV2());
@@ -304,8 +318,7 @@ TEST_CASE("'packet_v2::is_signed' determines whether the given bytes "
         // Errors
         REQUIRE_THROWS_AS(
             packet_v2::is_signed(heartbeat), std::invalid_argument);
-        REQUIRE_THROWS_AS(
-            packet_v2::is_signed(ping), std::invalid_argument);
+        REQUIRE_THROWS_AS(packet_v2::is_signed(ping), std::invalid_argument);
         REQUIRE_THROWS_AS(
             packet_v2::is_signed(set_mode), std::invalid_argument);
         REQUIRE_THROWS_AS(
@@ -320,11 +333,9 @@ TEST_CASE("'packet_v2::is_signed' determines whether the given bytes "
             packet_v2::is_signed(heartbeat),
             "Header is incomplete or invalid.");
         REQUIRE_THROWS_WITH(
-            packet_v2::is_signed(ping),
-            "Header is incomplete or invalid.");
+            packet_v2::is_signed(ping), "Header is incomplete or invalid.");
         REQUIRE_THROWS_WITH(
-            packet_v2::is_signed(set_mode),
-            "Header is incomplete or invalid.");
+            packet_v2::is_signed(set_mode), "Header is incomplete or invalid.");
         REQUIRE_THROWS_WITH(
             packet_v2::is_signed(mission_set_current),
             "Header is incomplete or invalid.");
@@ -392,12 +403,12 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
     }
     SECTION("And ensures the message ID is valid.")
     {
-        ping.msgid = 255; // ID 255 is not currently valid.
+        ping.msgid = 255;  // ID 255 is not currently valid.
         REQUIRE_THROWS_AS(
             packet_v2::Packet(to_vector(ping)), std::runtime_error);
         REQUIRE_THROWS_WITH(
             packet_v2::Packet(to_vector(ping)), "Invalid packet ID (#255).");
-        ping.msgid = 5000; // ID 5000 is not currently valid.
+        ping.msgid = 5000;  // ID 5000 is not currently valid.
         REQUIRE_THROWS_AS(
             packet_v2::Packet(to_vector(ping)), std::runtime_error);
         REQUIRE_THROWS_WITH(
@@ -568,8 +579,9 @@ TEST_CASE("packet_v2::Packet's are assignable (by move semantics).", "[Packet]")
 }
 
 
-TEST_CASE("packet_v2::Packet's contain raw packet data and make it accessible.",
-          "[packet_v2::Packet]")
+TEST_CASE(
+    "packet_v2::Packet's contain raw packet data and make it accessible.",
+    "[packet_v2::Packet]")
 {
     auto heartbeat = to_vector_with_sig(HeartbeatV2());
     auto ping = to_vector(PingV2());
@@ -582,8 +594,7 @@ TEST_CASE("packet_v2::Packet's contain raw packet data and make it accessible.",
     REQUIRE(packet_v2::Packet(set_mode).data() == set_mode);
     REQUIRE(
         packet_v2::Packet(mission_set_current).data() == mission_set_current);
-    REQUIRE(
-        packet_v2::Packet(encapsulated_data).data() == encapsulated_data);
+    REQUIRE(packet_v2::Packet(encapsulated_data).data() == encapsulated_data);
     REQUIRE(
         packet_v2::Packet(param_ext_request_list).data() ==
         param_ext_request_list);
@@ -666,8 +677,9 @@ TEST_CASE("packet_v2::Packet's have a source address.", "[packet_v2::Packet]")
 }
 
 
-TEST_CASE("packet_v2::Packet's optionally have a destination address.",
-          "[packet_v2::Packet]")
+TEST_CASE(
+    "packet_v2::Packet's optionally have a destination address.",
+    "[packet_v2::Packet]")
 {
     auto heartbeat = to_vector_with_sig(HeartbeatV2());
     auto ping = to_vector(PingV2());

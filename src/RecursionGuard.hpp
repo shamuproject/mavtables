@@ -58,13 +58,13 @@
  */
 class RecursionGuard
 {
-    public:
-        RecursionGuard(RecursionData &data);
-        ~RecursionGuard();
+  public:
+    RecursionGuard(RecursionData &data);
+    ~RecursionGuard();
 
-    private:
-        RecursionData &data_;
+  private:
+    RecursionData &data_;
 };
 
 
-#endif // RECURSIONGUARD_HPP_
+#endif  // RECURSIONGUARD_HPP_

@@ -28,35 +28,35 @@
 
 class InterfaceThreader
 {
-    public:
-        enum Threads
-        {
-            START,  //!< Start the interface (and worker threads) immediately.
-            DELAY_START //!< Delay starting, use \ref start to launch threads.
-        };
-        InterfaceThreader(
-            std::shared_ptr<Interface> interface,
-            std::chrono::microseconds = std::chrono::microseconds(100000),
-            Threads start_threads = InterfaceThreader::START);
-        InterfaceThreader(const InterfaceThreader &other) = delete;
-        InterfaceThreader(InterfaceThreader &&other) = delete;
-        ~InterfaceThreader();
-        void start();
-        void shutdown();
-        InterfaceThreader &operator=(const InterfaceThreader &other) = delete;
-        InterfaceThreader &operator=(InterfaceThreader &&other) = delete;
+  public:
+    enum Threads
+    {
+        START,       //!< Start the interface (and worker threads) immediately.
+        DELAY_START  //!< Delay starting, use \ref start to launch threads.
+    };
+    InterfaceThreader(
+        std::shared_ptr<Interface> interface,
+        std::chrono::microseconds = std::chrono::microseconds(100000),
+        Threads start_threads = InterfaceThreader::START);
+    InterfaceThreader(const InterfaceThreader &other) = delete;
+    InterfaceThreader(InterfaceThreader &&other) = delete;
+    ~InterfaceThreader();
+    void start();
+    void shutdown();
+    InterfaceThreader &operator=(const InterfaceThreader &other) = delete;
+    InterfaceThreader &operator=(InterfaceThreader &&other) = delete;
 
-    private:
-        // Variables
-        std::shared_ptr<Interface> interface_;
-        std::thread tx_thread_;
-        std::thread rx_thread_;
-        std::chrono::microseconds timeout_;
-        std::atomic<bool> running_;
-        // Methods
-        void tx_runner_();
-        void rx_runner_();
+  private:
+    // Variables
+    std::shared_ptr<Interface> interface_;
+    std::thread tx_thread_;
+    std::thread rx_thread_;
+    std::chrono::microseconds timeout_;
+    std::atomic<bool> running_;
+    // Methods
+    void tx_runner_();
+    void rx_runner_();
 };
 
 
-#endif // INTERFACETHREADER_HPP_
+#endif  // INTERFACETHREADER_HPP_

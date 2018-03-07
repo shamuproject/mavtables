@@ -32,36 +32,36 @@
  */
 class PacketParser
 {
-    public:
-        PacketParser();
-        PacketParser(const PacketParser &other) = delete;
-        PacketParser(PacketParser &&other) = delete;
-        size_t bytes_parsed() const;
-        void clear();
-        std::unique_ptr<Packet> parse_byte(uint8_t byte);
-        PacketParser &operator=(const PacketParser &other) = delete;
-        PacketParser &operator=(PacketParser &&other) = delete;
+  public:
+    PacketParser();
+    PacketParser(const PacketParser &other) = delete;
+    PacketParser(PacketParser &&other) = delete;
+    size_t bytes_parsed() const;
+    void clear();
+    std::unique_ptr<Packet> parse_byte(uint8_t byte);
+    PacketParser &operator=(const PacketParser &other) = delete;
+    PacketParser &operator=(PacketParser &&other) = delete;
 
-    private:
-        // Types
-        /** Packet parser states.
-         */
-        enum State
-        {
-            WAITING_FOR_START_BYTE, //!< Waiting for a magic start byte.
-            WAITING_FOR_HEADER,     //!< Waiting for complete header.
-            WAITING_FOR_PACKET      //!< Waitinf for complete packet.
-        };
-        // Variables
-        std::vector<uint8_t> buffer_;
-        PacketParser::State state_;
-        Packet::Version version_;
-        size_t bytes_remaining_;
-        // Methods
-        void waiting_for_start_byte_(uint8_t byte);
-        void waiting_for_header_(uint8_t byte);
-        std::unique_ptr<Packet> waiting_for_packet_(uint8_t byte);
+  private:
+    // Types
+    /** Packet parser states.
+     */
+    enum State
+    {
+        WAITING_FOR_START_BYTE,  //!< Waiting for a magic start byte.
+        WAITING_FOR_HEADER,      //!< Waiting for complete header.
+        WAITING_FOR_PACKET       //!< Waitinf for complete packet.
+    };
+    // Variables
+    std::vector<uint8_t> buffer_;
+    PacketParser::State state_;
+    Packet::Version version_;
+    size_t bytes_remaining_;
+    // Methods
+    void waiting_for_start_byte_(uint8_t byte);
+    void waiting_for_header_(uint8_t byte);
+    std::unique_ptr<Packet> waiting_for_packet_(uint8_t byte);
 };
 
 
-#endif // PACKETPARSER_HPP_
+#endif  // PACKETPARSER_HPP_

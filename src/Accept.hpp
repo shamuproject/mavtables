@@ -34,21 +34,21 @@
  */
 class Accept : public Rule
 {
-    public:
-        Accept(std::optional<If> condition = {});
-        Accept(int priority, std::optional<If> condition = {});
-        virtual Action action(
-            const Packet &packet, const MAVAddress &address) const;
-        virtual std::unique_ptr<Rule> clone() const;
-        virtual bool operator==(const Rule &other) const;
-        virtual bool operator!=(const Rule &other) const;
+  public:
+    Accept(std::optional<If> condition = {});
+    Accept(int priority, std::optional<If> condition = {});
+    virtual Action
+    action(const Packet &packet, const MAVAddress &address) const;
+    virtual std::unique_ptr<Rule> clone() const;
+    virtual bool operator==(const Rule &other) const;
+    virtual bool operator!=(const Rule &other) const;
 
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
+  protected:
+    virtual std::ostream &print_(std::ostream &os) const;
 
-    private:
-        std::optional<int> priority_;
+  private:
+    std::optional<int> priority_;
 };
 
 
-#endif // ACCEPT_HPP_
+#endif  // ACCEPT_HPP_

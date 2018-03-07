@@ -35,28 +35,28 @@
  */
 class UnixUDPSocket : public UDPSocket
 {
-    public:
-        UnixUDPSocket(
-            unsigned int port, std::optional<IPAddress> address = {},
-            std::unique_ptr<UnixSyscalls> syscalls =
-                std::make_unique<UnixSyscalls>());
-        virtual ~UnixUDPSocket();
-        virtual void send(
-            const std::vector<uint8_t> &data, const IPAddress &address) final;
-        virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero()) final;
+  public:
+    UnixUDPSocket(
+        unsigned int port, std::optional<IPAddress> address = {},
+        std::unique_ptr<UnixSyscalls> syscalls =
+            std::make_unique<UnixSyscalls>());
+    virtual ~UnixUDPSocket();
+    virtual void
+    send(const std::vector<uint8_t> &data, const IPAddress &address) final;
+    virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
+        const std::chrono::nanoseconds &timeout =
+            std::chrono::nanoseconds::zero()) final;
 
-    private:
-        // Variables
-        unsigned int port_;
-        std::optional<IPAddress> address_;
-        std::unique_ptr<UnixSyscalls> syscalls_;
-        int socket_;
-        // Methods
-        void create_socket_();
-        std::pair<std::vector<uint8_t>, IPAddress> receive_();
+  private:
+    // Variables
+    unsigned int port_;
+    std::optional<IPAddress> address_;
+    std::unique_ptr<UnixSyscalls> syscalls_;
+    int socket_;
+    // Methods
+    void create_socket_();
+    std::pair<std::vector<uint8_t>, IPAddress> receive_();
 };
 
 
-#endif // UNIXUDPSOCKET_HPP_
+#endif  // UNIXUDPSOCKET_HPP_

@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <chrono>
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <vector>
 
@@ -33,46 +33,44 @@ using namespace std::chrono_literals;
 
 namespace
 {
-
 #ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
     // Subclass of Interface used for testing the abstract class Interface.
     class InterfaceTestClass : public Interface
     {
-        private:
-            std::atomic<unsigned int> &tx_counter;
-            std::atomic<unsigned int> &rx_counter;
+      private:
+        std::atomic<unsigned int> &tx_counter;
+        std::atomic<unsigned int> &rx_counter;
 
-        public:
-            InterfaceTestClass(
-                std::atomic<unsigned int> &tx_counter_,
-                std::atomic<unsigned int> &rx_counter_)
-                : tx_counter(tx_counter_), rx_counter(rx_counter_)
-            {
-            }
-            void send_packet(
-                const std::chrono::nanoseconds &timeout =
-                    std::chrono::nanoseconds(100000)) final
-            {
-                std::this_thread::sleep_for(timeout);
-                ++tx_counter;
-            }
-            void receive_packet(
-                const std::chrono::nanoseconds &timeout =
-                    std::chrono::nanoseconds(100000)) final
-            {
-                std::this_thread::sleep_for(timeout);
-                ++rx_counter;
-            }
+      public:
+        InterfaceTestClass(
+            std::atomic<unsigned int> &tx_counter_,
+            std::atomic<unsigned int> &rx_counter_)
+            : tx_counter(tx_counter_), rx_counter(rx_counter_)
+        {
+        }
+        void send_packet(
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) final
+        {
+            std::this_thread::sleep_for(timeout);
+            ++tx_counter;
+        }
+        void receive_packet(
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) final
+        {
+            std::this_thread::sleep_for(timeout);
+            ++rx_counter;
+        }
     };
 
 #ifdef __clang__
-    #pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
-
 }
 
 
@@ -82,23 +80,23 @@ TEST_CASE("InterfaceThreader's can be constructed.", "[InterfaceThreader]")
     std::atomic<unsigned int> rx_count(0);
     SECTION("With delayed start.")
     {
-        REQUIRE_NOTHROW(
-            InterfaceThreader(
-                std::make_unique<InterfaceTestClass>(tx_count, rx_count),
-                1ms, InterfaceThreader::DELAY_START));
+        REQUIRE_NOTHROW(InterfaceThreader(
+            std::make_unique<InterfaceTestClass>(tx_count, rx_count), 1ms,
+            InterfaceThreader::DELAY_START));
     }
     SECTION("With immediate start.")
     {
-        REQUIRE_NOTHROW(
-            InterfaceThreader(
-                std::make_unique<InterfaceTestClass>(tx_count, rx_count)));
+        REQUIRE_NOTHROW(InterfaceThreader(
+            std::make_unique<InterfaceTestClass>(tx_count, rx_count)));
     }
 }
 
 
-TEST_CASE("InterfaceThreader's run Interface::send_packet and "
-          "Interface::receive_packet methods of the contained "
-          "Interface repeatedly.", "[InterfaceThreader]")
+TEST_CASE(
+    "InterfaceThreader's run Interface::send_packet and "
+    "Interface::receive_packet methods of the contained "
+    "Interface repeatedly.",
+    "[InterfaceThreader]")
 {
     std::atomic<unsigned int> tx_count(0);
     std::atomic<unsigned int> rx_count(0);
@@ -107,8 +105,8 @@ TEST_CASE("InterfaceThreader's run Interface::send_packet and "
         REQUIRE(tx_count == 0);
         REQUIRE(rx_count == 0);
         InterfaceThreader threader(
-            std::make_unique<InterfaceTestClass>(tx_count, rx_count),
-            1us, InterfaceThreader::DELAY_START);
+            std::make_unique<InterfaceTestClass>(tx_count, rx_count), 1us,
+            InterfaceThreader::DELAY_START);
         REQUIRE(tx_count == 0);
         REQUIRE(rx_count == 0);
         threader.start();

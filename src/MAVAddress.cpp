@@ -15,17 +15,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
-#include <string>
-#include <sstream>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <cctype>
 
-#include "util.hpp"
 #include "MAVAddress.hpp"
+#include "util.hpp"
 
 
 /** Construct MAVLink address from an address in numeric representation.
@@ -100,8 +100,8 @@ MAVAddress::MAVAddress(unsigned int system, unsigned int component)
 MAVAddress::MAVAddress(std::string address)
 {
     // Check validity of address string.
-    if (address.size() < 3 || !(isdigit(address.front()))
-            || !isdigit(address.back()))
+    if (address.size() < 3 || !(isdigit(address.front())) ||
+        !isdigit(address.back()))
     {
         throw std::invalid_argument("Invalid MAVLink address string.");
     }
@@ -141,10 +141,7 @@ MAVAddress::MAVAddress(std::string address)
  *      in the MSB and the Component ID in the LSB.
  *  \complexity \f$O(1)\f$
  */
-unsigned int MAVAddress::address() const
-{
-    return address_;
-}
+unsigned int MAVAddress::address() const { return address_; }
 
 
 /** Return the System ID.
@@ -152,10 +149,7 @@ unsigned int MAVAddress::address() const
  *  \return The System ID (0 - 255).
  *  \complexity \f$O(1)\f$
  */
-unsigned int MAVAddress::system() const
-{
-    return (address_ >> 8) & 0x00FF;
-}
+unsigned int MAVAddress::system() const { return (address_ >> 8) & 0x00FF; }
 
 
 /** Return the Component ID.
@@ -163,10 +157,7 @@ unsigned int MAVAddress::system() const
  *  \return The Component ID (0 - 255).
  *  \complexity \f$O(1)\f$
  */
-unsigned int MAVAddress::component() const
-{
-    return address_ & 0x00FF;
-}
+unsigned int MAVAddress::component() const { return address_ & 0x00FF; }
 
 
 /** Equality comparison.

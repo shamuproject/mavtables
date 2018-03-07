@@ -23,9 +23,9 @@
 
 #include <catch.hpp>
 
+#include "PacketVersion2.hpp"
 #include <Packet.hpp>
 #include <PacketQueue.hpp>
-#include "PacketVersion2.hpp"
 
 #include "common_Packet.hpp"
 
@@ -35,10 +35,7 @@ using namespace std::chrono_literals;
 
 TEST_CASE("PacketQueue's can be constructed.", "[AddressPool]")
 {
-    SECTION("Without a push callback.")
-    {
-        REQUIRE_NOTHROW(PacketQueue());
-    }
+    SECTION("Without a push callback.") { REQUIRE_NOTHROW(PacketQueue()); }
     SECTION("With a push callback.")
     {
         PacketQueue pq([]() {});
@@ -61,10 +58,7 @@ TEST_CASE("PacketQueue's 'push' adds a packet to the queue.", "[PacketQueue]")
     {
         auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
         bool called = false;
-        PacketQueue queue([&]()
-        {
-            called = true;
-        });
+        PacketQueue queue([&]() { called = true; });
         REQUIRE_FALSE(called);
         queue.push(ping);
         REQUIRE(called);
@@ -72,8 +66,10 @@ TEST_CASE("PacketQueue's 'push' adds a packet to the queue.", "[PacketQueue]")
 }
 
 
-TEST_CASE("PacketQueue's 'empty' method determines if the queue is empty or "
-          "not.", "[PacketQueue]")
+TEST_CASE(
+    "PacketQueue's 'empty' method determines if the queue is empty or "
+    "not.",
+    "[PacketQueue]")
 {
     auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     PacketQueue queue;
@@ -83,15 +79,14 @@ TEST_CASE("PacketQueue's 'empty' method determines if the queue is empty or "
 }
 
 
-TEST_CASE("PacketQueue's can be managed with 'push' and 'pop' methods.",
-          "[PacketQueue]")
+TEST_CASE(
+    "PacketQueue's can be managed with 'push' and 'pop' methods.",
+    "[PacketQueue]")
 {
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
-    auto ping =
-        std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
-    auto set_mode =
-        std::make_shared<packet_v2::Packet>(to_vector(SetModeV2()));
+    auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    auto set_mode = std::make_shared<packet_v2::Packet>(to_vector(SetModeV2()));
     auto mission_set_current =
         std::make_shared<packet_v2::Packet>(to_vector(MissionSetCurrentV2()));
     auto encapsulated_data =
@@ -165,8 +160,9 @@ TEST_CASE("PacketQueue's can be managed with 'push' and 'pop' methods.",
         REQUIRE(packet != nullptr);
         REQUIRE(*packet == *mission_set_current);
     }
-    SECTION("Maintains order among the same priority as well as "
-            "priority order.")
+    SECTION(
+        "Maintains order among the same priority as well as "
+        "priority order.")
     {
         queue.push(heartbeat);
         queue.push(ping, 2);
@@ -208,10 +204,8 @@ TEST_CASE("PacketQueue's 'pop' method blocks by default.", "[PacketQueue]")
     PacketQueue queue;
     SECTION("And will be released when a packet becomes available.")
     {
-        auto future = std::async(std::launch::async, [&]()
-        {
-            return queue.pop();
-        });
+        auto future =
+            std::async(std::launch::async, [&]() { return queue.pop(); });
         REQUIRE(future.wait_for(0s) != std::future_status::ready);
         queue.push(ping);
         auto result = future.get();
@@ -220,14 +214,10 @@ TEST_CASE("PacketQueue's 'pop' method blocks by default.", "[PacketQueue]")
     }
     SECTION("And will be released when the 'close' method is called.")
     {
-        auto future1 = std::async(std::launch::async, [&]()
-        {
-            return queue.pop();
-        });
-        auto future2 = std::async(std::launch::async, [&]()
-        {
-            return queue.pop();
-        });
+        auto future1 =
+            std::async(std::launch::async, [&]() { return queue.pop(); });
+        auto future2 =
+            std::async(std::launch::async, [&]() { return queue.pop(); });
         REQUIRE(future1.wait_for(0s) != std::future_status::ready);
         REQUIRE(future2.wait_for(0s) != std::future_status::ready);
         queue.close();
@@ -237,17 +227,15 @@ TEST_CASE("PacketQueue's 'pop' method blocks by default.", "[PacketQueue]")
 }
 
 
-TEST_CASE("PacketQueue's 'pop' method optionally has a timeout.",
-          "[PacketQueue]")
+TEST_CASE(
+    "PacketQueue's 'pop' method optionally has a timeout.", "[PacketQueue]")
 {
     auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     PacketQueue queue;
     SECTION("And will be released when a packet becomes available.")
     {
-        auto future = std::async(std::launch::async, [&]()
-        {
-            return queue.pop(10s);
-        });
+        auto future =
+            std::async(std::launch::async, [&]() { return queue.pop(10s); });
         auto status = future.wait_for(0s);
         REQUIRE(status != std::future_status::ready);
         queue.push(ping);
@@ -257,10 +245,8 @@ TEST_CASE("PacketQueue's 'pop' method optionally has a timeout.",
     }
     SECTION("And will be released when the timeout expires.")
     {
-        auto future = std::async(std::launch::async, [&]()
-        {
-            return queue.pop(1ms);
-        });
+        auto future =
+            std::async(std::launch::async, [&]() { return queue.pop(1ms); });
         auto status = future.wait_for(0s);
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
@@ -268,14 +254,10 @@ TEST_CASE("PacketQueue's 'pop' method optionally has a timeout.",
     }
     SECTION("And will be released when the 'close' method is called.")
     {
-        auto future1 = std::async(std::launch::async, [&]()
-        {
-            return queue.pop(10s);
-        });
-        auto future2 = std::async(std::launch::async, [&]()
-        {
-            return queue.pop(10s);
-        });
+        auto future1 =
+            std::async(std::launch::async, [&]() { return queue.pop(10s); });
+        auto future2 =
+            std::async(std::launch::async, [&]() { return queue.pop(10s); });
         REQUIRE(future1.wait_for(0s) != std::future_status::ready);
         REQUIRE(future2.wait_for(0s) != std::future_status::ready);
         queue.close();
@@ -285,8 +267,10 @@ TEST_CASE("PacketQueue's 'pop' method optionally has a timeout.",
 }
 
 
-TEST_CASE("PacketQueue's 'pop' method is non blocking when given a 0 second "
-          "timeout.", "[PacketQueue]")
+TEST_CASE(
+    "PacketQueue's 'pop' method is non blocking when given a 0 second "
+    "timeout.",
+    "[PacketQueue]")
 {
     auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     PacketQueue queue;

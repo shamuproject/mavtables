@@ -19,15 +19,15 @@
 #define UNIXSYSCALLS_HPP_
 
 
-#include <fcntl.h>      // open, fnctl
-#include <netinet/in.h> // sockaddr_in
-#include <sys/ioctl.h>  // ioctl
-#include <sys/poll.h>   // poll
-#include <sys/socket.h> // socket, bind, sendto, recvfrom
-#include <sys/stat.h>   // fstat
-#include <sys/types.h>  // socklen_t type on old BSD systems
-#include <termios.h>    // terminal control
-#include <unistd.h>     // read, write, close
+#include <fcntl.h>       // open, fnctl
+#include <netinet/in.h>  // sockaddr_in
+#include <sys/ioctl.h>   // ioctl
+#include <sys/poll.h>    // poll
+#include <sys/socket.h>  // socket, bind, sendto, recvfrom
+#include <sys/stat.h>    // fstat
+#include <sys/types.h>   // socklen_t type on old BSD systems
+#include <termios.h>     // terminal control
+#include <unistd.h>      // read, write, close
 
 #include "config.hpp"
 
@@ -53,31 +53,31 @@
  */
 class UnixSyscalls
 {
-    public:
-        TEST_VIRTUAL ~UnixSyscalls() = default;
-        TEST_VIRTUAL int bind(
-            int sockfd, const struct sockaddr *addr, socklen_t addrlen);
-        TEST_VIRTUAL speed_t cfgetispeed(const struct termios *termios_p);
-        TEST_VIRTUAL speed_t cfgetospeed(const struct termios *termios_p);
-        TEST_VIRTUAL int cfsetispeed(struct termios *termios_p, speed_t speed);
-        TEST_VIRTUAL int cfsetospeed(struct termios *termios_p, speed_t speed);
-        TEST_VIRTUAL int close(int fd);
-        TEST_VIRTUAL int ioctl(int fd, unsigned long request, void *argp);
-        TEST_VIRTUAL int open(const char *pathname, int flags);
-        TEST_VIRTUAL int poll(struct pollfd *fds, nfds_t nfds, int timeout);
-        TEST_VIRTUAL ssize_t read(int fd, void *buf, size_t count);
-        TEST_VIRTUAL ssize_t recvfrom(
-            int sockfd, void *buf, size_t len, int flags,
-            struct sockaddr *src_addr, socklen_t *addrlen);
-        TEST_VIRTUAL ssize_t sendto(
-            int sockfd, const void *buf, size_t len, int flags,
-            const struct sockaddr *dest_addr, socklen_t addrlen);
-        TEST_VIRTUAL int socket(int domain, int type, int protocol);
-        TEST_VIRTUAL int tcgetattr(int fd, struct termios *termios_p);
-        TEST_VIRTUAL int tcsetattr(
-            int fd, int optional_actions, const struct termios *termios_p);
-        TEST_VIRTUAL ssize_t write(int fd, const void *buf, size_t count);
+  public:
+    TEST_VIRTUAL ~UnixSyscalls() = default;
+    TEST_VIRTUAL int
+    bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+    TEST_VIRTUAL speed_t cfgetispeed(const struct termios *termios_p);
+    TEST_VIRTUAL speed_t cfgetospeed(const struct termios *termios_p);
+    TEST_VIRTUAL int cfsetispeed(struct termios *termios_p, speed_t speed);
+    TEST_VIRTUAL int cfsetospeed(struct termios *termios_p, speed_t speed);
+    TEST_VIRTUAL int close(int fd);
+    TEST_VIRTUAL int ioctl(int fd, unsigned long request, void *argp);
+    TEST_VIRTUAL int open(const char *pathname, int flags);
+    TEST_VIRTUAL int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+    TEST_VIRTUAL ssize_t read(int fd, void *buf, size_t count);
+    TEST_VIRTUAL ssize_t recvfrom(
+        int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr,
+        socklen_t *addrlen);
+    TEST_VIRTUAL ssize_t sendto(
+        int sockfd, const void *buf, size_t len, int flags,
+        const struct sockaddr *dest_addr, socklen_t addrlen);
+    TEST_VIRTUAL int socket(int domain, int type, int protocol);
+    TEST_VIRTUAL int tcgetattr(int fd, struct termios *termios_p);
+    TEST_VIRTUAL int
+    tcsetattr(int fd, int optional_actions, const struct termios *termios_p);
+    TEST_VIRTUAL ssize_t write(int fd, const void *buf, size_t count);
 };
 
 
-#endif // UNIXSYSCALLS_HPP_
+#endif  // UNIXSYSCALLS_HPP_

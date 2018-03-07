@@ -24,9 +24,9 @@
 
 #include "Action.hpp"
 #include "Chain.hpp"
-#include "config.hpp"
-#include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
+#include "config.hpp"
 
 
 /** The filter used to determin wheather to accept or reject a packet.
@@ -37,40 +37,40 @@
  */
 class Filter
 {
-    public:
-        /** Copy constructor.
-         *
-         *  \param other Filter to copy.
-         */
-        Filter(const Filter &other) = default;
-        /** Move constructor.
-         *
-         *  \param other Filter to move from.
-         */
-        Filter(Filter &&other) = default;
-        Filter(Chain default_chain, bool accept_by_default = false);
-        // LCOV_EXCL_START
-        TEST_VIRTUAL ~Filter() = default;
-        // LCOV_EXCL_STOP
-        TEST_VIRTUAL std::pair<bool, int> will_accept(
-            const Packet &packet, const MAVAddress &address);
-        /** Assignment operator.
-         *
-         * \param other Filter to copy.
-         */
-        Filter &operator=(const Filter &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other Filter to move from.
-         */
-        Filter &operator=(Filter &&other) = default;
+  public:
+    /** Copy constructor.
+     *
+     *  \param other Filter to copy.
+     */
+    Filter(const Filter &other) = default;
+    /** Move constructor.
+     *
+     *  \param other Filter to move from.
+     */
+    Filter(Filter &&other) = default;
+    Filter(Chain default_chain, bool accept_by_default = false);
+    // LCOV_EXCL_START
+    TEST_VIRTUAL ~Filter() = default;
+    // LCOV_EXCL_STOP
+    TEST_VIRTUAL std::pair<bool, int>
+    will_accept(const Packet &packet, const MAVAddress &address);
+    /** Assignment operator.
+     *
+     * \param other Filter to copy.
+     */
+    Filter &operator=(const Filter &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other Filter to move from.
+     */
+    Filter &operator=(Filter &&other) = default;
 
-        friend bool operator==(const Filter &lhs, const Filter &rhs);
-        friend bool operator!=(const Filter &lhs, const Filter &rhs);
+    friend bool operator==(const Filter &lhs, const Filter &rhs);
+    friend bool operator!=(const Filter &lhs, const Filter &rhs);
 
-    private:
-        Chain default_chain_;
-        bool accept_by_default_;
+  private:
+    Chain default_chain_;
+    bool accept_by_default_;
 };
 
 
@@ -78,4 +78,4 @@ bool operator==(const Filter &lhs, const Filter &rhs);
 bool operator!=(const Filter &lhs, const Filter &rhs);
 
 
-#endif // FILTER_HPP_
+#endif  // FILTER_HPP_

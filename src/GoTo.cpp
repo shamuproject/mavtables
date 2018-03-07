@@ -43,8 +43,7 @@
  *  \throws std::invalid_argument if the given pointer is nullptr.
  *  \sa action
  */
-GoTo::GoTo(
-    std::shared_ptr<Chain> chain, std::optional<If> condition)
+GoTo::GoTo(std::shared_ptr<Chain> chain, std::optional<If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain))
 {
     if (chain_ == nullptr)
@@ -70,8 +69,7 @@ GoTo::GoTo(
  *  \throws std::invalid_argument if the given pointer is nullptr.
  */
 GoTo::GoTo(
-    std::shared_ptr<Chain> chain, int priority,
-    std::optional<If> condition)
+    std::shared_ptr<Chain> chain, int priority, std::optional<If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain)), priority_(priority)
 {
     if (chain_ == nullptr)
@@ -114,8 +112,7 @@ std::ostream &GoTo::print_(std::ostream &os) const
  *  GoTo rule matches, no further rule in the chain should ever be ran,
  *  regardless of the contained chain.
  */
-Action GoTo::action(
-    const Packet &packet, const MAVAddress &address) const
+Action GoTo::action(const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {

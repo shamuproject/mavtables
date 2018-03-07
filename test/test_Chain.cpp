@@ -15,9 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <catch.hpp>
 
@@ -40,10 +40,7 @@
 
 TEST_CASE("Chain's are constructable.", "[Chain]")
 {
-    SECTION("Without rules.")
-    {
-        REQUIRE_NOTHROW(Chain("test_chain"));
-    }
+    SECTION("Without rules.") { REQUIRE_NOTHROW(Chain("test_chain")); }
     SECTION("With rules.")
     {
         std::vector<std::unique_ptr<Rule>> rules;
@@ -119,8 +116,9 @@ TEST_CASE("Chain's are comparable.", "[Chain]")
 }
 
 
-TEST_CASE("Chain's 'append' method appends a new rule to the filter chain.",
-          "[Chain]")
+TEST_CASE(
+    "Chain's 'append' method appends a new rule to the filter chain.",
+    "[Chain]")
 {
     std::vector<std::unique_ptr<Rule>> rules;
     rules.push_back(std::make_unique<Accept>(If().to("192.168")));
@@ -201,8 +199,10 @@ TEST_CASE("Chain's are assignable (by move semantics).", "[Chain]")
 }
 
 
-TEST_CASE("Chain's 'action' method determines what to do with a packet with "
-          " respect to a destination address.", "[Rule]")
+TEST_CASE(
+    "Chain's 'action' method determines what to do with a packet with "
+    " respect to a destination address.",
+    "[Rule]")
 {
     auto heartbeat = packet_v2::Packet(to_vector(HeartbeatV2()));
     auto ping = packet_v1::Packet(to_vector(PingV1()));
@@ -230,11 +230,9 @@ TEST_CASE("Chain's 'action' method determines what to do with a packet with "
             chain->action(set_mode, MAVAddress("172.0")) ==
             Action::make_accept());
         REQUIRE(
-            chain->action(ping, MAVAddress("172.16")) ==
-            Action::make_accept());
+            chain->action(ping, MAVAddress("172.16")) == Action::make_accept());
         REQUIRE(
-            chain->action(ping, MAVAddress("10.10")) ==
-            Action::make_reject());
+            chain->action(ping, MAVAddress("10.10")) == Action::make_reject());
         REQUIRE(
             chain->action(ping, MAVAddress("172.0")) ==
             Action::make_continue());
@@ -262,11 +260,9 @@ TEST_CASE("Chain's are printable.", "[Chain]")
         std::make_unique<Reject>(If().type("HEARTBEAT").from("10.10")));
     chain->append(
         std::make_unique<Accept>(-3, If().type("GPS_STATUS").to("172.0/8")));
-    chain->append(
-        std::make_unique<Accept>(
-            If().type("GLOBAL_POSITION_INT").to("172.0/8")));
-    chain->append(
-        std::make_unique<GoTo>(ap_in, 3, If().from("192.168")));
+    chain->append(std::make_unique<Accept>(
+        If().type("GLOBAL_POSITION_INT").to("172.0/8")));
+    chain->append(std::make_unique<GoTo>(ap_in, 3, If().from("192.168")));
     chain->append(std::make_unique<Call>(ap_out, If().to("192.168")));
     chain->append(std::make_unique<Reject>());
     REQUIRE(

@@ -26,8 +26,8 @@
  */
 DNSLookupError::DNSLookupError(std::string url)
 {
-    message_ = "DNSLookupError: Could not find an IP address for \""
-               + url + "\"";
+    message_ =
+        "DNSLookupError: Could not find an IP address for \"" + url + "\"";
 }
 
 
@@ -35,7 +35,4 @@ DNSLookupError::DNSLookupError(std::string url)
  *
  *  \return Error string containing unresolvable hostname.
  */
-const char *DNSLookupError::what() const noexcept
-{
-    return message_.c_str();
-}
+const char *DNSLookupError::what() const noexcept { return message_.c_str(); }

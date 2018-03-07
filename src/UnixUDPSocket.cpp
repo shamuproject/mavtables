@@ -46,8 +46,8 @@
 UnixUDPSocket::UnixUDPSocket(
     unsigned int port, std::optional<IPAddress> address,
     std::unique_ptr<UnixSyscalls> syscalls)
-    : port_(port), address_(std::move(address)),
-      syscalls_(std::move(syscalls)), socket_(-1)
+    : port_(port), address_(std::move(address)), syscalls_(std::move(syscalls)),
+      socket_(-1)
 {
     create_socket_();
 }
@@ -58,10 +58,7 @@ UnixUDPSocket::UnixUDPSocket(
  *  This closes the underlying file descriptor.
  */
 // LCOV_EXCL_START
-UnixUDPSocket::~UnixUDPSocket()
-{
-    syscalls_->close(socket_);
-}
+UnixUDPSocket::~UnixUDPSocket() { syscalls_->close(socket_); }
 // LCOV_EXCL_STOP
 
 
@@ -74,13 +71,12 @@ void UnixUDPSocket::send(
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(static_cast<uint16_t>(address.port()));
-    addr.sin_addr.s_addr =
-        htonl(static_cast<uint32_t>(address.address()));
+    addr.sin_addr.s_addr = htonl(static_cast<uint32_t>(address.address()));
     std::memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
     // Send the packet.
     auto err = syscalls_->sendto(
-                   socket_, data.data(), data.size(), 0,
-                   reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
+        socket_, data.data(), data.size(), 0,
+        reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
 
     if (err < 0)
     {
@@ -93,14 +89,14 @@ void UnixUDPSocket::send(
  *
  *  \note The timeout precision of this implementation is 1 millisecond.
  */
-std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive(
-    const std::chrono::nanoseconds &timeout)
+std::pair<std::vector<uint8_t>, IPAddress>
+UnixUDPSocket::receive(const std::chrono::nanoseconds &timeout)
 {
     std::chrono::milliseconds timeout_ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(timeout);
     struct pollfd fds = {socket_, POLLIN, 0};
-    auto result = syscalls_->poll(
-                      &fds, 1, static_cast<int>(timeout_ms.count()));
+    auto result =
+        syscalls_->poll(&fds, 1, static_cast<int>(timeout_ms.count()));
 
     // Poll error
     if (result < 0)
@@ -158,8 +154,9 @@ void UnixUDPSocket::create_socket_()
 
     std::memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
 
-    if ((syscalls_->bind(socket_, reinterpret_cast<struct sockaddr *>(&addr),
-                         sizeof(addr))) < 0)
+    if ((syscalls_->bind(
+            socket_, reinterpret_cast<struct sockaddr *>(&addr),
+            sizeof(addr))) < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
@@ -189,8 +186,8 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof(addr);
     auto size = syscalls_->recvfrom(
-                    socket_, buffer.data(), buffer.size(), 0,
-                    reinterpret_cast<struct sockaddr *>(&addr), &addrlen);
+        socket_, buffer.data(), buffer.size(), 0,
+        reinterpret_cast<struct sockaddr *>(&addr), &addrlen);
 
     // Handle errors and extract IP address.
     if (size < 0)

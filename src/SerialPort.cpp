@@ -27,9 +27,7 @@
 
 // Placed here to avoid weak-vtables error.
 // LCOV_EXCL_START
-SerialPort::~SerialPort()
-{
-}
+SerialPort::~SerialPort() {}
 // LCOV_EXCL_STOP
 
 

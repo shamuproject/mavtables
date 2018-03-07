@@ -18,19 +18,15 @@
 #include <memory>
 #include <utility>
 
-#include "mavlink.hpp"
+#include "PacketParser.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "PacketParser.hpp"
+#include "mavlink.hpp"
 
 
 /** Construct a \ref PacketParser.
  */
-PacketParser::PacketParser()
-    : state_(WAITING_FOR_START_BYTE)
-{
-    clear();
-}
+PacketParser::PacketParser() : state_(WAITING_FOR_START_BYTE) { clear(); }
 
 
 /** Return the number of bytes parsed on the current packet.
@@ -38,10 +34,7 @@ PacketParser::PacketParser()
  *  \returns The number of bytes parsed on the current packet, 0 if no packet is
  *      currently being parsed.
  */
-size_t PacketParser::bytes_parsed() const
-{
-    return buffer_.size();
-}
+size_t PacketParser::bytes_parsed() const { return buffer_.size(); }
 
 
 /** Reset packet parser so it can parse another packet.
@@ -182,13 +175,13 @@ std::unique_ptr<Packet> PacketParser::waiting_for_packet_(uint8_t byte)
         switch (version_)
         {
             case packet_v1::VERSION:
-                packet = std::make_unique<packet_v1::Packet>(
-                             std::move(buffer_));
+                packet =
+                    std::make_unique<packet_v1::Packet>(std::move(buffer_));
                 break;
 
             case packet_v2::VERSION:
-                packet = std::make_unique<packet_v2::Packet>(
-                             std::move(buffer_));
+                packet =
+                    std::make_unique<packet_v2::Packet>(std::move(buffer_));
                 break;
         }
 

@@ -23,31 +23,25 @@
 
 namespace
 {
-
 #ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
     class TestChain : public Chain
     {
-        public:
-            TestChain()
-                : Chain("test_chain")
-            {
-            }
-            // LCOV_EXCL_START
-            ~TestChain() = default;
-            // LCOV_EXCL_STOP
-            virtual Action action(
-                const Packet &packet, const MAVAddress &address)
-            {
-                (void)packet;
-                (void)address;
-                return Action::make_accept();
-            }
+      public:
+        TestChain() : Chain("test_chain") {}
+        // LCOV_EXCL_START
+        ~TestChain() = default;
+        // LCOV_EXCL_STOP
+        virtual Action action(const Packet &packet, const MAVAddress &address)
+        {
+            (void)packet;
+            (void)address;
+            return Action::make_accept();
+        }
     };
 #ifdef __clang__
-    #pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
-
 }

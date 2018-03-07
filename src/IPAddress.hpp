@@ -19,50 +19,50 @@
 #define IPADDRESS_HPP_
 
 
-#include <string>
+#include "DNSLookupError.hpp"
 #include <ostream>
 #include <stdexcept>
-#include "DNSLookupError.hpp"
+#include <string>
 
 
 /** An IP address with optional port number.
  */
 class IPAddress
 {
-    public:
-        /** Copy constructor.
-         *
-         * \param other IP address to copy.
-         */
-        IPAddress(const IPAddress &other) = default;
-        /** Move constructor.
-         *
-         * \param other IP address to move from.
-         */
-        IPAddress(IPAddress &&other) = default;
-        IPAddress(const IPAddress &other, unsigned int port);
-        IPAddress(unsigned long address, unsigned int port = 0);
-        IPAddress(std::string address);
-        unsigned long address() const;
-        unsigned int port() const;
-        /** Assignment operator.
-         *
-         * \param other IP address to copy.
-         */
-        IPAddress &operator=(const IPAddress &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other IP address to move from.
-         */
-        IPAddress &operator=(IPAddress &&other) = default;
+  public:
+    /** Copy constructor.
+     *
+     * \param other IP address to copy.
+     */
+    IPAddress(const IPAddress &other) = default;
+    /** Move constructor.
+     *
+     * \param other IP address to move from.
+     */
+    IPAddress(IPAddress &&other) = default;
+    IPAddress(const IPAddress &other, unsigned int port);
+    IPAddress(unsigned long address, unsigned int port = 0);
+    IPAddress(std::string address);
+    unsigned long address() const;
+    unsigned int port() const;
+    /** Assignment operator.
+     *
+     * \param other IP address to copy.
+     */
+    IPAddress &operator=(const IPAddress &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other IP address to move from.
+     */
+    IPAddress &operator=(IPAddress &&other) = default;
 
-        friend std::ostream &operator<<(
-            std::ostream &os, const IPAddress &ipaddress);
+    friend std::ostream &
+    operator<<(std::ostream &os, const IPAddress &ipaddress);
 
-    private:
-        unsigned long address_;
-        unsigned int port_;
-        void construct_(unsigned long address, unsigned int port);
+  private:
+    unsigned long address_;
+    unsigned int port_;
+    void construct_(unsigned long address, unsigned int port);
 };
 
 
@@ -78,4 +78,4 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress);
 IPAddress dnslookup(const std::string &url);
 
 
-#endif // IPADDRESS_HPP_
+#endif  // IPADDRESS_HPP_

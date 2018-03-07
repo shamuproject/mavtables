@@ -34,8 +34,10 @@ TEST_CASE("ConnectionPool's can be constructed.", "[ConnectionPool]")
 }
 
 
-TEST_CASE("ConnectionPool's can store at least one connection and send a "
-          "packet over it.", "[ConnectionPool]")
+TEST_CASE(
+    "ConnectionPool's can store at least one connection and send a "
+    "packet over it.",
+    "[ConnectionPool]")
 {
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock;
@@ -44,15 +46,16 @@ TEST_CASE("ConnectionPool's can store at least one connection and send a "
     ConnectionPool pool;
     pool.add(connection);
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-    fakeit::Verify(Method(mock, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Once();
+    fakeit::Verify(
+        Method(mock, send).Matching([&](auto a) { return *a == *packet; }))
+        .Once();
 }
 
 
-TEST_CASE("ConnectionPool's can store more than one connection and send a "
-          "packet over them.", "[ConnectionPool]")
+TEST_CASE(
+    "ConnectionPool's can store more than one connection and send a "
+    "packet over them.",
+    "[ConnectionPool]")
 {
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;
@@ -65,19 +68,18 @@ TEST_CASE("ConnectionPool's can store more than one connection and send a "
     pool.add(connection1);
     pool.add(connection2);
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-    fakeit::Verify(Method(mock1, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Once();
-    fakeit::Verify(Method(mock2, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Once();
+    fakeit::Verify(
+        Method(mock1, send).Matching([&](auto a) { return *a == *packet; }))
+        .Once();
+    fakeit::Verify(
+        Method(mock2, send).Matching([&](auto a) { return *a == *packet; }))
+        .Once();
 }
 
 
-TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
-          "[ConnectionPool]")
+TEST_CASE(
+    "ConnectionPool's 'remove' method removes a connection.",
+    "[ConnectionPool]")
 {
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;
@@ -92,19 +94,18 @@ TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     pool.remove(connection1);
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-    fakeit::Verify(Method(mock1, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Once();
-    fakeit::Verify(Method(mock2, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Exactly(2);
+    fakeit::Verify(
+        Method(mock1, send).Matching([&](auto a) { return *a == *packet; }))
+        .Once();
+    fakeit::Verify(
+        Method(mock2, send).Matching([&](auto a) { return *a == *packet; }))
+        .Exactly(2);
 }
 
 
-TEST_CASE("ConnectionPool's 'send' method connections that have expired.",
-          "[ConnectionPool]")
+TEST_CASE(
+    "ConnectionPool's 'send' method connections that have expired.",
+    "[ConnectionPool]")
 {
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;
@@ -119,12 +120,10 @@ TEST_CASE("ConnectionPool's 'send' method connections that have expired.",
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
     connection1.reset();
     pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-    fakeit::Verify(Method(mock1, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Once();
-    fakeit::Verify(Method(mock2, send).Matching([&](auto a)
-    {
-        return *a == *packet;
-    })).Exactly(2);
+    fakeit::Verify(
+        Method(mock1, send).Matching([&](auto a) { return *a == *packet; }))
+        .Once();
+    fakeit::Verify(
+        Method(mock2, send).Matching([&](auto a) { return *a == *packet; }))
+        .Exactly(2);
 }

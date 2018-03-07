@@ -25,46 +25,44 @@
 #include <vector>
 
 #include "Action.hpp"
-#include "config.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include <RecursionGuard.hpp>
 #include "Rule.hpp"
+#include "config.hpp"
+#include <RecursionGuard.hpp>
 
 
 /** A filter chain, containing a list of rules to check packets against.
  */
 class Chain
 {
-    public:
-        Chain(const Chain &other);
-        /** Move constructor.
-         *
-         *  \param other Chain to move from.
-         */
-        Chain(Chain &&other) = default;
-        Chain(std::string name_,
-              std::vector<std::unique_ptr<Rule>> &&rules = {});
-        TEST_VIRTUAL ~Chain() = default;
-        TEST_VIRTUAL Action action(
-            const Packet &packet, const MAVAddress &address);
-        void append(std::unique_ptr<Rule> rule);
-        const std::string &name() const;
-        Chain &operator=(const Chain &other);
-        /** Assignment operator (by move semantics).
-         *
-         * \param other Chain to move from.
-         */
-        Chain &operator=(Chain &&other) = default;
+  public:
+    Chain(const Chain &other);
+    /** Move constructor.
+     *
+     *  \param other Chain to move from.
+     */
+    Chain(Chain &&other) = default;
+    Chain(std::string name_, std::vector<std::unique_ptr<Rule>> &&rules = {});
+    TEST_VIRTUAL ~Chain() = default;
+    TEST_VIRTUAL Action action(const Packet &packet, const MAVAddress &address);
+    void append(std::unique_ptr<Rule> rule);
+    const std::string &name() const;
+    Chain &operator=(const Chain &other);
+    /** Assignment operator (by move semantics).
+     *
+     * \param other Chain to move from.
+     */
+    Chain &operator=(Chain &&other) = default;
 
-        friend bool operator==(const Chain &lhs, const Chain &rhs);
-        friend bool operator!=(const Chain &lhs, const Chain &rhs);
-        friend std::ostream &operator<<(std::ostream &os, const Chain &chain);
+    friend bool operator==(const Chain &lhs, const Chain &rhs);
+    friend bool operator!=(const Chain &lhs, const Chain &rhs);
+    friend std::ostream &operator<<(std::ostream &os, const Chain &chain);
 
-    private:
-        std::string name_;
-        std::vector<std::unique_ptr<Rule>> rules_;
-        RecursionData recursion_data_;
+  private:
+    std::string name_;
+    std::vector<std::unique_ptr<Rule>> rules_;
+    RecursionData recursion_data_;
 };
 
 
@@ -73,4 +71,4 @@ bool operator!=(const Chain &lhs, const Chain &rhs);
 std::ostream &operator<<(std::ostream &os, const Chain &chain);
 
 
-#endif // CHAIN_HPP_
+#endif  // CHAIN_HPP_

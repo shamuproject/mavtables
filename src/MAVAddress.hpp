@@ -19,8 +19,8 @@
 #define MAVADDRESS_HPP_
 
 
-#include <string>
 #include <ostream>
+#include <string>
 
 
 /** A MAVLink address.
@@ -36,37 +36,37 @@
  */
 class MAVAddress
 {
-    public:
-        /** Copy constructor.
-         *
-         * \param other MAVLink address to copy.
-         */
-        MAVAddress(const MAVAddress &other) = default;
-        /** Move constructor.
-         *
-         * \param other MAVLink address to move from.
-         */
-        MAVAddress(MAVAddress &&other) = default;
-        MAVAddress(unsigned int address);
-        MAVAddress(unsigned int system, unsigned int component);
-        MAVAddress(std::string address);
-        unsigned int address() const;
-        unsigned int system() const;
-        unsigned int component() const;
-        /** Assignment operator.
-         *
-         * \param other MAVLink address to copy.
-         */
-        MAVAddress &operator=(const MAVAddress &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other MAVLink address to move from.
-         */
-        MAVAddress &operator=(MAVAddress &&other) = default;
+  public:
+    /** Copy constructor.
+     *
+     * \param other MAVLink address to copy.
+     */
+    MAVAddress(const MAVAddress &other) = default;
+    /** Move constructor.
+     *
+     * \param other MAVLink address to move from.
+     */
+    MAVAddress(MAVAddress &&other) = default;
+    MAVAddress(unsigned int address);
+    MAVAddress(unsigned int system, unsigned int component);
+    MAVAddress(std::string address);
+    unsigned int address() const;
+    unsigned int system() const;
+    unsigned int component() const;
+    /** Assignment operator.
+     *
+     * \param other MAVLink address to copy.
+     */
+    MAVAddress &operator=(const MAVAddress &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other MAVLink address to move from.
+     */
+    MAVAddress &operator=(MAVAddress &&other) = default;
 
-    private:
-        unsigned int address_;
-        void construct_(unsigned int system, unsigned int component);
+  private:
+    unsigned int address_;
+    void construct_(unsigned int system, unsigned int component);
 };
 
 
@@ -79,4 +79,4 @@ bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs);
 std::ostream &operator<<(std::ostream &os, const MAVAddress &mavaddress);
 
 
-#endif // MAVADDRESS_HPP_
+#endif  // MAVADDRESS_HPP_

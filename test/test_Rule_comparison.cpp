@@ -20,10 +20,10 @@
 
 #include "Accept.hpp"
 #include "Call.hpp"
-#include "Rule.hpp"
-#include "Reject.hpp"
-#include "GoTo.hpp"
 #include "Chain.hpp"
+#include "GoTo.hpp"
+#include "Reject.hpp"
+#include "Rule.hpp"
 
 #include "common.hpp"
 

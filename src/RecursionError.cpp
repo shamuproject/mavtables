@@ -35,7 +35,4 @@ RecursionError::RecursionError(std::string message)
  *
  *  \return Error message string.
  */
-const char *RecursionError::what() const noexcept
-{
-    return message_.c_str();
-}
+const char *RecursionError::what() const noexcept { return message_.c_str(); }

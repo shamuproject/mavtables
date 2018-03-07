@@ -32,13 +32,15 @@
 
 TEST_CASE("Accept's are constructable.", "[Accept]")
 {
-    SECTION("Without a condition (match all packet/address combinations) or a "
-            "priority.")
+    SECTION(
+        "Without a condition (match all packet/address combinations) or a "
+        "priority.")
     {
         REQUIRE_NOTHROW(Accept());
     }
-    SECTION("Without a condition (match all packet/address combinations) but "
-            "with a priority.")
+    SECTION(
+        "Without a condition (match all packet/address combinations) but "
+        "with a priority.")
     {
         REQUIRE_NOTHROW(Accept(3));
     }
@@ -90,8 +92,10 @@ TEST_CASE("Accept's are comparable.", "[Accept]")
 }
 
 
-TEST_CASE("Accept's 'action' method determines what to do with a "
-          "packet/address combination.", "[Accept]")
+TEST_CASE(
+    "Accept's 'action' method determines what to do with a "
+    "packet/address combination.",
+    "[Accept]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     SECTION("Returns the accept action if there is no conditional.")
@@ -109,58 +113,54 @@ TEST_CASE("Accept's 'action' method determines what to do with a "
     {
         // Without priority.
         REQUIRE(
-            Accept(If().type("PING")).action(
-                ping, MAVAddress("192.168")) == Action::make_accept());
+            Accept(If().type("PING")).action(ping, MAVAddress("192.168")) ==
+            Action::make_accept());
         REQUIRE(
-            Accept(If().to("192.168")).action(
-                ping, MAVAddress("192.168")) == Action::make_accept());
+            Accept(If().to("192.168")).action(ping, MAVAddress("192.168")) ==
+            Action::make_accept());
         // With priority.
         REQUIRE(
-            Accept(3, If().type("PING")).action(
-                ping, MAVAddress("192.168")) == Action::make_accept(3));
+            Accept(3, If().type("PING")).action(ping, MAVAddress("192.168")) ==
+            Action::make_accept(3));
         REQUIRE(
-            Accept(3, If().to("192.168")).action(
-                ping, MAVAddress("192.168")) == Action::make_accept(3));
+            Accept(3, If().to("192.168")).action(ping, MAVAddress("192.168")) ==
+            Action::make_accept(3));
     }
     SECTION("Returns the continue action if the conditional does not match.")
     {
         // Without priority.
         REQUIRE(
-            Accept(If().type("SET_MODE")).action(
-                ping, MAVAddress("192.168")) == Action::make_continue());
+            Accept(If().type("SET_MODE")).action(ping, MAVAddress("192.168")) ==
+            Action::make_continue());
         REQUIRE(
-            Accept(If().to("172.16")).action(
-                ping, MAVAddress("192.168")) == Action::make_continue());
+            Accept(If().to("172.16")).action(ping, MAVAddress("192.168")) ==
+            Action::make_continue());
         // With priority.
         REQUIRE(
-            Accept(3, If().type("SET_MODE")).action(
-                ping, MAVAddress("192.168")) == Action::make_continue());
+            Accept(3, If().type("SET_MODE"))
+                .action(ping, MAVAddress("192.168")) ==
+            Action::make_continue());
         REQUIRE(
-            Accept(3, If().to("172.16")).action(
-                ping, MAVAddress("192.168")) == Action::make_continue());
+            Accept(3, If().to("172.16")).action(ping, MAVAddress("192.168")) ==
+            Action::make_continue());
     }
 }
 
 
-TEST_CASE("Accept's are printable (without a condition or a priority).",
-          "[Accept]")
+TEST_CASE(
+    "Accept's are printable (without a condition or a priority).", "[Accept]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     Accept accept;
     Rule &rule = accept;
-    SECTION("By direct type.")
-    {
-        REQUIRE(str(accept) == "accept");
-    }
-    SECTION("By polymorphic type.")
-    {
-        REQUIRE(str(rule) == "accept");
-    }
+    SECTION("By direct type.") { REQUIRE(str(accept) == "accept"); }
+    SECTION("By polymorphic type.") { REQUIRE(str(rule) == "accept"); }
 }
 
 
-TEST_CASE("Accept's are printable (without a condition but with a priority).",
-          "[Accept]")
+TEST_CASE(
+    "Accept's are printable (without a condition but with a priority).",
+    "[Accept]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     Accept accept(-3);
@@ -176,8 +176,9 @@ TEST_CASE("Accept's are printable (without a condition but with a priority).",
 }
 
 
-TEST_CASE("Accept's are printable (with a condition but without a priority).",
-          "[Accept]")
+TEST_CASE(
+    "Accept's are printable (with a condition but without a priority).",
+    "[Accept]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     Accept accept(If().type("PING").from("192.168/8").to("172.16/4"));
@@ -193,8 +194,8 @@ TEST_CASE("Accept's are printable (with a condition but without a priority).",
 }
 
 
-TEST_CASE("Accept's are printable (with a condition and a priority).",
-          "[Accept]")
+TEST_CASE(
+    "Accept's are printable (with a condition and a priority).", "[Accept]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     Accept accept(-3, If().type("PING").from("192.168/8").to("172.16/4"));

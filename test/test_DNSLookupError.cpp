@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
 #include <exception>
+#include <string>
 
 #include <catch.hpp>
 
@@ -46,8 +46,8 @@ TEST_CASE("DNSLookupError's can be thrown.", "[DNSLookupError]")
 }
 
 
-TEST_CASE("The 'what' method gives the unresolved hostname.",
-          "[DNSLookupError]")
+TEST_CASE(
+    "The 'what' method gives the unresolved hostname.", "[DNSLookupError]")
 {
     REQUIRE_THROWS_WITH(
         throw_lookup_error("example.com"),

@@ -15,77 +15,100 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include <catch.hpp>
 
-#include "util.hpp"
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
+#include "util.hpp"
 
 
 TEST_CASE("MAVSubnet's are comparable.", "[MAVSubnet]")
 {
     SECTION("with ==")
     {
-        REQUIRE(MAVSubnet(MAVAddress(0x0000), 0x0000) ==
-                MAVSubnet(MAVAddress(0x0000), 0x0000));
-        REQUIRE(MAVSubnet(MAVAddress(0x1234), 0x5678) ==
-                MAVSubnet(MAVAddress(0x1234), 0x5678));
-        REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
-                MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0x0000), 0x0000) ==
-                      MAVSubnet(MAVAddress(0x0001), 0x0000));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0x0000), 0x0000) ==
-                      MAVSubnet(MAVAddress(0x0000), 0x0001));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0x1234), 0x5678) ==
-                      MAVSubnet(MAVAddress(0x1235), 0x5678));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0x1234), 0x5678) ==
-                      MAVSubnet(MAVAddress(0x1234), 0x5679));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
-                      MAVSubnet(MAVAddress(0xFFFE), 0xFFFF));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
-                      MAVSubnet(MAVAddress(0xFFFF), 0xFFFE));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0x0000), 0x0000) ==
+            MAVSubnet(MAVAddress(0x0000), 0x0000));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0x1234), 0x5678) ==
+            MAVSubnet(MAVAddress(0x1234), 0x5678));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0x0000), 0x0000) ==
+            MAVSubnet(MAVAddress(0x0001), 0x0000));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0x0000), 0x0000) ==
+            MAVSubnet(MAVAddress(0x0000), 0x0001));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0x1234), 0x5678) ==
+            MAVSubnet(MAVAddress(0x1235), 0x5678));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0x1234), 0x5678) ==
+            MAVSubnet(MAVAddress(0x1234), 0x5679));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
+            MAVSubnet(MAVAddress(0xFFFE), 0xFFFF));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFE));
     }
     SECTION("with !=")
     {
-        REQUIRE(MAVSubnet(MAVAddress(0x0000), 0x0000) !=
-                MAVSubnet(MAVAddress(0x0001), 0x0000));
-        REQUIRE(MAVSubnet(MAVAddress(0x0000), 0x0000) !=
-                MAVSubnet(MAVAddress(0x0000), 0x0001));
-        REQUIRE(MAVSubnet(MAVAddress(0x1234), 0x5678) !=
-                MAVSubnet(MAVAddress(0x1235), 0x5678));
-        REQUIRE(MAVSubnet(MAVAddress(0x1234), 0x5678) !=
-                MAVSubnet(MAVAddress(0x1234), 0x5679));
-        REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) !=
-                MAVSubnet(MAVAddress(0xFFFE), 0xFFFF));
-        REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) !=
-                MAVSubnet(MAVAddress(0xFFFF), 0xFFFE));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0x0000), 0x0000) !=
-                      MAVSubnet(MAVAddress(0x0000), 0x0000));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0x1234), 0x5678) !=
-                      MAVSubnet(MAVAddress(0x1234), 0x5678));
-        REQUIRE_FALSE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) !=
-                      MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0x0000), 0x0000) !=
+            MAVSubnet(MAVAddress(0x0001), 0x0000));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0x0000), 0x0000) !=
+            MAVSubnet(MAVAddress(0x0000), 0x0001));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0x1234), 0x5678) !=
+            MAVSubnet(MAVAddress(0x1235), 0x5678));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0x1234), 0x5678) !=
+            MAVSubnet(MAVAddress(0x1234), 0x5679));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) !=
+            MAVSubnet(MAVAddress(0xFFFE), 0xFFFF));
+        REQUIRE(
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) !=
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFE));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0x0000), 0x0000) !=
+            MAVSubnet(MAVAddress(0x0000), 0x0000));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0x1234), 0x5678) !=
+            MAVSubnet(MAVAddress(0x1234), 0x5678));
+        REQUIRE_FALSE(
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) !=
+            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
     }
 }
 
 
-TEST_CASE("MAVSubnet's can be constructed from a MAVLink address "
-          "and a numeric mask.", "[MAVSubnet]")
+TEST_CASE(
+    "MAVSubnet's can be constructed from a MAVLink address "
+    "and a numeric mask.",
+    "[MAVSubnet]")
 {
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0x0000) ==
-            MAVSubnet(MAVAddress(0x0000), 0x0000));
-    REQUIRE(MAVSubnet(MAVAddress(0x1234), 0x5678) ==
-            MAVSubnet(MAVAddress(0x1234), 0x5678));
-    REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
-            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x0000), 0x0000) ==
+        MAVSubnet(MAVAddress(0x0000), 0x0000));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x1234), 0x5678) ==
+        MAVSubnet(MAVAddress(0x1234), 0x5678));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0xFFFF), 0xFFFF) ==
+        MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
     SECTION("And ensures the mask is within range (0x0000 - 0xFFFF).")
     {
         REQUIRE_THROWS_AS(
-            MAVSubnet(MAVAddress(0x0000),
-                      static_cast<unsigned int>(0x0000 - 1)),
+            MAVSubnet(
+                MAVAddress(0x0000), static_cast<unsigned int>(0x0000 - 1)),
             std::out_of_range);
         REQUIRE_THROWS_AS(
             MAVSubnet(MAVAddress(0x0000), 0xFFFF + 1), std::out_of_range);
@@ -93,23 +116,32 @@ TEST_CASE("MAVSubnet's can be constructed from a MAVLink address "
 }
 
 
-TEST_CASE("MAVSubnet's can be constructed from a MAVLink address, "
-          "system mask, and component mask.", "[MAVSubnet]")
+TEST_CASE(
+    "MAVSubnet's can be constructed from a MAVLink address, "
+    "system mask, and component mask.",
+    "[MAVSubnet]")
 {
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0, 0) ==
-            MAVSubnet(MAVAddress(0x0000), 0));
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 255, 0) ==
-            MAVSubnet(MAVAddress(0x0000), 0xFF00));
-    REQUIRE(MAVSubnet(MAVAddress(0x0000), 0, 255) ==
-            MAVSubnet(MAVAddress(0x0000), 0x00FF));
-    REQUIRE(MAVSubnet(MAVAddress(0xFFFF), 255, 255) ==
-            MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
-    REQUIRE(MAVSubnet(MAVAddress(0x1234), 64, 128) ==
-            MAVSubnet(MAVAddress(0x1234), 0x4080));
-    REQUIRE(MAVSubnet(MAVAddress(0x1234), 128, 64) ==
-            MAVSubnet(MAVAddress(0x1234), 0x8040));
-    SECTION("And ensures the system and component masks are within range "
-            "(0x00 - 0xFF).")
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x0000), 0, 0) ==
+        MAVSubnet(MAVAddress(0x0000), 0));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x0000), 255, 0) ==
+        MAVSubnet(MAVAddress(0x0000), 0xFF00));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x0000), 0, 255) ==
+        MAVSubnet(MAVAddress(0x0000), 0x00FF));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0xFFFF), 255, 255) ==
+        MAVSubnet(MAVAddress(0xFFFF), 0xFFFF));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x1234), 64, 128) ==
+        MAVSubnet(MAVAddress(0x1234), 0x4080));
+    REQUIRE(
+        MAVSubnet(MAVAddress(0x1234), 128, 64) ==
+        MAVSubnet(MAVAddress(0x1234), 0x8040));
+    SECTION(
+        "And ensures the system and component masks are within range "
+        "(0x00 - 0xFF).")
     {
         auto addr = MAVAddress(0x0000);
         // Errors
@@ -120,9 +152,9 @@ TEST_CASE("MAVSubnet's can be constructed from a MAVLink address, "
             MAVSubnet(addr, 0, static_cast<unsigned int>(-1)),
             std::out_of_range);
         REQUIRE_THROWS_AS(
-            MAVSubnet(addr,
-                      static_cast<unsigned int>(-1),
-                      static_cast<unsigned int>(-1)),
+            MAVSubnet(
+                addr, static_cast<unsigned int>(-1),
+                static_cast<unsigned int>(-1)),
             std::out_of_range);
         REQUIRE_THROWS_AS(MAVSubnet(addr, 256, 255), std::out_of_range);
         REQUIRE_THROWS_AS(MAVSubnet(addr, 255, 256), std::out_of_range);
@@ -359,9 +391,10 @@ TEST_CASE("MAVSubnet's are printable.", "[MAVSubnet]")
 }
 
 
-TEST_CASE("The 'contains' method determines if a MAVLink address "
-          "is in the subnet.",
-          "[MAVSubnet]")
+TEST_CASE(
+    "The 'contains' method determines if a MAVLink address "
+    "is in the subnet.",
+    "[MAVSubnet]")
 {
     REQUIRE(MAVSubnet("0.0:0.0").contains(MAVAddress("0.0")));
     REQUIRE(MAVSubnet("0.0:0.0").contains(MAVAddress("255.255")));

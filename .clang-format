@@ -11,12 +11,12 @@ AlignEscapedNewlines: Right
 AlignOperands: true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false # consider changing to true
-AllowShortCaseLabelsOnASingleLine: false # consider changing to true
-AllowShortFunctionsOnASingleLine: All # major change
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
-AlwaysBreakBeforeMultilineStrings: true # major change
+AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: true
 BinPackArguments: true
 BinPackParameters: true
@@ -39,7 +39,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Allman
 BreakBeforeInheritanceComma: false
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeComma
+BreakConstructorInitializers: BeforeColon
 BreakStringLiterals: true
 ColumnLimit: 80
 CompactNamespaces: false

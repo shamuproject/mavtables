@@ -29,37 +29,37 @@
  */
 class SerialPort
 {
-    public:
-        /** Parity.
-         */
-        enum Parity
-        {
-            NONE,   //!< No parity.
-            ODD,    //!< Odd parity, must have odd number of set bits.
-            EVEN,   //!< Even parity, must have even number of set bits.
-            MARK,   //!< Fill parity bit with 1.
-            SPACE   //!< Fill parity bit with 0.
-        };
-        /** Feature bitflags.
-         */
-        enum Feature
-        {
-            DEFAULT = 0,        //!< No special features.
-            FLOW_CONTROL = 1 << 0 //!< Enable flow control.
-        };
-        virtual ~SerialPort();
-        virtual std::vector<uint8_t> read(
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero());
-        virtual void read(
-            std::back_insert_iterator<std::vector<uint8_t>> it,
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero());
-        virtual void write(const std::vector<uint8_t> &data);
-        virtual void write(
-            std::vector<uint8_t>::const_iterator first,
-            std::vector<uint8_t>::const_iterator last);
+  public:
+    /** Parity.
+     */
+    enum Parity
+    {
+        NONE,  //!< No parity.
+        ODD,   //!< Odd parity, must have odd number of set bits.
+        EVEN,  //!< Even parity, must have even number of set bits.
+        MARK,  //!< Fill parity bit with 1.
+        SPACE  //!< Fill parity bit with 0.
+    };
+    /** Feature bitflags.
+     */
+    enum Feature
+    {
+        DEFAULT = 0,           //!< No special features.
+        FLOW_CONTROL = 1 << 0  //!< Enable flow control.
+    };
+    virtual ~SerialPort();
+    virtual std::vector<uint8_t> read(
+        const std::chrono::nanoseconds &timeout =
+            std::chrono::nanoseconds::zero());
+    virtual void read(
+        std::back_insert_iterator<std::vector<uint8_t>> it,
+        const std::chrono::nanoseconds &timeout =
+            std::chrono::nanoseconds::zero());
+    virtual void write(const std::vector<uint8_t> &data);
+    virtual void write(
+        std::vector<uint8_t>::const_iterator first,
+        std::vector<uint8_t>::const_iterator last);
 };
 
 
-#endif // SERIALPORT_HPP_
+#endif  // SERIALPORT_HPP_

@@ -50,19 +50,19 @@ TEST_CASE("ConnectionFactory's can be constructed.", "[ConnectionFactory]")
 }
 
 
-TEST_CASE("ConnectionFactory's 'get' method returns a new connection.",
-          "[ConnectionFactory]")
+TEST_CASE(
+    "ConnectionFactory's 'get' method returns a new connection.",
+    "[ConnectionFactory]")
 {
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;
-    fakeit::When(Method(mock_filter, will_accept)
-                ).AlwaysDo([](auto & a, auto & b)
-    {
-        (void)a;
-        (void)b;
-        return std::pair<bool, int>(true, 0);
-    });
+    fakeit::When(Method(mock_filter, will_accept))
+        .AlwaysDo([](auto &a, auto &b) {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(true, 0);
+        });
     auto filter = mock_shared(mock_filter);
     REQUIRE(filter != nullptr);
     ConnectionFactory<> connection_factory(filter);
@@ -75,20 +75,20 @@ TEST_CASE("ConnectionFactory's 'get' method returns a new connection.",
 }
 
 
-TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
-          "on any of the connections created by the factory.",
-          "[ConnectionFactory]")
+TEST_CASE(
+    "ConnectionFactory's 'wait_for_packet' method waits for a packet "
+    "on any of the connections created by the factory.",
+    "[ConnectionFactory]")
 {
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;
-    fakeit::When(Method(mock_filter, will_accept)
-                ).AlwaysDo([](auto & a, auto & b)
-    {
-        (void)a;
-        (void)b;
-        return std::pair<bool, int>(true, 0);
-    });
+    fakeit::When(Method(mock_filter, will_accept))
+        .AlwaysDo([](auto &a, auto &b) {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(true, 0);
+        });
     auto filter = mock_shared(mock_filter);
     REQUIRE(filter != nullptr);
     ConnectionFactory<> connection_factory(filter);
@@ -98,8 +98,7 @@ TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
     conn2->add_address(MAVAddress("192.168"));
     SECTION("First connection.")
     {
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return connection_factory.wait_for_packet(10s);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
@@ -109,8 +108,7 @@ TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
     }
     SECTION("Second connection.")
     {
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return connection_factory.wait_for_packet(10s);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
@@ -120,8 +118,7 @@ TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
     }
     SECTION("Returns false on timeout.")
     {
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return connection_factory.wait_for_packet(1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);

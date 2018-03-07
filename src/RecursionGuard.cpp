@@ -18,8 +18,8 @@
 #include <mutex>
 #include <thread>
 
-#include <RecursionError.hpp>
 #include <RecursionData.hpp>
+#include <RecursionError.hpp>
 #include <RecursionGuard.hpp>
 
 
@@ -32,8 +32,7 @@
  *  \throws RecursionError if the given data has already been marked by a
  *      RecursionGuard that is still in scope.
  */
-RecursionGuard::RecursionGuard(RecursionData &data)
-    : data_(data)
+RecursionGuard::RecursionGuard(RecursionData &data) : data_(data)
 {
     std::lock_guard<std::mutex> lock(data_.mutex_);
     std::thread::id id = std::this_thread::get_id();

@@ -37,8 +37,7 @@ SerialInterface::SerialInterface(
     std::unique_ptr<SerialPort> port,
     std::shared_ptr<ConnectionPool> connection_pool,
     std::unique_ptr<Connection> connection)
-    : port_(std::move(port)),
-      connection_pool_(std::move(connection_pool)),
+    : port_(std::move(port)), connection_pool_(std::move(connection_pool)),
       connection_(std::move(connection))
 {
     if (port_ == nullptr)

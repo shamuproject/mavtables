@@ -49,10 +49,7 @@ QueuedPacket::QueuedPacket(
  *
  *  \returns The contained MAVLink packet.
  */
-std::shared_ptr<const Packet> QueuedPacket::packet() const
-{
-    return packet_;
-}
+std::shared_ptr<const Packet> QueuedPacket::packet() const { return packet_; }
 
 
 /** Equality comparison.
@@ -117,7 +114,8 @@ bool operator!=(const QueuedPacket &lhs, const QueuedPacket &rhs)
  */
 bool operator<(const QueuedPacket &lhs, const QueuedPacket &rhs)
 {
-    return (lhs.priority_ < rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
+    return (lhs.priority_ < rhs.priority_) ||
+           (lhs.priority_ == rhs.priority_ &&
             (rhs.ticket_number_ - lhs.ticket_number_ >
              std::numeric_limits<unsigned long long>::max() / 2));
 }
@@ -144,7 +142,8 @@ bool operator<(const QueuedPacket &lhs, const QueuedPacket &rhs)
  */
 bool operator>(const QueuedPacket &lhs, const QueuedPacket &rhs)
 {
-    return (lhs.priority_ > rhs.priority_) || (lhs.priority_ == rhs.priority_ &&
+    return (lhs.priority_ > rhs.priority_) ||
+           (lhs.priority_ == rhs.priority_ &&
             (lhs.ticket_number_ - rhs.ticket_number_ >
              std::numeric_limits<unsigned long long>::max() / 2));
 }

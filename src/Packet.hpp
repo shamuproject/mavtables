@@ -37,68 +37,72 @@
  */
 class Packet
 {
-    public:
-        enum Version {V1 = 0x0100, V2 = 0x0200};
+  public:
+    enum Version
+    {
+        V1 = 0x0100,
+        V2 = 0x0200
+    };
 
-        /** Copy constructor.
-         *
-         *  \param other Packet to copy.
-         */
-        Packet(const Packet &other) = default;
-        /** Move constructor.
-         *
-         *  \param other Packet to move from.
-         */
-        Packet(Packet &&other) = default;
-        Packet(std::vector<uint8_t> data);
-        virtual ~Packet();  // Clang does not like pure virtual destructors.
-        /** Return packet version.
-         *
-         *  \returns Two byte Packet version with major version in MSB and minor
-         *      version in LSB.
-         */
-        virtual Version version() const = 0;
-        /** Return MAVLink message ID.
-         *
-         *  \returns The numeric message ID of the MAVLink packet (0 to 255).
-         */
-        virtual unsigned long id() const = 0;
-        /** Return MAVLink message name.
-         *
-         *  \returns The message name of the MAVLink packet.
-         */
-        virtual std::string name() const = 0;
-        /** Return source address.
-         *
-         *  Where the packet came from.
-         *
-         *  \returns The source MAVLink address of the packet.
-         */
-        virtual MAVAddress source() const = 0;
-        /** Return destination address.
-         *
-         *  Where the packet is sent to.  This is optional because not all
-         *  packets have a destination.   %If a system is specified but not a
-         *  component a component ID of 0 will be used (the broadcast ID).
-         *
-         *  \returns The destination MAVLink address of the packet if not a
-         *      broadcast packet.
-         */
-        virtual std::optional<MAVAddress> dest() const = 0;
-        const std::vector<uint8_t> &data() const;
-        /** Assignment operator.
-         *
-         *  \param other Packet to copy.
-         */
-        Packet &operator=(const Packet &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         *  \param other Packet to move from.
-         */
-        Packet &operator=(Packet &&other) = default;
+    /** Copy constructor.
+     *
+     *  \param other Packet to copy.
+     */
+    Packet(const Packet &other) = default;
+    /** Move constructor.
+     *
+     *  \param other Packet to move from.
+     */
+    Packet(Packet &&other) = default;
+    Packet(std::vector<uint8_t> data);
+    virtual ~Packet();  // Clang does not like pure virtual destructors.
+    /** Return packet version.
+     *
+     *  \returns Two byte Packet version with major version in MSB and minor
+     *      version in LSB.
+     */
+    virtual Version version() const = 0;
+    /** Return MAVLink message ID.
+     *
+     *  \returns The numeric message ID of the MAVLink packet (0 to 255).
+     */
+    virtual unsigned long id() const = 0;
+    /** Return MAVLink message name.
+     *
+     *  \returns The message name of the MAVLink packet.
+     */
+    virtual std::string name() const = 0;
+    /** Return source address.
+     *
+     *  Where the packet came from.
+     *
+     *  \returns The source MAVLink address of the packet.
+     */
+    virtual MAVAddress source() const = 0;
+    /** Return destination address.
+     *
+     *  Where the packet is sent to.  This is optional because not all
+     *  packets have a destination.   %If a system is specified but not a
+     *  component a component ID of 0 will be used (the broadcast ID).
+     *
+     *  \returns The destination MAVLink address of the packet if not a
+     *      broadcast packet.
+     */
+    virtual std::optional<MAVAddress> dest() const = 0;
+    const std::vector<uint8_t> &data() const;
+    /** Assignment operator.
+     *
+     *  \param other Packet to copy.
+     */
+    Packet &operator=(const Packet &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     *  \param other Packet to move from.
+     */
+    Packet &operator=(Packet &&other) = default;
 
-    private:
-        std::vector<uint8_t> data_;
+  private:
+    std::vector<uint8_t> data_;
 };
 
 
@@ -107,4 +111,4 @@ bool operator!=(const Packet &lhs, const Packet &rhs);
 std::ostream &operator<<(std::ostream &os, const Packet &packet);
 
 
-#endif // PACKET_HPP_
+#endif  // PACKET_HPP_

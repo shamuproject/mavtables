@@ -43,8 +43,7 @@
  *  \throws std::invalid_argument if the given pointer is nullptr.
  *  \sa action
  */
-Call::Call(
-    std::shared_ptr<Chain> chain, std::optional<If> condition)
+Call::Call(std::shared_ptr<Chain> chain, std::optional<If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain))
 {
     if (chain_ == nullptr)
@@ -71,8 +70,7 @@ Call::Call(
  *  \sa action
  */
 Call::Call(
-    std::shared_ptr<Chain> chain, int priority,
-    std::optional<If> condition)
+    std::shared_ptr<Chain> chain, int priority, std::optional<If> condition)
     : Rule(std::move(condition)), chain_(std::move(chain)), priority_(priority)
 {
     if (chain_ == nullptr)
@@ -115,8 +113,7 @@ std::ostream &Call::print_(std::ostream &os) const
  *  %If the result from the chain is an accept object and no priority has been
  *  set on it but this \ref Rule has a priority then the priority will be set.
  */
-Action Call::action(
-    const Packet &packet, const MAVAddress &address) const
+Action Call::action(const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {

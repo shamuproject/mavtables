@@ -35,10 +35,10 @@
 
 namespace
 {
-
     // Forward defines of locatl functions.
-    std::unique_ptr<Packet> test_packet_parser(PacketParser &parser,
-            const std::vector<uint8_t> &data, size_t packet_end);
+    std::unique_ptr<Packet> test_packet_parser(
+        PacketParser &parser, const std::vector<uint8_t> &data,
+        size_t packet_end);
     void add_bytes(std::vector<uint8_t> &data, size_t num_bytes);
 
 
@@ -53,8 +53,9 @@ namespace
      *
      *  \returns The packet parsed from the given \p data.
      */
-    std::unique_ptr<Packet> test_packet_parser(PacketParser &parser,
-            const std::vector<uint8_t> &data, size_t packet_end)
+    std::unique_ptr<Packet> test_packet_parser(
+        PacketParser &parser, const std::vector<uint8_t> &data,
+        size_t packet_end)
     {
         std::unique_ptr<Packet> packet;
 
@@ -94,7 +95,6 @@ namespace
             data.push_back(static_cast<uint8_t>(i));
         }
     }
-
 }
 
 
@@ -104,8 +104,8 @@ TEST_CASE("PacketParser's can be constructed.", "[PacketParser]")
 }
 
 
-TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
-          "[PacketParser]")
+TEST_CASE(
+    "PacketParser's can parse packets with 'parse_byte'.", "[PacketParser]")
 {
     PacketParser parser;
     SECTION("Can parse v1.0 packets.")
@@ -127,8 +127,7 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto data = to_vector_with_sig(PingV2());
         add_bytes(data, 3);
         auto packet = test_packet_parser(
-                          parser, data,
-                          sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
+            parser, data, sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
         REQUIRE(*packet == packet_v2::Packet(to_vector_with_sig(PingV2())));
     }
     SECTION("Can parse multiple packets back to back.")
@@ -139,8 +138,7 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto packet1 = test_packet_parser(parser, data1, sizeof(PingV1));
         auto packet2 = test_packet_parser(parser, data2, sizeof(PingV2));
         auto packet3 = test_packet_parser(
-                           parser, data3,
-                           sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH);
+            parser, data3, sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH);
         REQUIRE(*packet1 == packet_v1::Packet(to_vector(PingV1())));
         REQUIRE(*packet2 == packet_v2::Packet(to_vector(PingV2())));
         REQUIRE(*packet3 == packet_v2::Packet(to_vector_with_sig(PingV2())));
@@ -156,8 +154,7 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto packet1 = test_packet_parser(parser, data1, sizeof(PingV1) + 3);
         auto packet2 = test_packet_parser(parser, data2, sizeof(PingV2) + 3);
         auto packet3 = test_packet_parser(
-                           parser, data3,
-                           sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
+            parser, data3, sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
         REQUIRE(*packet1 == packet_v1::Packet(to_vector(PingV1())));
         REQUIRE(*packet2 == packet_v2::Packet(to_vector(PingV2())));
         REQUIRE(*packet3 == packet_v2::Packet(to_vector_with_sig(PingV2())));
@@ -178,8 +175,10 @@ TEST_CASE("PacketParser's can be cleared with 'clear'.", "[PacketParser]")
 }
 
 
-TEST_CASE("PacketParser's keep track of how many bytes they have parsed of "
-          "the current packet.", "[PacketParser]")
+TEST_CASE(
+    "PacketParser's keep track of how many bytes they have parsed of "
+    "the current packet.",
+    "[PacketParser]")
 {
     PacketParser parser;
     REQUIRE(parser.bytes_parsed() == 0);

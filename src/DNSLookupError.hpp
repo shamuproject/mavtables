@@ -19,21 +19,21 @@
 #define DNSLOOKUPERROR_HPP_
 
 
-#include <string>
 #include <exception>
+#include <string>
 
 
 /** Exception type for a failed DNS lookup.
  */
 class DNSLookupError : public std::exception
 {
-    public:
-        DNSLookupError(std::string url);
-        const char *what() const noexcept;
+  public:
+    DNSLookupError(std::string url);
+    const char *what() const noexcept;
 
-    private:
-        std::string message_;
+  private:
+    std::string message_;
 };
 
 
-#endif // DNSLOOKUPERROR_HPP_
+#endif  // DNSLOOKUPERROR_HPP_

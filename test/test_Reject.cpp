@@ -68,8 +68,10 @@ TEST_CASE("Reject's are comparable.", "[Reject]")
 }
 
 
-TEST_CASE("Reject's 'action' method determines what to do with a "
-          "packet/address combination.", "[Reject]")
+TEST_CASE(
+    "Reject's 'action' method determines what to do with a "
+    "packet/address combination.",
+    "[Reject]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     SECTION("Returns the reject action if there is no conditional.")
@@ -104,14 +106,8 @@ TEST_CASE("Reject's are printable (without a condition).", "[Reject]")
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     Reject reject;
     Rule &rule = reject;
-    SECTION("By direct type.")
-    {
-        REQUIRE(str(reject) == "reject");
-    }
-    SECTION("By polymorphic type.")
-    {
-        REQUIRE(str(rule) == "reject");
-    }
+    SECTION("By direct type.") { REQUIRE(str(reject) == "reject"); }
+    SECTION("By polymorphic type.") { REQUIRE(str(rule) == "reject"); }
 }
 
 

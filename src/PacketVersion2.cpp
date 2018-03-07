@@ -23,21 +23,19 @@
 #include <string>
 #include <vector>
 
-#include "mavlink.hpp"
 #include "PacketVersion2.hpp"
+#include "mavlink.hpp"
 
 
 namespace packet_v2
 {
-
     /** \copydoc ::Packet::Packet(std::vector<uint8_t> data)
      *
      *  \throws std::invalid_argument %If packet data does not start with magic
      *      byte (0xFD).
      *  \throws std::length_error %If packet data is not of correct length.
      */
-    Packet::Packet(std::vector<uint8_t> data)
-        : ::Packet(std::move(data))
+    Packet::Packet(std::vector<uint8_t> data) : ::Packet(std::move(data))
     {
         const std::vector<uint8_t> &packet_data = this->data();
 
@@ -54,13 +52,12 @@ namespace packet_v2
             if (START_BYTE != packet_data.front())
             {
                 std::stringstream ss;
-                ss << "Invalid packet starting byte (0x"
-                   << std::uppercase << std::hex
-                   << static_cast<unsigned int>(packet_data.front())
+                ss << "Invalid packet starting byte (0x" << std::uppercase
+                   << std::hex << static_cast<unsigned int>(packet_data.front())
                    << std::nouppercase << "), v2.0 packets should start with 0x"
                    << std::uppercase << std::hex
-                   << static_cast<unsigned int>(START_BYTE)
-                   << std::nouppercase << ".";
+                   << static_cast<unsigned int>(START_BYTE) << std::nouppercase
+                   << ".";
                 throw std::invalid_argument(ss.str());
             }
             // Otherwise the packet is not long enough.
@@ -69,14 +66,13 @@ namespace packet_v2
                 throw std::length_error(
                     "Packet (" + std::to_string(packet_data.size()) +
                     " bytes) is shorter than a v2.0 header (" +
-                    std::to_string(HEADER_LENGTH) +
-                    " bytes).");
+                    std::to_string(HEADER_LENGTH) + " bytes).");
             }
         }
 
         // Verify the message ID.
         if (mavlink_get_message_info_by_id(header(packet_data)->msgid) ==
-                nullptr)
+            nullptr)
         {
             throw std::runtime_error(
                 "Invalid packet ID (#" +
@@ -98,8 +94,8 @@ namespace packet_v2
 
             throw std::length_error(
                 prefix + " is " + std::to_string(packet_data.size()) +
-                " bytes, should be " +
-                std::to_string(expected_length) + " bytes.");
+                " bytes, should be " + std::to_string(expected_length) +
+                " bytes.");
         }
     }
 
@@ -109,20 +105,14 @@ namespace packet_v2
      *  \returns 0x0200 (v2.0) - ::Packet::V2
      *  \complexity \f$O(1)\f$
      */
-    ::Packet::Version Packet::version() const
-    {
-        return ::Packet::V2;
-    }
+    ::Packet::Version Packet::version() const { return ::Packet::V2; }
 
 
     /** \copydoc ::Packet::id()
      *
      *  \complexity \f$O(1)\f$
-    */
-    unsigned long Packet::id() const
-    {
-        return header(data())->msgid;
-    }
+     */
+    unsigned long Packet::id() const { return header(data())->msgid; }
 
 
     /** \copydoc ::Packet::name()
@@ -134,7 +124,7 @@ namespace packet_v2
     std::string Packet::name() const
     {
         if (const mavlink_message_info_t *msg_info =
-                    mavlink_get_message_info_by_id(header(data())->msgid))
+                mavlink_get_message_info_by_id(header(data())->msgid))
         {
             return std::string(msg_info->name);
         }
@@ -144,8 +134,8 @@ namespace packet_v2
         // MAVLink C library has an error in it.
         // LCOV_EXCL_START
         throw std::runtime_error(
-            "Invalid packet ID (#" +
-            std::to_string(header(data())->msgid) + ").");
+            "Invalid packet ID (#" + std::to_string(header(data())->msgid) +
+            ").");
         // LCOV_EXCL_STOP
     }
 
@@ -171,7 +161,7 @@ namespace packet_v2
     std::optional<MAVAddress> Packet::dest() const
     {
         if (const mavlink_msg_entry_t *msg_entry =
-                    mavlink_get_msg_entry(header(data())->msgid))
+                mavlink_get_msg_entry(header(data())->msgid))
         {
             int dest_system = -1;
             int dest_component = 0;
@@ -217,8 +207,9 @@ namespace packet_v2
             // Construct MAVLink address.
             if (dest_system >= 0 && dest_component >= 0)
             {
-                return MAVAddress(static_cast<unsigned int>(dest_system),
-                                  static_cast<unsigned int>(dest_component));
+                return MAVAddress(
+                    static_cast<unsigned int>(dest_system),
+                    static_cast<unsigned int>(dest_component));
             }
 
             // No destination address.
@@ -230,8 +221,8 @@ namespace packet_v2
         // MAVLink C library has an error in it.
         // LCOV_EXCL_START
         throw std::runtime_error(
-            "Invalid packet ID (#" +
-            std::to_string(header(data())->msgid) + ").");
+            "Invalid packet ID (#" + std::to_string(header(data())->msgid) +
+            ").");
         // LCOV_EXCL_STOP
     }
 
@@ -264,8 +255,7 @@ namespace packet_v2
      */
     bool header_complete(const std::vector<uint8_t> &data)
     {
-        return (data.size() >= HEADER_LENGTH) &&
-               (START_BYTE == data.front());
+        return (data.size() >= HEADER_LENGTH) && (START_BYTE == data.front());
     }
 
 
@@ -301,16 +291,14 @@ namespace packet_v2
      *  \return A pointer to the given data, cast to a v2.0 header structure.
      *      %If an incomplete header is given a nullptr will be returned.
      */
-    const struct mavlink::v2_header *header(
-        const std::vector<uint8_t> &data)
+    const struct mavlink::v2_header *header(const std::vector<uint8_t> &data)
     {
         if (header_complete(data))
         {
-            return reinterpret_cast <
-                   const struct mavlink::v2_header * >(&(data[0]));
+            return reinterpret_cast<const struct mavlink::v2_header *>(
+                &(data[0]));
         }
 
         return nullptr;
     }
-
 }

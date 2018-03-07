@@ -15,14 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <set>
-#include <vector>
-#include <memory>
-#include <string>
-#include <sstream>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <memory>
+#include <set>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <cstring>
 #include <netdb.h>
@@ -30,10 +30,10 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "config.hpp"
-#include "util.hpp"
 #include "DNSLookupError.hpp"
 #include "IPAddress.hpp"
+#include "config.hpp"
+#include "util.hpp"
 
 
 // Private functions.
@@ -52,8 +52,8 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
     if (address > 0xFFFFFFFF)
     {
         std::stringstream ss;
-        ss << "Address (0x"
-           << std::uppercase << std::hex << address << std::nouppercase
+        ss << "Address (0x" << std::uppercase << std::hex << address
+           << std::nouppercase
            << ") is outside of the allowed range (0x00000000 - 0xFFFFFFFF).";
         throw std::out_of_range(ss.str());
     }
@@ -120,10 +120,7 @@ IPAddress::IPAddress(std::string address)
     // Separate port from address.
     unsigned int port = 0;
     std::vector<std::string> parts;
-    boost::split(parts, address, [](char c)
-    {
-        return c == ':';
-    });
+    boost::split(parts, address, [](char c) { return c == ':'; });
 
     // Read port.
     if (parts.size() == 2)
@@ -140,8 +137,8 @@ IPAddress::IPAddress(std::string address)
     address = parts.back();
 
     // Check validity of address string.
-    if (address.size() < 7 || !(isdigit(address.front()))
-            || !isdigit(address.back()))
+    if (address.size() < 7 || !(isdigit(address.front())) ||
+        !isdigit(address.back()))
     {
         throw std::invalid_argument("Invalid IP address string.");
     }
@@ -183,8 +180,10 @@ IPAddress::IPAddress(std::string address)
     {
     }
 
-    construct_((octets[0] << 8 * 3) | (octets[1] << 8 * 2) |
-               (octets[2] << 8) | octets[3], port);
+    construct_(
+        (octets[0] << 8 * 3) | (octets[1] << 8 * 2) | (octets[2] << 8) |
+            octets[3],
+        port);
 }
 
 
@@ -194,10 +193,7 @@ IPAddress::IPAddress(std::string address)
  *      (0x00000000 - 0xFFFFFFFF).
  *  \complexity \f$O(1)\f$
  */
-unsigned long IPAddress::address() const
-{
-    return address_;
-}
+unsigned long IPAddress::address() const { return address_; }
 
 
 /** Return the port.
@@ -205,10 +201,7 @@ unsigned long IPAddress::address() const
  *  \return The port number (0 - 65535).
  *  \complexity \f$O(1)\f$
  */
-unsigned int IPAddress::port() const
-{
-    return port_;
-}
+unsigned int IPAddress::port() const { return port_; }
 
 
 /** Equality comparison.
@@ -254,8 +247,8 @@ bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
  */
 bool operator<(const IPAddress &lhs, const IPAddress &rhs)
 {
-    return (lhs.address() < rhs.address()) || ((lhs.address() == rhs.address())
-            && (lhs.port() < rhs.port()));
+    return (lhs.address() < rhs.address()) ||
+           ((lhs.address() == rhs.address()) && (lhs.port() < rhs.port()));
 }
 
 
@@ -272,8 +265,8 @@ bool operator<(const IPAddress &lhs, const IPAddress &rhs)
  */
 bool operator>(const IPAddress &lhs, const IPAddress &rhs)
 {
-    return (lhs.address() > rhs.address()) || ((lhs.address() == rhs.address())
-            && (lhs.port() > rhs.port()));
+    return (lhs.address() > rhs.address()) ||
+           ((lhs.address() == rhs.address()) && (lhs.port() > rhs.port()));
 }
 
 
@@ -354,11 +347,11 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
  */
 IPAddress dnslookup(const std::string &url)
 {
-    #ifdef UNIX
+#ifdef UNIX
     return unix_dnslookup(url, 0);
-    #elif WINDOWS
+#elif WINDOWS
     return win32_dnslookup(url, 0);
-    #endif
+#endif
 }
 
 
@@ -366,7 +359,6 @@ IPAddress dnslookup(const std::string &url)
 
 namespace
 {
-
     /* Lookup an IP address based on a hostname.
      *
      * This version is unix only and will be called by \ref dnslookup on UNIX
@@ -378,7 +370,7 @@ namespace
         // Setup hints.
         struct addrinfo hints;
         std::memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_INET; // IPv4 only (for now)
+        hints.ai_family = AF_INET;  // IPv4 only (for now)
         hints.ai_protocol = static_cast<int>(port);
         // Get IP addresses.
         struct addrinfo *result_ptr = nullptr;
@@ -388,15 +380,15 @@ namespace
             throw DNSLookupError(url);
         }
 
-        std::unique_ptr<struct addrinfo, void(*)(struct addrinfo *)>
-        result(result_ptr, freeaddrinfo);
+        std::unique_ptr<struct addrinfo, void (*)(struct addrinfo *)> result(
+            result_ptr, freeaddrinfo);
         result_ptr = nullptr;
 
         for (result_ptr = result.get(); result_ptr != nullptr;
-                result_ptr = result_ptr->ai_next)
+             result_ptr = result_ptr->ai_next)
         {
             struct sockaddr_in *address_ptr =
-                    reinterpret_cast<struct sockaddr_in *>(result_ptr->ai_addr);
+                reinterpret_cast<struct sockaddr_in *>(result_ptr->ai_addr);
             unsigned long address = ntohl(address_ptr->sin_addr.s_addr);
             addresses.insert(IPAddress(address, port));
         }
@@ -411,7 +403,6 @@ namespace
 
         return *(addresses.begin());
     }
-
 }
 
 #elif WINDOWS

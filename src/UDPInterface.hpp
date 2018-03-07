@@ -26,37 +26,37 @@
 #include "Connection.hpp"
 #include "ConnectionFactory.hpp"
 #include "ConnectionPool.hpp"
-#include "Interface.hpp"
 #include "IPAddress.hpp"
+#include "Interface.hpp"
 #include "PacketParser.hpp"
 #include "UDPSocket.hpp"
 
 
 class UDPInterface : public Interface
 {
-    public:
-        UDPInterface(
-            std::unique_ptr<UDPSocket> socket,
-            std::shared_ptr<ConnectionPool> connection_pool,
-            std::unique_ptr<ConnectionFactory<>> connection_factory);
-        // LCOV_EXCL_START
-        ~UDPInterface() = default;
-        // LCOV_EXCL_STOP
-        void send_packet(const std::chrono::nanoseconds &timeout) final;
-        void receive_packet(const std::chrono::nanoseconds &timeout) final;
+  public:
+    UDPInterface(
+        std::unique_ptr<UDPSocket> socket,
+        std::shared_ptr<ConnectionPool> connection_pool,
+        std::unique_ptr<ConnectionFactory<>> connection_factory);
+    // LCOV_EXCL_START
+    ~UDPInterface() = default;
+    // LCOV_EXCL_STOP
+    void send_packet(const std::chrono::nanoseconds &timeout) final;
+    void receive_packet(const std::chrono::nanoseconds &timeout) final;
 
-    private:
-        // Variables.
-        std::unique_ptr<UDPSocket> socket_;
-        std::shared_ptr<ConnectionPool> connection_pool_;
-        std::unique_ptr<ConnectionFactory<>> connection_factory_;
-        IPAddress last_ip_address_;
-        std::map<IPAddress, std::shared_ptr<Connection>> connections_;
-        PacketParser parser_;
-        // Methods
-        void update_connections_(
-            const MAVAddress &mav_address, const IPAddress &ip_address);
+  private:
+    // Variables.
+    std::unique_ptr<UDPSocket> socket_;
+    std::shared_ptr<ConnectionPool> connection_pool_;
+    std::unique_ptr<ConnectionFactory<>> connection_factory_;
+    IPAddress last_ip_address_;
+    std::map<IPAddress, std::shared_ptr<Connection>> connections_;
+    PacketParser parser_;
+    // Methods
+    void update_connections_(
+        const MAVAddress &mav_address, const IPAddress &ip_address);
 };
 
 
-#endif // UDPINTERFACE_HPP_
+#endif  // UDPINTERFACE_HPP_

@@ -15,18 +15,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <iostream>
 #include "config.hpp"
 #include "util.hpp"
+#include <iostream>
 
 
 int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    std::cout << NAME << ": v"
-              << VERSION_MAJOR << "."
-              << VERSION_MINOR << "."
+    std::cout << NAME << ": v" << VERSION_MAJOR << "." << VERSION_MINOR << "."
               << VERSION_PATCH << std::endl;
     std::cout << "A MAVLink router and firewall." << std::endl;
 }

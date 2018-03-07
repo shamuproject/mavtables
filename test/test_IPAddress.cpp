@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include <catch.hpp>
 
-#include "util.hpp"
 #include "IPAddress.hpp"
+#include "util.hpp"
 
 
 TEST_CASE("IPAddress's store an address and a port number.", "[IPAddress]")
@@ -145,8 +145,8 @@ TEST_CASE("IPAddress's are comparable.", "[IPAddress]")
 }
 
 
-TEST_CASE("IPAddress's can be constructed from an address and port.",
-          "[IPAddress]")
+TEST_CASE(
+    "IPAddress's can be constructed from an address and port.", "[IPAddress]")
 {
     REQUIRE(IPAddress(0x00000000, 0) == IPAddress(0x00000000, 0));
     REQUIRE(IPAddress(0x12345678, 123) == IPAddress(0x12345678, 123));
@@ -220,30 +220,20 @@ TEST_CASE("IPAddress's can be constructed from strings.", "[IPAddress]")
             IPAddress("1.2.+3.4"), "Invalid IP address string.");
         REQUIRE_THROWS_WITH(
             IPAddress("1.2.3.+4"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1."), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.2"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.2."), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.2.3"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.2.3."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.2"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.2."), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.2.3"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.2.3."), "Invalid IP address string.");
         REQUIRE_THROWS_WITH(
             IPAddress("1.2.3.4."), "Invalid IP address string.");
         REQUIRE_THROWS_WITH(
             IPAddress("1.2.3.4.5"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("a.2.3.4"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.b.3.4"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.2.c.4"), "Invalid IP address string.");
-        REQUIRE_THROWS_WITH(
-            IPAddress("1.2.3.d"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("a.2.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.b.3.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.2.c.4"), "Invalid IP address string.");
+        REQUIRE_THROWS_WITH(IPAddress("1.2.3.d"), "Invalid IP address string.");
         REQUIRE_THROWS_WITH(
             IPAddress("192.168.32.128.443"), "Invalid IP address string.");
         REQUIRE_THROWS_WITH(
@@ -292,8 +282,8 @@ TEST_CASE("IPAddress's are copyable.", "[IPAddress]")
 }
 
 
-TEST_CASE("The port of an IP address can be changed during a copy.",
-          "[IPAddress]")
+TEST_CASE(
+    "The port of an IP address can be changed during a copy.", "[IPAddress]")
 {
     IPAddress a(0x00000000, 0);
     IPAddress b(0xFFFFFFFF, 65535);

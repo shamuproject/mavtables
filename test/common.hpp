@@ -26,8 +26,9 @@
  *  \tparam T The type of object being mocked.
  *  \param mock The mock object itself.
  */
-template<typename T>
-std::shared_ptr<T> mock_shared(fakeit::Mock<T> &mock){
+template <typename T>
+std::shared_ptr<T> mock_shared(fakeit::Mock<T> &mock)
+{
     fakeit::Fake(Dtor(mock));
     std::shared_ptr<T> ptr(&mock.get());
     return std::move(ptr);
@@ -39,8 +40,9 @@ std::shared_ptr<T> mock_shared(fakeit::Mock<T> &mock){
  *  \tparam T The type of object being mocked.
  *  \param mock The mock object itself.
  */
-template<typename T>
-std::unique_ptr<T> mock_unique(fakeit::Mock<T> &mock){
+template <typename T>
+std::unique_ptr<T> mock_unique(fakeit::Mock<T> &mock)
+{
     fakeit::Fake(Dtor(mock));
     std::unique_ptr<T> ptr(&mock.get());
     return std::move(ptr);
