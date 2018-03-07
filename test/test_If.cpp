@@ -33,10 +33,7 @@ using namespace fakeit;
 
 TEST_CASE("If's are constructable.", "[If]")
 {
-    SECTION("With the default constructor.")
-    {
-        REQUIRE_NOTHROW(If());
-    }
+    SECTION("With the default constructor.") { REQUIRE_NOTHROW(If()); }
     SECTION("With ID, source subnet, and destination subnet arguments.")
     {
         REQUIRE_NOTHROW(If({}, {}, {}));
@@ -74,8 +71,7 @@ TEST_CASE("If's are comparable.", "[If]")
         REQUIRE(If({}, {}, {}) == If());
         REQUIRE(If(4, {}, {}) == If(4));
         REQUIRE(
-            If({}, MAVSubnet("192.0/8"), {}) ==
-            If({}, MAVSubnet("192.0/8")));
+            If({}, MAVSubnet("192.0/8"), {}) == If({}, MAVSubnet("192.0/8")));
         REQUIRE(
             If({}, {}, MAVSubnet("192.0/8")) ==
             If({}, {}, MAVSubnet("192.0/8")));
@@ -88,8 +84,7 @@ TEST_CASE("If's are comparable.", "[If]")
         REQUIRE_FALSE(If(0, {}, {}) == If());
         REQUIRE_FALSE(If(4, {}, {}) == If(0));
         REQUIRE_FALSE(
-            If({}, MAVSubnet("192.0/8"), {}) ==
-            If({}, MAVSubnet("192.0/7")));
+            If({}, MAVSubnet("192.0/8"), {}) == If({}, MAVSubnet("192.0/7")));
         REQUIRE_FALSE(
             If({}, {}, MAVSubnet("191.0/8")) ==
             If({}, {}, MAVSubnet("192.0/8")));
@@ -106,8 +101,7 @@ TEST_CASE("If's are comparable.", "[If]")
         REQUIRE(If(0, {}, {}) != If());
         REQUIRE(If(4, {}, {}) != If(0));
         REQUIRE(
-            If({}, MAVSubnet("192.0/8"), {}) !=
-            If({}, MAVSubnet("192.0/7")));
+            If({}, MAVSubnet("192.0/8"), {}) != If({}, MAVSubnet("192.0/7")));
         REQUIRE(
             If({}, {}, MAVSubnet("191.0/8")) !=
             If({}, {}, MAVSubnet("192.0/8")));
@@ -121,8 +115,7 @@ TEST_CASE("If's are comparable.", "[If]")
         REQUIRE_FALSE(If({}, {}, {}) != If());
         REQUIRE_FALSE(If(4, {}, {}) != If(4));
         REQUIRE_FALSE(
-            If({}, MAVSubnet("192.0/8"), {}) !=
-            If({}, MAVSubnet("192.0/8")));
+            If({}, MAVSubnet("192.0/8"), {}) != If({}, MAVSubnet("192.0/8")));
         REQUIRE_FALSE(
             If({}, {}, MAVSubnet("192.0/8")) !=
             If({}, {}, MAVSubnet("192.0/8")));
@@ -172,8 +165,10 @@ TEST_CASE("If's are assignable (by move semantics.)", "[If]")
 }
 
 
-TEST_CASE("If's 'check' method determines if a packet and destination"
-          "address matches the conditional.", "[If]")
+TEST_CASE(
+    "If's 'check' method determines if a packet and destination"
+    "address matches the conditional.",
+    "[If]")
 {
     Mock<Packet> mock;
     When(Method(mock, id)).AlwaysReturn(4);
@@ -228,36 +223,27 @@ TEST_CASE("If's 'check' method determines if a packet and destination"
     }
     SECTION("Based on packet ID, source subnet, and destination subnet.")
     {
-        REQUIRE(
-            If(4, MAVSubnet("192.168"), MAVSubnet("172.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(11, MAVSubnet("192.168"), MAVSubnet("172.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(4, MAVSubnet("193.168"), MAVSubnet("172.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(11, MAVSubnet("193.168"), MAVSubnet("172.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(4, MAVSubnet("192.168"), MAVSubnet("171.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(11, MAVSubnet("192.168"), MAVSubnet("171.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(4, MAVSubnet("193.168"), MAVSubnet("171.16")).check(
-                packet, address));
-        REQUIRE_FALSE(
-            If(11, MAVSubnet("193.168"), MAVSubnet("171.16")).check(
-                packet, address));
+        REQUIRE(If(4, MAVSubnet("192.168"), MAVSubnet("172.16"))
+                    .check(packet, address));
+        REQUIRE_FALSE(If(11, MAVSubnet("192.168"), MAVSubnet("172.16"))
+                          .check(packet, address));
+        REQUIRE_FALSE(If(4, MAVSubnet("193.168"), MAVSubnet("172.16"))
+                          .check(packet, address));
+        REQUIRE_FALSE(If(11, MAVSubnet("193.168"), MAVSubnet("172.16"))
+                          .check(packet, address));
+        REQUIRE_FALSE(If(4, MAVSubnet("192.168"), MAVSubnet("171.16"))
+                          .check(packet, address));
+        REQUIRE_FALSE(If(11, MAVSubnet("192.168"), MAVSubnet("171.16"))
+                          .check(packet, address));
+        REQUIRE_FALSE(If(4, MAVSubnet("193.168"), MAVSubnet("171.16"))
+                          .check(packet, address));
+        REQUIRE_FALSE(If(11, MAVSubnet("193.168"), MAVSubnet("171.16"))
+                          .check(packet, address));
     }
 }
 
 
-TEST_CASE("If's 'type' method sets the packet ID for matching.",
-          "[If]")
+TEST_CASE("If's 'type' method sets the packet ID for matching.", "[If]")
 {
     Mock<Packet> mock;
     When(Method(mock, id)).AlwaysReturn(4);
@@ -274,11 +260,9 @@ TEST_CASE("If's 'type' method sets the packet ID for matching.",
     {
         // Note: ID's 255 and 5000 are not currently valid.
         REQUIRE_THROWS_AS(If().type(255), std::invalid_argument);
-        REQUIRE_THROWS_WITH(
-            If().type(255), "Invalid packet ID (#255).");
+        REQUIRE_THROWS_WITH(If().type(255), "Invalid packet ID (#255).");
         REQUIRE_THROWS_AS(If().type(5000), std::invalid_argument);
-        REQUIRE_THROWS_WITH(
-            If().type(5000), "Invalid packet ID (#5000).");
+        REQUIRE_THROWS_WITH(If().type(5000), "Invalid packet ID (#5000).");
     }
     SECTION("When given a packet name.")
     {
@@ -297,8 +281,7 @@ TEST_CASE("If's 'type' method sets the packet ID for matching.",
 }
 
 
-TEST_CASE("If's 'from' method sets the source subnet to match.",
-          "[If]")
+TEST_CASE("If's 'from' method sets the source subnet to match.", "[If]")
 {
     Mock<Packet> mock;
     When(Method(mock, id)).AlwaysReturn(4);
@@ -322,8 +305,7 @@ TEST_CASE("If's 'from' method sets the source subnet to match.",
 }
 
 
-TEST_CASE("If's 'to' method sets the source subnet to match.",
-          "[If]")
+TEST_CASE("If's 'to' method sets the source subnet to match.", "[If]")
 {
     Mock<Packet> mock;
     When(Method(mock, id)).AlwaysReturn(4);
@@ -357,10 +339,8 @@ TEST_CASE("If's are printable.", "[If]")
     REQUIRE(str(If().from("192.0/8")) == "if from 192.0/8");
     REQUIRE(str(If().to("172.16")) == "if to 172.16");
     REQUIRE(str(If().to("172.0/8")) == "if to 172.0/8");
-    REQUIRE(
-        str(If().type("PING").from("192.168")) == "if PING from 192.168");
-    REQUIRE(
-        str(If().type("PING").to("172.16")) == "if PING to 172.16");
+    REQUIRE(str(If().type("PING").from("192.168")) == "if PING from 192.168");
+    REQUIRE(str(If().type("PING").to("172.16")) == "if PING to 172.16");
     REQUIRE(
         str(If().from("192.168").to("172.16")) == "if from 192.168 to 172.16");
     REQUIRE(

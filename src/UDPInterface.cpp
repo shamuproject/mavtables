@@ -22,8 +22,8 @@
 #include "Connection.hpp"
 #include "ConnectionFactory.hpp"
 #include "ConnectionPool.hpp"
-#include "Interface.hpp"
 #include "IPAddress.hpp"
+#include "Interface.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
 
@@ -47,8 +47,8 @@ void UDPInterface::update_connections_(
 
     if (it == connections_.end())
     {
-        it = connections_.insert(
-        {ip_address, connection_factory_->get()}).first;
+        it =
+            connections_.insert({ip_address, connection_factory_->get()}).first;
         connection_pool_->add(it->second);
     }
 
@@ -68,8 +68,7 @@ UDPInterface::UDPInterface(
     std::unique_ptr<UDPSocket> socket,
     std::shared_ptr<ConnectionPool> connection_pool,
     std::unique_ptr<ConnectionFactory<>> connection_factory)
-    : socket_(std::move(socket)),
-      connection_pool_(std::move(connection_pool)),
+    : socket_(std::move(socket)), connection_pool_(std::move(connection_pool)),
       connection_factory_(std::move(connection_factory)),
       last_ip_address_(IPAddress(0))
 {
@@ -132,7 +131,7 @@ void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
  */
 void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
 {
-    auto [buffer, ip_address] = socket_->receive(timeout);
+    auto[buffer, ip_address] = socket_->receive(timeout);
 
     if (!buffer.empty())
     {

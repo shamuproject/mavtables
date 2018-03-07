@@ -102,4 +102,4 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
     return os;
 }
 
-#endif // UTIL_HPP_
+#endif  // UTIL_HPP_

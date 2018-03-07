@@ -21,9 +21,9 @@
 #include <utility>
 
 #include "If.hpp"
-#include "mavlink.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"
+#include "mavlink.hpp"
 
 
 /** Construct an If statement.
@@ -47,8 +47,7 @@
  *  \throws std::invalid_argument if the given \p id is not valid.
  */
 If::If(
-    std::optional<unsigned long> id,
-    std::optional<MAVSubnet> source,
+    std::optional<unsigned long> id, std::optional<MAVSubnet> source,
     std::optional<MAVSubnet> dest)
     : source_(std::move(source)), dest_(std::move(dest))
 {

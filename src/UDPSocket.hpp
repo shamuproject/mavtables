@@ -38,22 +38,21 @@
  */
 class UDPSocket
 {
-    public:
-        virtual ~UDPSocket();
-        virtual void send(
-            const std::vector<uint8_t> &data, const IPAddress &address);
-        virtual void send(
-            std::vector<uint8_t>::const_iterator first,
-            std::vector<uint8_t>::const_iterator last,
-            const IPAddress &address);
-        virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero());
-        virtual IPAddress receive(
-            std::back_insert_iterator<std::vector<uint8_t>> it,
-            const std::chrono::nanoseconds &timeout =
-                std::chrono::nanoseconds::zero());
+  public:
+    virtual ~UDPSocket();
+    virtual void
+    send(const std::vector<uint8_t> &data, const IPAddress &address);
+    virtual void send(
+        std::vector<uint8_t>::const_iterator first,
+        std::vector<uint8_t>::const_iterator last, const IPAddress &address);
+    virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
+        const std::chrono::nanoseconds &timeout =
+            std::chrono::nanoseconds::zero());
+    virtual IPAddress receive(
+        std::back_insert_iterator<std::vector<uint8_t>> it,
+        const std::chrono::nanoseconds &timeout =
+            std::chrono::nanoseconds::zero());
 };
 
 
-#endif // UDPSOCKET_HPP_
+#endif  // UDPSOCKET_HPP_

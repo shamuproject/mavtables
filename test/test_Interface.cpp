@@ -32,46 +32,44 @@
 
 namespace
 {
-
 #ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
     // Subclass of Interface used for testing the abstract class Interface.
     class InterfaceTestClass : public Interface
     {
-        private:
-            std::shared_ptr<ConnectionPool> connection_pool_;
+      private:
+        std::shared_ptr<ConnectionPool> connection_pool_;
 
-        public:
-            InterfaceTestClass(std::shared_ptr<ConnectionPool> connection_pool)
-                : connection_pool_(std::move(connection_pool))
-            {
-            }
-            // LCOV_EXCL_START
-            ~InterfaceTestClass() = default;
-            // LCOV_EXCL_STOP
-            void send_packet(
-                const std::chrono::nanoseconds &timeout =
-                    std::chrono::nanoseconds(100000)) final
-            {
-                (void)timeout;
-            }
-            void receive_packet(
-                const std::chrono::nanoseconds &timeout =
-                    std::chrono::nanoseconds(100000)) final
-            {
-                (void)timeout;
-                connection_pool_->send(
-                    std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-            }
+      public:
+        InterfaceTestClass(std::shared_ptr<ConnectionPool> connection_pool)
+            : connection_pool_(std::move(connection_pool))
+        {
+        }
+        // LCOV_EXCL_START
+        ~InterfaceTestClass() = default;
+        // LCOV_EXCL_STOP
+        void send_packet(
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) final
+        {
+            (void)timeout;
+        }
+        void receive_packet(
+            const std::chrono::nanoseconds &timeout =
+                std::chrono::nanoseconds(100000)) final
+        {
+            (void)timeout;
+            connection_pool_->send(
+                std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
+        }
     };
 
 #ifdef __clang__
-    #pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
-
 }
 
 
@@ -83,8 +81,9 @@ TEST_CASE("Interface's can be constructed.", "[Interface]")
 }
 
 
-TEST_CASE("Interface's 'send_packet' method (included just for coverage)."
-          "[Interface]")
+TEST_CASE(
+    "Interface's 'send_packet' method (included just for coverage)."
+    "[Interface]")
 {
     fakeit::Mock<ConnectionPool> mock_pool;
     std::shared_ptr<ConnectionPool> pool = mock_shared(mock_pool);
@@ -93,16 +92,18 @@ TEST_CASE("Interface's 'send_packet' method (included just for coverage)."
 }
 
 
-TEST_CASE("Interface's 'receive_packet' method sends the packet using the "
-          "contained ConnectionPool.", "[Interface]")
+TEST_CASE(
+    "Interface's 'receive_packet' method sends the packet using the "
+    "contained ConnectionPool.",
+    "[Interface]")
 {
     fakeit::Mock<ConnectionPool> mock_pool;
     fakeit::Fake(Method(mock_pool, send));
     std::shared_ptr<ConnectionPool> pool = mock_shared(mock_pool);
     InterfaceTestClass interface(pool);
     interface.receive_packet();
-    fakeit::Verify(Method(mock_pool, send).Matching([](auto &&a)
-    {
+    fakeit::Verify(Method(mock_pool, send).Matching([](auto &&a) {
         return a != nullptr && *a == packet_v2::Packet(to_vector(PingV2()));
-    })).Once();
+    }))
+        .Once();
 }

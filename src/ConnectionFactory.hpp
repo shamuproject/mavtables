@@ -29,22 +29,20 @@
 
 /** A factory for making related connections that use a common semaphore.
  */
-template <class C = Connection,
-          class AP = AddressPool<>,
-          class PQ = PacketQueue>
+template <
+    class C = Connection, class AP = AddressPool<>, class PQ = PacketQueue>
 class ConnectionFactory
 {
-    public:
-        ConnectionFactory(std::shared_ptr<Filter> filter, bool mirror = false);
-        TEST_VIRTUAL ~ConnectionFactory() = default;
-        TEST_VIRTUAL std::unique_ptr<C> get();
-        TEST_VIRTUAL bool wait_for_packet(
-            const std::chrono::nanoseconds &timeout);
+  public:
+    ConnectionFactory(std::shared_ptr<Filter> filter, bool mirror = false);
+    TEST_VIRTUAL ~ConnectionFactory() = default;
+    TEST_VIRTUAL std::unique_ptr<C> get();
+    TEST_VIRTUAL bool wait_for_packet(const std::chrono::nanoseconds &timeout);
 
-    private:
-        std::shared_ptr<Filter> filter_;
-        bool mirror_;
-        semaphore semaphore_;
+  private:
+    std::shared_ptr<Filter> filter_;
+    bool mirror_;
+    semaphore semaphore_;
 };
 
 
@@ -76,12 +74,8 @@ template <class C, class AP, class PQ>
 std::unique_ptr<C> ConnectionFactory<C, AP, PQ>::get()
 {
     return std::make_unique<C>(
-               filter_, mirror_,
-               std::make_unique<AP>(),
-               std::make_unique<PQ>([this]()
-    {
-        semaphore_.notify();
-    }));
+        filter_, mirror_, std::make_unique<AP>(),
+        std::make_unique<PQ>([this]() { semaphore_.notify(); }));
 }
 
 
@@ -100,4 +94,4 @@ bool ConnectionFactory<C, AP, PQ>::wait_for_packet(
 }
 
 
-#endif // CONNECTIONFACTORY_HPP_
+#endif  // CONNECTIONFACTORY_HPP_

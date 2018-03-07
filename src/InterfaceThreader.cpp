@@ -63,11 +63,9 @@ void InterfaceThreader::rx_runner_()
  *      is called.
  */
 InterfaceThreader::InterfaceThreader(
-    std::shared_ptr<Interface> interface,
-    std::chrono::microseconds timeout,
+    std::shared_ptr<Interface> interface, std::chrono::microseconds timeout,
     Threads start_threads)
-    : interface_(std::move(interface)),
-      timeout_(std::move(timeout)),
+    : interface_(std::move(interface)), timeout_(std::move(timeout)),
       running_(false)
 {
     if (start_threads == InterfaceThreader::START)
@@ -79,10 +77,7 @@ InterfaceThreader::InterfaceThreader(
 
 /** Shutdown the interface and its associated worker threads.
  */
-InterfaceThreader::~InterfaceThreader()
-{
-    shutdown();
-}
+InterfaceThreader::~InterfaceThreader() { shutdown(); }
 
 
 /** Start the worker threads for the interface.

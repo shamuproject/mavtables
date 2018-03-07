@@ -35,24 +35,24 @@
  */
 class semaphore
 {
-    public:
-        semaphore(const semaphore &other) = delete;
-        semaphore(semaphore &&other) = delete;
-        semaphore(size_t initial_value = 0);
-        void notify();
-        void wait();
-        template<class Rep, class Period>
-        bool wait_for(const std::chrono::duration<Rep, Period> &rel_time);
-        template<class Clock, class Duration>
-        bool wait_until(
-            const std::chrono::time_point<Clock, Duration> &timeout_time);
-        semaphore &operator=(const semaphore &other) = delete;
-        semaphore &operator=(semaphore &&other) = delete;
+  public:
+    semaphore(const semaphore &other) = delete;
+    semaphore(semaphore &&other) = delete;
+    semaphore(size_t initial_value = 0);
+    void notify();
+    void wait();
+    template <class Rep, class Period>
+    bool wait_for(const std::chrono::duration<Rep, Period> &rel_time);
+    template <class Clock, class Duration>
+    bool
+    wait_until(const std::chrono::time_point<Clock, Duration> &timeout_time);
+    semaphore &operator=(const semaphore &other) = delete;
+    semaphore &operator=(semaphore &&other) = delete;
 
-    private:
-        size_t value_;
-        std::mutex mutex_;
-        std::condition_variable cv_;
+  private:
+    size_t value_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
 };
 
 
@@ -62,14 +62,11 @@ class semaphore
  *  \retval true The semaphore has been successfully decremented.
  *  \retval false The semaphore timed out.
  */
-template<class Rep, class Period>
+template <class Rep, class Period>
 bool semaphore::wait_for(const std::chrono::duration<Rep, Period> &rel_time)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    bool result = cv_.wait_for(lock, rel_time, [this]()
-    {
-        return value_ > 0;
-    });
+    bool result = cv_.wait_for(lock, rel_time, [this]() { return value_ > 0; });
     --value_;
     return result;
 }
@@ -81,18 +78,16 @@ bool semaphore::wait_for(const std::chrono::duration<Rep, Period> &rel_time)
  *  \retval true The semaphore has been successfully decremented.
  *  \retval false The semaphore timed out.
  */
-template<class Clock, class Duration>
+template <class Clock, class Duration>
 bool semaphore::wait_until(
     const std::chrono::time_point<Clock, Duration> &timeout_time)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    bool result = cv_.wait_until(lock, timeout_time, [this]()
-    {
-        return value_ > 0;
-    });
+    bool result =
+        cv_.wait_until(lock, timeout_time, [this]() { return value_ > 0; });
     --value_;
     return result;
 }
 
 
-#endif // SEMAPHORE_HPP_
+#endif  // SEMAPHORE_HPP_

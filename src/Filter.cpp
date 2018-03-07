@@ -21,8 +21,8 @@
 #include "Action.hpp"
 #include "Chain.hpp"
 #include "Filter.hpp"
-#include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 
 
 /** Construct a new packet filter.
@@ -50,8 +50,8 @@ Filter::Filter(Chain default_chain, bool accept_by_default)
  *      packet.  The second value is only defined if the first value is true
  *      (accept).
  */
-std::pair<bool, int> Filter::will_accept(
-    const Packet &packet, const MAVAddress &address)
+std::pair<bool, int>
+Filter::will_accept(const Packet &packet, const MAVAddress &address)
 {
     Action result = default_chain_.action(packet, address);
 
@@ -73,13 +73,13 @@ std::pair<bool, int> Filter::will_accept(
 
 
 /** Equality comparison.
-*
-*  \relates Filter
-*  \param lhs The left hand side packet filter.
-*  \param rhs The right hand side packet filter.
-*  \retval true if \p lhs is the same as rhs.
-*  \retval false if \p lhs is not the same as rhs.
-*/
+ *
+ *  \relates Filter
+ *  \param lhs The left hand side packet filter.
+ *  \param rhs The right hand side packet filter.
+ *  \retval true if \p lhs is the same as rhs.
+ *  \retval false if \p lhs is not the same as rhs.
+ */
 bool operator==(const Filter &lhs, const Filter &rhs)
 {
     return (lhs.default_chain_ == rhs.default_chain_) &&
@@ -88,13 +88,13 @@ bool operator==(const Filter &lhs, const Filter &rhs)
 
 
 /** Inequality comparison.
-*
-*  \relates Filter
-*  \param lhs The left hand side packet filter.
-*  \param rhs The right hand side packet filter.
-*  \retval true if \p lhs is not the same as rhs.
-*  \retval false if \p lhs is the same as rhs.
-*/
+ *
+ *  \relates Filter
+ *  \param lhs The left hand side packet filter.
+ *  \param rhs The right hand side packet filter.
+ *  \retval true if \p lhs is not the same as rhs.
+ *  \retval false if \p lhs is the same as rhs.
+ */
 bool operator!=(const Filter &lhs, const Filter &rhs)
 {
     return (lhs.default_chain_ != rhs.default_chain_) ||

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <iterator>
@@ -26,16 +27,14 @@
 
 // Placed here to avoid weak-vtables error.
 // LCOV_EXCL_START
-SerialPort::~SerialPort()
-{
-}
+SerialPort::~SerialPort() {}
 // LCOV_EXCL_STOP
 
 
 /** Read data from the serial port.
  *
- *  \param timeout How long to wait for data to arrive on the serial
- *      port.  The default is to not wait.
+ *  \param timeout How long to wait for data to arrive on the serial port.  The
+ *      default is to not wait.
  *  \returns The data read from the serial port.
  */
 std::vector<uint8_t> SerialPort::read(const std::chrono::nanoseconds &timeout)
@@ -46,6 +45,21 @@ std::vector<uint8_t> SerialPort::read(const std::chrono::nanoseconds &timeout)
 }
 
 
+/** Read data from the serial port.
+ *
+ *  \param it A back insert iterator to read bytes into.
+ *  \param timeout How long to wait for data to arrive on the serial port.  The
+ *  default is to not wait.
+ */
+void SerialPort::read(
+    std::back_insert_iterator<std::vector<uint8_t>> it,
+    const std::chrono::nanoseconds &timeout)
+{
+    auto vec = read(timeout);
+    std::copy(vec.begin(), vec.end(), it);
+}
+
+
 /** Write data to the serial port.
  *
  *  \param data The bytes to send.
@@ -53,4 +67,19 @@ std::vector<uint8_t> SerialPort::read(const std::chrono::nanoseconds &timeout)
 void SerialPort::write(const std::vector<uint8_t> &data)
 {
     write(data.begin(), data.end());
+}
+
+
+/** Write data to the serial port.
+ *
+ *  \param first Iterator to first byte in range to send.
+ *  \param last Iterator to one past the last byte to send.
+ */
+void SerialPort::write(
+    std::vector<uint8_t>::const_iterator first,
+    std::vector<uint8_t>::const_iterator last)
+{
+    std::vector<uint8_t> vec;
+    std::copy(first, last, std::back_inserter(vec));
+    write(vec);
 }

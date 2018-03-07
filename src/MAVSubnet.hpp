@@ -19,8 +19,8 @@
 #define MAVSUBNET_HPP_
 
 
-#include <string>
 #include <ostream>
+#include <string>
 
 #include "MAVAddress.hpp"
 
@@ -35,41 +35,42 @@
  */
 class MAVSubnet
 {
-    public:
-        /** Copy constructor.
-         *
-         * \param other MAVLink subnet to copy.
-         */
-        MAVSubnet(const MAVSubnet &other) = default;
-        /** Move constructor.
-         *
-         * \param other MAVLink subnet to move from.
-         */
-        MAVSubnet(MAVSubnet &&other) = default;
-        MAVSubnet(const MAVAddress &address, unsigned int mask = 0xFFFF);
-        MAVSubnet(const MAVAddress &address, unsigned int system_mask,
-                  unsigned int component_mask);
-        MAVSubnet(std::string address);
-        bool contains(const MAVAddress &address) const;
-        /** Assignment operator.
-         *
-         * \param other MAVLink subnet to copy.
-         */
-        MAVSubnet &operator=(const MAVSubnet &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other MAVLink subnet to move from.
-         */
-        MAVSubnet &operator=(MAVSubnet &&other) = default;
+  public:
+    /** Copy constructor.
+     *
+     * \param other MAVLink subnet to copy.
+     */
+    MAVSubnet(const MAVSubnet &other) = default;
+    /** Move constructor.
+     *
+     * \param other MAVLink subnet to move from.
+     */
+    MAVSubnet(MAVSubnet &&other) = default;
+    MAVSubnet(const MAVAddress &address, unsigned int mask = 0xFFFF);
+    MAVSubnet(
+        const MAVAddress &address, unsigned int system_mask,
+        unsigned int component_mask);
+    MAVSubnet(std::string address);
+    bool contains(const MAVAddress &address) const;
+    /** Assignment operator.
+     *
+     * \param other MAVLink subnet to copy.
+     */
+    MAVSubnet &operator=(const MAVSubnet &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other MAVLink subnet to move from.
+     */
+    MAVSubnet &operator=(MAVSubnet &&other) = default;
 
-        friend bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs);
-        friend bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs);
-        friend std::ostream &operator<<(std::ostream &os,
-                                        const MAVSubnet &mavsubnet);
+    friend bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs);
+    friend bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs);
+    friend std::ostream &
+    operator<<(std::ostream &os, const MAVSubnet &mavsubnet);
 
-    private:
-        MAVAddress address_;
-        unsigned int mask_;
+  private:
+    MAVAddress address_;
+    unsigned int mask_;
 };
 
 
@@ -78,4 +79,4 @@ bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs);
 std::ostream &operator<<(std::ostream &os, const MAVSubnet &mavsubnet);
 
 
-#endif // MAVSUBNET_HPP_
+#endif  // MAVSUBNET_HPP_

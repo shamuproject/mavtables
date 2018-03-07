@@ -47,7 +47,7 @@ void Connection::send_to_address_(
     if (pool_->contains(dest))
     {
         // Run packet/address combination through the filter.
-        auto [accept, priority] = filter_->will_accept(*packet, dest);
+        auto[accept, priority] = filter_->will_accept(*packet, dest);
 
         // Add packet to the queue.
         if (accept)
@@ -77,7 +77,7 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     for (const auto &i : pool_->addresses())
     {
         // Filter packet/address combination.
-        auto [accept_, priority_] = filter_->will_accept(*packet, i);
+        auto[accept_, priority_] = filter_->will_accept(*packet, i);
 
         // Update accept/priority.
         if (accept_)
@@ -112,8 +112,7 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
  */
 Connection::Connection(
     std::shared_ptr<Filter> filter, bool mirror,
-    std::unique_ptr<AddressPool<>> pool,
-    std::unique_ptr<PacketQueue> queue)
+    std::unique_ptr<AddressPool<>> pool, std::unique_ptr<PacketQueue> queue)
     : filter_(std::move(filter)), pool_(std::move(pool)),
       queue_(std::move(queue)), mirror_(mirror)
 {
@@ -151,7 +150,6 @@ void Connection::add_address(MAVAddress address)
 }
 
 
-
 /** Get next packet to send.
  *
  *  Blocks until a packet is ready to be sent or the \p timeout expires.
@@ -162,8 +160,8 @@ void Connection::add_address(MAVAddress address)
  *  \returns The next packet to send.  Or nullptr if the call times out waiting
  *      on a packet.
  */
-std::shared_ptr<const Packet> Connection::next_packet(
-    const std::chrono::nanoseconds &timeout)
+std::shared_ptr<const Packet>
+Connection::next_packet(const std::chrono::nanoseconds &timeout)
 {
     return queue_->pop(timeout);
 }

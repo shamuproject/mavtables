@@ -34,48 +34,46 @@
 
 namespace
 {
-
     class RuleTestClass : public Rule
     {
-        protected:
-            virtual std::ostream &print_(std::ostream &os) const
-            {
-                os << "test_rule";
-                return os;
-            }
+      protected:
+        virtual std::ostream &print_(std::ostream &os) const
+        {
+            os << "test_rule";
+            return os;
+        }
 
-        public:
-            virtual std::unique_ptr<Rule> clone() const
+      public:
+        virtual std::unique_ptr<Rule> clone() const
+        {
+            return std::make_unique<RuleTestClass>();
+        }
+        virtual Action
+        action(const Packet &packet, const MAVAddress &address) const
+        {
+            if (packet.name() == "PING")
             {
-                return std::make_unique<RuleTestClass>();
-            }
-            virtual Action action(
-                const Packet &packet, const MAVAddress &address) const
-            {
-                if (packet.name() == "PING")
+                if (MAVSubnet("192.0/14").contains(address))
                 {
-                    if (MAVSubnet("192.0/14").contains(address))
-                    {
-                        return Action::make_accept();
-                    }
-
-                    return Action::make_reject();
+                    return Action::make_accept();
                 }
 
-                return Action::make_continue();
+                return Action::make_reject();
             }
-            virtual bool operator==(const Rule &other) const
-            {
-                (void)other;
-                return true;
-            }
-            virtual bool operator!=(const Rule &other) const
-            {
-                (void)other;
-                return false;
-            }
-    };
 
+            return Action::make_continue();
+        }
+        virtual bool operator==(const Rule &other) const
+        {
+            (void)other;
+            return true;
+        }
+        virtual bool operator!=(const Rule &other) const
+        {
+            (void)other;
+            return false;
+        }
+    };
 }
 
 
@@ -92,8 +90,10 @@ TEST_CASE("Rule's are comparable.", "[Rule]")
 }
 
 
-TEST_CASE("Rule's 'action' method determines what to do with a packet with "
-          "respect to a destination address.", "[Rule]")
+TEST_CASE(
+    "Rule's 'action' method determines what to do with a packet with "
+    "respect to a destination address.",
+    "[Rule]")
 {
     auto ping = packet_v1::Packet(to_vector(PingV1()));
     auto set_mode = packet_v2::Packet(to_vector(SetModeV2()));
@@ -130,10 +130,7 @@ TEST_CASE("Rule's are printable.", "[Rule]")
     auto ping = packet_v2::Packet(to_vector(PingV2()));
     RuleTestClass rule;
     Rule &polymorphic = rule;
-    SECTION("By direct type.")
-    {
-        REQUIRE(str(rule) == "test_rule");
-    }
+    SECTION("By direct type.") { REQUIRE(str(rule) == "test_rule"); }
     SECTION("By polymorphic type.")
     {
         REQUIRE(str(polymorphic) == "test_rule");

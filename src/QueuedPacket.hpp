@@ -34,51 +34,45 @@
  */
 class QueuedPacket
 {
-    public:
-        /** Copy constructor.
-         *
-         *  \param other QueuedPacket to copy.
-         */
-        QueuedPacket(const QueuedPacket &other) = default;
-        /** Move constructor.
-         *
-         *  \param other QueuedPacket to move from.
-         */
-        QueuedPacket(QueuedPacket &&other) = default;
-        QueuedPacket(
-            std::shared_ptr<const Packet> packet, int priority,
-            unsigned long long ticket_number);
-        std::shared_ptr<const Packet> packet() const;
-        /** Assignment operator.
-         *
-         * \param other QueuedPacket to copy.
-         */
-        QueuedPacket &operator=(const QueuedPacket &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other QueuedPacket to move from.
-         */
-        QueuedPacket &operator=(QueuedPacket &&other) = default;
+  public:
+    /** Copy constructor.
+     *
+     *  \param other QueuedPacket to copy.
+     */
+    QueuedPacket(const QueuedPacket &other) = default;
+    /** Move constructor.
+     *
+     *  \param other QueuedPacket to move from.
+     */
+    QueuedPacket(QueuedPacket &&other) = default;
+    QueuedPacket(
+        std::shared_ptr<const Packet> packet, int priority,
+        unsigned long long ticket_number);
+    std::shared_ptr<const Packet> packet() const;
+    /** Assignment operator.
+     *
+     * \param other QueuedPacket to copy.
+     */
+    QueuedPacket &operator=(const QueuedPacket &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other QueuedPacket to move from.
+     */
+    QueuedPacket &operator=(QueuedPacket &&other) = default;
 
-        friend bool operator==(
-            const QueuedPacket &lhs, const QueuedPacket &rhs);
-        friend bool operator!=(
-            const QueuedPacket &lhs, const QueuedPacket &rhs);
-        friend bool operator<(
-            const QueuedPacket &lhs, const QueuedPacket &rhs);
-        friend bool operator>(
-            const QueuedPacket &lhs, const QueuedPacket &rhs);
-        friend bool operator<=(
-            const QueuedPacket &lhs, const QueuedPacket &rhs);
-        friend bool operator>=(
-            const QueuedPacket &lhs, const QueuedPacket &rhs);
-        friend std::ostream &operator<<(
-            std::ostream &os, const QueuedPacket &queued_packet);
+    friend bool operator==(const QueuedPacket &lhs, const QueuedPacket &rhs);
+    friend bool operator!=(const QueuedPacket &lhs, const QueuedPacket &rhs);
+    friend bool operator<(const QueuedPacket &lhs, const QueuedPacket &rhs);
+    friend bool operator>(const QueuedPacket &lhs, const QueuedPacket &rhs);
+    friend bool operator<=(const QueuedPacket &lhs, const QueuedPacket &rhs);
+    friend bool operator>=(const QueuedPacket &lhs, const QueuedPacket &rhs);
+    friend std::ostream &
+    operator<<(std::ostream &os, const QueuedPacket &queued_packet);
 
-    private:
-        std::shared_ptr<const Packet> packet_;
-        int priority_;
-        unsigned long long ticket_number_;
+  private:
+    std::shared_ptr<const Packet> packet_;
+    int priority_;
+    unsigned long long ticket_number_;
 };
 
 bool operator==(const QueuedPacket &lhs, const QueuedPacket &rhs);
@@ -90,4 +84,4 @@ bool operator>=(const QueuedPacket &lhs, const QueuedPacket &rhs);
 std::ostream &operator<<(std::ostream &os, const QueuedPacket &queued_packet);
 
 
-#endif // QUEUEDPACKET_HPP_
+#endif  // QUEUEDPACKET_HPP_

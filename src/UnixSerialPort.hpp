@@ -15,48 +15,49 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef UNIXUDPSOCKET_HPP_
-#define UNIXUDPSOCKET_HPP_
+#ifndef UNIXSERIALPORT_HPP_
+#define UNIXSERIALPORT_HPP_
 
 
 #include <chrono>
-#include <cstdint>
 #include <iterator>
 #include <memory>
-#include <optional>
+#include <string>
 #include <vector>
 
-#include "IPAddress.hpp"
-#include "UDPSocket.hpp"
+#include "SerialPort.hpp"
 #include "UnixSyscalls.hpp"
 
 
-/** A Unix UDP socket, listening on a port/address combination.
+/** A serial port.
  */
-class UnixUDPSocket : public UDPSocket
+class UnixSerialPort : public SerialPort
 {
   public:
-    UnixUDPSocket(
-        unsigned int port, std::optional<IPAddress> address = {},
+    UnixSerialPort(
+        std::string device, unsigned long baud_rate = 9600,
+        SerialPort::Feature features = SerialPort::DEFAULT,
         std::unique_ptr<UnixSyscalls> syscalls =
             std::make_unique<UnixSyscalls>());
-    virtual ~UnixUDPSocket();
-    virtual void
-    send(const std::vector<uint8_t> &data, const IPAddress &address) final;
-    virtual std::pair<std::vector<uint8_t>, IPAddress> receive(
+    virtual ~UnixSerialPort();
+    virtual std::vector<uint8_t> read(
         const std::chrono::nanoseconds &timeout =
             std::chrono::nanoseconds::zero()) final;
+    virtual void write(const std::vector<uint8_t> &data) final;
 
   private:
     // Variables
-    unsigned int port_;
-    std::optional<IPAddress> address_;
+    std::string device_;
+    unsigned long baud_rate_;
+    SerialPort::Feature features_;
     std::unique_ptr<UnixSyscalls> syscalls_;
-    int socket_;
+    int port_;
     // Methods
-    void create_socket_();
-    std::pair<std::vector<uint8_t>, IPAddress> receive_();
+    void configure_port_(unsigned long buad_rate, SerialPort::Feature features);
+    void open_port_();
+    std::vector<uint8_t> read_();
+    speed_t speed_constant_(unsigned long buad_rate);
 };
 
 
-#endif  // UNIXUDPSOCKET_HPP_
+#endif  // UNIXSERIALPORT_HPP_

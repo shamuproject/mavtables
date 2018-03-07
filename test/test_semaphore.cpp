@@ -34,16 +34,15 @@ TEST_CASE("semaphore's can be constructed.", "[semaphore]")
 }
 
 
-TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
-          "decremented.", "[semaphore]")
+TEST_CASE(
+    "semaphore's 'wait' method waits until the semaphore can be "
+    "decremented.",
+    "[semaphore]")
 {
     SECTION("Single wait.")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
-            sp.wait();
-        });
+        auto future = std::async(std::launch::async, [&]() { sp.wait(); });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
@@ -52,8 +51,7 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
     SECTION("Multiple wait.")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             sp.wait();
             sp.wait();
         });
@@ -68,10 +66,7 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
     {
         semaphore sp;
         sp.notify();
-        auto future = std::async(std::launch::async, [&]()
-        {
-            sp.wait();
-        });
+        auto future = std::async(std::launch::async, [&]() { sp.wait(); });
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         future.wait();
     }
@@ -79,8 +74,7 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
     {
         semaphore sp;
         sp.notify();
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             sp.wait();
             sp.wait();
         });
@@ -92,18 +86,14 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
     SECTION("Single wait, with initial value in constructor.")
     {
         semaphore sp(1);
-        auto future = std::async(std::launch::async, [&]()
-        {
-            sp.wait();
-        });
+        auto future = std::async(std::launch::async, [&]() { sp.wait(); });
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         future.wait();
     }
     SECTION("Multiple wait, with initial value in constructor.")
     {
         semaphore sp(2);
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             sp.wait();
             sp.wait();
         });
@@ -113,29 +103,27 @@ TEST_CASE("semaphore's 'wait' method waits until the semaphore can be "
 }
 
 
-TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
-          "decremented, or the timeout is reached (returning false if it "
-          "timed out).", "[semaphore]")
+TEST_CASE(
+    "semaphore's 'wait_for' method waits until the semaphore can be "
+    "decremented, or the timeout is reached (returning false if it "
+    "timed out).",
+    "[semaphore]")
 {
     SECTION("Single wait (no timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
-            return sp.wait_for(20ms);
-        });
+        auto future =
+            std::async(std::launch::async, [&]() { return sp.wait_for(20ms); });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Single wait (timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
-            return sp.wait_for(1ms);
-        });
+        auto future =
+            std::async(std::launch::async, [&]() { return sp.wait_for(1ms); });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
@@ -143,22 +131,20 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
     SECTION("Multiple wait (no timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return sp.wait_for(20ms) && sp.wait_for(20ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Multiple wait (timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return sp.wait_for(1ms) && sp.wait_for(1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
@@ -168,15 +154,16 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
 }
 
 
-TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
-          "decremented, or the timeout timepoint is reached (returning false "
-          "if it timed out).", "[semaphore]")
+TEST_CASE(
+    "semaphore's 'wait_until' method waits until the semaphore can be "
+    "decremented, or the timeout timepoint is reached (returning false "
+    "if it timed out).",
+    "[semaphore]")
 {
     SECTION("Single wait (no timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return sp.wait_until(std::chrono::steady_clock::now() + 20ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
@@ -187,8 +174,7 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
     SECTION("Single wait (timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return sp.wait_until(std::chrono::steady_clock::now() + 1ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
@@ -198,23 +184,21 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
     SECTION("Multiple wait (no timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return sp.wait_until(std::chrono::steady_clock::now() + 20ms) &&
                    sp.wait_until(std::chrono::steady_clock::now() + 20ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Multiple wait (timeout).")
     {
         semaphore sp;
-        auto future = std::async(std::launch::async, [&]()
-        {
+        auto future = std::async(std::launch::async, [&]() {
             return sp.wait_until(std::chrono::steady_clock::now() + 1ms) &&
                    sp.wait_until(std::chrono::steady_clock::now() + 1ms);
         });

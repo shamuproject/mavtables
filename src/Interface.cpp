@@ -24,7 +24,5 @@
 
 // Placed here to avoid weak-vtables error.
 // LCOV_EXCL_START
-Interface::~Interface()
-{
-}
+Interface::~Interface() {}
 // LCOV_EXCL_STOP

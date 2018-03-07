@@ -42,24 +42,24 @@ class Chain;
  */
 class Call : public Rule
 {
-    public:
-        Call(std::shared_ptr<Chain> chain,
-             std::optional<If> condition = {});
-        Call(std::shared_ptr<Chain> chain, int priority,
-             std::optional<If> condition = {});
-        virtual Action action(
-            const Packet &packet, const MAVAddress &address) const;
-        virtual std::unique_ptr<Rule> clone() const;
-        virtual bool operator==(const Rule &other) const;
-        virtual bool operator!=(const Rule &other) const;
+  public:
+    Call(std::shared_ptr<Chain> chain, std::optional<If> condition = {});
+    Call(
+        std::shared_ptr<Chain> chain, int priority,
+        std::optional<If> condition = {});
+    virtual Action
+    action(const Packet &packet, const MAVAddress &address) const;
+    virtual std::unique_ptr<Rule> clone() const;
+    virtual bool operator==(const Rule &other) const;
+    virtual bool operator!=(const Rule &other) const;
 
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
+  protected:
+    virtual std::ostream &print_(std::ostream &os) const;
 
-    private:
-        std::shared_ptr<Chain> chain_;
-        std::optional<int> priority_;
+  private:
+    std::shared_ptr<Chain> chain_;
+    std::optional<int> priority_;
 };
 
 
-#endif // CALL_HPP_
+#endif  // CALL_HPP_

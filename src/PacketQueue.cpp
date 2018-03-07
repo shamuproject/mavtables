@@ -103,10 +103,7 @@ std::shared_ptr<const Packet> PacketQueue::pop()
 {
     std::unique_lock<std::mutex> lock(mutex_);
     // Wait for available packet.
-    cv_.wait(lock, [this]()
-    {
-        return !running_ || !queue_.empty();
-    });
+    cv_.wait(lock, [this]() { return !running_ || !queue_.empty(); });
     // Return the packet if the queue is running and is not empty.
     return get_packet_();
 }
@@ -125,18 +122,16 @@ std::shared_ptr<const Packet> PacketQueue::pop()
  *  \remarks
  *      Threadsafe (locking).
  */
-std::shared_ptr<const Packet> PacketQueue::pop(
-    const std::chrono::nanoseconds &timeout)
+std::shared_ptr<const Packet>
+PacketQueue::pop(const std::chrono::nanoseconds &timeout)
 {
     std::unique_lock<std::mutex> lock(mutex_);
 
     if (timeout > std::chrono::nanoseconds::zero())
     {
         // Wait for available packet (or the queue to be closed).
-        cv_.wait_for(lock, timeout, [this]()
-        {
-            return !running_ || !queue_.empty();
-        });
+        cv_.wait_for(
+            lock, timeout, [this]() { return !running_ || !queue_.empty(); });
     }
 
     // Return the packet if the queue is running and is not empty.

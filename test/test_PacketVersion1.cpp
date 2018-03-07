@@ -23,15 +23,17 @@
 #include <catch.hpp>
 
 #include "MAVAddress.hpp"
-#include "mavlink.hpp"
 #include "PacketVersion1.hpp"
+#include "mavlink.hpp"
 #include "util.hpp"
 
 #include "common_Packet.hpp"
 
 
-TEST_CASE("'packet_v1::header_complete' determines whether the given bytes "
-          "at least represent a complete header.", "[packet_v1]")
+TEST_CASE(
+    "'packet_v1::header_complete' determines whether the given bytes "
+    "at least represent a complete header.",
+    "[packet_v1]")
 {
     auto heartbeat = to_vector(HeartbeatV1());
     auto ping = to_vector(PingV1());
@@ -72,8 +74,10 @@ TEST_CASE("'packet_v1::header_complete' determines whether the given bytes "
 }
 
 
-TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
-          "header data.", "[packet_v1]")
+TEST_CASE(
+    "'packet_v1::header' returns a structure pointer to the given "
+    "header data.",
+    "[packet_v1]")
 {
     auto heartbeat = to_vector(HeartbeatV1());
     auto ping = to_vector(PingV1());
@@ -146,8 +150,10 @@ TEST_CASE("'packet_v1::header' returns a structure pointer to the given "
 }
 
 
-TEST_CASE("'packet_v1::packet_complete' determines whether the given bytes "
-          "represent a complete packet.", "[packet_v1]")
+TEST_CASE(
+    "'packet_v1::packet_complete' determines whether the given bytes "
+    "represent a complete packet.",
+    "[packet_v1]")
 {
     auto heartbeat = to_vector(HeartbeatV1());
     auto ping = to_vector(PingV1());
@@ -231,7 +237,7 @@ TEST_CASE("packet_v1::Packet's can be constructed.", "[packet_v1::Packet]")
     }
     SECTION("And ensures the message ID is valid.")
     {
-        ping.msgid = 255; // ID 255 is not currently valid.
+        ping.msgid = 255;  // ID 255 is not currently valid.
         REQUIRE_THROWS_AS(
             packet_v1::Packet(to_vector(ping)), std::runtime_error);
         REQUIRE_THROWS_WITH(
@@ -242,24 +248,21 @@ TEST_CASE("packet_v1::Packet's can be constructed.", "[packet_v1::Packet]")
         // HEARTBEAT (no target system/component).
         auto heartbeat_data = to_vector(heartbeat);
         heartbeat_data.pop_back();
-        REQUIRE_THROWS_AS(
-            packet_v1::Packet(heartbeat_data), std::length_error);
+        REQUIRE_THROWS_AS(packet_v1::Packet(heartbeat_data), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v1::Packet(heartbeat_data),
             "Packet is 16 bytes, should be 17 bytes.");
         // PING (with target system/component).
         auto ping_data = to_vector(ping);
         ping_data.push_back(0x00);
-        REQUIRE_THROWS_AS(
-            packet_v1::Packet(ping_data), std::length_error);
+        REQUIRE_THROWS_AS(packet_v1::Packet(ping_data), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v1::Packet(ping_data),
             "Packet is 23 bytes, should be 22 bytes.");
         // SET_MODE (target system only, no target component).
         auto set_mode_data = to_vector(set_mode);
         set_mode_data.pop_back();
-        REQUIRE_THROWS_AS(
-            packet_v1::Packet(set_mode_data), std::length_error);
+        REQUIRE_THROWS_AS(packet_v1::Packet(set_mode_data), std::length_error);
         REQUIRE_THROWS_WITH(
             packet_v1::Packet(set_mode_data),
             "Packet is 13 bytes, should be 14 bytes.");
@@ -334,8 +337,9 @@ TEST_CASE("packet_v1::Packet's are assignable (by move semantics).", "[Packet]")
 }
 
 
-TEST_CASE("packet_v1::Packet's contain raw packet data and make it accessible.",
-          "[packet_v1::Packet]")
+TEST_CASE(
+    "packet_v1::Packet's contain raw packet data and make it accessible.",
+    "[packet_v1::Packet]")
 {
     auto heartbeat = to_vector(HeartbeatV1());
     auto ping = to_vector(PingV1());
@@ -402,8 +406,9 @@ TEST_CASE("packet_v1::Packet's have a source address.", "[packet_v1::Packet]")
 }
 
 
-TEST_CASE("packet_v1::Packet's optionally have a destination address.",
-          "[packet_v1::Packet]")
+TEST_CASE(
+    "packet_v1::Packet's optionally have a destination address.",
+    "[packet_v1::Packet]")
 {
     auto heartbeat = to_vector(HeartbeatV1());
     auto ping = to_vector(PingV1());

@@ -24,13 +24,12 @@
 #include <string>
 #include <vector>
 
-#include "mavlink.hpp"
 #include "Packet.hpp"
+#include "mavlink.hpp"
 
 
 namespace packet_v1
 {
-
     /** MAVLink v1.0 start byte (0xFE).
      */
     const uint8_t START_BYTE = MAVLINK_STX_MAVLINK1;
@@ -55,42 +54,40 @@ namespace packet_v1
      */
     class Packet : public ::Packet
     {
-        public:
-            /** Copy constructor.
-             *
-             *  \param other Packet to copy.
-             */
-            Packet(const Packet &other) = default;
-            /** Move constructor.
-             *
-             *  \param other Packet to move from.
-             */
-            Packet(Packet &&other) = default;
-            Packet(std::vector<uint8_t> data);
-            virtual ::Packet::Version version() const;
-            virtual unsigned long id() const;
-            virtual std::string name() const;
-            virtual MAVAddress source() const;
-            virtual std::optional<MAVAddress> dest() const;
-            /** Assignment operator.
-             *
-             *  \param other Packet to copy.
-             */
-            Packet &operator=(const Packet &other) = default;
-            /** Assignment operator (by move semantics).
-             *
-             *  \param other Packet to move from.
-             */
-            Packet &operator=(Packet &&other) = default;
+      public:
+        /** Copy constructor.
+         *
+         *  \param other Packet to copy.
+         */
+        Packet(const Packet &other) = default;
+        /** Move constructor.
+         *
+         *  \param other Packet to move from.
+         */
+        Packet(Packet &&other) = default;
+        Packet(std::vector<uint8_t> data);
+        virtual ::Packet::Version version() const;
+        virtual unsigned long id() const;
+        virtual std::string name() const;
+        virtual MAVAddress source() const;
+        virtual std::optional<MAVAddress> dest() const;
+        /** Assignment operator.
+         *
+         *  \param other Packet to copy.
+         */
+        Packet &operator=(const Packet &other) = default;
+        /** Assignment operator (by move semantics).
+         *
+         *  \param other Packet to move from.
+         */
+        Packet &operator=(Packet &&other) = default;
     };
 
 
     bool header_complete(const std::vector<uint8_t> &data);
     bool packet_complete(const std::vector<uint8_t> &data);
-    const struct mavlink::v1_header *header(
-        const std::vector<uint8_t> &data);
-
+    const struct mavlink::v1_header *header(const std::vector<uint8_t> &data);
 }
 
 
-#endif // PACKETVERSION1_HPP_
+#endif  // PACKETVERSION1_HPP_

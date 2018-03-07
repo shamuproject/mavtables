@@ -39,10 +39,7 @@
  *      combination.
  *  \sa action
  */
-Reject::Reject(std::optional<If> condition)
-    : Rule(std::move(condition))
-{
-}
+Reject::Reject(std::optional<If> condition) : Rule(std::move(condition)) {}
 
 
 /** \copydoc Rule::print_(std::ostream &os) const
@@ -69,8 +66,7 @@ std::ostream &Reject::print_(std::ostream &os) const
  *  combination then it will return the reject object, otherwise it will return
  *  the continue object.
  */
-Action Reject::action(
-    const Packet &packet, const MAVAddress &address) const
+Action Reject::action(const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {

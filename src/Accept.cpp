@@ -39,10 +39,7 @@
  *      combination.
  *  \sa action
  */
-Accept::Accept(std::optional<If> condition)
-    : Rule(std::move(condition))
-{
-}
+Accept::Accept(std::optional<If> condition) : Rule(std::move(condition)) {}
 
 
 /** Construct an accept rule, with a priority.
@@ -94,8 +91,7 @@ std::ostream &Accept::print_(std::ostream &os) const
  *  combination then it will return the accept object (with optional priority),
  *  otherwise it will return the continue object.
  */
-Action Accept::action(
-    const Packet &packet, const MAVAddress &address) const
+Action Accept::action(const Packet &packet, const MAVAddress &address) const
 {
     if (!condition_ || condition_->check(packet, address))
     {

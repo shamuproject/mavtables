@@ -26,39 +26,39 @@
 #include <optional>
 #include <queue>
 
-#include "config.hpp"
 #include "Packet.hpp"
 #include "QueuedPacket.hpp"
+#include "config.hpp"
 
 
 /** A threadsafe priority queue for MAVLink packets.
  */
 class PacketQueue
 {
-    public:
-        PacketQueue(std::optional<std::function<void(void)>> callback = {});
-        // LCOV_EXCL_START
-        TEST_VIRTUAL ~PacketQueue() = default;
-        // LCOV_EXCL_STOP
-        TEST_VIRTUAL void close();
-        TEST_VIRTUAL bool empty();
-        TEST_VIRTUAL std::shared_ptr<const Packet> pop();
-        TEST_VIRTUAL std::shared_ptr<const Packet> pop(
-            const std::chrono::nanoseconds &timeout);
-        TEST_VIRTUAL void push(
-            std::shared_ptr<const Packet> packet, int priority = 0);
+  public:
+    PacketQueue(std::optional<std::function<void(void)>> callback = {});
+    // LCOV_EXCL_START
+    TEST_VIRTUAL ~PacketQueue() = default;
+    // LCOV_EXCL_STOP
+    TEST_VIRTUAL void close();
+    TEST_VIRTUAL bool empty();
+    TEST_VIRTUAL std::shared_ptr<const Packet> pop();
+    TEST_VIRTUAL std::shared_ptr<const Packet>
+    pop(const std::chrono::nanoseconds &timeout);
+    TEST_VIRTUAL void
+    push(std::shared_ptr<const Packet> packet, int priority = 0);
 
-    private:
-        // Variables.
-        std::optional<std::function<void(void)>> callback_;
-        unsigned long long ticket_;
-        bool running_;
-        std::priority_queue<QueuedPacket> queue_;
-        std::mutex mutex_;
-        std::condition_variable cv_;
-        // Methods
-        std::shared_ptr<const Packet> get_packet_();
+  private:
+    // Variables.
+    std::optional<std::function<void(void)>> callback_;
+    unsigned long long ticket_;
+    bool running_;
+    std::priority_queue<QueuedPacket> queue_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    // Methods
+    std::shared_ptr<const Packet> get_packet_();
 };
 
 
-#endif // PACKETQUEUE_HPP_
+#endif  // PACKETQUEUE_HPP_

@@ -27,7 +27,6 @@
 #include "common_Packet.hpp"
 
 
-
 TEST_CASE("QueuedPacket's can be constructed.", "[QueuedPacket]")
 {
     auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
@@ -59,13 +58,11 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
     SECTION("with <")
     {
         // Priority takes precidence.
-        REQUIRE(
-            QueuedPacket(packet, 0, 10) < QueuedPacket(packet, 3, 100));
+        REQUIRE(QueuedPacket(packet, 0, 10) < QueuedPacket(packet, 3, 100));
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 100) < QueuedPacket(packet, 0, 10));
         // Ticket number.
-        REQUIRE(
-            QueuedPacket(packet, 3, 100) < QueuedPacket(packet, 3, 10));
+        REQUIRE(QueuedPacket(packet, 3, 100) < QueuedPacket(packet, 3, 10));
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) < QueuedPacket(packet, 3, 100));
         // Ticket number, with rollover.
@@ -77,8 +74,7 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 0) <
             QueuedPacket(
-                packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2));
+                packet, 3, std::numeric_limits<unsigned long long>::max() / 2));
         // Not equal.
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) < QueuedPacket(packet, 3, 10));
@@ -86,13 +82,11 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
     SECTION("with >")
     {
         // Priority takes precidence.
-        REQUIRE(
-            QueuedPacket(packet, 3, 10) > QueuedPacket(packet, 0, 100));
+        REQUIRE(QueuedPacket(packet, 3, 10) > QueuedPacket(packet, 0, 100));
         REQUIRE_FALSE(
             QueuedPacket(packet, 0, 100) > QueuedPacket(packet, 3, 10));
         // Ticket number.
-        REQUIRE(
-            QueuedPacket(packet, 3, 10) > QueuedPacket(packet, 3, 100));
+        REQUIRE(QueuedPacket(packet, 3, 10) > QueuedPacket(packet, 3, 100));
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 100) > QueuedPacket(packet, 3, 10));
         // Ticket number, with rollover.
@@ -103,8 +97,7 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
             QueuedPacket(packet, 3, 0));
         REQUIRE_FALSE(
             QueuedPacket(
-                packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2) >
+                packet, 3, std::numeric_limits<unsigned long long>::max() / 2) >
             QueuedPacket(packet, 3, 0));
         // Not equal.
         REQUIRE_FALSE(
@@ -115,13 +108,11 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
         // Equality.
         REQUIRE(QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 3, 10));
         // Priority takes precidence.
-        REQUIRE(
-            QueuedPacket(packet, 0, 10) <= QueuedPacket(packet, 3, 100));
+        REQUIRE(QueuedPacket(packet, 0, 10) <= QueuedPacket(packet, 3, 100));
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 100) <= QueuedPacket(packet, 0, 10));
         // Ticket number.
-        REQUIRE(
-            QueuedPacket(packet, 3, 100) <= QueuedPacket(packet, 3, 10));
+        REQUIRE(QueuedPacket(packet, 3, 100) <= QueuedPacket(packet, 3, 10));
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 10) <= QueuedPacket(packet, 3, 100));
         // Ticket number, with rollover.
@@ -133,21 +124,18 @@ TEST_CASE("QueuedPacket' are comparable.", "[QueuedPacket]")
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 0) <=
             QueuedPacket(
-                packet, 3,
-                std::numeric_limits<unsigned long long>::max() / 2));
+                packet, 3, std::numeric_limits<unsigned long long>::max() / 2));
     }
     SECTION("with >=")
     {
         // Equality.
         REQUIRE(QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 3, 10));
         // Priority takes precidence.
-        REQUIRE(
-            QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 0, 100));
+        REQUIRE(QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 0, 100));
         REQUIRE_FALSE(
             QueuedPacket(packet, 0, 100) >= QueuedPacket(packet, 3, 10));
         // Ticket number.
-        REQUIRE(
-            QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 3, 100));
+        REQUIRE(QueuedPacket(packet, 3, 10) >= QueuedPacket(packet, 3, 100));
         REQUIRE_FALSE(
             QueuedPacket(packet, 3, 100) >= QueuedPacket(packet, 3, 10));
         // Ticket number, with rollover.
@@ -194,8 +182,8 @@ TEST_CASE("QueuedPacket's are assignable.", "[QueuedPacket]")
 }
 
 
-TEST_CASE("QueuedPacket's are assignable (by move semantics).",
-          "[QueuedPacket]")
+TEST_CASE(
+    "QueuedPacket's are assignable (by move semantics).", "[QueuedPacket]")
 {
     auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     auto a = QueuedPacket(packet, 3, 10);
@@ -206,8 +194,9 @@ TEST_CASE("QueuedPacket's are assignable (by move semantics).",
 }
 
 
-TEST_CASE("QueuedPacket's 'packet' method returns the contained MAVLink packet",
-          "[QueuedPacket]")
+TEST_CASE(
+    "QueuedPacket's 'packet' method returns the contained MAVLink packet",
+    "[QueuedPacket]")
 {
     auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
     REQUIRE(*QueuedPacket(packet, 3, 10).packet() == *packet);

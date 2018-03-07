@@ -50,10 +50,7 @@ before making a change.
 
 * All C++17 features are allowed.
 * Simply running the `style` rule of the Makefile will fix most style issues and
-  should be used to ensure consistent style.  This target will be ran before
-  a merge to check for style consistency but does not check naming conventions.
-  It does not always fix line length problems though.  This is why the `style`
-  rule also prints lines exceeding 80 characters that must be fixed manually.
+  should be used to ensure consistent style.
 * All type names such as classes, structs, type aliases, enums, and type
   template parameters should be `CamelCase`.
 * Functions, variables, and namespaces should be `snake_case`.

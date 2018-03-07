@@ -28,9 +28,7 @@
 
 // Placed here to avoid weak-vtables error.
 // LCOV_EXCL_START
-UDPSocket::~UDPSocket()
-{
-}
+UDPSocket::~UDPSocket() {}
 // LCOV_EXCL_STOP
 
 
@@ -53,8 +51,7 @@ void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
  */
 void UDPSocket::send(
     std::vector<uint8_t>::const_iterator first,
-    std::vector<uint8_t>::const_iterator last,
-    const IPAddress &address)
+    std::vector<uint8_t>::const_iterator last, const IPAddress &address)
 {
     std::vector<uint8_t> vec;
     std::copy(first, last, std::back_inserter(vec));
@@ -73,8 +70,8 @@ void UDPSocket::send(
  *      default is to not wait.
  *  \returns The data read from the socket and the IP address it was sent from.
  */
-std::pair<std::vector<uint8_t>, IPAddress> UDPSocket::receive(
-    const std::chrono::nanoseconds &timeout)
+std::pair<std::vector<uint8_t>, IPAddress>
+UDPSocket::receive(const std::chrono::nanoseconds &timeout)
 {
     std::vector<uint8_t> vec;
     return {vec, receive(std::back_inserter(vec), timeout)};
@@ -98,7 +95,7 @@ IPAddress UDPSocket::receive(
     std::back_insert_iterator<std::vector<uint8_t>> it,
     const std::chrono::nanoseconds &timeout)
 {
-    auto [vec, address] = receive(timeout);
+    auto[vec, address] = receive(timeout);
     std::copy(vec.begin(), vec.end(), it);
     return address;
 }

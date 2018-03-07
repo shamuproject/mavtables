@@ -15,15 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <fcntl.h>      // open, fnctl
-#include <netinet/in.h> // sockaddr_in
-#include <sys/ioctl.h>  // ioctl
-#include <sys/poll.h>   // poll
-#include <sys/socket.h> // socket, bind, sendto, recvfrom
-#include <sys/stat.h>   // fstat
-#include <sys/types.h>  // socklen_t type on old BSD systems
-#include <termios.h>    // terminal control
-#include <unistd.h>     // read, write, close
+#include <fcntl.h>       // open, fnctl
+#include <netinet/in.h>  // sockaddr_in
+#include <sys/ioctl.h>   // ioctl
+#include <sys/poll.h>    // poll
+#include <sys/socket.h>  // socket, bind, sendto, recvfrom
+#include <sys/stat.h>    // fstat
+#include <sys/types.h>   // socklen_t type on old BSD systems
+#include <termios.h>     // terminal control
+#include <unistd.h>      // read, write, close
 
 #include "UnixSyscalls.hpp"
 
@@ -95,10 +95,7 @@ int UnixSyscalls::cfsetospeed(struct termios *termios_p, speed_t speed)
  *
  *  \param fd The file descriptor to close.
  */
-int UnixSyscalls::close(int fd)
-{
-    return ::close(fd);
-}
+int UnixSyscalls::close(int fd) { return ::close(fd); }
 
 
 /** Control device.
@@ -168,8 +165,8 @@ ssize_t UnixSyscalls::read(int fd, void *buf, size_t count)
  *  \returns The number of bytes written to \p or -1 if an error occurred.
  */
 ssize_t UnixSyscalls::recvfrom(
-    int sockfd, void *buf, size_t len, int flags,
-    struct sockaddr *src_addr, socklen_t *addrlen)
+    int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr,
+    socklen_t *addrlen)
 {
     return ::recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
 }

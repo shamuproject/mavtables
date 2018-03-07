@@ -25,29 +25,29 @@
 #include "Connection.hpp"
 #include "ConnectionPool.hpp"
 #include "Interface.hpp"
-#include "SerialPort.hpp"
 #include "PacketParser.hpp"
+#include "SerialPort.hpp"
 
 
 class SerialInterface : public Interface
 {
-    public:
-        SerialInterface(
-            std::unique_ptr<SerialPort> port,
-            std::shared_ptr<ConnectionPool> connection_pool,
-            std::unique_ptr<Connection> connection);
-        // LCOV_EXCL_START
-        ~SerialInterface() = default;
-        // LCOV_EXCL_STOP
-        void send_packet(const std::chrono::nanoseconds &timeout) final;
-        void receive_packet(const std::chrono::nanoseconds &timeout) final;
+  public:
+    SerialInterface(
+        std::unique_ptr<SerialPort> port,
+        std::shared_ptr<ConnectionPool> connection_pool,
+        std::unique_ptr<Connection> connection);
+    // LCOV_EXCL_START
+    ~SerialInterface() = default;
+    // LCOV_EXCL_STOP
+    void send_packet(const std::chrono::nanoseconds &timeout) final;
+    void receive_packet(const std::chrono::nanoseconds &timeout) final;
 
-    private:
-        std::unique_ptr<SerialPort> port_;
-        std::shared_ptr<ConnectionPool> connection_pool_;
-        std::shared_ptr<Connection> connection_;
-        PacketParser parser_;
+  private:
+    std::unique_ptr<SerialPort> port_;
+    std::shared_ptr<ConnectionPool> connection_pool_;
+    std::shared_ptr<Connection> connection_;
+    PacketParser parser_;
 };
 
 
-#endif // SERIALINTERFACE_HPP_
+#endif  // SERIALINTERFACE_HPP_

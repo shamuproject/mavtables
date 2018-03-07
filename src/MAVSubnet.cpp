@@ -15,11 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
-#include <string>
-#include <sstream>
 #include <exception>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <boost/tokenizer.hpp>
 
@@ -42,8 +42,8 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
     if (mask > 0xFFFF)
     {
         std::ostringstream ss;
-        ss << "mask (0x"
-           << std::uppercase << std::hex << mask << std::nouppercase
+        ss << "mask (0x" << std::uppercase << std::hex << mask
+           << std::nouppercase
            << ") is outside of the allowed range (0x0000 - 0xFFFF).";
         throw std::out_of_range(ss.str());
     }
@@ -65,16 +65,17 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
  *      between 0x00 and 0xFF.
  *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
  */
-MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
-                     unsigned int component_mask)
+MAVSubnet::MAVSubnet(
+    const MAVAddress &address, unsigned int system_mask,
+    unsigned int component_mask)
     : address_(address)
 {
     // Ensure system mask is withing range.
     if (system_mask > 0xFF)
     {
         std::ostringstream ss;
-        ss << "System mask (0x"
-           << std::uppercase << std::hex << system_mask << std::nouppercase
+        ss << "System mask (0x" << std::uppercase << std::hex << system_mask
+           << std::nouppercase
            << ") is outside of the allowed range (0x00 - 0xFF).";
         throw std::out_of_range(ss.str());
     }
@@ -83,8 +84,8 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
     if (component_mask > 0xFF)
     {
         std::ostringstream ss;
-        ss << "Component mask (0x" << std::hex << component_mask <<
-           ") is outside of the allowed range (0x00 - 0xFF).";
+        ss << "Component mask (0x" << std::hex << component_mask
+           << ") is outside of the allowed range (0x00 - 0xFF).";
         throw std::out_of_range(ss.str());
     }
 
@@ -156,8 +157,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  \throws std::out_of_range if the mask or slash bits are out of range.
  *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
  */
-MAVSubnet::MAVSubnet(std::string subnet)
-    : address_(0)
+MAVSubnet::MAVSubnet(std::string subnet) : address_(0)
 {
     // If only an address was given (exact match subnet).
     try
@@ -216,8 +216,8 @@ MAVSubnet::MAVSubnet(std::string subnet)
             if (slashmask > 16)
             {
                 throw std::out_of_range(
-                    "Forward slash mask (" + std::to_string(slashmask)
-                    + ") is outside of allowed range (0 - 16).");
+                    "Forward slash mask (" + std::to_string(slashmask) +
+                    ") is outside of allowed range (0 - 16).");
             }
 
             mask_ = (0xFFFF << (16 - slashmask)) & 0xFFFF;
@@ -230,8 +230,8 @@ MAVSubnet::MAVSubnet(std::string subnet)
             if (slashmask > 8)
             {
                 throw std::out_of_range(
-                    "Backslash mask (" + std::to_string(slashmask)
-                    + ") is outside of allowed range (0 - 8).");
+                    "Backslash mask (" + std::to_string(slashmask) +
+                    ") is outside of allowed range (0 - 8).");
             }
 
             mask_ = (0xFFFF << (8 - slashmask)) & 0x00FF;

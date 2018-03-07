@@ -33,53 +33,36 @@
 
 namespace
 {
-
 #ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 
     // Subclass of Packet used for testing the abstract class Packet.
     class PacketTestClass : public Packet
     {
-        public:
-            PacketTestClass(const PacketTestClass &other) = default;
-            PacketTestClass(PacketTestClass &&other) = default;
-            PacketTestClass(std::vector<uint8_t> data)
-                : Packet(std::move(data))
-            {
-            }
-            // LCOV_EXCL_START
-            ~PacketTestClass() = default;
-            // LCOV_EXCL_STOP
-            virtual ::Packet::Version version() const
-            {
-                return ::Packet::V1;
-            }
-            virtual unsigned long id() const
-            {
-                return 42;
-            }
-            virtual std::string name() const
-            {
-                return "MISSION_CURRENT";
-            }
-            virtual MAVAddress source() const
-            {
-                return MAVAddress("3.14");
-            }
-            virtual std::optional<MAVAddress> dest() const
-            {
-                return MAVAddress("2.71");
-            }
-            PacketTestClass &operator=(const PacketTestClass &other) = default;
-            PacketTestClass &operator=(PacketTestClass &&other) = default;
+      public:
+        PacketTestClass(const PacketTestClass &other) = default;
+        PacketTestClass(PacketTestClass &&other) = default;
+        PacketTestClass(std::vector<uint8_t> data) : Packet(std::move(data)) {}
+        // LCOV_EXCL_START
+        ~PacketTestClass() = default;
+        // LCOV_EXCL_STOP
+        virtual ::Packet::Version version() const { return ::Packet::V1; }
+        virtual unsigned long id() const { return 42; }
+        virtual std::string name() const { return "MISSION_CURRENT"; }
+        virtual MAVAddress source() const { return MAVAddress("3.14"); }
+        virtual std::optional<MAVAddress> dest() const
+        {
+            return MAVAddress("2.71");
+        }
+        PacketTestClass &operator=(const PacketTestClass &other) = default;
+        PacketTestClass &operator=(PacketTestClass &&other) = default;
     };
 
 #ifdef __clang__
-    #pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
-
 }
 
 
@@ -146,8 +129,8 @@ TEST_CASE("Packet's are assignable (by move semantics).", "[Packet]")
 }
 
 
-TEST_CASE("Packet's contain raw packet data and make it accessible.",
-          "[Packet]")
+TEST_CASE(
+    "Packet's contain raw packet data and make it accessible.", "[Packet]")
 {
     REQUIRE(
         PacketTestClass({1, 3, 3, 7}).data() ==

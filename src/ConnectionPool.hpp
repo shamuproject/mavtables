@@ -23,9 +23,9 @@
 #include <set>
 #include <shared_mutex>
 
-#include "config.hpp"
 #include "Connection.hpp"
 #include "Packet.hpp"
+#include "config.hpp"
 
 
 /** A pool of connections to send packets out on.
@@ -35,19 +35,20 @@
  */
 class ConnectionPool
 {
-    public:
-        // LCOV_EXCL_START
-        TEST_VIRTUAL ~ConnectionPool() = default;
-        // LCOV_EXCL_STOP
-        TEST_VIRTUAL void add(std::weak_ptr<Connection> connection);
-        TEST_VIRTUAL void remove(const std::weak_ptr<Connection> &connection);
-        TEST_VIRTUAL void send(std::unique_ptr<const Packet> packet);
+  public:
+    // LCOV_EXCL_START
+    TEST_VIRTUAL ~ConnectionPool() = default;
+    // LCOV_EXCL_STOP
+    TEST_VIRTUAL void add(std::weak_ptr<Connection> connection);
+    TEST_VIRTUAL void remove(const std::weak_ptr<Connection> &connection);
+    TEST_VIRTUAL void send(std::unique_ptr<const Packet> packet);
 
-    private:
-        std::set<std::weak_ptr<Connection>,
-            std::owner_less<std::weak_ptr<Connection>>> connections_;
-        std::shared_mutex mutex_;
+  private:
+    std::set<
+        std::weak_ptr<Connection>, std::owner_less<std::weak_ptr<Connection>>>
+        connections_;
+    std::shared_mutex mutex_;
 };
 
 
-#endif // CONNECTIONPOOL_HPP_
+#endif  // CONNECTIONPOOL_HPP_

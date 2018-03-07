@@ -25,8 +25,8 @@
 
 #include "Action.hpp"
 #include "If.hpp"
-#include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 #include "Rule.hpp"
 
 
@@ -34,17 +34,17 @@
  */
 class Reject : public Rule
 {
-    public:
-        Reject(std::optional<If> condition = {});
-        virtual Action action(
-            const Packet &packet, const MAVAddress &address) const;
-        virtual std::unique_ptr<Rule> clone() const;
-        virtual bool operator==(const Rule &other) const;
-        virtual bool operator!=(const Rule &other) const;
+  public:
+    Reject(std::optional<If> condition = {});
+    virtual Action
+    action(const Packet &packet, const MAVAddress &address) const;
+    virtual std::unique_ptr<Rule> clone() const;
+    virtual bool operator==(const Rule &other) const;
+    virtual bool operator!=(const Rule &other) const;
 
-    protected:
-        virtual std::ostream &print_(std::ostream &os) const;
+  protected:
+    virtual std::ostream &print_(std::ostream &os) const;
 };
 
 
-#endif // REJECT_HPP_
+#endif  // REJECT_HPP_

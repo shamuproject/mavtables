@@ -30,18 +30,13 @@
  *      combination.
  *  \sa action
  */
-Rule::Rule(std::optional<If> condition)
-    : condition_(std::move(condition))
-{
-}
+Rule::Rule(std::optional<If> condition) : condition_(std::move(condition)) {}
 
 
 // GCC generates a seemingly uncallable destructor for pure virtual classes.
 // Therefore, it must be excluded from test coverage.
 // LCOV_EXCL_START
-Rule::~Rule()
-{
-}
+Rule::~Rule() {}
 // LCOV_EXCL_STOP
 
 

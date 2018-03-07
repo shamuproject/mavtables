@@ -48,10 +48,9 @@ Prints all lines exceeding 80 characters.
 
 ## style
 
-Fix the style of C++ source code and header files.  The original files are
-backed up with a `.orig` extension.  [Artistic
-Style](http://astyle.sourceforge.net/) is required to use this target.  This
-will also call the linecheck target.
+Fix the style of C++ source code and header files.  This is done with
+'clang-format' and thus requires Clang to be installed.This will also call the
+linecheck target.
 
 
 ## html

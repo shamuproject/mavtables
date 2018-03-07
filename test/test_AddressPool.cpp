@@ -38,8 +38,8 @@ TEST_CASE("AddressPool's can be constructed.", "[AddressPool]")
 }
 
 
-TEST_CASE("AddressPool's 'add' method adds an address to the pool.",
-          "[AddressPool]")
+TEST_CASE(
+    "AddressPool's 'add' method adds an address to the pool.", "[AddressPool]")
 {
     SECTION("With fake_clock.")
     {
@@ -50,12 +50,8 @@ TEST_CASE("AddressPool's 'add' method adds an address to the pool.",
         auto addr = pool.addresses();
         std::sort(addr.begin(), addr.end(), std::greater<MAVAddress>());
         REQUIRE(addr.size() == 3);
-        std::vector<MAVAddress> compare =
-        {
-            MAVAddress("192.168"),
-            MAVAddress("172.16"),
-            MAVAddress("10.10")
-        };
+        std::vector<MAVAddress> compare = {
+            MAVAddress("192.168"), MAVAddress("172.16"), MAVAddress("10.10")};
         REQUIRE(addr == compare);
     }
     SECTION("With std::chrono::steady_clock.")  // for complete coverage
@@ -67,19 +63,17 @@ TEST_CASE("AddressPool's 'add' method adds an address to the pool.",
         auto addr = pool.addresses();
         std::sort(addr.begin(), addr.end(), std::greater<MAVAddress>());
         REQUIRE(addr.size() == 3);
-        std::vector<MAVAddress> compare =
-        {
-            MAVAddress("192.168"),
-            MAVAddress("172.16"),
-            MAVAddress("10.10")
-        };
+        std::vector<MAVAddress> compare = {
+            MAVAddress("192.168"), MAVAddress("172.16"), MAVAddress("10.10")};
         REQUIRE(addr == compare);
     }
 }
 
 
-TEST_CASE("AddressPool's 'contains' method determines whether an address is "
-          "in the pool or not.", "[AddressPool]")
+TEST_CASE(
+    "AddressPool's 'contains' method determines whether an address is "
+    "in the pool or not.",
+    "[AddressPool]")
 {
     SECTION("With fake_clock.")
     {
@@ -112,37 +106,37 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
     {
         AddressPool<fake_clock> pool;
         pool.add(MAVAddress("0.0"));
-        fake_clock::advance(1s); // 00:00:01
+        fake_clock::advance(1s);  // 00:00:01
         pool.add(MAVAddress("1.1"));
-        fake_clock::advance(1s); // 00:00:02
+        fake_clock::advance(1s);  // 00:00:02
         pool.add(MAVAddress("2.2"));
-        fake_clock::advance(1s); // 00:00:03
+        fake_clock::advance(1s);  // 00:00:03
         pool.add(MAVAddress("3.3"));
         REQUIRE(pool.contains(MAVAddress("0.0")));
         REQUIRE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(117s); // 00:02:00
+        fake_clock::advance(117s);  // 00:02:00
         REQUIRE(pool.contains(MAVAddress("0.0")));
         REQUIRE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 00:02:01
+        fake_clock::advance(1s);  // 00:02:01
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 00:02:02
+        fake_clock::advance(1s);  // 00:02:02
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE_FALSE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 00:02:03
+        fake_clock::advance(1s);  // 00:02:03
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE_FALSE(pool.contains(MAVAddress("1.1")));
         REQUIRE_FALSE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 00:02:04
+        fake_clock::advance(1s);  // 00:02:04
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE_FALSE(pool.contains(MAVAddress("1.1")));
         REQUIRE_FALSE(pool.contains(MAVAddress("2.2")));
@@ -152,37 +146,37 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
     {
         AddressPool<fake_clock> pool(1h);
         pool.add(MAVAddress("0.0"));
-        fake_clock::advance(1s); // 00:00:01
+        fake_clock::advance(1s);  // 00:00:01
         pool.add(MAVAddress("1.1"));
-        fake_clock::advance(1s); // 00:00:02
+        fake_clock::advance(1s);  // 00:00:02
         pool.add(MAVAddress("2.2"));
-        fake_clock::advance(1s); // 00:00:03
+        fake_clock::advance(1s);  // 00:00:03
         pool.add(MAVAddress("3.3"));
         REQUIRE(pool.contains(MAVAddress("0.0")));
         REQUIRE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(3597s); // 01:00:00
+        fake_clock::advance(3597s);  // 01:00:00
         REQUIRE(pool.contains(MAVAddress("0.0")));
         REQUIRE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 01:00:01
+        fake_clock::advance(1s);  // 01:00:01
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 01:00:02
+        fake_clock::advance(1s);  // 01:00:02
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE_FALSE(pool.contains(MAVAddress("1.1")));
         REQUIRE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 01:00:03
+        fake_clock::advance(1s);  // 01:00:03
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE_FALSE(pool.contains(MAVAddress("1.1")));
         REQUIRE_FALSE(pool.contains(MAVAddress("2.2")));
         REQUIRE(pool.contains(MAVAddress("3.3")));
-        fake_clock::advance(1s); // 01:00:04
+        fake_clock::advance(1s);  // 01:00:04
         REQUIRE_FALSE(pool.contains(MAVAddress("0.0")));
         REQUIRE_FALSE(pool.contains(MAVAddress("1.1")));
         REQUIRE_FALSE(pool.contains(MAVAddress("2.2")));
@@ -192,15 +186,14 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
     {
         AddressPool<fake_clock> pool;
         pool.add(MAVAddress("0.0"));
-        fake_clock::advance(1s); // 00:00:01
+        fake_clock::advance(1s);  // 00:00:01
         pool.add(MAVAddress("1.1"));
-        fake_clock::advance(1s); // 00:00:02
+        fake_clock::advance(1s);  // 00:00:02
         pool.add(MAVAddress("2.2"));
-        fake_clock::advance(1s); // 00:00:03
+        fake_clock::advance(1s);  // 00:00:03
         pool.add(MAVAddress("3.3"));
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -210,10 +203,9 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(117s); // 00:02:00
+        fake_clock::advance(117s);  // 00:02:00
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -223,10 +215,9 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 00:02:01
+        fake_clock::advance(1s);  // 00:02:01
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
@@ -235,10 +226,9 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 00:02:02
+        fake_clock::advance(1s);  // 00:02:02
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
             };
@@ -246,17 +236,16 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 00:02:03
+        fake_clock::advance(1s);  // 00:02:03
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("3.3"),
             };
             auto addr = pool.addresses();
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 00:02:04
+        fake_clock::advance(1s);  // 00:02:04
         {
             std::vector<MAVAddress> vec;
             REQUIRE(pool.addresses().empty());
@@ -266,15 +255,14 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
     {
         AddressPool<fake_clock> pool(1h);
         pool.add(MAVAddress("0.0"));
-        fake_clock::advance(1s); // 00:00:01
+        fake_clock::advance(1s);  // 00:00:01
         pool.add(MAVAddress("1.1"));
-        fake_clock::advance(1s); // 00:00:02
+        fake_clock::advance(1s);  // 00:00:02
         pool.add(MAVAddress("2.2"));
-        fake_clock::advance(1s); // 00:00:03
+        fake_clock::advance(1s);  // 00:00:03
         pool.add(MAVAddress("3.3"));
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -284,10 +272,9 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(3597s); // 01:00:00
+        fake_clock::advance(3597s);  // 01:00:00
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("0.0"),
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
@@ -297,10 +284,9 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 01:00:01
+        fake_clock::advance(1s);  // 01:00:01
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("1.1"),
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
@@ -309,10 +295,9 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 01:00:02
+        fake_clock::advance(1s);  // 01:00:02
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("2.2"),
                 MAVAddress("3.3"),
             };
@@ -320,17 +305,16 @@ TEST_CASE("AddressPool removes expired addresses.", "[AddressPool]")
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 01:00:03
+        fake_clock::advance(1s);  // 01:00:03
         {
-            std::vector<MAVAddress> vec =
-            {
+            std::vector<MAVAddress> vec = {
                 MAVAddress("3.3"),
             };
             auto addr = pool.addresses();
             std::sort(addr.begin(), addr.end());
             REQUIRE(vec == addr);
         }
-        fake_clock::advance(1s); // 01:00:04
+        fake_clock::advance(1s);  // 01:00:04
         {
             std::vector<MAVAddress> vec;
             REQUIRE(pool.addresses().empty());

@@ -30,18 +30,13 @@
  *
  *  \param data Raw packet data.
  */
-Packet::Packet(std::vector<uint8_t> data)
-    : data_(std::move(data))
-{
-}
+Packet::Packet(std::vector<uint8_t> data) : data_(std::move(data)) {}
 
 
 // GCC generates a seemingly uncallable destructor for pure virtual classes.
 // Therefore, it must be excluded from test coverage.
 // LCOV_EXCL_START
-Packet::~Packet()
-{
-}
+Packet::~Packet() {}
 // LCOV_EXCL_STOP
 
 
@@ -49,10 +44,7 @@ Packet::~Packet()
  *
  *  \return The packet data as a vector of bytes.
  */
-const std::vector<uint8_t> &Packet::data() const
-{
-    return data_;
-}
+const std::vector<uint8_t> &Packet::data() const { return data_; }
 
 
 /** Equality comparison.
@@ -114,7 +106,7 @@ std::ostream &operator<<(std::ostream &os, const Packet &packet)
     }
 
     // Version.
-    os << " (v" << ((packet.version() & 0xFF00) >> 8) << "." <<
-       (packet.version() & 0x00FF) << ")";
+    os << " (v" << ((packet.version() & 0xFF00) >> 8) << "."
+       << (packet.version() & 0x00FF) << ")";
     return os;
 }

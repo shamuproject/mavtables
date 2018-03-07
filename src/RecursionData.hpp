@@ -37,35 +37,29 @@
  */
 class RecursionData
 {
-        friend class RecursionGuard;
+    friend class RecursionGuard;
 
-    public:
-        RecursionData() = default;
-        RecursionData(const RecursionData &other)
-        {
-            (void)other;
-        }
-        RecursionData(RecursionData &&other)
-        {
-            (void)other;
-        }
-        RecursionData &operator=(const RecursionData &other)
-        {
-            (void)other;
-            calling_threads_.clear();
-            return *this;
-        }
-        RecursionData &operator=(RecursionData &&other)
-        {
-            (void)other;
-            calling_threads_.clear();
-            return *this;
-        }
+  public:
+    RecursionData() = default;
+    RecursionData(const RecursionData &other) { (void)other; }
+    RecursionData(RecursionData &&other) { (void)other; }
+    RecursionData &operator=(const RecursionData &other)
+    {
+        (void)other;
+        calling_threads_.clear();
+        return *this;
+    }
+    RecursionData &operator=(RecursionData &&other)
+    {
+        (void)other;
+        calling_threads_.clear();
+        return *this;
+    }
 
-    private:
-        std::set<std::thread::id> calling_threads_;
-        std::mutex mutex_;
+  private:
+    std::set<std::thread::id> calling_threads_;
+    std::mutex mutex_;
 };
 
 
-#endif // RECURSIONDATA_HPP_
+#endif  // RECURSIONDATA_HPP_

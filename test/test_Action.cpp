@@ -23,8 +23,9 @@
 #include "util.hpp"
 
 
-TEST_CASE("Action's 'make_accept' factory method constructs an ACCEPT action.",
-          "[Action]")
+TEST_CASE(
+    "Action's 'make_accept' factory method constructs an ACCEPT action.",
+    "[Action]")
 {
     SECTION("Without a priority.")
     {
@@ -41,8 +42,9 @@ TEST_CASE("Action's 'make_accept' factory method constructs an ACCEPT action.",
 }
 
 
-TEST_CASE("Action's 'make_reject' factory method constructs a REJECT action.",
-          "[Action]")
+TEST_CASE(
+    "Action's 'make_reject' factory method constructs a REJECT action.",
+    "[Action]")
 {
     auto result = Action::make_reject();
     REQUIRE(result.action() == Action::REJECT);
@@ -50,8 +52,10 @@ TEST_CASE("Action's 'make_reject' factory method constructs a REJECT action.",
 }
 
 
-TEST_CASE("Action's 'make_continue' factory method constructs a CONTINUE "
-          "action.", "[Action]")
+TEST_CASE(
+    "Action's 'make_continue' factory method constructs a CONTINUE "
+    "action.",
+    "[Action]")
 {
     auto result = Action::make_continue();
     REQUIRE(result.action() == Action::CONTINUE);
@@ -59,8 +63,9 @@ TEST_CASE("Action's 'make_continue' factory method constructs a CONTINUE "
 }
 
 
-TEST_CASE("Action's 'make_default' factory method constructs a DEFAULT action.",
-          "[Action]")
+TEST_CASE(
+    "Action's 'make_default' factory method constructs a DEFAULT action.",
+    "[Action]")
 {
     auto result = Action::make_default();
     REQUIRE(result.action() == Action::DEFAULT);
@@ -68,8 +73,7 @@ TEST_CASE("Action's 'make_default' factory method constructs a DEFAULT action.",
 }
 
 
-TEST_CASE("Action's 'priority' method sets and gets the priority.",
-          "[Action]")
+TEST_CASE("Action's 'priority' method sets and gets the priority.", "[Action]")
 {
     SECTION("Can be set exactly once for accept results without a priority.")
     {

@@ -19,12 +19,12 @@
 #define IF_HPP_
 
 
-#include <string>
 #include <optional>
+#include <string>
 
-#include "Packet.hpp"
-#include "MAVSubnet.hpp"
 #include "MAVAddress.hpp"
+#include "MAVSubnet.hpp"
+#include "Packet.hpp"
 
 
 /** An if statement used to determine if a packet matches a rule.
@@ -35,47 +35,46 @@
  */
 class If
 {
-    public:
-        If(std::optional<unsigned long> id = {},
-           std::optional<MAVSubnet> source = {},
-           std::optional<MAVSubnet> dest = {});
-        /** Copy constructor.
-         *
-         * \param other If to copy.
-         */
-        If(const If &other) = default;
-        /** Move constructor.
-         *
-         * \param other If to move from.
-         */
-        If(If &&other) = default;
-        If &type(unsigned long id);
-        If &type(const std::string &name);
-        If &from(MAVSubnet subnet);
-        If &from(const std::string &subnet);
-        If &to(MAVSubnet subnet);
-        If &to(const std::string &subnet);
-        bool check(const Packet &packet, const MAVAddress &address) const;
-        /** Assignment operator.
-         *
-         * \param other If to copy.
-         */
-        If &operator=(const If &other) = default;
-        /** Assignment operator (by move semantics).
-         *
-         * \param other If to move from.
-         */
-        If &operator=(If &&other) = default;
+  public:
+    If(std::optional<unsigned long> id = {},
+       std::optional<MAVSubnet> source = {},
+       std::optional<MAVSubnet> dest = {});
+    /** Copy constructor.
+     *
+     * \param other If to copy.
+     */
+    If(const If &other) = default;
+    /** Move constructor.
+     *
+     * \param other If to move from.
+     */
+    If(If &&other) = default;
+    If &type(unsigned long id);
+    If &type(const std::string &name);
+    If &from(MAVSubnet subnet);
+    If &from(const std::string &subnet);
+    If &to(MAVSubnet subnet);
+    If &to(const std::string &subnet);
+    bool check(const Packet &packet, const MAVAddress &address) const;
+    /** Assignment operator.
+     *
+     * \param other If to copy.
+     */
+    If &operator=(const If &other) = default;
+    /** Assignment operator (by move semantics).
+     *
+     * \param other If to move from.
+     */
+    If &operator=(If &&other) = default;
 
-        friend bool operator==(const If &lhs, const If &rhs);
-        friend bool operator!=(const If &lhs, const If &rhs);
-        friend std::ostream &operator<<(
-            std::ostream &os, const If &if_);
+    friend bool operator==(const If &lhs, const If &rhs);
+    friend bool operator!=(const If &lhs, const If &rhs);
+    friend std::ostream &operator<<(std::ostream &os, const If &if_);
 
-    private:
-        std::optional<unsigned long> id_;
-        std::optional<MAVSubnet> source_;
-        std::optional<MAVSubnet> dest_;
+  private:
+    std::optional<unsigned long> id_;
+    std::optional<MAVSubnet> source_;
+    std::optional<MAVSubnet> dest_;
 };
 
 
@@ -84,4 +83,4 @@ bool operator!=(const If &lhs, const If &rhs);
 std::ostream &operator<<(std::ostream &os, const If &if_);
 
 
-#endif // IF_HPP_
+#endif  // IF_HPP_
