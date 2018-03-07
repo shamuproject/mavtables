@@ -46,7 +46,7 @@ linecheck:
 
 style:
 	# astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
-	clang-format -i --style=.clang-format src/*.hpp src/*.hpp test/*.cpp test/*.hpp
+	clang-format -i --style=file src/*.hpp src/*.cpp test/*.cpp test/*.hpp
 	$(MAKE) -f $(THIS_FILE) linecheck
 
 html:
