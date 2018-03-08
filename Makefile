@@ -45,7 +45,7 @@ linecheck:
 	-grep -rPIn --color=always '(.{81})' test | grep -v '\\copydoc'
 
 style:
-	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp"
+	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp" | grep 'Formatted' || true
 	$(MAKE) -f $(THIS_FILE) linecheck
 
 html:

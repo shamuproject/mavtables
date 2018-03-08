@@ -4,6 +4,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_AddressPool.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Call.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Chain.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_configuration.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Connection.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_ConnectionFactory.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_ConnectionPool.cpp"
