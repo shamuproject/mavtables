@@ -23,6 +23,8 @@
 #include <optional>
 #include <string>
 
+#include <pegtl.hpp>
+
 #include "Filesystem.hpp"
 
 

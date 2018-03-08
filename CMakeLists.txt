@@ -43,6 +43,7 @@ add_subdirectory (lib)
 add_executable (mavtables src/mavtables.cpp)
 target_link_libraries (mavtables
     MAVLink 
+    PEGTL
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
 install (TARGETS mavtables DESTINATION bin)
@@ -55,6 +56,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         FakeIt
         FakeClock
         MAVLink
+        PEGTL
         ${Boost_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT})
     add_test(NAME UnitTests COMMAND unit_tests)

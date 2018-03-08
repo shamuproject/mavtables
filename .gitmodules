@@ -13,3 +13,6 @@
 [submodule "lib/fake_clock"]
 	path = lib/fake_clock
 	url = https://github.com/korfuri/fake_clock.git
+[submodule "lib/pegtl"]
+	path = lib/pegtl
+	url = git@github.com:taocpp/PEGTL.git

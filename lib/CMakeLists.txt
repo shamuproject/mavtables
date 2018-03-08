@@ -67,6 +67,23 @@ add_library (MAVLink INTERFACE)
 target_include_directories (MAVLink SYSTEM INTERFACE "${MAVLINK_INCLUDE_DIR}")
 
 
+# PEGTL (Parser Expression Grammar Template Library)
+find_path (
+    PEGTL_INCLUDE_DIR pegtl.hpp
+    HINTS ${CMAKE_CURRENT_LIST_DIR}/pegtl/include/tao
+)
+if ((NOT PEGTL_INCLUDE_DIR) OR (NOT EXISTS "${PEGTL_INCLUDE_DIR}"))
+    execute_process (
+        COMMAND git submodule update --init --recursive
+        WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+    )
+endif ()
+set (PEGTL_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/pegtl/include/tao/")
+list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/pegtl/*')
+add_library (PEGTL INTERFACE)
+target_include_directories (PEGTL SYSTEM INTERFACE "${PEGTL_INCLUDE_DIR}")
+
+
 # Pass lcov ignore patterns up to parent.
 set (
     LCOV_REMOVE_PATTERNS
