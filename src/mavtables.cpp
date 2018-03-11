@@ -15,18 +15,50 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <cstdlib>
+#include <exception>
 #include <iostream>
+#include <string>
+
+#include <boost/program_options.hpp>
+
 #include "config.hpp"
+#include "configuration.hpp"
 #include "util.hpp"
+#include "Options.hpp"
 
 
-int main(int argc, char **argv)
+namespace po = boost::program_options;
+
+
+int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
-    std::cout << NAME << ": v"
-              << VERSION_MAJOR << "."
-              << VERSION_MINOR << "."
-              << VERSION_PATCH << std::endl;
-    std::cout << "A MAVLink router and firewall." << std::endl;
+    try
+    {
+        Options options(std::cout, argc, argv);
+
+        if (options)
+        {
+            std::cout << "Configuration file located at "
+                      << options.config_file() << std::endl;
+            // parse_file2(options.config_file());
+            parse_file(options.config_file());
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+    // mavtables --dot
+    // mavtables --ast
+    // (void)argc;
+    // (void)argv;
+    // std::cout << NAME << ": v"
+    //           << VERSION_MAJOR << "."
+    //           << VERSION_MINOR << "."
+    //           << VERSION_PATCH << std::endl;
+    // std::cout << "A MAVLink router and firewall." << std::endl;
 }

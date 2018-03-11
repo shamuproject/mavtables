@@ -25,64 +25,76 @@
 #include "configuration.hpp"
 
 
-/** Find the configuration file.
- *
- *  The order of checking is:
- *  1. The given path.
- *  2. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
- *  3. `.mavtablesrc` in the current directory.
- *  4. `.mavtablesrc` at `$HOME/.mavtablesrc`.
- *  5. The main configuration file at `/etc/mavtables.conf`.
- *
- *  \param config Path to the configuration file specified on the command line.
- *  \param filesystem A filesystem instance.  The default is to construct an
- *      instance.
- *  \returns The path the first configuration file found.
- */
-std::string find_config(
-    std::optional<std::string> config, std::unique_ptr<Filesystem> filesystem)
+
+namespace config
 {
-    // Check given path.
-    if (config)
+    void print_node(const pegtl::parse_tree::node &n, const std::string &s = "");
+    void print_node(const pegtl::parse_tree::node &n, const std::string &s)
     {
-        if (filesystem->exists(config.value()))
+        // detect the root node:
+        if (n.is_root())
         {
-            return config.value();
+            std::cout << "ROOT" << std::endl;
+        }
+        else
+        {
+            if (n.has_content())
+            {
+                std::cout << s << n.name() << " \"" << n.content() << "\" at " << n.begin() <<
+                          " to " << n.end() << std::endl;
+            }
+            else
+            {
+                std::cout << s << n.name() << " at " << n.begin() << std::endl;
+            }
+        }
+
+        // print all child nodes
+        if (!n.children.empty())
+        {
+            const auto s2 = s + "  ";
+
+            for (auto &up : n.children)
+            {
+                print_node(*up, s2);
+            }
         }
     }
+}
 
-    // Check MATABLES_CONFIG_PATH.
-    if (auto config_path = std::getenv("MAVTABLES_CONFIG_PATH"))
+#include <cstdio>
+#include <fstream>
+
+void parse_file(std::string filename)
+{
+    // std::cout << filename << std::endl;
+    // pegtl::string_input<> in("3 + 4", filename);
+    pegtl::read_input<> in(filename);
+    // std::ifstream ifs("test.conf");
+    // pegtl::istream_input<> in(ifs, 1024, filename);
+
+    // std::ifstream t(filename);
+    // std::string str((std::istreambuf_iterator<char>(t)),
+    //                  std::istreambuf_iterator<char>());
+    //
+    // std::cout << str << std::endl;
+    // pegtl::string_input<> in(str, filename);
+    const auto root = pegtl::parse_tree::parse<config::grammar, config::store>( in );
+    if (root != nullptr)
     {
-        if (filesystem->exists(Filesystem::path(config_path)))
-        {
-            return config_path;
-        }
+        config::print_node(*root);
     }
-
-    // Check for .mavtablesrc in current directory.
-    if (filesystem->exists(".mavtablesrc"))
+    else
     {
-        return ".mavtablesrc";
+        std::cout << "Configuration file is invalid." << std::endl;
     }
+}
 
-    // Check for .mavtablesrc in home directory.
-    if (auto home = std::getenv("HOME"))
-    {
-        Filesystem::path config_path(home);
-        config_path /= ".mavtablesrc";
 
-        if (filesystem->exists(config_path))
-        {
-            return config_path.string();
-        }
-    }
-
-    // Check for /etc/mavtables.conf.
-    if (filesystem->exists("/etc/mavtables.conf"))
-    {
-        return "/etc/mavtables.conf";
-    }
-
-    throw std::runtime_error("Could not locate any configuration files.");
+void parse_file2(std::string filename)
+{
+    // std::cout << filename << std::endl;
+    // pegtl::string_input<> in("3 + 4", filename);
+    pegtl::read_input<> in(filename);
+    tao::pegtl::parse<config::grammar>( in );
 }

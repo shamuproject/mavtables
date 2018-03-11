@@ -33,7 +33,7 @@ endif ()
 add_subdirectory (cmake)
 find_package (Threads)
 find_package (codecov)
-find_package (Boost 1.54 REQUIRED COMPONENTS filesystem)
+find_package (Boost 1.54 REQUIRED COMPONENTS filesystem program_options)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 # libraries

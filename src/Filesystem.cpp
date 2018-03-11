@@ -24,7 +24,7 @@
  *
  *  \param p The path to check if it exists.
  */
-bool Filesystem::exists(const Filesystem::path &p)
+bool Filesystem::exists(const Filesystem::path &p) const
 {
     return boost::filesystem::exists(p);
 }
