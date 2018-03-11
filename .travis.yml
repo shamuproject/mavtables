@@ -45,12 +45,11 @@ jobs:
     - os: osx
       env:
         - NAME="OS X"
-      osx_image: xcode9.2
+      osx_image: xcode9.3beta
       script: make test
       before_install:
         - brew update
         - brew install ctags
-        - brew install gcc || true
-        - brew link --overwrite gcc
-        - CC=gcc-7
-        - CXX=g++-7
+        - brew install llvm
+        - CC=/usr/local/opt/llvm/bin/clang
+        - CXX=/usr/local/opt/llvm/bin/clang++
