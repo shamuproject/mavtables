@@ -63,18 +63,20 @@ namespace config
 
     // Generic statement with optional value.
     template <typename K, typename V = success>
-    struct t_statement
-        : seq<p<K>, must<p<V>>, must<eos>> {};
+    struct t_statement : if_must<K, p<V>, eos> {};
 
     // Generic block.
     template <typename K, typename... Statements>
-    struct t_block : seq<p<K>, p<one<'{'>>,
-        star<p<sor<Statements...>>>, p<one<'}'>>> {};
+    // struct t_block : seq<p<K>, p<one<'{'>>,
+    //     star<p<sor<Statements...>>>, p<one<'}'>>> {};
+    struct t_block :
+        if_must<K, p<one<'{'>>, star<p<sor<Statements...>>>, p<one<'}'>>> {};
 
     // Generic named block.
     template <typename K, typename N, typename... Statements>
-        struct t_named_block : seq<p<K>, p<N>, p<one<'{'>>,
-        star<p<sor<Statements...>>>, p<one<'}'>>> {};
+    struct t_named_block
+        : if_must<K, p<N>,
+          p<one<'{'>>, star<p<sor<Statements...>>>, p<one<'}'>>> {};
 
     // Yes/No (boolean) value.
     struct yesno
@@ -87,23 +89,23 @@ namespace config
     struct signed_integer : seq<opt<one<'+', '-'>>, integer> {};
 
     // IP address.
-    struct ip : must<seq<integer, rep<3, seq<one<'.'>, integer>>>> {};
+    struct ip : seq<integer, rep<3, seq<one<'.'>, integer>>> {};
     template<> struct store<ip> : std::true_type {};
 
     // Port number.
-    struct port : must<integer> {};
+    struct port : integer {};
     template<> struct store<port> : std::true_type {};
 
     // Serial port device name.
-    struct device : must<plus<sor<alnum, one<'_', '/'>>>> {};
+    struct device : plus<sor<alnum, one<'_', '/'>>> {};
     template<> struct store<device> : std::true_type {};
 
     // Serial port baud rate.
-    struct baudrate : must<integer> {};
+    struct baudrate : integer {};
     template<> struct store<baudrate> : std::true_type {};
 
     // Serial port flow control.
-    struct flow_control : must<yesno> {};
+    struct flow_control : yesno {};
     template<> struct store<flow_control> : std::true_type {};
 
     // Identifier name (keep node and content).
@@ -123,9 +125,9 @@ namespace config
 
     // MAVLink addresses and masks.
     struct mavaddr : seq<integer, one<'.'>, integer> {};
-    struct full_mask : seq<one<':'>, mavaddr> {};
-    struct forward_mask : seq<one<'/'>, integer> {};
-    struct backward_mask : seq<one<'\\'>, integer> {};
+    struct full_mask : if_must<one<':'>, mavaddr> {};
+    struct forward_mask : if_must<one<'/'>, integer> {};
+    struct backward_mask : if_must<one<'\\'>, integer> {};
     struct mavmask
         : seq<mavaddr, opt<sor<full_mask, forward_mask, backward_mask>>> {};
 
@@ -135,21 +137,25 @@ namespace config
     struct source : mavmask {};
     template<> struct store<source> : std::true_type {};
     struct source_command
-        : seq<TAO_PEGTL_STRING("from"), must<p<source>>> {};
+        : if_must<TAO_PEGTL_STRING("from"), p<source>> {};
     struct dest : mavmask {};
     template<> struct store<dest> : std::true_type {};
     struct dest_command
-        : seq<TAO_PEGTL_STRING("to"), must<p<dest>>> {};
-    struct conditional
-        : seq<TAO_PEGTL_STRING("if"), opt<p<packet_type>>,
-        opt<p<source_command>>, opt<p<dest_command>>> {};
-    template<> struct store<conditional> : std::true_type {};
+        : if_must<TAO_PEGTL_STRING("to"), p<dest>> {};
+    struct start_with_packet_type
+        : seq<packet_type, opt<p<source_command>>, opt<p<dest_command>>> {};
+    struct start_with_source : seq<source_command, opt<p<dest_command>>> {};
+    struct start_with_dest : dest_command {};
+    struct condition
+        : p<sor<start_with_packet_type, start_with_source, start_with_dest>> {};
+    struct conditional : if_must<TAO_PEGTL_STRING("if"), condition> {};
+    template<> struct store<conditional> : no_content {};
 
     // Priority.
     struct priority : signed_integer {};
     template<> struct store<priority> : std::true_type {};
     struct priority_command
-        : seq<TAO_PEGTL_STRING("with"), p<TAO_PEGTL_STRING("priority")>,
+        : if_must<TAO_PEGTL_STRING("with"), p<TAO_PEGTL_STRING("priority")>,
           p<priority>> {};
 
     // Catch unsuported statements.
@@ -159,7 +165,8 @@ namespace config
 
     // Filter chain.
     struct rule
-        : seq<p<action>, opt<p<priority_command>>, opt<p<conditional>>, eos> {};
+        : if_must<action, opt<p<priority_command>>,
+          opt<p<conditional>>, eos> {};
     template<> struct store<rule> : no_content {};
     struct rules : plus<p<rule>> {};
     template<> struct store<rules> : no_content {};
