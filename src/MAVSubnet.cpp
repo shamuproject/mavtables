@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+#include <iostream>
 
 #include <vector>
 #include <string>
@@ -212,6 +212,8 @@ MAVSubnet::MAVSubnet(std::string subnet)
         // Forward slash based subnet (bits from left).
         case '/':
             std::istringstream(parts.at(2)) >> slashmask;
+
+            std::cout << "slashmask = " << slashmask << std::endl;
 
             if (slashmask > 16)
             {
