@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
         {
             std::cout << "Configuration file located at "
                       << options.config_file() << std::endl;
-            // parse_file2(options.config_file());
             parse_file(options.config_file());
         }
     }

@@ -26,75 +26,49 @@
 
 
 
-namespace config
+void print_node(const tao::pegtl::parse_tree::node &n, const std::string &s)
 {
-    void print_node(const pegtl::parse_tree::node &n, const std::string &s = "");
-    void print_node(const pegtl::parse_tree::node &n, const std::string &s)
+    // detect the root node:
+    if (n.is_root())
     {
-        // detect the root node:
-        if (n.is_root())
+        std::cout << "ROOT" << std::endl;
+    }
+    else
+    {
+        if (n.has_content())
         {
-            std::cout << "ROOT" << std::endl;
+            std::cout << s << n.name() << " \"" << n.content() << "\" at " << n.begin() <<
+                      " to " << n.end() << std::endl;
         }
         else
         {
-            if (n.has_content())
-            {
-                std::cout << s << n.name() << " \"" << n.content() << "\" at " << n.begin() <<
-                          " to " << n.end() << std::endl;
-            }
-            else
-            {
-                std::cout << s << n.name() << " at " << n.begin() << std::endl;
-            }
+            std::cout << s << n.name() << " at " << n.begin() << std::endl;
         }
+    }
 
-        // print all child nodes
-        if (!n.children.empty())
+    // print all child nodes
+    if (!n.children.empty())
+    {
+        const auto s2 = s + "  ";
+
+        for (auto &up : n.children)
         {
-            const auto s2 = s + "  ";
-
-            for (auto &up : n.children)
-            {
-                print_node(*up, s2);
-            }
+            print_node(*up, s2);
         }
     }
 }
 
-#include <cstdio>
-#include <fstream>
 
 void parse_file(std::string filename)
 {
-    // std::cout << filename << std::endl;
-    // pegtl::string_input<> in("3 + 4", filename);
-    pegtl::read_input<> in(filename);
-    // std::ifstream ifs("test.conf");
-    // pegtl::istream_input<> in(ifs, 1024, filename);
-
-    // std::ifstream t(filename);
-    // std::string str((std::istreambuf_iterator<char>(t)),
-    //                  std::istreambuf_iterator<char>());
-    //
-    // std::cout << str << std::endl;
-    // pegtl::string_input<> in(str, filename);
-    const auto root = pegtl::parse_tree::parse<config::grammar, config::store>( in );
+    tao::pegtl::read_input<> in(filename);
+    const auto root = tao::pegtl::parse_tree::parse<config::grammar, config::store>( in );
     if (root != nullptr)
     {
-        config::print_node(*root);
+        print_node(*root);
     }
     else
     {
         std::cout << "Configuration file is invalid." << std::endl;
     }
-}
-
-
-void parse_file2(std::string filename)
-{
-    // std::cout << filename << std::endl;
-    // pegtl::string_input<> in("3 + 4", filename);
-    pegtl::read_input<> in(filename);
-    tao::pegtl::parse<config::grammar>( in );
 }
