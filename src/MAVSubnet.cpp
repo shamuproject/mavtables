@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#include <iostream>
+
 
 #include <vector>
 #include <string>
@@ -190,7 +190,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
 
     address_ = MAVAddress(parts[0]);
     // Determine format of subnet string.
-    unsigned int slashmask;
+    int slashmask;
 
     // If a regular subnet was given.
     switch (parts[1].at(0))
@@ -213,9 +213,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
         case '/':
             std::istringstream(parts.at(2)) >> slashmask;
 
-            std::cout << "slashmask = " << slashmask << std::endl;
-
-            if (slashmask > 16)
+            if (slashmask < 0 || slashmask > 16)
             {
                 throw std::out_of_range(
                     "Forward slash mask (" + std::to_string(slashmask)
@@ -229,7 +227,7 @@ MAVSubnet::MAVSubnet(std::string subnet)
         case '\\':
             std::istringstream(parts.at(2)) >> slashmask;
 
-            if (slashmask > 8)
+            if (slashmask < 0 || slashmask > 8)
             {
                 throw std::out_of_range(
                     "Backslash mask (" + std::to_string(slashmask)
