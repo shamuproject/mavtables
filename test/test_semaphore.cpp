@@ -149,9 +149,9 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(5ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Multiple wait (timeout).")
