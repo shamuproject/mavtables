@@ -27,8 +27,8 @@
 #include "common.hpp"
 
 
-TEST_CASE("'find_config' returns the path to the highest priority configuration "
-          "file.", "[configuration]")
+TEST_CASE("'find_config' returns the path to the highest priority "
+          "configuration file.", "[configuration]")
 {
     std::vector<Filesystem::path> paths;
     fakeit::Mock<Filesystem> fs_mock;

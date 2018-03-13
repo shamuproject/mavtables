@@ -27,7 +27,8 @@
 #include <type_traits>
 
 #include <pegtl.hpp>
-#include <pegtl/contrib/parse_tree.hpp>
+#include <parse_tree.hpp>
+// #include <pegtl/contrib/parse_tree.hpp>
 
 
 /// @cond INTERNAL
@@ -41,7 +42,7 @@ namespace config
     struct no_content : std::true_type
     {
         static void transform(
-            std::unique_ptr<tao::pegtl::parse_tree::node> &n)
+            std::unique_ptr<config::parse_tree::node> &n)
         {
             n->remove_content();
         }
@@ -80,7 +81,7 @@ namespace config
 
     // Yes/No (boolean) value.
     struct yesno
-        : sor<TAO_PEGTL_ISTRING("yes"), TAO_PEGTL_ISTRING("no")> {};
+    : sor<TAO_PEGTL_ISTRING("yes"), TAO_PEGTL_ISTRING("no")> {};
 
     // Unsigned integer value.
     struct integer : plus<digit> {};
@@ -137,11 +138,11 @@ namespace config
     struct source : mavmask {};
     template<> struct store<source> : std::true_type {};
     struct source_command
-        : if_must<TAO_PEGTL_STRING("from"), p<source>> {};
+    : if_must<TAO_PEGTL_STRING("from"), p<source>> {};
     struct dest : mavmask {};
     template<> struct store<dest> : std::true_type {};
     struct dest_command
-        : if_must<TAO_PEGTL_STRING("to"), p<dest>> {};
+    : if_must<TAO_PEGTL_STRING("to"), p<dest>> {};
     struct start_with_packet_type
         : seq<packet_type, opt<p<source_command>>, opt<p<dest_command>>> {};
     struct start_with_source : seq<source_command, opt<p<dest_command>>> {};
@@ -155,8 +156,8 @@ namespace config
     struct priority : signed_integer {};
     template<> struct store<priority> : std::true_type {};
     struct priority_command
-        : if_must<TAO_PEGTL_STRING("with"), p<TAO_PEGTL_STRING("priority")>,
-          p<priority>> {};
+    : if_must<TAO_PEGTL_STRING("with"), p<TAO_PEGTL_STRING("priority")>,
+      p<priority>> {};
 
     // Catch unsuported statements.
     // TODO: Consider changing failure to raise.
@@ -175,25 +176,25 @@ namespace config
 
     // Default filter action (keep node, no content).
     struct default_action
-        : t_statement<TAO_PEGTL_STRING("default_action"),
-          sor<accept, reject>> {};
+    : t_statement<TAO_PEGTL_STRING("default_action"),
+      sor<accept, reject>> {};
     template<> struct store<default_action> : no_content {};
 
     // UDP connection block.
     struct s_port : t_statement<TAO_PEGTL_STRING("port"), port> {};
     struct s_address : t_statement<TAO_PEGTL_STRING("address"), ip> {};
     struct udp
-        : t_block<TAO_PEGTL_STRING("udp"), s_port, s_address, s_catch> {};
+    : t_block<TAO_PEGTL_STRING("udp"), s_port, s_address, s_catch> {};
     template<> struct store<udp> : no_content {};
 
     // Serial port block.
     struct s_device : t_statement<TAO_PEGTL_STRING("device"), device> {};
     struct s_baudrate : t_statement<TAO_PEGTL_STRING("baudrate"), baudrate> {};
     struct s_flow_control
-        : t_statement<TAO_PEGTL_STRING("flow_control"), flow_control> {};
+    : t_statement<TAO_PEGTL_STRING("flow_control"), flow_control> {};
     struct serial
-        : t_block<TAO_PEGTL_STRING("serial"),
-        s_device, s_baudrate, s_flow_control, s_catch> {};
+    : t_block<TAO_PEGTL_STRING("serial"),
+      s_device, s_baudrate, s_flow_control, s_catch> {};
     template<> struct store<serial> : no_content {};
 
     // Combine grammar.
@@ -209,7 +210,7 @@ namespace config
 void parse_file(std::string filename);
 
 void print_node(
-    const tao::pegtl::parse_tree::node &n, const std::string &s = "");
+    const config::parse_tree::node &n, const std::string &s = "");
 
 
 #endif  // CONFIGURATION_HPP_

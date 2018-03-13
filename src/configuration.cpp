@@ -23,10 +23,10 @@
 
 #include "Filesystem.hpp"
 #include "configuration.hpp"
+#include "parse_tree.hpp"
 
 
-
-void print_node(const tao::pegtl::parse_tree::node &n, const std::string &s)
+void print_node(const config::parse_tree::node &n, const std::string &s)
 {
     // detect the root node:
     if (n.is_root())
@@ -37,8 +37,9 @@ void print_node(const tao::pegtl::parse_tree::node &n, const std::string &s)
     {
         if (n.has_content())
         {
-            std::cout << s << n.name() << " \"" << n.content() << "\" at " << n.begin() <<
-                      " to " << n.end() << std::endl;
+            std::cout << s << n.name() << " \"" << n.content()
+                      << "\" at " << n.begin()
+                      << " to " << n.end() << std::endl;
         }
         else
         {
@@ -62,7 +63,9 @@ void print_node(const tao::pegtl::parse_tree::node &n, const std::string &s)
 void parse_file(std::string filename)
 {
     tao::pegtl::read_input<> in(filename);
-    const auto root = tao::pegtl::parse_tree::parse<config::grammar, config::store>( in );
+    const auto root =
+        config::parse_tree::parse<config::grammar, config::store>(in);
+
     if (root != nullptr)
     {
         print_node(*root);
