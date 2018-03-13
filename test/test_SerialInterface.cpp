@@ -102,7 +102,8 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     auto encapsulated_data =
         std::make_shared<packet_v2::Packet>(to_vector(EncapsulatedDataV2()));
     // Serial port
-    fakeit::Mock<SerialPort> mock_port;
+    SerialPort serial_port;
+    fakeit::Mock<SerialPort> mock_port(serial_port);
     auto port = mock_unique(mock_port);
     using read_type =
         void(std::back_insert_iterator<std::vector<uint8_t>>,
@@ -298,7 +299,8 @@ TEST_CASE("SerialInterace's 'send_packet' method.", "[UPDInterface]")
     auto encapsulated_data =
         std::make_shared<packet_v2::Packet>(to_vector(EncapsulatedDataV2()));
     // Serial port
-    fakeit::Mock<SerialPort> mock_port;
+    SerialPort serial_port;
+    fakeit::Mock<SerialPort> mock_port(serial_port);
     auto port = mock_unique(mock_port);
     using write_type =
         void(std::vector<uint8_t>::const_iterator first,
