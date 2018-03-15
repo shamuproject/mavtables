@@ -120,13 +120,3 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/src/mavlink.hpp.in"
     "${PROJECT_BINARY_DIR}/mavlink.hpp"
 )
-
-list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/src/parse_tree.hpp')
-
-
-# Pass lcov ignore patterns up to parent.
-set (
-    LCOV_REMOVE_PATTERNS
-    ${LCOV_REMOVE_PATTERNS} "${LCOV_REMOVE_LOCAL}"
-    PARENT_SCOPE
-)
