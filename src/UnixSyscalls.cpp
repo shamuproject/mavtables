@@ -44,50 +44,6 @@ int UnixSyscalls::bind(
 }
 
 
-/** Get the input baud rate from the given termios structure.
- *
- *  See [man 2 termios](http://man7.org/linux/man-pages/man3/termios.3.html) for
- *  documentation.
- */
-speed_t UnixSyscalls::cfgetispeed(const struct termios *termios_p)
-{
-    return ::cfgetispeed(termios_p);
-}
-
-
-/** Get the output baud rate from the given termios structure.
- *
- *  See [man 2 termios](http://man7.org/linux/man-pages/man3/termios.3.html) for
- *  documentation.
- */
-speed_t UnixSyscalls::cfgetospeed(const struct termios *termios_p)
-{
-    return ::cfgetospeed(termios_p);
-}
-
-
-/** Set the input baud rate in the given termios structure.
- *
- *  See [man 2 termios](http://man7.org/linux/man-pages/man3/termios.3.html) for
- *  documentation.
- */
-int UnixSyscalls::cfsetispeed(struct termios *termios_p, speed_t speed)
-{
-    return ::cfsetispeed(termios_p, speed);
-}
-
-
-/** Set the output baud rate in the given termios structure.
- *
- *  See [man 2 termios](http://man7.org/linux/man-pages/man3/termios.3.html) for
- *  documentation.
- */
-int UnixSyscalls::cfsetospeed(struct termios *termios_p, speed_t speed)
-{
-    return ::cfsetospeed(termios_p, speed);
-}
-
-
 /** Close a file descriptor.
  *
  *  See [man 2 close](http://man7.org/linux/man-pages/man2/close.2.html) for

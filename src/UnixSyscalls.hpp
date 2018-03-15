@@ -57,10 +57,6 @@ class UnixSyscalls
         TEST_VIRTUAL ~UnixSyscalls() = default;
         TEST_VIRTUAL int bind(
             int sockfd, const struct sockaddr *addr, socklen_t addrlen);
-        TEST_VIRTUAL speed_t cfgetispeed(const struct termios *termios_p);
-        TEST_VIRTUAL speed_t cfgetospeed(const struct termios *termios_p);
-        TEST_VIRTUAL int cfsetispeed(struct termios *termios_p, speed_t speed);
-        TEST_VIRTUAL int cfsetospeed(struct termios *termios_p, speed_t speed);
         TEST_VIRTUAL int close(int fd);
         TEST_VIRTUAL int ioctl(int fd, unsigned long request, void *argp);
         TEST_VIRTUAL int open(const char *pathname, int flags);
