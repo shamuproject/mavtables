@@ -33,15 +33,14 @@
 #include <utility>
 #include <vector>
 
+#include <boost/hana.hpp>
+#include <pegtl/config.hpp>
+#include <pegtl/normal.hpp>
+#include <pegtl/nothing.hpp>
+#include <pegtl/parse.hpp>
+#include <pegtl/internal/demangle.hpp>
+#include <pegtl/internal/iterator.hpp>
 
-#include "pegtl/config.hpp"
-#include "pegtl/normal.hpp"
-#include "pegtl/nothing.hpp"
-#include "pegtl/parse.hpp"
-
-
-#include "pegtl/internal/demangle.hpp"
-#include "pegtl/internal/iterator.hpp"
 
 
 // Not included in documentation because it is mostly copied from PEGTL.
@@ -274,6 +273,15 @@ namespace config
                 }
             };
 
+            // https://stackoverflow.com/a/16000226
+            template <typename T, typename = int>
+            struct has_error_message : std::false_type {};
+
+            // https://stackoverflow.com/a/16000226
+            template <typename T>
+            struct has_error_message <T, decltype((void) T::error_message, 0)>
+                : std::true_type {};
+
             template<template<typename> class S>
             struct make_control
             {
@@ -289,6 +297,23 @@ namespace config
             struct make_control< S >::control< Rule, false >
                 : pegtl::normal< Rule >
             {
+
+                // custom error message
+                template< typename Input, typename... States >
+                static void raise( const Input& in, States&&... )
+                {
+                    if constexpr (has_error_message<S<Rule>>::value)
+                    {
+                        throw pegtl::parse_error(S<Rule>::error_message, in);
+                    }
+                    else
+                    {
+                        throw pegtl::parse_error(
+                            "Parse error matching " +
+                            pegtl::internal::demangle<Rule>(), in);
+                    }
+                }
+
             };
 
             template<template<typename> class S>
@@ -296,6 +321,23 @@ namespace config
             struct make_control<S>::control< Rule, true >
                 : pegtl::normal<Rule>
             {
+
+                // custom error message
+                template< typename Input, typename... States >
+                static void raise( const Input& in, States&&... )
+                {
+                    if constexpr (has_error_message<S<Rule>>::value)
+                    {
+                        throw pegtl::parse_error(S<Rule>::error_message, in);
+                    }
+                    else
+                    {
+                        throw pegtl::parse_error(
+                            "Parse error matching " +
+                            pegtl::internal::demangle<Rule>(), in);
+                    }
+                }
+
                 template<typename Input, typename Node, typename... States>
                 static void start(
                     const Input &in, state< Node > &state, States &&... st)
@@ -394,8 +436,8 @@ namespace config
 
             if (!pegtl::parse <
                     Rule, pegtl::nothing,
-                    internal::make_control<S>::template type >
-            (in, state, st...))
+                    internal::make_control<S>::template type>
+                    (in, state, st...))
             {
                 return nullptr;
             }
