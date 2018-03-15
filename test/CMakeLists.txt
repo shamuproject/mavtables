@@ -18,6 +18,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_mavlink.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_MAVSubnet.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Options.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion1.cpp"
