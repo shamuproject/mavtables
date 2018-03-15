@@ -38,6 +38,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
 )
+
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
@@ -66,6 +67,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/parse_tree.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.hpp"
@@ -82,6 +84,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
 )
+
 target_sources (mavtables 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/mavtables.cpp"
@@ -95,6 +98,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             ${HEADERS}
     )
 endif ()
+
 target_include_directories (mavtables 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}"
@@ -107,6 +111,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             "${PROJECT_BINARY_DIR}"
     )
 endif ()
+
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/config.hpp.in"
     "${PROJECT_BINARY_DIR}/config.hpp"
@@ -114,4 +119,14 @@ configure_file (
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/mavlink.hpp.in"
     "${PROJECT_BINARY_DIR}/mavlink.hpp"
+)
+
+list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/src/parse_tree.hpp')
+
+
+# Pass lcov ignore patterns up to parent.
+set (
+    LCOV_REMOVE_PATTERNS
+    ${LCOV_REMOVE_PATTERNS} "${LCOV_REMOVE_LOCAL}"
+    PARENT_SCOPE
 )

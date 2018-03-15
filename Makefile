@@ -38,7 +38,7 @@ coverage: COVERAGE = On
 coverage: test
 	$(MAKE) -C build lcov-geninfo
 	$(MAKE) -C build lcov-genhtml
-	gcovr -r . -e 'lib.*'
+	gcovr -r . -e 'lib.*' -e 'src/parse_tree.hpp'
 
 linecheck:
 	-grep -rPIn --color=always '(.{81})' src | grep -v '\\copydoc'

@@ -33,7 +33,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/hana.hpp>
 #include <pegtl/config.hpp>
 #include <pegtl/normal.hpp>
 #include <pegtl/nothing.hpp>
