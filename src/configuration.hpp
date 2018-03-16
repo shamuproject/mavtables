@@ -21,10 +21,13 @@
 
 #include <iostream>
 
+#include <iterator>
 #include <memory>
 #include <optional>
 #include <string>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <pegtl.hpp>
 #include <parse_tree.hpp>
@@ -73,10 +76,32 @@ namespace config
     template<typename T>
     struct yes_without_content : std::true_type, error<T>
     {
-        static void transform(
-            std::unique_ptr<config::parse_tree::node> &n)
+        static void transform(std::unique_ptr<config::parse_tree::node> &node)
         {
-            n->remove_content();
+            node->remove_content();
+        }
+    };
+
+    // Replace with first child storage mixin.
+    template <typename T>
+    struct replace_with_first_child : std::true_type, error<T>
+    {
+        static void transform(std::unique_ptr<config::parse_tree::node> &node)
+        {
+            auto children = std::move(node->children);
+            node = std::move(children.front());
+            children.erase(children.begin());
+            if (node->children.empty())
+            {
+                node->children = std::move(children);
+            }
+            else
+            {
+                node->children.insert(
+                    std::end(node->children),
+                    std::make_move_iterator(std::begin(children)),
+                    std::make_move_iterator(std::end(children)));
+            }
         }
     };
 
@@ -151,15 +176,26 @@ namespace config
     template<> struct store<chain_name> : yes<chain_name> {};
 
     // Rule actions.
+    // accept
     struct accept : TAO_PEGTL_STRING("accept") {};
     template<> struct store<accept> : yes_without_content<accept> {};
+    // reject
     struct reject : TAO_PEGTL_STRING("reject") {};
     template<> struct store<reject> : yes_without_content<reject> {};
-    struct call : seq<TAO_PEGTL_STRING("call"), p<must<chain_name>>> {};
-    template<> struct store<call> : yes_without_content<call> {};
-    struct goto_ : seq<TAO_PEGTL_STRING("goto"), p<must<chain_name>>> {};
-    template<> struct store<goto_> : yes_without_content<goto_> {};
-    struct action : sor<accept, reject, call, goto_> {};
+    // call
+    struct call : chain_name {};
+    template<> struct store<call> : yes<call> {};
+    struct call_container : seq<TAO_PEGTL_STRING("call"), p<must<call>>> {};
+    template<> struct store<call_container>
+        : replace_with_first_child<call_container> {};
+    // goto
+    struct goto_ : chain_name {};
+    template<> struct store<goto_> : yes<goto_> {};
+    struct goto_container : seq<TAO_PEGTL_STRING("goto"), p<must<goto_>>> {};
+    template<> struct store<goto_container>
+        : replace_with_first_child<goto_container> {};
+    // generic action
+    struct action : sor<accept, reject, call_container, goto_container> {};
 
     // MAVLink addresses and masks.
     struct mavaddr : seq<integer, one<'.'>, integer> {};
@@ -218,12 +254,16 @@ namespace config
     struct rule
         : if_must<action, opt<p<priority_command>>,
           opt<p<conditional>>, eos> {};
-    template<> struct store<rule> : yes_without_content<rule> {};
+    template<> struct store<rule> : replace_with_first_child<rule> {};
+    // template<> struct store<rule> : yes_without_content<rule> {};
     struct rules : plus<p<sor<rule, rule_catch>>> {};
     template<> struct store<rules> : yes_without_content<rules> {};
-    struct chain
-        : t_named_block<TAO_PEGTL_STRING("chain"), chain_name, rules> {};
-    template<> struct store<chain> : yes_without_content<chain> {};
+    struct chain : chain_name {};
+    template<> struct store<chain> : yes<chain> {};
+    struct chain_container
+        : t_named_block<TAO_PEGTL_STRING("chain"), chain, rules> {};
+    template<> struct store<chain_container>
+        : replace_with_first_child<chain_container> {};
 
     // Default filter action (keep node, no content).
     struct default_action_option : sor<accept, reject> {};
@@ -250,19 +290,22 @@ namespace config
     template<> struct store<serial> : yes_without_content<serial> {};
 
     // Combine grammar.
-    struct block : sor<udp, serial, chain> {};
+    struct block : sor<udp, serial, chain_container> {};
     struct statement : sor<default_action, s_catch> {};
     struct element : sor<comment, block, statement> {};
     struct grammar : seq<star<pad<element, ignored>>, eof> {};
+
+    // Print a given AST node and all it's children.
+    void print_node(
+        const parse_tree::node &n,
+        bool print_location = false,
+        const std::string &s = "");
 
 }
 /// @endcond
 
 
 void parse_file(std::string filename);
-
-void print_node(
-    const config::parse_tree::node &n, const std::string &s = "");
 
 
 #endif  // CONFIGURATION_HPP_

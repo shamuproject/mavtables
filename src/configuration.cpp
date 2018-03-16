@@ -116,40 +116,50 @@ namespace config
     #pragma clang diagnostic pop
 #endif
 
-}
-
-
-void print_node(const config::parse_tree::node &n, const std::string &s)
-{
-    // detect the root node
-    if (n.is_root())
+    void print_node(
+        const config::parse_tree::node &node,
+        bool print_location, const std::string &prefix)
     {
-        std::cout << "ROOT" << std::endl;
-    }
-    else
-    {
-        if (n.has_content())
+        // detect the root node
+        if (node.is_root())
         {
-            std::cout << s << n.name() << " \"" << n.content()
-                      << "\" at " << n.begin()
-                      << " to " << n.end() << std::endl;
+            std::cout << "ROOT" << std::endl;
         }
         else
         {
-            std::cout << s << n.name() << " at " << n.begin() << std::endl;
+            auto name = node.name();
+            name.erase(0, 8);
+            const auto begin = name.find_first_not_of("_");
+            const auto end = name.find_last_not_of("_");
+            name = name.substr(begin, end - begin + 1);
+            std::cout << prefix << name;
+            if (node.has_content())
+            {
+                std::cout << " \"" << node.content() << "\"";
+            }
+            if (print_location)
+            {
+                std::cout << " at " << node.begin();
+                if (node.has_content())
+                {
+                    std::cout << " to " << node.end();
+                }
+            }
+            std::cout << std::endl;
         }
-    }
 
-    // print all child nodes
-    if (!n.children.empty())
-    {
-        const auto s2 = s + "  ";
-
-        for (auto &up : n.children)
+        // print all child nodes
+        if (!node.children.empty())
         {
-            print_node(*up, s2);
+            const auto prefix2 = prefix + "    ";
+
+            for (auto &up : node.children)
+            {
+                print_node(*up, print_location, prefix2);
+            }
         }
     }
+
 }
 
 
@@ -161,7 +171,7 @@ void parse_file(std::string filename)
 
     if (root != nullptr)
     {
-        print_node(*root);
+        config::print_node(*root);
     }
     else
     {
