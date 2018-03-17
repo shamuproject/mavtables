@@ -47,20 +47,9 @@ namespace config
         static const std::string error_message;
     };
 
-#ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wglobal-constructors"
-    #pragma clang diagnostic ignored "-Wexit-time-destructors"
-#endif
 
-    // Default error message.
-    template<typename T>
-    const std::string error<T>::error_message =
-       "parse error matching " + internal::demangle<T>();
-
-#ifdef __clang__
-    #pragma clang diagnostic pop
-#endif
+    // template<typename T>
+    // const std::string error<T>::error_message;
 
 
     // Store node mixin.
@@ -292,6 +281,81 @@ namespace config
     struct grammar : seq<star<pad<element, ignored>>, eof> {};
 
     /// @endcond
+
+
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wglobal-constructors"
+    #pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+
+    // Error messages
+
+    template<>
+    const std::string error<eos>::error_message;
+
+    template<>
+    const std::string error<opening_bracket>::error_message;
+
+    template<>
+    const std::string error<closing_bracket>::error_message;
+
+    template<>
+    const std::string error<unsupported_statement>::error_message;
+
+    template<>
+    const std::string error<default_action_option>::error_message;
+
+    template<>
+    const std::string error<port>::error_message;
+
+    template<>
+    const std::string error<ip>::error_message;
+
+    template<>
+    const std::string error<device>::error_message;
+
+    template<>
+    const std::string error<baudrate>::error_message;
+
+    template<>
+    const std::string error<flow_control>::error_message;
+
+    template<>
+    const std::string error<chain_name>::error_message;
+
+    template<>
+    const std::string error<invalid_rule>::error_message;
+
+    template<>
+    const std::string error<condition>::error_message;
+
+    template<>
+    const std::string error<dest>::error_message;
+
+    template<>
+    const std::string error<source>::error_message;
+
+    template<>
+    const std::string error<mavaddr>::error_message;
+
+    template<>
+    const std::string error<integer>::error_message;
+
+    template<>
+    const std::string error<priority>::error_message;
+
+    template<>
+    const std::string error<priority_keyword>::error_message;
+
+    // Default error message.
+    template<typename T>
+    const std::string error<T>::error_message =
+       "parse error matching " + internal::demangle<T>();
+
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif
 
 }
 
