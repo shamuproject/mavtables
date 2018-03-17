@@ -41,7 +41,6 @@
 #include <pegtl/internal/iterator.hpp>
 
 
-
 // Not included in documentation because it is mostly copied from PEGTL.
 
 /// @cond INTERNAL
@@ -377,51 +376,6 @@ namespace config
             };
 
         }  // namespace internal
-
-        // use these helper classes as a base class to derive your
-        // specialization from:
-
-        // some nodes don't need to store their content
-        struct remove_content : std::true_type
-        {
-            template<typename Node, typename... States>
-            static void transform(
-                std::unique_ptr<Node> &n, States &&... st)
-            noexcept(noexcept(n->remove_content(st...)))
-            {
-                n->remove_content(st...);
-            }
-        };
-
-        // if a node has only one child, replace the node with its child
-        struct fold_one : std::true_type
-        {
-            template<typename Node, typename... States>
-            static void transform(
-                std::unique_ptr<Node> &n, States &&... /*unused*/)
-            noexcept(noexcept(n->size(), n->front()))
-            {
-                if (n->size() == 1)
-                {
-                    n = std::move(n->front());
-                }
-            }
-        };
-
-        // if a node has only one child, replace the node with its child
-        struct discard_empty : std::true_type
-        {
-            template<typename Node, typename... States>
-            static void transform(
-                std::unique_ptr<Node> &n, States &&... /*unused*/)
-            noexcept(noexcept(n->empty()))
-            {
-                if (n->empty())
-                {
-                    n.reset();
-                }
-            }
-        };
 
         template <
             typename Rule,

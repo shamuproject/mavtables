@@ -19,8 +19,6 @@
 #define CONFIGURATION_HPP_
 
 
-#include <iostream>
-
 #include <iterator>
 #include <memory>
 #include <optional>
@@ -33,9 +31,10 @@
 #include <parse_tree.hpp>
 
 
-/// @cond INTERNAL
 namespace config
 {
+
+    /// @cond INTERNAL
 
     using namespace tao::pegtl;
     using namespace tao::pegtl::ascii;
@@ -156,7 +155,7 @@ namespace config
     template<> struct store<ip> : yes<ip> {};
 
     // Port number.
-    struct port : integer {};
+    struct port : seq<integer> {};
     template<> struct store<port> : yes<port> {};
 
     // Serial port device name.
@@ -255,13 +254,10 @@ namespace config
         : if_must<action, opt<p<priority_command>>,
           opt<p<conditional>>, eos> {};
     template<> struct store<rule> : replace_with_first_child<rule> {};
-    // template<> struct store<rule> : yes_without_content<rule> {};
-    struct rules : plus<p<sor<rule, rule_catch>>> {};
-    template<> struct store<rules> : yes_without_content<rules> {};
     struct chain : chain_name {};
     template<> struct store<chain> : yes<chain> {};
     struct chain_container
-        : t_named_block<TAO_PEGTL_STRING("chain"), chain, rules> {};
+        : t_named_block<TAO_PEGTL_STRING("chain"), chain, rule> {};
     template<> struct store<chain_container>
         : replace_with_first_child<chain_container> {};
 
@@ -295,17 +291,18 @@ namespace config
     struct element : sor<comment, block, statement> {};
     struct grammar : seq<star<pad<element, ignored>>, eof> {};
 
-    // Print a given AST node and all it's children.
-    void print_node(
-        const parse_tree::node &n,
-        bool print_location = false,
-        const std::string &s = "");
+    /// @endcond
 
 }
-/// @endcond
 
 
-void parse_file(std::string filename);
+std::ostream &print_node(
+    std::ostream &os, const config::parse_tree::node &n,
+    bool print_location, const std::string &s = "");
+
+
+std::ostream &operator<<(
+    std::ostream &os, const config::parse_tree::node &node);
 
 
 #endif  // CONFIGURATION_HPP_

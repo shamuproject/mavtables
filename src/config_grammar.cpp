@@ -16,19 +16,29 @@
 
 
 #include <cstdlib>
+#include <iostream>
+#include <iomanip>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
 
 #include "Filesystem.hpp"
-#include "configuration.hpp"
+#include "config_grammar.hpp"
 #include "parse_tree.hpp"
+
+
+/** \defgroup config Configuration functions.
+ *
+ *  These functions are used to parse the configuration file.
+ */
 
 
 // custom error messages
 namespace config
 {
+
+/// @cond INTERNAL
 
 #ifdef __clang__
     #pragma clang diagnostic push
@@ -116,65 +126,84 @@ namespace config
     #pragma clang diagnostic pop
 #endif
 
-    void print_node(
-        const config::parse_tree::node &node,
-        bool print_location, const std::string &prefix)
-    {
-        // detect the root node
-        if (node.is_root())
-        {
-            std::cout << "ROOT" << std::endl;
-        }
-        else
-        {
-            auto name = node.name();
-            name.erase(0, 8);
-            const auto begin = name.find_first_not_of("_");
-            const auto end = name.find_last_not_of("_");
-            name = name.substr(begin, end - begin + 1);
-            std::cout << prefix << name;
-            if (node.has_content())
-            {
-                std::cout << " \"" << node.content() << "\"";
-            }
-            if (print_location)
-            {
-                std::cout << " at " << node.begin();
-                if (node.has_content())
-                {
-                    std::cout << " to " << node.end();
-                }
-            }
-            std::cout << std::endl;
-        }
-
-        // print all child nodes
-        if (!node.children.empty())
-        {
-            const auto prefix2 = prefix + "    ";
-
-            for (auto &up : node.children)
-            {
-                print_node(*up, print_location, prefix2);
-            }
-        }
-    }
-
+/// @endcond
 }
 
 
-void parse_file(std::string filename)
+/** Print an AST node and all its children.
+ *
+ *  \ingroup config
+ *  \param os The output stream to print to.
+ *  \param node The node to print, also prints it's children.
+ *  \param print_location Set to true to print file and line numbers of each
+ *      AST node.
+ *  \param prefix A string to prefix to each AST element.  This is reserved
+ *      for internal use.
+ *  \returns The output stream.
+ */
+std::ostream &print_node(
+    std::ostream &os,
+    const config::parse_tree::node &node,
+    bool print_location, const std::string &prefix)
 {
-    tao::pegtl::read_input<> in(filename);
-    const auto root =
-        config::parse_tree::parse<config::grammar, config::store>(in);
+    auto new_prefix = prefix;
 
-    if (root != nullptr)
+    // If not the root node.
+    if (!node.is_root())
     {
-        config::print_node(*root);
+        // Add 2 spaces to the indent.
+        new_prefix = prefix + "|  ";
+
+        // Remove "config::" prefix from node name.
+        auto node_name = node.name();
+        node_name.erase(0, 8);
+        const auto begin = node_name.find_first_not_of("_");
+        const auto end = node_name.find_last_not_of("_");
+        node_name = node_name.substr(begin, end - begin + 1);
+
+        // Print location.
+        if (print_location)
+        {
+            os << node.begin().source << ":"
+               << std::setfill('0') << std::setw(3)
+               << node.begin().line << ":  ";
+        }
+
+        // Print name.
+        os << prefix << node_name;
+
+        // Print node content.
+        if (node.has_content())
+        {
+            os << " " << node.content() << "";
+        }
+        os << std::endl;
     }
-    else
+
+    // Print all child nodes
+    if (!node.children.empty())
     {
-        std::cout << "Configuration file is invalid." << std::endl;
+        for (auto &up : node.children)
+        {
+            print_node(os, *up, print_location, new_prefix);
+        }
     }
+    return os;
+}
+
+
+/** Print AST node to the given output stream.
+ *
+ *  This is the same as calling \ref config::print_node with the location option
+ *  set to true.
+ *
+ *  \ingroup config
+ *  \param os The output stream to print to.
+ *  \param node The node to print, also prints it's children.
+ *  \return The output stream.
+ */
+std::ostream &operator<<(
+    std::ostream &os, const config::parse_tree::node &node)
+{
+    return print_node(os, node, true);
 }

@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,11 +16,29 @@
 
 
 #include <string>
+#include <stdexcept>
 
-#include "util.hpp"
+#include <config_grammar.hpp>
+#include <parse_tree.hpp>
+
+#include "ConfigFileParser.hpp"
 
 
-/** \defgroup utility Utility Functions
+/** Construct a configuration parser from a file.
  *
- *  Utility functions that don't warrant their own file.
+ *  \param filename The path to the configuration file to parse.
  */
+ConfigFileParser::ConfigFileParser(std::string filename)
+    : in_(filename)
+{
+    root_ = config::parse_tree::parse<config::grammar, config::store>(in_);
+    if (root_ == nullptr)
+    {
+        throw std::runtime_error("Configuration file is invalid.");
+    }
+}
+
+
+ConfigFileParser::~ConfigFileParser()
+{
+}

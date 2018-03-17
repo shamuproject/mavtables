@@ -78,6 +78,7 @@ std::array<ByteType, sizeof(T)> to_bytes(T number)
 
 /** Print a vector to the given output stream.
  *
+ *  \ingroup utility
  *  \tparam T The type stored in the vector, it must support the << operator.
  *  \param os The output stream to print to.
  *  \param vector The vector of elements to print.
