@@ -40,32 +40,6 @@ namespace config
 
 /// @cond INTERNAL
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #ifdef __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -77,12 +51,12 @@ namespace config
            "expected end of statement ';' character";
 
     template<>
-    const std::string error<opening_bracket>::error_message =
-           "expected opening bracket '{'";
+    const std::string error<opening_brace>::error_message =
+           "expected opening brace '{'";
 
     template<>
-    const std::string error<closing_bracket>::error_message =
-           "expected closing bracket '}'";
+    const std::string error<closing_brace>::error_message =
+           "expected closing brace '}'";
 
     template<>
     const std::string error<unsupported_statement>::error_message =
@@ -97,7 +71,7 @@ namespace config
            "expected a valid port number";
 
     template<>
-    const std::string error<ip>::error_message =
+    const std::string error<address>::error_message =
            "expected a valid IP address";
 
     template<>
@@ -106,7 +80,7 @@ namespace config
 
     template<>
     const std::string error<baudrate>::error_message =
-           "expected a valid baudrate";
+           "expected a valid baud rate";
 
     template<>
     const std::string error<flow_control>::error_message =
@@ -117,12 +91,24 @@ namespace config
            "expected a valid chain name";
 
     template<>
+    const std::string error<chain>::error_message =
+           "expected a valid chain name";
+
+    template<>
+    const std::string error<call>::error_message =
+           "expected a valid chain name";
+
+    template<>
+    const std::string error<goto_>::error_message =
+           "expected a valid chain name";
+
+    template<>
     const std::string error<invalid_rule>::error_message =
            "expected a valid rule";
 
     template<>
-    const std::string error<condition>::error_message =
-           "conditional is empty";
+    const std::string error<condition_value>::error_message =
+           "condition is empty or invalid";
 
     template<>
     const std::string error<dest>::error_message =
@@ -153,68 +139,69 @@ namespace config
 #endif
 
 /// @endcond
-}
 
 
-/** Print an AST node and all its children.
- *
- *  \ingroup config
- *  \param os The output stream to print to.
- *  \param node The node to print, also prints it's children.
- *  \param print_location Set to true to print file and line numbers of each
- *      AST node.
- *  \param prefix A string to prefix to each AST element.  This is reserved
- *      for internal use.
- *  \returns The output stream.
- */
-std::ostream &print_node(
-    std::ostream &os,
-    const config::parse_tree::node &node,
-    bool print_location, const std::string &prefix)
-{
-    auto new_prefix = prefix;
-
-    // If not the root node.
-    if (!node.is_root())
+    /** Print an AST node and all its children.
+     *
+     *  \ingroup config
+     *  \param os The output stream to print to.
+     *  \param node The node to print, also prints it's children.
+     *  \param print_location Set to true to print file and line numbers of each
+     *      AST node.
+     *  \param prefix A string to prefix to each AST element.  This is reserved
+     *      for internal use.
+     *  \returns The output stream.
+     */
+    std::ostream &print_node(
+        std::ostream &os,
+        const config::parse_tree::node &node,
+        bool print_location, const std::string &prefix)
     {
-        // Add 2 spaces to the indent.
-        new_prefix = prefix + "|  ";
+        auto new_prefix = prefix;
 
-        // Remove "config::" prefix from node name.
-        auto node_name = node.name();
-        node_name.erase(0, 8);
-        const auto begin = node_name.find_first_not_of("_");
-        const auto end = node_name.find_last_not_of("_");
-        node_name = node_name.substr(begin, end - begin + 1);
-
-        // Print location.
-        if (print_location)
+        // If not the root node.
+        if (!node.is_root())
         {
-            os << node.begin().source << ":"
-               << std::setfill('0') << std::setw(3)
-               << node.begin().line << ":  ";
+            // Add 2 spaces to the indent.
+            new_prefix = prefix + "|  ";
+
+            // Remove "config::" prefix from node name.
+            auto node_name = node.name();
+            node_name.erase(0, 8);
+            const auto begin = node_name.find_first_not_of("_");
+            const auto end = node_name.find_last_not_of("_");
+            node_name = node_name.substr(begin, end - begin + 1);
+
+            // Print location.
+            if (print_location)
+            {
+                os << node.begin().source << ":"
+                   << std::setfill('0') << std::setw(3)
+                   << node.begin().line << ":  ";
+            }
+
+            // Print name.
+            os << prefix << node_name;
+
+            // Print node content.
+            if (node.has_content())
+            {
+                os << " " << node.content() << "";
+            }
+            os << std::endl;
         }
 
-        // Print name.
-        os << prefix << node_name;
-
-        // Print node content.
-        if (node.has_content())
+        // Print all child nodes
+        if (!node.children.empty())
         {
-            os << " " << node.content() << "";
+            for (auto &up : node.children)
+            {
+                print_node(os, *up, print_location, new_prefix);
+            }
         }
-        os << std::endl;
+        return os;
     }
 
-    // Print all child nodes
-    if (!node.children.empty())
-    {
-        for (auto &up : node.children)
-        {
-            print_node(os, *up, print_location, new_prefix);
-        }
-    }
-    return os;
 }
 
 
@@ -231,5 +218,5 @@ std::ostream &print_node(
 std::ostream &operator<<(
     std::ostream &os, const config::parse_tree::node &node)
 {
-    return print_node(os, node, true);
+    return config::print_node(os, node, true);
 }

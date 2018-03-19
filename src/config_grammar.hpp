@@ -48,10 +48,6 @@ namespace config
     };
 
 
-    // template<typename T>
-    // const std::string error<T>::error_message;
-
-
     // Store node mixin.
     template<typename T>
     struct yes : std::true_type, error<T> {};
@@ -115,23 +111,23 @@ namespace config
     struct a1_statement : seq<K, p<must<V>>, p<must<eos>>> {};
 
     // Generic block.
-    struct opening_bracket : one<'{'> {};
-    struct closing_bracket : one<'}'> {};
+    struct opening_brace : one<'{'> {};
+    struct closing_brace : one<'}'> {};
     template <typename K, typename... Statements>
     struct t_block : seq<K,
-        p<must<opening_bracket>>,
+        p<must<opening_brace>>,
         star<p<sor<Statements...>>>,
-        p<must<closing_bracket>>> {};
+        p<must<closing_brace>>> {};
 
     // Generic named block.
     template <typename K, typename N, typename... Statements>
     struct t_named_block
-        : seq<K, p<must<N>>, p<must<opening_bracket>>,
-        star<p<sor<Statements...>>>, p<must<closing_bracket>>> {};
+        : seq<K, p<must<N>>, p<must<opening_brace>>,
+        star<p<sor<Statements...>>>, p<must<closing_brace>>> {};
 
     // Yes/No (boolean) value.
     struct yesno
-    : sor<TAO_PEGTL_ISTRING("yes"), TAO_PEGTL_ISTRING("no")> {};
+    : sor<TAO_PEGTL_STRING("yes"), TAO_PEGTL_STRING("no")> {};
 
     // Unsigned integer value.
     struct integer : plus<digit> {};
@@ -140,8 +136,8 @@ namespace config
     struct signed_integer : seq<opt<one<'+', '-'>>, integer> {};
 
     // IP address.
-    struct ip : seq<integer, rep<3, seq<one<'.'>, integer>>> {};
-    template<> struct store<ip> : yes<ip> {};
+    struct address : seq<integer, rep<3, seq<one<'.'>, integer>>> {};
+    template<> struct store<address> : yes<address> {};
 
     // Port number.
     struct port : seq<integer> {};
@@ -208,10 +204,10 @@ namespace config
         : seq<packet_type, opt<p<source_command>>, opt<p<dest_command>>> {};
     struct start_with_source : seq<source_command, opt<p<dest_command>>> {};
     struct start_with_dest : dest_command {};
-    struct condition
+    struct condition_value
         : p<sor<start_with_packet_type, start_with_source, start_with_dest>> {};
-    struct conditional : if_must<TAO_PEGTL_STRING("if"), condition> {};
-    template<> struct store<conditional> : yes_without_content<conditional> {};
+    struct condition : if_must<TAO_PEGTL_STRING("if"), condition_value> {};
+    template<> struct store<condition> : yes_without_content<condition> {};
 
     // Priority.
     struct priority : signed_integer {};
@@ -240,8 +236,8 @@ namespace config
 
     // Filter chain.
     struct rule
-        : if_must<action, opt<p<priority_command>>,
-          opt<p<conditional>>, eos> {};
+        : if_must<sor<action, rule_catch>, opt<p<priority_command>>,
+          opt<p<condition>>, eos> {};
     template<> struct store<rule> : replace_with_first_child<rule> {};
     struct chain : chain_name {};
     template<> struct store<chain> : yes<chain> {};
@@ -259,7 +255,7 @@ namespace config
 
     // UDP connection block.
     struct s_port : a1_statement<TAO_PEGTL_STRING("port"), port> {};
-    struct s_address : a1_statement<TAO_PEGTL_STRING("address"), ip> {};
+    struct s_address : a1_statement<TAO_PEGTL_STRING("address"), address> {};
     struct udp
     : t_block<TAO_PEGTL_STRING("udp"), s_port, s_address, s_catch> {};
     template<> struct store<udp> : yes_without_content<udp> {};
@@ -295,10 +291,10 @@ namespace config
     const std::string error<eos>::error_message;
 
     template<>
-    const std::string error<opening_bracket>::error_message;
+    const std::string error<opening_brace>::error_message;
 
     template<>
-    const std::string error<closing_bracket>::error_message;
+    const std::string error<closing_brace>::error_message;
 
     template<>
     const std::string error<unsupported_statement>::error_message;
@@ -310,7 +306,7 @@ namespace config
     const std::string error<port>::error_message;
 
     template<>
-    const std::string error<ip>::error_message;
+    const std::string error<address>::error_message;
 
     template<>
     const std::string error<device>::error_message;
@@ -325,10 +321,19 @@ namespace config
     const std::string error<chain_name>::error_message;
 
     template<>
+    const std::string error<chain>::error_message;
+
+    template<>
+    const std::string error<call>::error_message;
+
+    template<>
+    const std::string error<goto_>::error_message;
+
+    template<>
     const std::string error<invalid_rule>::error_message;
 
     template<>
-    const std::string error<condition>::error_message;
+    const std::string error<condition_value>::error_message;
 
     template<>
     const std::string error<dest>::error_message;
@@ -357,12 +362,19 @@ namespace config
     #pragma clang diagnostic pop
 #endif
 
+    // TODO: document
+    template <typename Input>
+    std::unique_ptr<config::parse_tree::node> parse(Input &in)
+    {
+        return parse_tree::parse<grammar, config::store>(in);
+    }
+
+    std::ostream &print_node(
+        std::ostream &os, const config::parse_tree::node &n,
+        bool print_location, const std::string &s = "");
 }
 
 
-std::ostream &print_node(
-    std::ostream &os, const config::parse_tree::node &n,
-    bool print_location, const std::string &s = "");
 
 
 std::ostream &operator<<(
