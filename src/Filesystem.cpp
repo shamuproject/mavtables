@@ -20,6 +20,15 @@
 #include "Filesystem.hpp"
 
 
+// GCC generates a seemingly uncallable destructor for pure virtual classes.
+// Therefore, it must be excluded from test coverage.
+// LCOV_EXCL_START
+Filesystem::~Filesystem()
+{
+}
+// LCOV_EXCL_STOP
+
+
 /** Returns true if the given path exists.
  *
  *  \param p The path to check if it exists.

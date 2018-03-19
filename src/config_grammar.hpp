@@ -66,7 +66,8 @@ namespace config
         }
     };
 
-    // Replace with first child storage mixin.
+    // Replace with first child storage mixin.  Removes any children of the
+    // first child.
     template <typename T>
     struct replace_with_first_child : std::true_type, error<T>
     {
@@ -75,17 +76,7 @@ namespace config
             auto children = std::move(node->children);
             node = std::move(children.front());
             children.erase(children.begin());
-            if (node->children.empty())
-            {
-                node->children = std::move(children);
-            }
-            else
-            {
-                node->children.insert(
-                    std::end(node->children),
-                    std::make_move_iterator(std::begin(children)),
-                    std::make_move_iterator(std::end(children)));
-            }
+            node->children = std::move(children);
         }
     };
 

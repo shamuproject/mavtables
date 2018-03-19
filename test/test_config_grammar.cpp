@@ -27,6 +27,15 @@
 #include "common.hpp"
 
 
+
+TEST_CASE("Completly invalid configuration file retuns null.", "[config]")
+{
+        tao::pegtl::string_input<> in("1337", "");
+        auto root = config::parse(in);
+        REQUIRE(root == nullptr);
+}
+
+
 TEST_CASE("Global statements.", "[config]")
 {
     SECTION("Missing end of statement ';'.")
@@ -59,9 +68,29 @@ TEST_CASE("Parse global 'default_action' statement.", "[config]")
             ":001:  default_action\n"
             ":001:  |  accept\n");
     }
+    SECTION("Parses the 'accept' option (with comments).")
+    {
+        tao::pegtl::string_input<> in("default_action accept;# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  default_action\n"
+            ":001:  |  accept\n");
+    }
     SECTION("Parses the 'reject' option.")
     {
         tao::pegtl::string_input<> in("default_action reject;", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  default_action\n"
+            ":001:  |  reject\n");
+    }
+    SECTION("Parses the 'reject' option (with comments).")
+    {
+        tao::pegtl::string_input<> in("default_action reject;# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -103,6 +132,13 @@ TEST_CASE("UDP configuration block.", "[config]")
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  udp\n");
     }
+    SECTION("Empty UDP blocks are allowed (single line with comments).")
+    {
+        tao::pegtl::string_input<> in("udp {}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  udp\n");
+    }
     SECTION("Empty UDP blocks are allowed (1TBS style).")
     {
         tao::pegtl::string_input<> in("udp {\n}", "");
@@ -110,9 +146,24 @@ TEST_CASE("UDP configuration block.", "[config]")
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  udp\n");
     }
+    SECTION("Empty UDP blocks are allowed (1TBS style with comments).")
+    {
+        tao::pegtl::string_input<> in("udp {# comment\n}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  udp\n");
+    }
     SECTION("Empty UDP blocks are allowed (Allman style).")
     {
         tao::pegtl::string_input<> in("udp\n{\n}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  udp\n");
+    }
+    SECTION("Empty UDP blocks are allowed (Allman style with commentd).")
+    {
+        tao::pegtl::string_input<> in(
+            "udp# comment \n{# comment\n}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  udp\n");
@@ -149,6 +200,19 @@ TEST_CASE("UDP port setting.", "[config]")
             "udp {\n"
             "    port 14500;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  udp\n"
+            ":002:  |  port 14500\n");
+    }
+    SECTION("Parses port number setting (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {# comment\n"
+            "    port 14500;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -198,6 +262,19 @@ TEST_CASE("UDP IP address setting.", "[config]")
             "udp {\n"
             "    address 127.0.0.1;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  udp\n"
+            ":002:  |  address 127.0.0.1\n");
+    }
+    SECTION("Parses IP address setting (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {# comment\n"
+            "    address 127.0.0.1;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -329,6 +406,13 @@ TEST_CASE("Serial port configuration block.", "[config]")
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  serial\n");
     }
+    SECTION("Empty serial port blocks are allowed (single line with comments).")
+    {
+        tao::pegtl::string_input<> in("serial {}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  serial\n");
+    }
     SECTION("Empty serial port blocks are allowed (1TBS style).")
     {
         tao::pegtl::string_input<> in("serial {\n}", "");
@@ -336,9 +420,25 @@ TEST_CASE("Serial port configuration block.", "[config]")
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  serial\n");
     }
+    SECTION("Empty serial port blocks are allowed (1TBS style with comments).")
+    {
+        tao::pegtl::string_input<> in("serial {# comment\n}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  serial\n");
+    }
     SECTION("Empty serial port blocks are allowed (Allman style).")
     {
         tao::pegtl::string_input<> in("serial\n{\n}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  serial\n");
+    }
+    SECTION("Empty serial port blocks are allowed "
+            "(Allman style with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "serial# comment\n{# comment\n}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  serial\n");
@@ -382,12 +482,38 @@ TEST_CASE("Serial port device setting.", "[config]")
             ":001:  serial\n"
             ":002:  |  device /dev/tty_USB0\n");
     }
+    SECTION("Parses device string setting (with comments) [1].")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {# comment\n"
+            "    device /dev/tty_USB0;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  device /dev/tty_USB0\n");
+    }
     SECTION("Parses device string setting [2].")
     {
         tao::pegtl::string_input<> in(
             "serial {\n"
             "    device COM1;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  device COM1\n");
+    }
+    SECTION("Parses device string setting (with comment) [2].")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {# comment\n"
+            "    device COM1;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -446,12 +572,38 @@ TEST_CASE("Serial port flow control setting.", "[config]")
             ":001:  serial\n"
             ":002:  |  flow_control yes\n");
     }
+    SECTION("Parses flow control setting (yes with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {# comments\n"
+            "    flow_control yes;# comments\n"
+            "}# comments", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  flow_control yes\n");
+    }
     SECTION("Parses flow control setting (no).")
     {
         tao::pegtl::string_input<> in(
             "serial {\n"
             "    flow_control no;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  flow_control no\n");
+    }
+    SECTION("Parses flow control setting (no with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {# comments\n"
+            "    flow_control no;# comments\n"
+            "}# comments", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -504,6 +656,13 @@ TEST_CASE("Chain block.", "[config]")
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  chain some_name10\n");
     }
+    SECTION("Empty chain blocks are allowed (single line with comments).")
+    {
+        tao::pegtl::string_input<> in("chain some_name10 {}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  chain some_name10\n");
+    }
     SECTION("Empty chain blocks are allowed (1TBS style).")
     {
         tao::pegtl::string_input<> in("chain some_name10 {\n}", "");
@@ -511,9 +670,25 @@ TEST_CASE("Chain block.", "[config]")
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  chain some_name10\n");
     }
+    SECTION("Empty chain blocks are allowed (1TBS style with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain some_name10 {# comment\n}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  chain some_name10\n");
+    }
     SECTION("Empty chain blocks are allowed (Allman style).")
     {
         tao::pegtl::string_input<> in("chain some_name10\n{\n}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(str(*root) == ":001:  chain some_name10\n");
+    }
+    SECTION("Empty chain blocks are allowed (Allman style with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain some_name10# comment\n{# comment\n}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(str(*root) == ":001:  chain some_name10\n");
@@ -587,6 +762,19 @@ TEST_CASE("Accept rule.", "[config]")
             ":001:  chain default\n"
             ":002:  |  accept\n");
     }
+    SECTION("Parses 'accept' rule (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n");
+    }
     SECTION("Missing end of statement.")
     {
         tao::pegtl::string_input<> in(
@@ -616,6 +804,19 @@ TEST_CASE("Reject rule.", "[config]")
             ":001:  chain default\n"
             ":002:  |  reject\n");
     }
+    SECTION("Parses 'reject' rule (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    reject;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  reject\n");
+    }
     SECTION("Missing end of statement.")
     {
         tao::pegtl::string_input<> in(
@@ -638,6 +839,19 @@ TEST_CASE("Call rule.", "[config]")
             "chain default {\n"
             "    call some_name10;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  call some_name10\n");
+    }
+    SECTION("Parses 'call' rule (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    call some_name10;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -689,6 +903,19 @@ TEST_CASE("GoTo rule.", "[config]")
             "chain default {\n"
             "    goto some_name10;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  goto some_name10\n");
+    }
+    SECTION("Parses 'goto' rule (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    goto some_name10;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -765,6 +992,21 @@ TEST_CASE("Packet type condition.", "[config]")
             ":002:  |  |  condition\n"
             ":002:  |  |  |  packet_type PING\n");
     }
+    SECTION("Parses packet type condition (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if PING;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  packet_type PING\n");
+    }
     SECTION("Invalid packet type [1].")
     {
         tao::pegtl::string_input<> in(
@@ -807,12 +1049,42 @@ TEST_CASE("Source condition.", "[config]")
             ":002:  |  |  condition\n"
             ":002:  |  |  |  source 192.0\n");
     }
+    SECTION("Parses source condition (with comments) [1].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if from 192.0;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  source 192.0\n");
+    }
     SECTION("Parses source condition [2].")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"
             "    accept if from 192.0/8;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  source 192.0/8\n");
+    }
+    SECTION("Parses source condition (with comments) [2].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if from 192.0/8;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -837,12 +1109,42 @@ TEST_CASE("Source condition.", "[config]")
             ":002:  |  |  condition\n"
             ":002:  |  |  |  source 192.0\\4\n");
     }
+    SECTION("Parses source condition (with comments) [3].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if from 192.0\\4;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  source 192.0\\4\n");
+    }
     SECTION("Parses source condition [4].")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"
             "    accept if from 192.0:255.255;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  source 192.0:255.255\n");
+    }
+    SECTION("Parses source condition (with comments) [4].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if from 192.0:255.255;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -916,12 +1218,42 @@ TEST_CASE("Destination condition.", "[config]")
             ":002:  |  |  condition\n"
             ":002:  |  |  |  dest 192.0\n");
     }
+    SECTION("Parses destination condition (with comments) [1].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if to 192.0;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  dest 192.0\n");
+    }
     SECTION("Parses destination condition [2].")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"
             "    accept if to 192.0/8;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  dest 192.0/8\n");
+    }
+    SECTION("Parses destination condition (with comments) [2].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if to 192.0/8;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -946,12 +1278,42 @@ TEST_CASE("Destination condition.", "[config]")
             ":002:  |  |  condition\n"
             ":002:  |  |  |  dest 192.0\\4\n");
     }
+    SECTION("Parses destination condition (with comments) [3].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if to 192.0\\4;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  dest 192.0\\4\n");
+    }
     SECTION("Parses destination condition [4].")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"
             "    accept if to 192.0:255.255;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  dest 192.0:255.255\n");
+    }
+    SECTION("Parses destination condition (with comments) [4].")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept if to 192.0:255.255;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(
@@ -1024,6 +1386,20 @@ TEST_CASE("Priority.", "[config]")
             ":002:  |  accept\n"
             ":002:  |  |  priority 99\n");
     }
+    SECTION("Parses priority (no sign with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept with priority 99;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  priority 99\n");
+    }
     SECTION("Parses priority (positive).")
     {
         tao::pegtl::string_input<> in(
@@ -1038,12 +1414,40 @@ TEST_CASE("Priority.", "[config]")
             ":002:  |  accept\n"
             ":002:  |  |  priority +99\n");
     }
+    SECTION("Parses priority (positive with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept with priority +99;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  priority +99\n");
+    }
     SECTION("Parses priority (negative).")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"
             "    accept with priority -99;\n"
             "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  priority -99\n");
+    }
+    SECTION("Parses priority (negative with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {# comment\n"
+            "    accept with priority -99;# comment\n"
+            "}# comment", "");
         auto root = config::parse(in);
         REQUIRE(root != nullptr);
         REQUIRE(

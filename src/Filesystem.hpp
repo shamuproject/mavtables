@@ -32,7 +32,7 @@ class Filesystem
 {
     public:
         using path = boost::filesystem::path;
-        TEST_VIRTUAL ~Filesystem() = default;
+        TEST_VIRTUAL ~Filesystem();
         TEST_VIRTUAL bool exists(const path &p) const;
 };
 
