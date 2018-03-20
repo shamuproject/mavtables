@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <sstream>
+
 #include <catch.hpp>
 #include <fakeit.hpp>
 #include <pegtl.hpp>
@@ -2597,6 +2599,53 @@ TEST_CASE("Rule combinations with 'goto'.", "[config]")
             ":002:  |  goto some_name10\n"
             ":002:  |  |  priority 99\n"
             ":002:  |  |  condition\n"
+            ":002:  |  |  |  source 127.1\n"
+            ":002:  |  |  |  dest 192.0\n");
+    }
+}
+
+
+TEST_CASE("'print_node' method prints an abstract syntax tree.", "[config]")
+{
+    SECTION("Print without line information.")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {\n"
+            "    call some_name10 with priority 99 "
+            "if PING from 127.1 to 192.0;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        std::stringstream ss;
+        config::print_node(ss, *root, false);
+        REQUIRE(
+            ss.str() ==
+            "chain default\n"
+            "|  call some_name10\n"
+            "|  |  priority 99\n"
+            "|  |  condition\n"
+            "|  |  |  packet_type PING\n"
+            "|  |  |  source 127.1\n"
+            "|  |  |  dest 192.0\n");
+    }
+    SECTION("Print with line information.")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {\n"
+            "    call some_name10 with priority 99 "
+            "if PING from 127.1 to 192.0;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        std::stringstream ss;
+        config::print_node(ss, *root, true);
+        REQUIRE(
+            ss.str() ==
+            ":001:  chain default\n"
+            ":002:  |  call some_name10\n"
+            ":002:  |  |  priority 99\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  packet_type PING\n"
             ":002:  |  |  |  source 127.1\n"
             ":002:  |  |  |  dest 192.0\n");
     }

@@ -357,7 +357,16 @@ namespace config
     /// @endcond
 
 
-    // TODO: document
+    /** Parses given input into and abstract syntax tree.
+     *
+     *  \note The returned AST is only valid while \ref in exists.  Therefore,
+     *      the input should be kept until the AST passes out of scope.
+     *
+     *  \tparam Input The type of input, usually either read_input or
+     *      string_input.
+     *  \param in The input, from read_input etc, to parse.
+     *  \returns The abstract syntax tree parsed from the input.
+     */
     template <typename Input>
     std::unique_ptr<config::parse_tree::node> parse(Input &in)
     {
@@ -368,8 +377,6 @@ namespace config
         std::ostream &os, const config::parse_tree::node &n,
         bool print_location, const std::string &s = "");
 }
-
-
 
 
 std::ostream &operator<<(
