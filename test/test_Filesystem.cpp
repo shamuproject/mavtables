@@ -15,23 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
+
 #include <catch.hpp>
 #include <fakeit.hpp>
 
 #include "Filesystem.hpp"
 
 
-TEST_CASE("Filesystem's 'exist' method determins the existance of a file.",
+TEST_CASE("Filesystem's 'exist' method determines the existence of a file.",
           "[Filesystem]")
 {
-    Filesystem filesystem;
+    // Note: both compile time and dynamic construction used for complete
+    //       coverage.
     SECTION("Returns 'true' when the file exists.")
     {
+        Filesystem filesystem;
         REQUIRE(filesystem.exists("examples/test.conf"));
     }
     SECTION("Returns 'false' when the file does not exist.")
     {
+        auto filesystem = std::make_unique<Filesystem>();
         REQUIRE_FALSE(
-            filesystem.exists("examples/file_that_does_not_exist.conf"));
+            filesystem->exists("examples/file_that_does_not_exist.conf"));
     }
 }
