@@ -19,7 +19,6 @@
 #include <stdexcept>
 
 #include <config_grammar.hpp>
-#include <parse_tree.hpp>
 
 #include "ConfigFileParser.hpp"
 
@@ -31,10 +30,15 @@
 ConfigFileParser::ConfigFileParser(std::string filename)
     : in_(filename)
 {
-    root_ = config::parse_tree::parse<config::grammar, config::store>(in_);
+    root_ = config::parse(in_);
     if (root_ == nullptr)
     {
-        throw std::runtime_error("Configuration file is invalid.");
+        // It is technically impossible to reach this because all possible
+        // errors should produce a parse_error.
+        // LCOV_EXCL_START
+        throw std::runtime_error(
+            "Unexpected error while parsing configuration file.");
+        // LCOV_EXCL_STOP
     }
 }
 

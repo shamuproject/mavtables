@@ -265,7 +265,8 @@ namespace config
     struct block : sor<udp, serial, chain_container> {};
     struct statement : sor<default_action, s_catch> {};
     struct element : sor<comment, block, statement> {};
-    struct grammar : seq<star<pad<element, ignored>>, eof> {};
+    struct elements : plus<pad<element, ignored>> {};
+    struct grammar : seq<must<elements>, eof> {};
 
     /// @endcond
 
@@ -343,6 +344,9 @@ namespace config
 
     template<>
     const std::string error<priority_keyword>::error_message;
+
+    template<>
+    const std::string error<elements>::error_message;
 
     // Default error message.
     template<typename T>

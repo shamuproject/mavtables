@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <memory>
-
 #include <catch.hpp>
 #include <fakeit.hpp>
 #include <pegtl.hpp>
@@ -27,12 +25,14 @@
 #include "common.hpp"
 
 
-
-TEST_CASE("Completly invalid configuration file retuns null.", "[config]")
+TEST_CASE("A configuration string must have at least one valid statement "
+          "or block.", "[config]")
 {
         tao::pegtl::string_input<> in("1337", "");
-        auto root = config::parse(in);
-        REQUIRE(root == nullptr);
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":1:0(0): expected at least one valid statement or block");
 }
 
 
@@ -553,6 +553,70 @@ TEST_CASE("Serial port device setting.", "[config]")
         REQUIRE_THROWS_WITH(
             config::parse(in),
             ":2:10(19): expected a valid serial port device name");
+    }
+}
+
+
+TEST_CASE("Serial port baud rate setting.", "[config]")
+{
+    SECTION("Parses baud rate setting.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    baudrate 9600;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  baudrate 9600\n");
+    }
+    SECTION("Parses device string setting (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {# comment\n"
+            "    baudrate 9600;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  baudrate 9600\n");
+    }
+    SECTION("Missing end of statement.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    baudrate 9600\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":3:0(27): expected end of statement ';' character");
+    }
+    SECTION("Invalid baud rate.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    baudrate +9600;\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":2:13(22): expected a valid baud rate");
+    }
+    SECTION("Missing baud rate value.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    baudrate;\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":2:12(21): expected a valid baud rate");
     }
 }
 
@@ -1508,7 +1572,7 @@ TEST_CASE("Rule combinations with 'accept'.", "[config]")
             ":001:  chain default\n"
             ":002:  |  accept\n");
     }
-    SECTION("accept if PING.")
+    SECTION("accept if PING")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"

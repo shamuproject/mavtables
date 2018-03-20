@@ -134,6 +134,10 @@ namespace config
     const std::string error<priority_keyword>::error_message =
            "'with' keyword must be followed by the 'priority' keyword";
 
+    template<>
+    const std::string error<elements>::error_message =
+           "expected at least one valid statement or block";
+
 #ifdef __clang__
     #pragma clang diagnostic pop
 #endif
