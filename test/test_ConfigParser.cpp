@@ -15,36 +15,32 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <memory>
-#include <stdexcept>
-
 #include <catch.hpp>
 #include <fakeit.hpp>
 
-#include "ConfigFileParser.hpp"
+#include "ConfigParser.hpp"
 #include "util.hpp"
 
 
-TEST_CASE("ConfigFileParser can parse a file.")
+TEST_CASE("ConfigParser can parse a file.", "[ConfigParser]")
 {
     SECTION("When the file exists and is valid.")
     {
-        REQUIRE_NOTHROW(ConfigFileParser("examples/test.conf"));
+        REQUIRE_NOTHROW(ConfigParser("examples/test.conf"));
     }
     SECTION("Throws an error if the file does not exist.")
     {
         REQUIRE_THROWS(
-            ConfigFileParser("examples/file_that_does_not_exist.conf"));
+            ConfigParser("examples/file_that_does_not_exist.conf"));
     }
 }
 
 
-TEST_CASE("ConfigFileParser are printable.")
+TEST_CASE("ConfigParser are printable.", "[ConfigParser]")
 {
-    auto config = std::make_unique<ConfigFileParser>("examples/test.conf");
-    REQUIRE(config != nullptr);
+    ConfigParser config("examples/test.conf");
     REQUIRE(
-        str(*config) ==
+        str(config) ==
         "examples/test.conf:001:  default_action\n"
         "examples/test.conf:001:  |  accept\n"
         "examples/test.conf:004:  udp\n"

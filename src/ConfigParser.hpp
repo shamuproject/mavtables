@@ -21,24 +21,26 @@
 
 #include <memory>
 #include <ostream>
+#include <string>
 
+#include <pegtl.hpp>
 #include "parse_tree.hpp"
 
 
 class ConfigParser
 {
     public:
-        ConfigParser();
+        ConfigParser(std::string filename);
         ConfigParser(const ConfigParser &other) = delete;
         ConfigParser(ConfigParser &&other) = delete;
         ConfigParser &operator=(const ConfigParser &other) = delete;
         ConfigParser &operator=(ConfigParser &&other) = delete;
-        virtual ~ConfigParser();
 
         friend std::ostream &operator<<(
                 std::ostream &os, const ConfigParser &config_parser);
 
     protected:
+        tao::pegtl::read_input<> in_;
         std::unique_ptr<config::parse_tree::node> root_;
 };
 

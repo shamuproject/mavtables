@@ -16,19 +16,31 @@
 
 
 #include <ostream>
+#include <string>
+#include <stdexcept>
 
 #include "parse_tree.hpp"
 #include "config_grammar.hpp"
 #include "ConfigParser.hpp"
 
 
-ConfigParser::ConfigParser()
+/** Construct a configuration parser from a file.
+ *
+ *  \param filename The path to the configuration file to parse.
+ */
+ConfigParser::ConfigParser(std::string filename)
+    : in_(filename)
 {
-}
-
-
-ConfigParser::~ConfigParser()
-{
+    root_ = config::parse(in_);
+    if (root_ == nullptr)
+    {
+        // It is technically impossible parsing errors should be raised as a
+        // parse_error.
+        // LCOV_EXCL_START
+        throw std::runtime_error(
+            "Unexpected error while parsing configuration file.");
+        // LCOV_EXCL_STOP
+    }
 }
 
 

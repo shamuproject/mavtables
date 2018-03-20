@@ -27,8 +27,7 @@
 #include "util.hpp"
 #include "Options.hpp"
 
-#include "ConfigFileParser.hpp"
-#include "ConfigStringParser.hpp"
+#include "ConfigParser.hpp"
 
 
 namespace po = boost::program_options;
@@ -44,10 +43,8 @@ int main(int argc, char *argv[])
         {
             std::cout << "Configuration file located at "
                       << options.config_file() << std::endl;
-            auto config = std::make_unique<ConfigFileParser>(
+            auto config = std::make_unique<ConfigParser>(
                     options.config_file());
-            // auto config = std::make_unique<ConfigStringParser>(
-            //         "default_action accept;");
             std::cout << *config;
         }
     }
