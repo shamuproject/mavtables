@@ -268,9 +268,6 @@ namespace config
     struct elements : plus<pad<element, ignored>> {};
     struct grammar : seq<must<elements>, eof> {};
 
-    /// @endcond
-
-
 #ifdef __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -356,6 +353,9 @@ namespace config
 #ifdef __clang__
     #pragma clang diagnostic pop
 #endif
+
+    /// @endcond
+
 
     // TODO: document
     template <typename Input>
