@@ -3,9 +3,12 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Action.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Call.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Chain.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/config_grammar.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/ConfigParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Connection.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/ConnectionPool.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Filesystem.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Filter.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/GoTo.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.cpp"
@@ -15,6 +18,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/mavlink.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Options.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
@@ -35,16 +39,20 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
 )
+
 set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Accept.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/AddressPool.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Call.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Chain.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/config_grammar.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/ConfigParser.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Connection.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/ConnectionFactory.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/ConnectionPool.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/DNSLookupError.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Filesystem.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Filter.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/GoTo.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/If.hpp"
@@ -55,11 +63,13 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/mavlink.hpp.in"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Options.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/parse_tree.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.hpp"
@@ -76,6 +86,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
 )
+
 target_sources (mavtables 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/mavtables.cpp"
@@ -89,6 +100,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             ${HEADERS}
     )
 endif ()
+
 target_include_directories (mavtables 
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}"
@@ -101,6 +113,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             "${PROJECT_BINARY_DIR}"
     )
 endif ()
+
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/config.hpp.in"
     "${PROJECT_BINARY_DIR}/config.hpp"

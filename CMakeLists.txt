@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.8.2) # required for C++17
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 24)
+set (VERSION_PATCH 25)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -33,7 +33,7 @@ endif ()
 add_subdirectory (cmake)
 find_package (Threads)
 find_package (codecov)
-find_package (Boost 1.54 REQUIRED COMPONENTS)
+find_package (Boost 1.54 REQUIRED COMPONENTS filesystem program_options)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 # libraries
@@ -43,6 +43,7 @@ add_subdirectory (lib)
 add_executable (mavtables src/mavtables.cpp)
 target_link_libraries (mavtables
     MAVLink 
+    PEGTL
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
 install (TARGETS mavtables DESTINATION bin)
@@ -55,6 +56,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         FakeIt
         FakeClock
         MAVLink
+        PEGTL
         ${Boost_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT})
     add_test(NAME UnitTests COMMAND unit_tests)

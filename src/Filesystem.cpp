@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,12 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
+#include <boost/filesystem.hpp>
 
-#include "util.hpp"
+#include "Filesystem.hpp"
 
 
-/** \defgroup utility Utility Functions
+// GCC generates a seemingly uncallable destructor for pure virtual classes.
+// Therefore, it must be excluded from test coverage.
+// LCOV_EXCL_START
+Filesystem::~Filesystem()
+{
+}
+// LCOV_EXCL_STOP
+
+
+/** Returns true if the given path exists.
  *
- *  Utility functions that don't warrant their own file.
+ *  \param p The path to check if it exists.
  */
+bool Filesystem::exists(const Filesystem::path &p) const
+{
+    return boost::filesystem::exists(p);
+}
