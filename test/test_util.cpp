@@ -86,7 +86,7 @@ TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
     }
     SECTION("long long's can be converted to at least 8 bytes")
     {
-        auto bytes = to_bytes(static_cast<long>(0x0123456789ABCDEF));
+        auto bytes = to_bytes(static_cast<long long>(0x0123456789ABCDEF));
         REQUIRE(bytes.size() >= 8);
         REQUIRE(bytes[0] == 0xEF);
         REQUIRE(bytes[1] == 0xCD);
@@ -99,7 +99,7 @@ TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
     }
     SECTION("unsigned long long's can be converted to at least 8 bytes")
     {
-        auto bytes = to_bytes(static_cast<unsigned long>(0x0123456789ABCDEFu));
+        auto bytes = to_bytes(static_cast<unsigned long long>(0x0123456789ABCDEFu));
         REQUIRE(bytes.size() >= 8);
         REQUIRE(bytes[0] == 0xEF);
         REQUIRE(bytes[1] == 0xCD);
