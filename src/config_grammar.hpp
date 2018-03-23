@@ -359,7 +359,7 @@ namespace config
 
     /** Parses given input into and abstract syntax tree.
      *
-     *  \note The returned AST is only valid while \ref in exists.  Therefore,
+     *  \note The returned AST is only valid while the input exists.  Therefore,
      *      the input should be kept until the AST passes out of scope.
      *
      *  \tparam Input The type of input, usually either read_input or
