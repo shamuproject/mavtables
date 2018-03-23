@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,10 +21,20 @@
 
 #include <array>
 #include <boost/range/irange.hpp>
+#include <iterator>
 #include <ostream>
 #include <sstream>
+#include <utility>
 #include <vector>
 
+
+template <typename T>
+typename std::vector<T>::iterator append(
+    std::vector<T>& dest, const std::vector<T>& source);
+
+template <typename T>
+typename std::vector<T>::iterator append(
+    std::vector<T>& dest, std::vector<T>&& source);
 
 template <class T>
 std::string str(const T &object);
@@ -34,6 +44,66 @@ std::array<ByteType, sizeof(T)> to_bytes(T number);
 
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
+
+
+/** Append one vector to another.
+ *
+ *  Taken from https://stackoverflow.com/a/37210097
+ *
+ *  \param dest Vector to append to.
+ *  \param source Vector to append the elements from.
+ *  \returns Iterator pointing to the first element appended, or the end of the
+ *      destination vector if the source vector is empty.
+ */
+template <typename T>
+typename std::vector<T>::iterator append(
+    std::vector<T>& dest, const std::vector<T>& source)
+{
+    typename std::vector<T>::iterator result;
+
+    if (dest.empty()) {
+        dest = source;
+        result = std::begin(dest);
+    } else {
+        result =
+            dest.insert(std::end(dest), std::cbegin(source), std::cend(source));
+    }
+
+    return result;
+}
+
+
+/** Append one vector to another (move from source).
+ *
+ *  Taken from https://stackoverflow.com/a/37210097
+ *
+ *  \param dest Vector to append to.
+ *  \param source Vector to append the elements from.  \p source will be a valid
+ *      empty vector after this call.
+ *  \returns Iterator pointing to the first element appended, or the end of the
+ *      destination vector if the source vector is empty.
+ */
+template <typename T>
+typename std::vector<T>::iterator append(
+    std::vector<T>& dest, std::vector<T>&& source)
+{
+    typename std::vector<T>::iterator result;
+
+    if (dest.empty()) {
+        dest = std::move(source);
+        result = std::begin(dest);
+    } else {
+        result = dest.insert(
+            std::end(dest),
+            std::make_move_iterator(std::begin(source)),
+            std::make_move_iterator(std::end(source)));
+    }
+
+    source.clear();
+    source.shrink_to_fit();
+
+    return result;
+}
 
 
 /** Convert any object supporting the output stream operator (<<) to a string.
@@ -102,5 +172,6 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
     os << "]";
     return os;
 }
+
 
 #endif // UTIL_HPP_
