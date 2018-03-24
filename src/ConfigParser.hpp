@@ -19,12 +19,38 @@
 #define CONFIGPARSER_HPP_
 
 
+#include <map>
 #include <memory>
 #include <ostream>
 #include <string>
 
 #include <pegtl.hpp>
 #include "parse_tree.hpp"
+#include "Chain.hpp"
+#include "Filter.hpp"
+
+
+void parse_chain(
+    Chain &chain,
+    const config::parse_tree::node &root,
+    const std::map<std::string, std::shared_ptr<Chain>> &chains);
+
+
+std::unique_ptr<Rule> parse_action(
+    const config::parse_tree::node &root,
+    std::optional<int> priority,
+    std::optional<If> condition,
+    const std::map<std::string, std::shared_ptr<Chain>> &chains);
+
+
+If parse_condition(const config::parse_tree::node &root);
+
+int parse_priority(const config::parse_tree::node &root);
+
+std::map<std::string, std::shared_ptr<Chain>> init_chains(
+        const config::parse_tree::node &root);
+
+std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root);
 
 
 class ConfigParser

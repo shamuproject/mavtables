@@ -14,14 +14,203 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
 
+#include <map>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <stdexcept>
+#include <vector>
+#include <utility>
 
+#include "If.hpp"
+#include "Filter.hpp"
 #include "parse_tree.hpp"
 #include "config_grammar.hpp"
 #include "ConfigParser.hpp"
+#include "Chain.hpp"
+#include "Accept.hpp"
+#include "Reject.hpp"
+#include "Call.hpp"
+#include "GoTo.hpp"
+
+
+std::map<std::string, std::shared_ptr<Chain>> init_chains(
+        const config::parse_tree::node &root)
+{
+    std::map<std::string, std::shared_ptr<Chain>> chains;
+    for (auto &node : root.children)
+    {
+        if (node->name() == "config::chain")
+        {
+            if (node->has_content() && node->content() != "default")
+            {
+                chains[node->content()]
+                    = std::make_shared<Chain>(node->content());
+            }
+        }
+    }
+    return chains;
+}
+
+
+int parse_priority(const config::parse_tree::node &root)
+{
+    return std::stoi(root.content());
+}
+
+
+If parse_condition(const config::parse_tree::node &root)
+{
+    If condition;
+    for (auto &child : root.children)
+    {
+        if (child->name() == "packet_type")
+        {
+            condition.type(child->content());
+        }
+        else if (child->name() == "source")
+        {
+            condition.from(child->content());
+        }
+        else if (child->name() == "dest")
+        {
+            condition.to(child->content());
+        }
+    }
+    return condition;
+}
+
+
+std::unique_ptr<Rule> parse_action(
+    const config::parse_tree::node &root,
+    std::optional<int> priority,
+    std::optional<If> condition,
+    const std::map<std::string, std::shared_ptr<Chain>> &chains)
+{
+    // std::cout << root.name();
+    if (root.name() == "config::accept")
+    {
+        if (priority)
+        {
+            return std::make_unique<Accept>(
+                priority.value(), std::move(condition));
+        }
+        else
+        {
+            return std::make_unique<Accept>(std::move(condition));
+        }
+    }
+    else if (root.name() == "config::reject")
+    {
+        return std::make_unique<Reject>(std::move(condition));
+    }
+    else if (root.name() == "config::call")
+    {
+        if (priority)
+        {
+            return std::make_unique<Call>(
+                chains.at(root.content()),
+                priority.value(),
+                std::move(condition));
+        }
+        else
+        {
+            return std::make_unique<Call>(
+                chains.at(root.content()),
+                std::move(condition));
+        }
+    }
+    else if (root.name() == "config::goto")
+    {
+        if (priority)
+        {
+            return std::make_unique<GoTo>(
+                chains.at(root.content()),
+                priority.value(),
+                std::move(condition));
+        }
+        else
+        {
+            return std::make_unique<GoTo>(
+                chains.at(root.content()),
+                std::move(condition));
+        }
+    }
+    throw std::runtime_error("unknown action " + root.name());
+}
+
+
+void parse_chain(
+    Chain &chain,
+    const config::parse_tree::node &root,
+    const std::map<std::string, std::shared_ptr<Chain>> &chains)
+{
+    for (auto &node : root.children)
+    {
+        std::optional<int> priority;
+        std::optional<If> condition;
+        for (auto &child : node->children)
+        {
+            if (child->name() == "priority")
+            {
+                priority = parse_priority(*child);
+            }
+            else if (child->name() == "condition")
+            {
+                condition = parse_condition(*child);
+            }
+        }
+        chain.append(
+            parse_action(
+                *node, std::move(priority), std::move(condition), chains));
+    }
+}
+
+
+std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
+{
+    Chain default_chain("default");
+    bool default_action = false;
+    std::map<std::string, std::shared_ptr<Chain>> chains = init_chains(root);
+
+    // Construct chains from AST.
+    for (auto &node : root.children)
+    {
+        if (node->name() == "config::chain")
+        {
+            if (node->content() == "default")
+            {
+                parse_chain(default_chain, *node, chains);
+            }
+            else
+            {
+                parse_chain(*chains.at(node->content()), *node, chains);
+            }
+        }
+        else if (node->name() == "config::default_action")
+        {
+            default_action = node->name() == "accept";
+        }
+    }
+
+    return std::make_unique<Filter>(std::move(default_chain), default_action);
+}
+
+
+//
+//
+// std::vector<std::unique_ptr<Interface>> parse_interfaces(
+//         config::parse_tree::node root, std::unique_ptr<Filter> filter)
+// {
+//     std::shared_ptr<Filter> shared_filter = std::move(filter);
+//     std::vector<std::unique_ptr<UDPInterface>> udp_interfaces =
+//         parse_udp_interfaces(root, filter);
+//     std::vector<std::unique_ptr<SerialInterface>> serial_interfaces =
+//         parse_udp_interfaces(root, filter);
+//     std::vector<std::unique_ptr<Interface>> interfaces;
+// }
 
 
 /** Construct a configuration parser from a file.
@@ -41,6 +230,28 @@ ConfigParser::ConfigParser(std::string filename)
             "Unexpected error while parsing configuration file.");
         // LCOV_EXCL_STOP
     }
+
+    auto filter = parse_filter(*root_);
+    // auto interfaces = parse_interfaces(root_, std::move(filter));
+    // App app(interfaces);
+    // return app;
+
+
+
+    // identify chains
+    // create default chain and named chains
+    // add rules to default chain
+    // add rules to each named chain
+    // create ConnectionPool
+    // create Filter with default chain and default filter action
+    // create UDPSocket
+    // create ConnectionFactory
+    // create UDPInterface with socket, factory, and pool
+    // create SerialPort
+    // create a Connection for the serial port
+    // create SerialInteface with port, pool, and connection
+    // load interfaces into Interface threaders.
+    // construct an App from the interface threaders
 }
 
 
