@@ -104,7 +104,7 @@ TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         conn1->send(heartbeat);
-        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Second connection.")
@@ -115,7 +115,7 @@ TEST_CASE("ConnectionFactory's 'wait_for_packet' method waits for a packet "
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         conn2->send(heartbeat);
-        REQUIRE(future.wait_for(1ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Returns false on timeout.")
