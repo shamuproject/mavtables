@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include <iostream>
 
 #include <map>
@@ -34,6 +35,12 @@
 #include "Reject.hpp"
 #include "Call.hpp"
 #include "GoTo.hpp"
+#include "IPAddress.hpp"
+#include "UDPInterface.hpp"
+#include "ConnectionFactory.hpp"
+#include "ConnectionPool.hpp"
+// #include "UDPSocket.hpp"
+#include "UnixUDPSocket.hpp"
 
 
 std::map<std::string, std::shared_ptr<Chain>> init_chains(
@@ -122,7 +129,7 @@ std::unique_ptr<Rule> parse_action(
                 std::move(condition));
         }
     }
-    else if (root.name() == "config::goto")
+    else if (root.name() == "config::goto_")
     {
         if (priority)
         {
@@ -199,18 +206,65 @@ std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
 }
 
 
-//
-//
-// std::vector<std::unique_ptr<Interface>> parse_interfaces(
-//         config::parse_tree::node root, std::unique_ptr<Filter> filter)
+
+
+std::unique_ptr<UDPInterface> parse_udp(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool)
+{
+    unsigned int port = 14444;
+    std::optional<IPAddress> address;
+    for (auto &node : root.children)
+    {
+        if (node->name() == "config::port")
+        {
+            port = static_cast<unsigned int>(std::stol(node->content()));
+        }
+        else if (node->name() == "config::address")
+        {
+            address = IPAddress(node->content());
+        }
+    }
+    if (address.has_value() && address->port() != 0)
+    {
+        port = address->port();
+    }
+
+    auto socket = std::make_unique<UnixUDPSocket>(port, address);
+    auto factory = std::make_unique<ConnectionFactory<>>(filter, false);
+    return std::make_unique<UDPInterface>(
+        std::move(socket), pool, std::move(factory));
+}
+
+
+// std::unique_ptr<SerialInterfaces> parse_udp(
+//     const config::parse_tree::node &root, std::shared_ptr<Filter> filter)
 // {
-//     std::shared_ptr<Filter> shared_filter = std::move(filter);
-//     std::vector<std::unique_ptr<UDPInterface>> udp_interfaces =
-//         parse_udp_interfaces(root, filter);
-//     std::vector<std::unique_ptr<SerialInterface>> serial_interfaces =
-//         parse_udp_interfaces(root, filter);
-//     std::vector<std::unique_ptr<Interface>> interfaces;
 // }
+
+
+std::vector<std::unique_ptr<Interface>> parse_interfaces(
+        const config::parse_tree::node &root, std::unique_ptr<Filter> filter)
+{
+    std::shared_ptr<Filter> shared_filter = std::move(filter);
+    std::vector<std::unique_ptr<Interface>> interfaces;
+    auto connection_pool = std::make_shared<ConnectionPool>();
+    for (auto &node : root.children)
+    {
+        if (node->name() == "config::udp")
+        {
+            interfaces.push_back(
+                parse_udp(*node, shared_filter, connection_pool));
+        }
+        else if (node->name() == "config::serial")
+        {
+            // interfaces.push_back(
+            //     parse_serial(*node, shared_filter, connection_pool));
+        }
+    }
+    return interfaces;
+}
 
 
 /** Construct a configuration parser from a file.

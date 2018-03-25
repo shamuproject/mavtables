@@ -28,6 +28,7 @@
 #include "parse_tree.hpp"
 #include "Chain.hpp"
 #include "Filter.hpp"
+#include "UDPInterface.hpp"
 
 
 void parse_chain(
@@ -36,12 +37,21 @@ void parse_chain(
     const std::map<std::string, std::shared_ptr<Chain>> &chains);
 
 
+
+std::unique_ptr<UDPInterface> parse_udp(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool);
+
 std::unique_ptr<Rule> parse_action(
     const config::parse_tree::node &root,
     std::optional<int> priority,
     std::optional<If> condition,
     const std::map<std::string, std::shared_ptr<Chain>> &chains);
 
+
+std::vector<std::unique_ptr<Interface>> parse_interfaces(
+        const config::parse_tree::node &root, std::unique_ptr<Filter> filter);
 
 If parse_condition(const config::parse_tree::node &root);
 
