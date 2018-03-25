@@ -41,6 +41,10 @@
 #include "ConnectionPool.hpp"
 // #include "UDPSocket.hpp"
 #include "UnixUDPSocket.hpp"
+#include "SerialInterface.hpp"
+#include "SerialPort.hpp"
+#include "UnixSerialPort.hpp"
+#include "App.hpp"
 
 
 std::map<std::string, std::shared_ptr<Chain>> init_chains(
@@ -59,12 +63,6 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
         }
     }
     return chains;
-}
-
-
-int parse_priority(const config::parse_tree::node &root)
-{
-    return std::stoi(root.content());
 }
 
 
@@ -162,7 +160,7 @@ void parse_chain(
         {
             if (child->name() == "priority")
             {
-                priority = parse_priority(*child);
+                priority = std::stoi(child->content());
             }
             else if (child->name() == "condition")
             {
@@ -238,10 +236,48 @@ std::unique_ptr<UDPInterface> parse_udp(
 }
 
 
-// std::unique_ptr<SerialInterfaces> parse_udp(
-//     const config::parse_tree::node &root, std::shared_ptr<Filter> filter)
-// {
-// }
+
+
+std::unique_ptr<SerialInterface> parse_serial(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool)
+{
+    // Default settings.
+    std::optional<std::string> device;
+    unsigned long baud_rate = 9600;
+    SerialPort::Feature features = SerialPort::DEFAULT;
+
+    // Extract settings from AST.
+    for (auto &node : root.children)
+    {
+        if (node->name() == "config::device")
+        {
+            device = node->content();
+        }
+        else if (node->name() == "config::baudrate")
+        {
+            baud_rate = static_cast<unsigned long>(std::stol(node->content()));
+        }
+        else if (node->name() == "config::flow_control")
+        {
+            features = SerialPort::FLOW_CONTROL;
+        }
+    }
+
+    // Throw error if no device was given.
+    if (!device.has_value())
+    {
+        throw std::invalid_argument("AST does not contain a device string");
+    }
+
+    // Construct serial interface.
+    auto port = std::make_unique<UnixSerialPort>(
+        device.value(), baud_rate, features);
+    auto connection = std::make_unique<Connection>(filter, false);
+    return std::make_unique<SerialInterface>(
+        std::move(port), pool, std::move(connection));
+}
 
 
 std::vector<std::unique_ptr<Interface>> parse_interfaces(
@@ -259,8 +295,8 @@ std::vector<std::unique_ptr<Interface>> parse_interfaces(
         }
         else if (node->name() == "config::serial")
         {
-            // interfaces.push_back(
-            //     parse_serial(*node, shared_filter, connection_pool));
+            interfaces.push_back(
+                parse_serial(*node, shared_filter, connection_pool));
         }
     }
     return interfaces;
@@ -285,8 +321,6 @@ ConfigParser::ConfigParser(std::string filename)
         // LCOV_EXCL_STOP
     }
 
-    auto filter = parse_filter(*root_);
-    // auto interfaces = parse_interfaces(root_, std::move(filter));
     // App app(interfaces);
     // return app;
 
@@ -307,6 +341,15 @@ ConfigParser::ConfigParser(std::string filename)
     // load interfaces into Interface threaders.
     // construct an App from the interface threaders
 }
+
+
+std::unique_ptr<App> ConfigParser::make_app()
+{
+    auto filter = parse_filter(*root_);
+    auto interfaces = parse_interfaces(*root_, std::move(filter));
+    return std::make_unique<App>();
+}
+
 
 
 /** Print the configuration settings to the given output stream.

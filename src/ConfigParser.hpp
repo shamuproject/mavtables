@@ -29,6 +29,8 @@
 #include "Chain.hpp"
 #include "Filter.hpp"
 #include "UDPInterface.hpp"
+#include "SerialInterface.hpp"
+#include "App.hpp"
 
 
 void parse_chain(
@@ -63,12 +65,19 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
 std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root);
 
 
+std::unique_ptr<SerialInterface> parse_serial(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool);
+
+
 class ConfigParser
 {
     public:
         ConfigParser(std::string filename);
         ConfigParser(const ConfigParser &other) = delete;
         ConfigParser(ConfigParser &&other) = delete;
+        std::unique_ptr<App> make_app();
         ConfigParser &operator=(const ConfigParser &other) = delete;
         ConfigParser &operator=(ConfigParser &&other) = delete;
 
