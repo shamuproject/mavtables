@@ -25,19 +25,17 @@
 #include <string>
 
 #include <pegtl.hpp>
-#include "parse_tree.hpp"
+
+#include "App.hpp"
 #include "Chain.hpp"
 #include "Filter.hpp"
-#include "UDPInterface.hpp"
+#include "parse_tree.hpp"
 #include "SerialInterface.hpp"
-#include "App.hpp"
-
+#include "UDPInterface.hpp"
 
 
 std::map<std::string, std::shared_ptr<Chain>> init_chains(
         const config::parse_tree::node &root);
-
-If parse_condition(const config::parse_tree::node &root);
 
 std::unique_ptr<Rule> parse_action(
     const config::parse_tree::node &root,
@@ -50,24 +48,29 @@ void parse_chain(
     const config::parse_tree::node &root,
     const std::map<std::string, std::shared_ptr<Chain>> &chains);
 
+If parse_condition(const config::parse_tree::node &root);
+
 std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root);
 
-std::unique_ptr<UDPInterface> parse_udp(
-    const config::parse_tree::node &root,
-    std::shared_ptr<Filter> filter,
-    std::shared_ptr<ConnectionPool> pool);
+std::vector<std::unique_ptr<Interface>> parse_interfaces(
+        const config::parse_tree::node &root, std::unique_ptr<Filter> filter);
 
 std::unique_ptr<SerialInterface> parse_serial(
     const config::parse_tree::node &root,
     std::shared_ptr<Filter> filter,
     std::shared_ptr<ConnectionPool> pool);
 
-std::vector<std::unique_ptr<Interface>> parse_interfaces(
-        const config::parse_tree::node &root, std::unique_ptr<Filter> filter);
+std::unique_ptr<UDPInterface> parse_udp(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool);
 
 
-
-
+/** Configuration file parser.
+ *
+ *  Used to parse a configuration file and create an instance of the mavtables
+ *  application.
+ */
 class ConfigParser
 {
     public:

@@ -15,36 +15,34 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <iostream>
-
 #include <map>
 #include <memory>
 #include <ostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <vector>
 #include <utility>
 
-#include "If.hpp"
-#include "Filter.hpp"
-#include "parse_tree.hpp"
-#include "config_grammar.hpp"
-#include "ConfigParser.hpp"
-#include "Chain.hpp"
 #include "Accept.hpp"
-#include "Reject.hpp"
+#include "App.hpp"
+
 #include "Call.hpp"
-#include "GoTo.hpp"
-#include "IPAddress.hpp"
-#include "UDPInterface.hpp"
+#include "Chain.hpp"
+#include "ConfigParser.hpp"
+#include "config_grammar.hpp"
 #include "ConnectionFactory.hpp"
 #include "ConnectionPool.hpp"
-// #include "UDPSocket.hpp"
-#include "UnixUDPSocket.hpp"
+#include "Filter.hpp"
+#include "GoTo.hpp"
+#include "If.hpp"
+#include "IPAddress.hpp"
+#include "parse_tree.hpp"
+#include "Reject.hpp"
 #include "SerialInterface.hpp"
 #include "SerialPort.hpp"
+#include "UDPInterface.hpp"
 #include "UnixSerialPort.hpp"
-#include "App.hpp"
+#include "UnixUDPSocket.hpp"
 
 
 /** Construct map of non default chains.
@@ -70,37 +68,6 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
         }
     }
     return chains;
-}
-
-
-/** Construct conditional from AST.
- *
- *  \param root AST conditional node.
- *  \returns The conditional constructed from the given AST node.
- */
-If parse_condition(const config::parse_tree::node &root)
-{
-    If condition;
-    // Parse condition options.
-    for (auto &child : root.children)
-    {
-        // Parse packet type.
-        if (child->name() == "packet_type")
-        {
-            condition.type(child->content());
-        }
-        // Parse source MAVLink address.
-        else if (child->name() == "source")
-        {
-            condition.from(child->content());
-        }
-        // Parse destination MAVLink address.
-        else if (child->name() == "dest")
-        {
-            condition.to(child->content());
-        }
-    }
-    return condition;
 }
 
 
@@ -218,6 +185,37 @@ void parse_chain(
 }
 
 
+/** Construct conditional from AST.
+ *
+ *  \param root AST conditional node.
+ *  \returns The conditional constructed from the given AST node.
+ */
+If parse_condition(const config::parse_tree::node &root)
+{
+    If condition;
+    // Parse condition options.
+    for (auto &child : root.children)
+    {
+        // Parse packet type.
+        if (child->name() == "packet_type")
+        {
+            condition.type(child->content());
+        }
+        // Parse source MAVLink address.
+        else if (child->name() == "source")
+        {
+            condition.from(child->content());
+        }
+        // Parse destination MAVLink address.
+        else if (child->name() == "dest")
+        {
+            condition.to(child->content());
+        }
+    }
+    return condition;
+}
+
+
 /** Parse filter from AST.
  *
  *  \param root Root of configuration AST.
@@ -258,48 +256,35 @@ std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
 }
 
 
-/** Parse a UPD interface from an AST.
+/** Parse UDP and serial port interfaces from AST root.
  *
- *  \param root The UDP node to parse.
- *  \param filter The filter to use for the interface.
- *  \param pool The connection pool to add the interface's connection to.
- *  \returns The UDP interface parsed from the AST and using the given filter
- *      and connection pool.
+ *  \param root The root of the AST to create interfaces from.
+ *  \param filter The packet filter to use for the interfaces.
+ *  \returns A vector of UDP and serial port interfaces.
  */
-std::unique_ptr<UDPInterface> parse_udp(
-    const config::parse_tree::node &root,
-    std::shared_ptr<Filter> filter,
-    std::shared_ptr<ConnectionPool> pool)
+std::vector<std::unique_ptr<Interface>> parse_interfaces(
+        const config::parse_tree::node &root, std::unique_ptr<Filter> filter)
 {
-    unsigned int port = 14444;
-    std::optional<IPAddress> address;
-
-    // Loop over options for UDP interface.
+    std::shared_ptr<Filter> shared_filter = std::move(filter);
+    std::vector<std::unique_ptr<Interface>> interfaces;
+    auto connection_pool = std::make_shared<ConnectionPool>();
+    // Loop over each node of the root AST node.
     for (auto &node : root.children)
     {
-        // Parse port number.
-        if (node->name() == "config::port")
+        // Parse UDP interface.
+        if (node->name() == "config::udp")
         {
-            port = static_cast<unsigned int>(std::stol(node->content()));
+            interfaces.push_back(
+                parse_udp(*node, shared_filter, connection_pool));
         }
-        // Parse IP address and optionally port number.
-        else if (node->name() == "config::address")
+        // Parse serial port interface.
+        else if (node->name() == "config::serial")
         {
-            address = IPAddress(node->content());
+            interfaces.push_back(
+                parse_serial(*node, shared_filter, connection_pool));
         }
     }
-
-    // Override port number with that provided with IP address.
-    if (address.has_value() && address->port() != 0)
-    {
-        port = address->port();
-    }
-
-    // Construct the UDP interface.
-    auto socket = std::make_unique<UnixUDPSocket>(port, address);
-    auto factory = std::make_unique<ConnectionFactory<>>(filter, false);
-    return std::make_unique<UDPInterface>(
-        std::move(socket), pool, std::move(factory));
+    return interfaces;
 }
 
 
@@ -356,35 +341,48 @@ std::unique_ptr<SerialInterface> parse_serial(
 }
 
 
-/** Parse UDP and serial port interfaces from AST root.
+/** Parse a UPD interface from an AST.
  *
- *  \param root The root of the AST to create interfaces from.
- *  \param filter The packet filter to use for the interfaces.
- *  \returns A vector of UDP and serial port interfaces.
+ *  \param root The UDP node to parse.
+ *  \param filter The filter to use for the interface.
+ *  \param pool The connection pool to add the interface's connection to.
+ *  \returns The UDP interface parsed from the AST and using the given filter
+ *      and connection pool.
  */
-std::vector<std::unique_ptr<Interface>> parse_interfaces(
-        const config::parse_tree::node &root, std::unique_ptr<Filter> filter)
+std::unique_ptr<UDPInterface> parse_udp(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool)
 {
-    std::shared_ptr<Filter> shared_filter = std::move(filter);
-    std::vector<std::unique_ptr<Interface>> interfaces;
-    auto connection_pool = std::make_shared<ConnectionPool>();
-    // Loop over each node of the root AST node.
+    unsigned int port = 14444;
+    std::optional<IPAddress> address;
+
+    // Loop over options for UDP interface.
     for (auto &node : root.children)
     {
-        // Parse UDP interface.
-        if (node->name() == "config::udp")
+        // Parse port number.
+        if (node->name() == "config::port")
         {
-            interfaces.push_back(
-                parse_udp(*node, shared_filter, connection_pool));
+            port = static_cast<unsigned int>(std::stol(node->content()));
         }
-        // Parse serial port interface.
-        else if (node->name() == "config::serial")
+        // Parse IP address and optionally port number.
+        else if (node->name() == "config::address")
         {
-            interfaces.push_back(
-                parse_serial(*node, shared_filter, connection_pool));
+            address = IPAddress(node->content());
         }
     }
-    return interfaces;
+
+    // Override port number with that provided with IP address.
+    if (address.has_value() && address->port() != 0)
+    {
+        port = address->port();
+    }
+
+    // Construct the UDP interface.
+    auto socket = std::make_unique<UnixUDPSocket>(port, address);
+    auto factory = std::make_unique<ConnectionFactory<>>(filter, false);
+    return std::make_unique<UDPInterface>(
+        std::move(socket), pool, std::move(factory));
 }
 
 
@@ -405,21 +403,6 @@ ConfigParser::ConfigParser(std::string filename)
             "Unexpected error while parsing configuration file.");
         // LCOV_EXCL_STOP
     }
-
-    // identify chains
-    // create default chain and named chains
-    // add rules to default chain
-    // add rules to each named chain
-    // create ConnectionPool
-    // create Filter with default chain and default filter action
-    // create UDPSocket
-    // create ConnectionFactory
-    // create UDPInterface with socket, factory, and pool
-    // create SerialPort
-    // create a Connection for the serial port
-    // create SerialInteface with port, pool, and connection
-    // load interfaces into Interface threaders.
-    // construct an App from the interface threaders
 }
 
 
@@ -429,7 +412,6 @@ std::unique_ptr<App> ConfigParser::make_app()
     auto interfaces = parse_interfaces(*root_, std::move(filter));
     return std::make_unique<App>(std::move(interfaces));
 }
-
 
 
 /** Print the configuration settings to the given output stream.
