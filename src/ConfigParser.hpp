@@ -33,17 +33,11 @@
 #include "App.hpp"
 
 
-void parse_chain(
-    Chain &chain,
-    const config::parse_tree::node &root,
-    const std::map<std::string, std::shared_ptr<Chain>> &chains);
 
+std::map<std::string, std::shared_ptr<Chain>> init_chains(
+        const config::parse_tree::node &root);
 
-
-std::unique_ptr<UDPInterface> parse_udp(
-    const config::parse_tree::node &root,
-    std::shared_ptr<Filter> filter,
-    std::shared_ptr<ConnectionPool> pool);
+If parse_condition(const config::parse_tree::node &root);
 
 std::unique_ptr<Rule> parse_action(
     const config::parse_tree::node &root,
@@ -51,24 +45,27 @@ std::unique_ptr<Rule> parse_action(
     std::optional<If> condition,
     const std::map<std::string, std::shared_ptr<Chain>> &chains);
 
-
-std::vector<std::unique_ptr<Interface>> parse_interfaces(
-        const config::parse_tree::node &root, std::unique_ptr<Filter> filter);
-
-If parse_condition(const config::parse_tree::node &root);
-
-int parse_priority(const config::parse_tree::node &root);
-
-std::map<std::string, std::shared_ptr<Chain>> init_chains(
-        const config::parse_tree::node &root);
+void parse_chain(
+    Chain &chain,
+    const config::parse_tree::node &root,
+    const std::map<std::string, std::shared_ptr<Chain>> &chains);
 
 std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root);
 
+std::unique_ptr<UDPInterface> parse_udp(
+    const config::parse_tree::node &root,
+    std::shared_ptr<Filter> filter,
+    std::shared_ptr<ConnectionPool> pool);
 
 std::unique_ptr<SerialInterface> parse_serial(
     const config::parse_tree::node &root,
     std::shared_ptr<Filter> filter,
     std::shared_ptr<ConnectionPool> pool);
+
+std::vector<std::unique_ptr<Interface>> parse_interfaces(
+        const config::parse_tree::node &root, std::unique_ptr<Filter> filter);
+
+
 
 
 class ConfigParser

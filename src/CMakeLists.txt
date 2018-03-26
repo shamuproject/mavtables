@@ -1,4 +1,5 @@
 set (SOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/App.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Accept.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Action.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Call.cpp"

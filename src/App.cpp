@@ -15,4 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <vector>
+#include <memory>
+
+
 #include "App.hpp"
+#include "Interface.hpp"
+
+
+App::App(std::vector<std::unique_ptr<Interface>> interfaces)
+{
+    (void)interfaces;
+}

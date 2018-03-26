@@ -47,10 +47,17 @@
 #include "App.hpp"
 
 
+/** Construct map of non default chains.
+ *
+ *  \param root Root of configuration AST.
+ *  \returns Map of chain names to chains.
+ */
 std::map<std::string, std::shared_ptr<Chain>> init_chains(
         const config::parse_tree::node &root)
 {
     std::map<std::string, std::shared_ptr<Chain>> chains;
+
+    // Loop through top AST nodes creating chains for.
     for (auto &node : root.children)
     {
         if (node->name() == "config::chain")
@@ -66,19 +73,28 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
 }
 
 
+/** Construct conditional from AST.
+ *
+ *  \param root AST conditional node.
+ *  \returns The conditional constructed from the given AST node.
+ */
 If parse_condition(const config::parse_tree::node &root)
 {
     If condition;
+    // Parse condition options.
     for (auto &child : root.children)
     {
+        // Parse packet type.
         if (child->name() == "packet_type")
         {
             condition.type(child->content());
         }
+        // Parse source MAVLink address.
         else if (child->name() == "source")
         {
             condition.from(child->content());
         }
+        // Parse destination MAVLink address.
         else if (child->name() == "dest")
         {
             condition.to(child->content());
@@ -88,13 +104,24 @@ If parse_condition(const config::parse_tree::node &root)
 }
 
 
+/** Construct action from AST, priority, and condition.
+ *
+ *  \param root AST action node.
+ *  \param priority The priority to use when constructing the action.  No
+ *      priority if {}.  If the AST node is a reject action the priority will be
+ *      ignored.
+ *  \param condition The condition to use when constructing the action.
+ *  \param chains Map of chain names to chains for call and goto actions.
+ *  \returns The action (or rule) parsed from the given AST node, priority, and
+ *      condition.
+ */
 std::unique_ptr<Rule> parse_action(
     const config::parse_tree::node &root,
     std::optional<int> priority,
     std::optional<If> condition,
     const std::map<std::string, std::shared_ptr<Chain>> &chains)
 {
-    // std::cout << root.name();
+    // Parse accept rule.
     if (root.name() == "config::accept")
     {
         if (priority)
@@ -107,10 +134,12 @@ std::unique_ptr<Rule> parse_action(
             return std::make_unique<Accept>(std::move(condition));
         }
     }
+    // Parse reject rule.
     else if (root.name() == "config::reject")
     {
         return std::make_unique<Reject>(std::move(condition));
     }
+    // Parse call rule.
     else if (root.name() == "config::call")
     {
         if (priority)
@@ -127,6 +156,7 @@ std::unique_ptr<Rule> parse_action(
                 std::move(condition));
         }
     }
+    // Parse call goto.
     else if (root.name() == "config::goto_")
     {
         if (priority)
@@ -143,30 +173,44 @@ std::unique_ptr<Rule> parse_action(
                 std::move(condition));
         }
     }
+    // Only called if the AST is invalid.
     throw std::runtime_error("unknown action " + root.name());
 }
 
 
+/** Add rules from AST to a chain.
+ *
+ *  \param chain Chain to add rules to.
+ *  \param root AST chain node containing rules.
+ *  \param chains Map of chain names to chains for call and goto actions.
+ */
 void parse_chain(
     Chain &chain,
     const config::parse_tree::node &root,
     const std::map<std::string, std::shared_ptr<Chain>> &chains)
 {
+    // Loop through each children.
     for (auto &node : root.children)
     {
         std::optional<int> priority;
         std::optional<If> condition;
+
+        // Loop through rule options.
         for (auto &child : node->children)
         {
+            // Extract priority.
             if (child->name() == "priority")
             {
                 priority = std::stoi(child->content());
             }
+            // Extract condition.
             else if (child->name() == "condition")
             {
                 condition = parse_condition(*child);
             }
         }
+
+        // Create and add the new rule.
         chain.append(
             parse_action(
                 *node, std::move(priority), std::move(condition), chains));
@@ -174,38 +218,54 @@ void parse_chain(
 }
 
 
+/** Parse filter from AST.
+ *
+ *  \param root Root of configuration AST.
+ *  \returns The filter parsed from the AST.
+ */
 std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
 {
     Chain default_chain("default");
     bool default_action = false;
     std::map<std::string, std::shared_ptr<Chain>> chains = init_chains(root);
 
-    // Construct chains from AST.
+    // Look through top nodes.
     for (auto &node : root.children)
     {
+        // Parse chain.
         if (node->name() == "config::chain")
         {
+            // Parse default chain.
             if (node->content() == "default")
             {
                 parse_chain(default_chain, *node, chains);
             }
+            // Parse named chain.
             else
             {
                 parse_chain(*chains.at(node->content()), *node, chains);
             }
         }
+        // Parse default filter action.
         else if (node->name() == "config::default_action")
         {
             default_action = node->name() == "accept";
         }
     }
 
+    // Construct the filter.
     return std::make_unique<Filter>(std::move(default_chain), default_action);
 }
 
 
-
-
+/** Parse a UPD interface from an AST.
+ *
+ *  \param root The UDP node to parse.
+ *  \param filter The filter to use for the interface.
+ *  \param pool The connection pool to add the interface's connection to.
+ *  \returns The UDP interface parsed from the AST and using the given filter
+ *      and connection pool.
+ */
 std::unique_ptr<UDPInterface> parse_udp(
     const config::parse_tree::node &root,
     std::shared_ptr<Filter> filter,
@@ -213,22 +273,29 @@ std::unique_ptr<UDPInterface> parse_udp(
 {
     unsigned int port = 14444;
     std::optional<IPAddress> address;
+
+    // Loop over options for UDP interface.
     for (auto &node : root.children)
     {
+        // Parse port number.
         if (node->name() == "config::port")
         {
             port = static_cast<unsigned int>(std::stol(node->content()));
         }
+        // Parse IP address and optionally port number.
         else if (node->name() == "config::address")
         {
             address = IPAddress(node->content());
         }
     }
+
+    // Override port number with that provided with IP address.
     if (address.has_value() && address->port() != 0)
     {
         port = address->port();
     }
 
+    // Construct the UDP interface.
     auto socket = std::make_unique<UnixUDPSocket>(port, address);
     auto factory = std::make_unique<ConnectionFactory<>>(filter, false);
     return std::make_unique<UDPInterface>(
@@ -236,8 +303,14 @@ std::unique_ptr<UDPInterface> parse_udp(
 }
 
 
-
-
+/** Parse a serial port interface from an AST.
+ *
+ *  \param root The serial port node to parse.
+ *  \param filter The filter to use for the interface.
+ *  \param pool The connection pool to add the interface's connection to.
+ *  \returns The serial port interface parsed from the AST and using the given
+ *      filter and connection pool.
+ */
 std::unique_ptr<SerialInterface> parse_serial(
     const config::parse_tree::node &root,
     std::shared_ptr<Filter> filter,
@@ -251,14 +324,17 @@ std::unique_ptr<SerialInterface> parse_serial(
     // Extract settings from AST.
     for (auto &node : root.children)
     {
+        // Extract device string.
         if (node->name() == "config::device")
         {
             device = node->content();
         }
+        // Extract device baud rate.
         else if (node->name() == "config::baudrate")
         {
             baud_rate = static_cast<unsigned long>(std::stol(node->content()));
         }
+        // Extract flow control.
         else if (node->name() == "config::flow_control")
         {
             features = SerialPort::FLOW_CONTROL;
@@ -280,19 +356,28 @@ std::unique_ptr<SerialInterface> parse_serial(
 }
 
 
+/** Parse UDP and serial port interfaces from AST root.
+ *
+ *  \param root The root of the AST to create interfaces from.
+ *  \param filter The packet filter to use for the interfaces.
+ *  \returns A vector of UDP and serial port interfaces.
+ */
 std::vector<std::unique_ptr<Interface>> parse_interfaces(
         const config::parse_tree::node &root, std::unique_ptr<Filter> filter)
 {
     std::shared_ptr<Filter> shared_filter = std::move(filter);
     std::vector<std::unique_ptr<Interface>> interfaces;
     auto connection_pool = std::make_shared<ConnectionPool>();
+    // Loop over each node of the root AST node.
     for (auto &node : root.children)
     {
+        // Parse UDP interface.
         if (node->name() == "config::udp")
         {
             interfaces.push_back(
                 parse_udp(*node, shared_filter, connection_pool));
         }
+        // Parse serial port interface.
         else if (node->name() == "config::serial")
         {
             interfaces.push_back(
@@ -321,11 +406,6 @@ ConfigParser::ConfigParser(std::string filename)
         // LCOV_EXCL_STOP
     }
 
-    // App app(interfaces);
-    // return app;
-
-
-
     // identify chains
     // create default chain and named chains
     // add rules to default chain
@@ -347,7 +427,7 @@ std::unique_ptr<App> ConfigParser::make_app()
 {
     auto filter = parse_filter(*root_);
     auto interfaces = parse_interfaces(*root_, std::move(filter));
-    return std::make_unique<App>();
+    return std::make_unique<App>(std::move(interfaces));
 }
 
 

@@ -19,8 +19,16 @@
 #define APP_HPP_
 
 
+#include <vector>
+#include <memory>
+
+#include "Interface.hpp"
+
+
 class App
 {
+    public:
+        App(std::vector<std::unique_ptr<Interface>> interfaces);
 };
 
 
