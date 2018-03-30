@@ -37,6 +37,8 @@ The following packages are only needed for development work:
 * [Gcovr](http://gcovr.com/) (coverage report)
 * [LCOV](http://ltp.sourceforge.net/coverage/lcov.php) (detailed coverage html
   report)
+* [socat](http://www.dest-unreach.org/socat/) (for testing serial port
+  communications)
 
 `mavtables` can be easily installed using the standard procedure of
 ```

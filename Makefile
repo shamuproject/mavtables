@@ -29,10 +29,8 @@ debug: tags
 tags:
 	ctags -R .
 
-test: unit_tests
-
-unit_tests: debug
-	./build/unit_tests
+test: debug
+	./test/run_tests.sh
 
 coverage: COVERAGE = On
 coverage: test

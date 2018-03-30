@@ -15,6 +15,7 @@ jobs:
             - lcov
             - cmake
             - libboost-all-dev
+            - socat
       script: make COVERAGE=On test
       before_install:
         - CC=gcc-7
@@ -37,6 +38,7 @@ jobs:
             - clang-5.0
             - cmake
             - libboost-all-dev
+            - socat
       script: make test
       before_install:
         - CC=clang-5.0
@@ -56,6 +58,7 @@ jobs:
             - clang-6.0
             - cmake
             - libboost-all-dev
+            - socat
       script: make test
       before_install:
         - CC=clang-6.0
@@ -70,5 +73,6 @@ jobs:
         - brew update
         - brew install ctags
         - brew install llvm
+        - brew install socat
         - CC=/usr/local/opt/llvm/bin/clang
         - CXX=/usr/local/opt/llvm/bin/clang++
