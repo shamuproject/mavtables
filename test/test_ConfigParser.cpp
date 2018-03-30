@@ -990,15 +990,15 @@ TEST_CASE("ConfigParser are printable.", "[ConfigParser]")
         "examples/test.conf:019:  |  |  |  source 127.1\n"
         "examples/test.conf:019:  |  |  |  dest 192.0\n"
         "examples/test.conf:020:  |  reject\n"
-        "examples/test.conf:025:  chain some_chain10\n"
+        "examples/test.conf:024:  chain some_chain10\n"
+        "examples/test.conf:026:  |  accept\n"
+        "examples/test.conf:026:  |  |  priority 99\n"
+        "examples/test.conf:026:  |  |  condition\n"
+        "examples/test.conf:026:  |  |  |  dest 192.0\n"
         "examples/test.conf:027:  |  accept\n"
-        "examples/test.conf:027:  |  |  priority 99\n"
         "examples/test.conf:027:  |  |  condition\n"
-        "examples/test.conf:027:  |  |  |  dest 192.0\n"
-        "examples/test.conf:028:  |  accept\n"
-        "examples/test.conf:028:  |  |  condition\n"
-        "examples/test.conf:028:  |  |  |  packet_type PING\n"
-        "examples/test.conf:029:  |  accept\n");
+        "examples/test.conf:027:  |  |  |  packet_type PING\n"
+        "examples/test.conf:028:  |  accept\n");
 }
 
 TEST_CASE("ConfigParser's 'make_app' method returns an application object.",
