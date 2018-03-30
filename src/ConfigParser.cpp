@@ -43,10 +43,12 @@
 #include "UDPInterface.hpp"
 #include "UnixSerialPort.hpp"
 #include "UnixUDPSocket.hpp"
+#include "util.hpp"
 
 
 /** Construct map of non default chains.
  *
+ *  \relates ConfigParser
  *  \param root Root of configuration AST.
  *  \returns Map of chain names to chains.
  */
@@ -73,6 +75,7 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
 
 /** Construct action from AST, priority, and condition.
  *
+ *  \relates ConfigParser
  *  \param root AST action node.
  *  \param priority The priority to use when constructing the action.  No
  *      priority if {}.  If the AST node is a reject action the priority will be
@@ -109,6 +112,10 @@ std::unique_ptr<Rule> parse_action(
     // Parse call rule.
     else if (root.name() == "config::call")
     {
+        if (root.content() == "default")
+        {
+            throw std::invalid_argument("cannot 'call' the default chain");
+        }
         if (priority)
         {
             return std::make_unique<Call>(
@@ -126,6 +133,10 @@ std::unique_ptr<Rule> parse_action(
     // Parse call goto.
     else if (root.name() == "config::goto_")
     {
+        if (root.content() == "default")
+        {
+            throw std::invalid_argument("cannot 'goto' the default chain");
+        }
         if (priority)
         {
             return std::make_unique<GoTo>(
@@ -140,13 +151,17 @@ std::unique_ptr<Rule> parse_action(
                 std::move(condition));
         }
     }
-    // Only called if the AST is invalid.
+    // Only called if the AST is invalid, this can't be called as long as
+    // config_grammar.hpp does not contain any bugs.
+    // LCOV_EXCL_START
     throw std::runtime_error("unknown action " + root.name());
+    // LCOV_EXCL_STOP
 }
 
 
 /** Add rules from AST to a chain.
  *
+ *  \relates ConfigParser
  *  \param chain Chain to add rules to.
  *  \param root AST chain node containing rules.
  *  \param chains Map of chain names to chains for call and goto actions.
@@ -166,12 +181,12 @@ void parse_chain(
         for (auto &child : node->children)
         {
             // Extract priority.
-            if (child->name() == "priority")
+            if (child->name() == "config::priority")
             {
                 priority = std::stoi(child->content());
             }
             // Extract condition.
-            else if (child->name() == "condition")
+            else if (child->name() == "config::condition")
             {
                 condition = parse_condition(*child);
             }
@@ -187,6 +202,7 @@ void parse_chain(
 
 /** Construct conditional from AST.
  *
+ *  \relates ConfigParser
  *  \param root AST conditional node.
  *  \returns The conditional constructed from the given AST node.
  */
@@ -197,17 +213,17 @@ If parse_condition(const config::parse_tree::node &root)
     for (auto &child : root.children)
     {
         // Parse packet type.
-        if (child->name() == "packet_type")
+        if (child->name() == "config::packet_type")
         {
             condition.type(child->content());
         }
         // Parse source MAVLink address.
-        else if (child->name() == "source")
+        else if (child->name() == "config::source")
         {
             condition.from(child->content());
         }
         // Parse destination MAVLink address.
-        else if (child->name() == "dest")
+        else if (child->name() == "config::dest")
         {
             condition.to(child->content());
         }
@@ -215,9 +231,11 @@ If parse_condition(const config::parse_tree::node &root)
     return condition;
 }
 
+#include <iostream>
 
 /** Parse filter from AST.
  *
+ *  \relates ConfigParser
  *  \param root Root of configuration AST.
  *  \returns The filter parsed from the AST.
  */
@@ -247,7 +265,7 @@ std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
         // Parse default filter action.
         else if (node->name() == "config::default_action")
         {
-            default_action = node->name() == "accept";
+            default_action = node->children[0]->name() == "config::accept";
         }
     }
 
@@ -258,6 +276,7 @@ std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
 
 /** Parse UDP and serial port interfaces from AST root.
  *
+ *  \relates ConfigParser
  *  \param root The root of the AST to create interfaces from.
  *  \param filter The packet filter to use for the interfaces.
  *  \returns A vector of UDP and serial port interfaces.
@@ -290,6 +309,7 @@ std::vector<std::unique_ptr<Interface>> parse_interfaces(
 
 /** Parse a serial port interface from an AST.
  *
+ *  \relates ConfigParser
  *  \param root The serial port node to parse.
  *  \param filter The filter to use for the interface.
  *  \param pool The connection pool to add the interface's connection to.
@@ -322,14 +342,17 @@ std::unique_ptr<SerialInterface> parse_serial(
         // Extract flow control.
         else if (node->name() == "config::flow_control")
         {
-            features = SerialPort::FLOW_CONTROL;
+            if (to_lower(node->content()) == "yes")
+            {
+                features = SerialPort::FLOW_CONTROL;
+            }
         }
     }
 
     // Throw error if no device was given.
     if (!device.has_value())
     {
-        throw std::invalid_argument("AST does not contain a device string");
+        throw std::invalid_argument("missing device string");
     }
 
     // Construct serial interface.
@@ -343,6 +366,7 @@ std::unique_ptr<SerialInterface> parse_serial(
 
 /** Parse a UPD interface from an AST.
  *
+ *  \relates ConfigParser
  *  \param root The UDP node to parse.
  *  \param filter The filter to use for the interface.
  *  \param pool The connection pool to add the interface's connection to.
@@ -370,12 +394,6 @@ std::unique_ptr<UDPInterface> parse_udp(
         {
             address = IPAddress(node->content());
         }
-    }
-
-    // Override port number with that provided with IP address.
-    if (address.has_value() && address->port() != 0)
-    {
-        port = address->port();
     }
 
     // Construct the UDP interface.

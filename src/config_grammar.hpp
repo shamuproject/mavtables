@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef CONFIGURATION_HPP_
-#define CONFIGURATION_HPP_
+#ifndef CONFIG_GRAMMAR_HPP_
+#define CONFIG_GRAMMAR_HPP_
 
 
 #include <iterator>
@@ -135,7 +135,7 @@ namespace config
     template<> struct store<port> : yes<port> {};
 
     // Serial port device name.
-    struct device : plus<sor<alnum, one<'_', '/'>>> {};
+    struct device : plus<sor<alnum, one<'.', '_', '/'>>> {};
     template<> struct store<device> : yes<device> {};
 
     // Serial port baud rate.
@@ -383,4 +383,4 @@ std::ostream &operator<<(
     std::ostream &os, const config::parse_tree::node &node);
 
 
-#endif  // CONFIGURATION_HPP_
+#endif  // CONFIG_GRAMMAR_HPP_
