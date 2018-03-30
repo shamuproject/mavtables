@@ -330,3 +330,22 @@ speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
                 std::to_string(baud_rate) + " bps is not a valid baud rate.");
     }
 }
+
+/** \copydoc SerialPort::print_(std::ostream &os)const
+ */
+std::ostream &UnixSerialPort::print_(std::ostream &os) const
+{
+    os << "serial {" << std::endl;
+    os << "    device " << device_ << ";" << std::endl;
+    os << "    baudrate " << std::to_string(baud_rate_) << ";" << std::endl;
+    if ((features_ & SerialPort::FLOW_CONTROL) != 0)
+    {
+        os << "    flow_control yes;" << std::endl;
+    }
+    else
+    {
+        os << "    flow_control no;" << std::endl;
+    }
+    os << "}";
+    return os;
+}

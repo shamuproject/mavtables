@@ -47,6 +47,9 @@ class UnixUDPSocket : public UDPSocket
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds::zero()) final;
 
+    protected:
+        std::ostream &print_(std::ostream &os) const final;
+
     private:
         // Variables
         unsigned int port_;

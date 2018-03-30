@@ -85,3 +85,32 @@ void SerialPort::write(
     std::copy(first, last, std::back_inserter(vec));
     write(vec);
 }
+
+
+std::ostream &SerialPort::print_(std::ostream &os) const
+{
+    os << "unknown serial port";
+    return os;
+}
+
+
+/** Print the given serial port to the given output stream.
+ *
+ *  An example:
+ *  ```
+ *  serial {
+ *      device /dev/ttyUSB0;
+ *      baudrate 115200;
+ *      flow_control yes;
+ *  }
+ *  ```
+ 
+ *  \relates SerialPort
+ *  \param os The output stream to print to.
+ *  \param serial_port The serial port (or any child of SerialPort) to print.
+ *  \return The output stream.
+ */
+std::ostream &operator<<(std::ostream &os, const SerialPort &serial_port)
+{
+    return serial_port.print_(os);
+}

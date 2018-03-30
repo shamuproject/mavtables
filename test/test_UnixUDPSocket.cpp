@@ -27,6 +27,7 @@
 
 #include "UnixSyscalls.hpp"
 #include "UnixUDPSocket.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 
@@ -694,5 +695,45 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
             errno = error;
             REQUIRE_THROWS_AS(socket.receive(250ms), std::system_error);
         }
+    }
+}
+
+
+TEST_CASE("UnixUDPSocket's are printable.", "[UnixUDPSocket]")
+{
+    // Mock system calls.
+    fakeit::Mock<UnixSyscalls> mock_sys;
+    // Mock 'socket'.
+    fakeit::When(Method(mock_sys, socket)).Return(3);
+    // Mock 'bind'.
+    struct sockaddr_in address;
+    fakeit::When(Method(mock_sys, bind)).Do(
+        [&](auto fd, auto addr, auto addrlen)
+    {
+        (void)fd;
+        std::memcpy(&address, addr, addrlen);
+        return 0;
+    });
+    // Mock 'close'.
+    fakeit::When(Method(mock_sys, close)).Return(0);
+    SECTION("Without explicit IP address.")
+    {
+        UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
+        REQUIRE(
+            str(socket) ==
+            "udp {\n"
+            "    port 14050;\n"
+            "}");
+    }
+    SECTION("With explicit IP address.")
+    {
+        UnixUDPSocket socket(
+            14050, IPAddress("127.0.0.1"), mock_unique(mock_sys));
+        REQUIRE(
+            str(socket) ==
+            "udp {\n"
+            "    port 14050;\n"
+            "    address 127.0.0.1;\n"
+            "}");
     }
 }

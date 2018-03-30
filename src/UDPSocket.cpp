@@ -102,3 +102,32 @@ IPAddress UDPSocket::receive(
     std::copy(vec.begin(), vec.end(), it);
     return address;
 }
+
+
+std::ostream &UDPSocket::print_(std::ostream &os) const
+{
+    os << "unknown UDP socket";
+    return os;
+}
+
+
+/** Print the given UDP socket to the given output stream.
+ *
+ *  An example:
+ *  ```
+ *  serial {
+ *      device /dev/ttyUSB0;
+ *      baudrate 115200;
+ *      flow_control yes;
+ *  }
+ *  ```
+ 
+ *  \relates SerialPort
+ *  \param os The output stream to print to.
+ *  \param udp_socket The UDP socket (or any child of UDPSocket) to print.
+ *  \return The output stream.
+ */
+std::ostream &operator<<(std::ostream &os, const UDPSocket &udp_socket)
+{
+    return udp_socket.print_(os);
+}

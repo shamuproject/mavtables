@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
 
 #include <algorithm>
 #include <chrono>
@@ -31,6 +32,7 @@
 #include "PacketVersion2.hpp"
 #include "SerialInterface.hpp"
 #include "SerialPort.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -94,7 +96,7 @@ TEST_CASE("SerialInterface's can be constructed.", "[SerialInterface]")
 }
 
 
-TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
+TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
 {
     // MAVLink packets.
     auto heartbeat =
@@ -113,8 +115,8 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
     auto pool = mock_shared(mock_pool);
     fakeit::Fake(Method(mock_pool, add));
     std::multiset<packet_v2::Packet,
-        bool(*)(packet_v2::Packet, packet_v2::Packet)>
-        send_packets([](auto a, auto b)
+        bool(*)(const packet_v2::Packet &, const packet_v2::Packet &)>
+        send_packets([](const auto &a, const auto &b)
     {
         return a.data() < b.data();
     });
@@ -291,7 +293,7 @@ TEST_CASE("SerialInterace's 'receive_packet' method.", "[SerialInterface]")
 }
 
 
-TEST_CASE("SerialInterace's 'send_packet' method.", "[UPDInterface]")
+TEST_CASE("SerialInterface's 'send_packet' method.", "[SerialInterface]")
 {
     // MAVLink packets.
     auto heartbeat =
@@ -371,4 +373,17 @@ TEST_CASE("SerialInterace's 'send_packet' method.", "[UPDInterface]")
         REQUIRE(write_bytes.count(heartbeat->data()) == 1);
         REQUIRE(write_bytes.count(encapsulated_data->data()) == 1);
     }
+}
+
+
+TEST_CASE("SerialInterface's are printable.", "[SerialInterface]")
+{
+    fakeit::Mock<ConnectionPool> mock_pool;
+    fakeit::Mock<Connection> mock_connection;
+    fakeit::Fake(Method(mock_pool, add));
+    auto pool = mock_shared(mock_pool);
+    auto connection = mock_unique(mock_connection);
+    auto port = std::make_unique<SerialPort>();
+    SerialInterface serial(std::move(port), pool, std::move(connection));
+    REQUIRE(str(serial) == "unknown serial port");
 }

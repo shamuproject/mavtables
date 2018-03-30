@@ -45,6 +45,9 @@ class UDPInterface : public Interface
         void send_packet(const std::chrono::nanoseconds &timeout) final;
         void receive_packet(const std::chrono::nanoseconds &timeout) final;
 
+    protected:
+        std::ostream &print_(std::ostream &os) const final;
+
     private:
         // Variables.
         std::unique_ptr<UDPSocket> socket_;

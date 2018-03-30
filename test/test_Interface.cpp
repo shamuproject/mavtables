@@ -25,6 +25,7 @@
 #include "Interface.hpp"
 #include "Packet.hpp"
 #include "PacketVersion2.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -41,9 +42,6 @@ namespace
     // Subclass of Interface used for testing the abstract class Interface.
     class InterfaceTestClass : public Interface
     {
-        private:
-            std::shared_ptr<ConnectionPool> connection_pool_;
-
         public:
             InterfaceTestClass(std::shared_ptr<ConnectionPool> connection_pool)
                 : connection_pool_(std::move(connection_pool))
@@ -66,6 +64,16 @@ namespace
                 connection_pool_->send(
                     std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
             }
+
+        protected:
+            std::ostream &print_(std::ostream &os) const final
+            {
+                os << "interface test class";
+                return os;
+            }
+
+        private:
+            std::shared_ptr<ConnectionPool> connection_pool_;
     };
 
 #ifdef __clang__
@@ -105,4 +113,12 @@ TEST_CASE("Interface's 'receive_packet' method sends the packet using the "
     {
         return a != nullptr && *a == packet_v2::Packet(to_vector(PingV2()));
     })).Once();
+}
+
+
+TEST_CASE("Interface's are printable.", "[Interface]")
+{
+    fakeit::Mock<ConnectionPool> mock_pool;
+    std::shared_ptr<ConnectionPool> pool = mock_shared(mock_pool);
+    REQUIRE(str(InterfaceTestClass(pool)) == "interface test class");
 }

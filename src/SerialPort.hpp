@@ -59,7 +59,21 @@ class SerialPort
         virtual void write(
             std::vector<uint8_t>::const_iterator first,
             std::vector<uint8_t>::const_iterator last);
+
+        friend std::ostream &operator<<(
+            std::ostream &os, const SerialPort &serial_port);
+
+    protected:
+        /** Print the serial port to the given output stream.
+         *
+         *  \param os The output stream to print to.
+         *  \return The output stream.
+         */
+        virtual std::ostream &print_(std::ostream &os) const;
 };
+
+
+std::ostream &operator<<(std::ostream &os, const SerialPort &serial_port);
 
 
 #endif // SERIALPORT_HPP_
