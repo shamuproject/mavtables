@@ -63,7 +63,6 @@ std::pair<bool, int> Filter::will_accept(
             return {false, 0};
         case Action::CONTINUE:
             break;
-
         case Action::DEFAULT:
             break;
     }

@@ -196,6 +196,15 @@ TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
 }
 
 
+TEST_CASE("'to_lower' converts string to lower case.", "[util]")
+{
+    REQUIRE(to_lower("HELLO WORLD") == "hello world");
+    REQUIRE(to_lower("Hello World") == "hello world");
+    REQUIRE_NOTHROW(
+        to_lower("1234567891!@#$%^&*()_+") == "1234567890!@#$%^&*()_+");
+}
+
+
 TEST_CASE("'str' converts printable types to strings.", "[util]")
 {
     REQUIRE(str(256) == "256");

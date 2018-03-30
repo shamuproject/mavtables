@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <algorithm>
+#include <cctype>
 #include <string>
 
 #include "util.hpp"
@@ -24,3 +26,16 @@
  *
  *  Utility functions that don't warrant their own file.
  */
+
+
+/** Convert string to lower case.
+ *
+ *  \ingroup utility
+ *  \param string The string to convert to lower case.
+ *  \returns The \a string converted to lower case.
+ */
+std::string to_lower(std::string string)
+{
+    std::transform(string.begin(), string.end(), string.begin(), ::tolower);
+    return string;
+}

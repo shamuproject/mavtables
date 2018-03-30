@@ -91,7 +91,7 @@ class Rule
 };
 
 
-std::ostream &operator<<(std::ostream &os, const Rule &action);
+std::ostream &operator<<(std::ostream &os, const Rule &rule);
 
 
 #endif // RULE_HPP_

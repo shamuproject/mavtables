@@ -24,6 +24,7 @@
 #include <iterator>
 #include <ostream>
 #include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -41,6 +42,8 @@ std::string str(const T &object);
 
 template <class ByteType = unsigned char, class T>
 std::array<ByteType, sizeof(T)> to_bytes(T number);
+
+std::string to_lower(std::string string);
 
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
