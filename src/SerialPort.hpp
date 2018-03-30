@@ -21,6 +21,7 @@
 
 #include <chrono>
 #include <iterator>
+#include <ostream>
 #include <string>
 #include <vector>
 
