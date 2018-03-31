@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #define OPTIONS_HPP_
 
 
+#include <iostream>
 #include <string>
 #include <ostream>
 #include <optional>
@@ -32,7 +33,7 @@ class Options
 {
     public:
         Options(
-            std::ostream &os, int argc, char *argv[],
+            int argc, const char *argv[], std::ostream &os = std::cout,
             const Filesystem &filesystem = Filesystem());
         std::string config_file();
         bool ast();

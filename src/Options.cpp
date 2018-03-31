@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
 #include <boost/program_options.hpp>
 
 #include "Options.hpp"
+#include "config.hpp"
 
 
 namespace po = boost::program_options;
@@ -37,16 +37,18 @@ namespace po = boost::program_options;
  *      instance.
  */
 Options::Options(
-    std::ostream &os, int argc, char *argv[],
+    int argc, const char *argv[], std::ostream &os,
     const Filesystem &filesystem)
     : continue_(true)
 {
     // Command line options.
-    po::options_description options("Allowed options");
+    po::options_description options(
+        "usage: " + std::string(argv[0]));
     options.add_options()
     ("help,h", "print this message")
-    ("config,c", po::value<std::string>(), "specify configuration file")
-    ("ast,a", "print ast of configuration file instead of running firewall");
+    ("config", po::value<std::string>(), "specify configuration file")
+    ("ast", "print AST of configuration file (do not run)")
+    ("version", "print version and license information");
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, options), vm);
     po::notify(vm);
@@ -59,20 +61,49 @@ Options::Options(
         return;
     }
 
-    // Find configuration file.
-    if (vm.count("config") && filesystem.exists(vm["config"].as<std::string>()))
+    // Print version information.
+    if (vm.count("version"))
     {
-        config_file_ = vm["config"].as<std::string>();
+        os << "mavtables (SHAMU Project) ";
+        os << "v" << std::to_string(VERSION_MAJOR);
+        os << "." << std::to_string(VERSION_MINOR);
+        os << "." << std::to_string(VERSION_PATCH) << "\n";
+        os << "Copyright (C) 2018  Michael R. Shannon\n";
+        os << "\n";
+        os << "License: GPL v2.0 or any later version.\n";
+        os << "This is free software; see the source for copying conditions.  ";
+        os << "There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS ";
+        os << "FOR A PARTICULAR PURPOSE." << std::endl;
+        continue_ = false;
+        return;
     }
-    else if (auto config_file = find_config(filesystem))
+
+    // Find configuration file.
+    if (vm.count("config"))
     {
-        config_file_ = config_file.value();
+        if (filesystem.exists(vm["config"].as<std::string>()))
+        {
+            config_file_ = vm["config"].as<std::string>();
+        }
+        else
+        {
+            continue_ = false;
+            throw std::runtime_error(
+                "mavtables could not locate a configuration file");
+        }
     }
     else
     {
-        continue_ = false;
-        throw std::runtime_error(
-            "mavtables could not locate an configuration file.");
+        if (auto config_file = find_config(filesystem))
+        {
+            config_file_ = config_file.value();
+        }
+        else
+        {
+            continue_ = false;
+            throw std::runtime_error(
+                "mavtables could not locate a configuration file");
+        }
     }
 
     // Determine actions.
