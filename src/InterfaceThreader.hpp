@@ -35,7 +35,7 @@ class InterfaceThreader
             DELAY_START //!< Delay starting, use \ref start to launch threads.
         };
         InterfaceThreader(
-            std::shared_ptr<Interface> interface,
+            std::unique_ptr<Interface> interface,
             std::chrono::microseconds = std::chrono::microseconds(100000),
             Threads start_threads = InterfaceThreader::START);
         InterfaceThreader(const InterfaceThreader &other) = delete;
@@ -48,7 +48,7 @@ class InterfaceThreader
 
     private:
         // Variables
-        std::shared_ptr<Interface> interface_;
+        std::unique_ptr<Interface> interface_;
         std::thread tx_thread_;
         std::thread rx_thread_;
         std::chrono::microseconds timeout_;
