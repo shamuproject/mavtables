@@ -183,7 +183,7 @@ TEST_CASE("Options's class prints version information when given the "
 
 
 
-TEST_CASE("Options's class will use the given configuraiton file "
+TEST_CASE("Options's class will use the given configuration file "
           "(--config flag).", "[Options]")
 {
     std::vector<Filesystem::path> paths;
@@ -265,6 +265,8 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(options);
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
+        // Verify printing.
+        REQUIRE(ss.str() == "");
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(1);
         REQUIRE(paths.size() == 1);
@@ -290,6 +292,8 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(options);
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
+        // Verify printing.
+        REQUIRE(ss.str() == "");
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(2);
         REQUIRE(paths.size() == 2);
@@ -318,6 +322,8 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(options);
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
+        // Verify printing.
+        REQUIRE(ss.str() == "");
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(3);
         REQUIRE(paths.size() == 3);
@@ -347,6 +353,8 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(options);
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
+        // Verify printing.
+        REQUIRE(ss.str() == "");
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(4);
         REQUIRE(paths.size() == 4);
@@ -392,3 +400,23 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
 }
 
 
+TEST_CASE("Options's class sets run to false and ast to true when the --ast "
+          "flag is given.", "[Options]")
+{
+    // Setup mocks.
+    fakeit::Mock<Filesystem> fs_mock;
+    fakeit::When(Method(fs_mock, exists)).AlwaysReturn(true);
+    // Construct Options object.
+    int argc = 4;
+    const char *argv[4] = {
+        "mavtables", "--ast", "--config", "examples/test.conf"};
+    std::stringstream ss;
+    Options options(argc, argv, ss);
+    // Verify Options object.
+    REQUIRE(options.config_file() == "examples/test.conf");
+    REQUIRE(options);
+    REQUIRE(options.ast());
+    REQUIRE_FALSE(options.run());
+    // Verify printing.
+    REQUIRE(ss.str() == "");
+}
