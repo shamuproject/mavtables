@@ -35,6 +35,7 @@
 #include "PacketVersion2.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -105,14 +106,14 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     // Filter
     fakeit::Mock<Filter> mock_filter;
     std::multiset<packet_v2::Packet,
-        bool(*)(packet_v2::Packet, packet_v2::Packet)>
-        will_accept_packets([](auto a, auto b)
+        bool(*)(const packet_v2::Packet &, const packet_v2::Packet &)>
+        will_accept_packets([](const auto &a, const auto &b)
     {
         return a.data() < b.data();
     });
     std::multiset<MAVAddress> will_accept_addresses;
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-        [&](auto & a, auto & b)
+        [&](auto &a, auto &b)
     {
         will_accept_packets.insert(
             dynamic_cast<const packet_v2::Packet &>(a));
@@ -637,6 +638,18 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::Verify(
             OverloadedMethod(mock_socket, send, send_type)).Once();
     }
+}
+
+
+TEST_CASE("UDPInterface's are printable.", "[UDPInterface]")
+{
+    fakeit::Mock<ConnectionPool> mock_pool;
+    fakeit::Mock<ConnectionFactory<>> mock_factory;
+    auto pool = mock_shared(mock_pool);
+    auto factory = mock_unique(mock_factory);
+    auto socket = std::make_unique<UDPSocket>();
+    UDPInterface udp(std::move(socket), pool, std::move(factory));
+    REQUIRE(str(udp) == "unknown UDP socket");
 }
 
 

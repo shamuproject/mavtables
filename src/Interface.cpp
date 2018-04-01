@@ -28,3 +28,31 @@ Interface::~Interface()
 {
 }
 // LCOV_EXCL_STOP
+
+
+/** Print the give interface to the given output stream.
+ *
+ *  Some examples are:
+ *  ```
+ *  serial {
+ *      device /dev/ttyUSB0;
+ *      baudrate 115200;
+ *      flow_control yes;
+ *  }
+ *  ```
+ *  ```
+ *  udp {
+ *      port 14500;
+ *      address 127.0.0.1;
+ *  }
+ *  ```
+ 
+ *  \relates Interface
+ *  \param os The output stream to print to.
+ *  \param interface The interface (or any child of Interface) to print.
+ *  \return The output stream.
+ */
+std::ostream &operator<<(std::ostream &os, const Interface &interface)
+{
+    return interface.print_(os);
+}

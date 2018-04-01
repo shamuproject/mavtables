@@ -45,7 +45,7 @@ Rule::~Rule()
 // LCOV_EXCL_STOP
 
 
-/** Print the given action to the given output stream.
+/** Print the given rule to the given output stream.
  *
  *  Some examples are:
  *      - `accept`
@@ -56,10 +56,10 @@ Rule::~Rule()
  *
  *  \relates Rule
  *  \param os The output stream to print to.
- *  \param action The action (or any child of Rule) to print.
+ *  \param rule The rule (or any child of Rule) to print.
  *  \return The output stream.
  */
-std::ostream &operator<<(std::ostream &os, const Rule &action)
+std::ostream &operator<<(std::ostream &os, const Rule &rule)
 {
-    return action.print_(os);
+    return rule.print_(os);
 }

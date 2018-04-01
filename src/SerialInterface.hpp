@@ -42,7 +42,11 @@ class SerialInterface : public Interface
         void send_packet(const std::chrono::nanoseconds &timeout) final;
         void receive_packet(const std::chrono::nanoseconds &timeout) final;
 
+    protected:
+        std::ostream &print_(std::ostream &os) const final;
+
     private:
+        // Variables.
         std::unique_ptr<SerialPort> port_;
         std::shared_ptr<ConnectionPool> connection_pool_;
         std::shared_ptr<Connection> connection_;

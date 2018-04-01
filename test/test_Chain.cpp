@@ -33,7 +33,7 @@
 #include "PacketVersion2.hpp"
 #include "RecursionError.hpp"
 #include "Reject.hpp"
-#include "util.cpp"
+#include "util.hpp"
 
 #include "common_Packet.hpp"
 

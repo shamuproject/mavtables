@@ -20,13 +20,13 @@
 #include <catch.hpp>
 #include <fakeit.hpp>
 
+#include "Accept.hpp"
+#include "Call.hpp"
 #include "Chain.hpp"
 #include "Filter.hpp"
-#include "PacketVersion2.hpp"
-#include "Accept.hpp"
-#include "Reject.hpp"
-#include "Call.hpp"
 #include "GoTo.hpp"
+#include "PacketVersion2.hpp"
+#include "Reject.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

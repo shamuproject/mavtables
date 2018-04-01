@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,89 @@
 #include <catch.hpp>
 
 #include "util.hpp"
+
+
+TEST_CASE("'append' appends one vector to another.", "[util]")
+{
+    SECTION("{} + {} = {}")
+    {
+        std::vector<int> vec_1;
+        std::vector<int> vec_2;
+        REQUIRE(vec_1.empty());
+        REQUIRE(vec_2.empty());
+        append(vec_1, vec_2);
+        REQUIRE(vec_1.empty());
+    }
+    SECTION("{1, 2, 3, 4} + {} = {1, 2, 3, 4}")
+    {
+        std::vector<int> vec_1 = {1, 2, 3, 4};
+        std::vector<int> vec_2;
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+        REQUIRE(vec_2.empty());
+        append(vec_1, vec_2);
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+    }
+    SECTION("{} + {1, 2, 3, 4} = {1, 2, 3, 4}")
+    {
+        std::vector<int> vec_1;
+        std::vector<int> vec_2 = {1, 2, 3, 4};
+        REQUIRE(vec_1.empty());
+        REQUIRE(vec_2 == std::vector<int>({1, 2, 3, 4}));
+        append(vec_1, vec_2);
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+    }
+    SECTION("{1, 2, 3, 4} + {5, 6, 7, 8} = {1, 2, 3, 4, 5, 6, 7, 8}")
+    {
+        std::vector<int> vec_1 = {1, 2, 3, 4};
+        std::vector<int> vec_2 = {5, 6, 7, 8};
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+        REQUIRE(vec_2 == std::vector<int>({5, 6, 7, 8}));
+        append(vec_1, vec_2);
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8}));
+    }
+}
+
+
+TEST_CASE("'append' (with move semantics) appends one vector to another.",
+          "[util]")
+{
+    SECTION("{} + {} = {}")
+    {
+        std::vector<int> vec_1;
+        std::vector<int> vec_2;
+        REQUIRE(vec_1.empty());
+        REQUIRE(vec_2.empty());
+        append(vec_1, std::move(vec_2));
+        REQUIRE(vec_1.empty());
+    }
+    SECTION("{1, 2, 3, 4} + {} = {1, 2, 3, 4}")
+    {
+        std::vector<int> vec_1 = {1, 2, 3, 4};
+        std::vector<int> vec_2;
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+        REQUIRE(vec_2.empty());
+        append(vec_1, std::move(vec_2));
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+    }
+    SECTION("{} + {1, 2, 3, 4} = {1, 2, 3, 4}")
+    {
+        std::vector<int> vec_1;
+        std::vector<int> vec_2 = {1, 2, 3, 4};
+        REQUIRE(vec_1.empty());
+        REQUIRE(vec_2 == std::vector<int>({1, 2, 3, 4}));
+        append(vec_1, std::move(vec_2));
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+    }
+    SECTION("{1, 2, 3, 4} + {5, 6, 7, 8} = {1, 2, 3, 4, 5, 6, 7, 8}")
+    {
+        std::vector<int> vec_1 = {1, 2, 3, 4};
+        std::vector<int> vec_2 = {5, 6, 7, 8};
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4}));
+        REQUIRE(vec_2 == std::vector<int>({5, 6, 7, 8}));
+        append(vec_1, std::move(vec_2));
+        REQUIRE(vec_1 == std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8}));
+    }
+}
 
 
 TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
@@ -110,6 +193,15 @@ TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
         REQUIRE(bytes[6] == 0x23);
         REQUIRE(bytes[7] == 0x01);
     }
+}
+
+
+TEST_CASE("'to_lower' converts string to lower case.", "[util]")
+{
+    REQUIRE(to_lower("HELLO WORLD") == "hello world");
+    REQUIRE(to_lower("Hello World") == "hello world");
+    REQUIRE_NOTHROW(
+        to_lower("1234567891!@#$%^&*()_+") == "1234567890!@#$%^&*()_+");
 }
 
 

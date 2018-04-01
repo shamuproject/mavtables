@@ -46,7 +46,21 @@ class Interface
          */
         virtual void receive_packet(
             const std::chrono::nanoseconds &timeout) = 0;
+
+        friend std::ostream &operator<<(
+            std::ostream &os, const Interface &interface);
+
+    protected:
+        /** Print the interface to the given output stream.
+         *
+         *  \param os The output stream to print to.
+         *  \return The output stream.
+         */
+        virtual std::ostream &print_(std::ostream &os) const = 0;
 };
+
+
+std::ostream &operator<<(std::ostream &os, const Interface &interface);
 
 
 #endif // INTERFACE_HPP_

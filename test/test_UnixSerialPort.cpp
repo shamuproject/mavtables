@@ -28,6 +28,7 @@
 
 #include "UnixSyscalls.hpp"
 #include "UnixSerialPort.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 
@@ -767,7 +768,7 @@ TEST_CASE("UnixSerialPort's 'write' method sends data over the serial port.",
         REQUIRE_THROWS_AS(port.write(vec), std::runtime_error);
         REQUIRE_THROWS_WITH(port.write(vec), "Could only write 3 of 4 bytes.");
     }
-    SECTION("Emmits errors from 'write' system call.")
+    SECTION("Emits errors from 'write' system call.")
     {
         fakeit::When(Method(mock_sys, write)).AlwaysReturn(-1);
         std::array<int, 11> errors{{
@@ -789,5 +790,62 @@ TEST_CASE("UnixSerialPort's 'write' method sends data over the serial port.",
             errno = error;
             REQUIRE_THROWS_AS(port.write({1, 3, 3, 7}), std::system_error);
         }
+    }
+}
+
+
+TEST_CASE("UnixSerialPort's are printable.", "[UnixSerialPort]")
+{
+    // Mock system calls.
+    fakeit::Mock<UnixSyscalls> mock_sys;
+    // Mock 'open'.
+    fakeit::When(Method(mock_sys, open)).AlwaysReturn(3);
+    // Mock 'tcgetattr'.
+    fakeit::When(Method(mock_sys, tcgetattr)).AlwaysDo(
+        [&](auto fd, auto termios_p)
+    {
+        (void)fd;
+        std::memset(termios_p, '\0', sizeof(struct termios));
+        return 0;
+    });
+    // Mock 'tcsetattr'.
+    struct termios tty;
+    fakeit::When(Method(mock_sys, tcsetattr)).AlwaysDo(
+        [&](auto fd, auto action, auto termios_p)
+    {
+        (void)fd;
+        (void)action;
+        std::memcpy(&tty, termios_p, sizeof(struct termios));
+        return 0;
+    });
+    // Mock 'close'.
+    fakeit::When(Method(mock_sys, close)).AlwaysReturn(0);
+    SECTION("Without flow control.")
+    {
+        UnixSerialPort port(
+            "/dev/ttyUSB0", 9600,
+            SerialPort::DEFAULT,
+            mock_unique(mock_sys));
+        REQUIRE(
+            str(port) ==
+            "serial {\n"
+            "    device /dev/ttyUSB0;\n"
+            "    baudrate 9600;\n"
+            "    flow_control no;\n"
+            "}");
+    }
+    SECTION("With flow control.")
+    {
+        UnixSerialPort port(
+            "/dev/ttyUSB0", 9600,
+            SerialPort::FLOW_CONTROL,
+            mock_unique(mock_sys));
+        REQUIRE(
+            str(port) ==
+            "serial {\n"
+            "    device /dev/ttyUSB0;\n"
+            "    baudrate 9600;\n"
+            "    flow_control yes;\n"
+            "}");
     }
 }

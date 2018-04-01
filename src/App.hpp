@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017-2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,27 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <algorithm>
-#include <cctype>
-#include <string>
-
-#include "util.hpp"
+#ifndef APP_HPP_
+#define APP_HPP_
 
 
-/** \defgroup utility Utility Functions
- *
- *  Utility functions that don't warrant their own file.
+#include <memory>
+#include <vector>
+
+#include "Interface.hpp"
+#include "InterfaceThreader.hpp"
+
+
+/** The mavtables application class.
  */
-
-
-/** Convert string to lower case.
- *
- *  \ingroup utility
- *  \param string The string to convert to lower case.
- *  \returns The \a string converted to lower case.
- */
-std::string to_lower(std::string string)
+class App
 {
-    std::transform(string.begin(), string.end(), string.begin(), ::tolower);
-    return string;
-}
+    public:
+        App(std::vector<std::unique_ptr<Interface>> interfaces);
+        void run();
+
+    private:
+        std::vector<std::unique_ptr<InterfaceThreader>> threaders_;
+};
+
+
+#endif // APP_HPP_

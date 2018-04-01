@@ -210,3 +210,18 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
     // Failed to read datagram.
     return {std::vector<uint8_t>(), IPAddress(0)};
 }
+
+
+/** \copydoc UDPSocket::print_(std::ostream &os)const
+ */
+std::ostream &UnixUDPSocket::print_(std::ostream &os) const
+{
+    os << "udp {" << std::endl;
+    os << "    port " << std::to_string(port_) << ";" << std::endl;
+    if (address_.has_value())
+    {
+        os << "    address " << address_.value() << ";" << std::endl;
+    }
+    os << "}";
+    return os;
+}

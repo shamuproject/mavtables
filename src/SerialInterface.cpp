@@ -99,3 +99,21 @@ void SerialInterface::receive_packet(const std::chrono::nanoseconds &timeout)
         }
     }
 }
+
+
+/** \copydoc Interface::print_(std::ostream &os)const
+ *
+ *  Example:
+ *  ```
+ *  serial {
+ *      device /dev/ttyUSB0;
+ *      baudrate 115200;
+ *      flow_control yes;
+ *  }
+ *  ```
+ */
+std::ostream &SerialInterface::print_(std::ostream &os) const
+{
+    os << *port_;
+    return os;
+}

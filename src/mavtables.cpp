@@ -33,19 +33,24 @@
 namespace po = boost::program_options;
 
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     try
     {
-        Options options(std::cout, argc, argv);
+        Options options(argc, argv);
 
         if (options)
         {
-            std::cout << "Configuration file located at "
-                      << options.config_file() << std::endl;
-            auto config = std::make_unique<ConfigParser>(
-                    options.config_file());
-            std::cout << *config;
+            auto config = std::make_unique<ConfigParser>(options.config_file());
+            if (options.ast())
+            {
+                std::cout << *config;
+            }
+            if (options.run())
+            {
+                auto app = config->make_app();
+                app->run();
+            }
         }
     }
     catch (const std::exception &e)
@@ -55,13 +60,4 @@ int main(int argc, char *argv[])
     }
 
     return EXIT_SUCCESS;
-    // mavtables --dot
-    // mavtables --ast
-    // (void)argc;
-    // (void)argv;
-    // std::cout << NAME << ": v"
-    //           << VERSION_MAJOR << "."
-    //           << VERSION_MINOR << "."
-    //           << VERSION_PATCH << std::endl;
-    // std::cout << "A MAVLink router and firewall." << std::endl;
 }

@@ -46,6 +46,9 @@ class UnixSerialPort : public SerialPort
                 std::chrono::nanoseconds::zero()) final;
         virtual void write(const std::vector<uint8_t> &data) final;
 
+    protected:
+        std::ostream &print_(std::ostream &os) const final;
+
     private:
         // Variables
         std::string device_;

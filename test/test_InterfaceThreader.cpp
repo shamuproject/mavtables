@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <chrono>
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <vector>
 
@@ -29,7 +29,9 @@
 #include <iostream>
 #include <thread>
 
+
 using namespace std::chrono_literals;
+
 
 namespace
 {
@@ -42,10 +44,6 @@ namespace
     // Subclass of Interface used for testing the abstract class Interface.
     class InterfaceTestClass : public Interface
     {
-        private:
-            std::atomic<unsigned int> &tx_counter;
-            std::atomic<unsigned int> &rx_counter;
-
         public:
             InterfaceTestClass(
                 std::atomic<unsigned int> &tx_counter_,
@@ -67,6 +65,21 @@ namespace
                 std::this_thread::sleep_for(timeout);
                 ++rx_counter;
             }
+
+        protected:
+            // No point in testing this.
+            // LCOV_EXCL_START
+            std::ostream &print_(std::ostream &os) const final
+            {
+                os << "interface test class";
+                return os;
+            }
+            // LCOV_EXCL_STOP
+
+        private:
+            std::atomic<unsigned int> &tx_counter;
+            std::atomic<unsigned int> &rx_counter;
+
     };
 
 #ifdef __clang__

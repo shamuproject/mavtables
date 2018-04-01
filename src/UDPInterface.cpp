@@ -157,3 +157,20 @@ void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
         }
     }
 }
+
+
+/** \copydoc Interface::print_(std::ostream &os)const
+ *
+ *  Example:
+ *  ```
+ *  udp {
+ *      port 14500;
+ *      address 127.0.0.1;
+ *  }
+ *  ```
+ */
+std::ostream &UDPInterface::print_(std::ostream &os) const
+{
+    os << *socket_;
+    return os;
+}

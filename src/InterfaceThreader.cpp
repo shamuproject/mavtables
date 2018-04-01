@@ -63,7 +63,7 @@ void InterfaceThreader::rx_runner_()
  *      is called.
  */
 InterfaceThreader::InterfaceThreader(
-    std::shared_ptr<Interface> interface,
+    std::unique_ptr<Interface> interface,
     std::chrono::microseconds timeout,
     Threads start_threads)
     : interface_(std::move(interface)),

@@ -53,7 +53,21 @@ class UDPSocket
             std::back_insert_iterator<std::vector<uint8_t>> it,
             const std::chrono::nanoseconds &timeout =
                 std::chrono::nanoseconds::zero());
+
+        friend std::ostream &operator<<(
+            std::ostream &os, const UDPSocket &udp_socket);
+
+    protected:
+        /** Print the UDP socket to the given output stream.
+         *
+         *  \param os The output stream to print to.
+         *  \return The output stream.
+         */
+        virtual std::ostream &print_(std::ostream &os) const;
 };
+
+
+std::ostream &operator<<(std::ostream &os, const UDPSocket &udp_socket);
 
 
 #endif // UDPSOCKET_HPP_
