@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include <signal.h>
 
 #include "App.hpp"
 #include "Interface.hpp"
@@ -52,8 +53,30 @@ App::App(std::vector<std::unique_ptr<Interface>> interfaces)
  */
 void App::run()
 {
+    // Start interfaces.
     for (auto &interface : threaders_)
     {
         interface->start();
+    }
+
+    #ifdef UNIX
+    // Wait for SIGINT (Ctrl+C).
+    sigset_t waitset;
+    sigemptyset(&waitset);
+    sigaddset(&waitset, SIGINT);
+    sigprocmask(SIG_BLOCK, &waitset, nullptr);
+    int sig;
+    if (sigwait(&waitset, &sig) < 0)
+    {
+        throw std::system_error(std::error_code(errno, std::system_category()));
+    }
+    #elif WINDOWS
+    throw std::runtime_error("Microsoft Windows is not currently supported.")
+    #endif
+
+    // Shutdown interfaces.
+    for (auto &interface : threaders_)
+    {
+        interface->shutdown();
     }
 }

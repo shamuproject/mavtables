@@ -49,6 +49,7 @@ int main(int argc, const char *argv[])
             if (options.run())
             {
                 auto app = config->make_app();
+                app->run();
             }
         }
     }
