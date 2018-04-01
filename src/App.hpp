@@ -19,16 +19,23 @@
 #define APP_HPP_
 
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "Interface.hpp"
+#include "InterfaceThreader.hpp"
 
 
+/** The mavtables application class.
+ */
 class App
 {
     public:
         App(std::vector<std::unique_ptr<Interface>> interfaces);
+        void run();
+
+    private:
+        std::vector<std::unique_ptr<InterfaceThreader>> threaders_;
 };
 
 
