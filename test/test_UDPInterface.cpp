@@ -96,6 +96,8 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     // MAVLink packets.
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
+    auto mission_set_current =
+        std::make_shared<packet_v2::Packet>(to_vector(MissionSetCurrentV2()));
     auto encapsulated_data =
         std::make_shared<packet_v2::Packet>(to_vector(EncapsulatedDataV2()));
     // Connection pool
@@ -156,61 +158,18 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
-                    ).AlwaysDo([](auto a, auto b)
+                    ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into connection.
             (void)b;
             auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
             std::copy(vec.begin(), vec.end() - 1, a);
-            return IPAddress("127.0.0.1:4000");
-        });
-        // Test
-        udp.receive_packet(timeout);
-        // Verification
-        fakeit::Verify(
-            OverloadedMethod(mock_socket, receive, receive_type).Matching(
-                [&](auto a, auto b)
-        {
-            (void)a;
-            return b == 250ms;
-        })).Once();
-        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(0);
-        fakeit::Verify(Method(spy_pool, add)).Exactly(0);
-    }
-    SECTION("Full packet received.")
-    {
-        // Mocks
-        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
-                    ).AlwaysDo([](auto a, auto b)
-        {
-            (void)b;
-            auto vec = to_vector(HeartbeatV2());
-            std::copy(vec.begin(), vec.end(), a);
-            return IPAddress("127.0.0.1:4000");
-        });
-        // Test
-        udp.receive_packet(timeout);
-        // Verification
-        fakeit::Verify(
-            OverloadedMethod(mock_socket, receive, receive_type).Matching(
-                [&](auto a, auto b)
-        {
-            (void)a;
-            return b == 250ms;
-        })).Once();
-        fakeit::Verify(Method(mock_filter, will_accept)).Once();
-        REQUIRE(will_accept_packets.count(*heartbeat) == 1);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
-        fakeit::Verify(Method(spy_pool, add)).Once();
-    }
-    SECTION("Multiple packets received (same IP and MAVLink addresses).")
-    {
-        // Mocks
-        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
-                    ).AlwaysDo([](auto a, auto b)
-        {
-            (void)b;
-            auto vec = to_vector(HeartbeatV2());
-            std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         });
         // Test
@@ -224,17 +183,16 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             (void)a;
             return b == 250ms;
         })).Exactly(2);
-        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(2);
-        REQUIRE(will_accept_packets.count(*heartbeat) == 2);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
-        fakeit::Verify(Method(spy_pool, add)).Once();
+        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(0);
+        fakeit::Verify(Method(spy_pool, add)).Exactly(1);
     }
-    SECTION("Multiple packets received (same IP, different MAVLink addresses).")
+    SECTION("Full packet received.")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into connection.
             (void)b;
             auto vec = to_vector(HeartbeatV2());
             std::copy(vec.begin(), vec.end(), a);
@@ -257,9 +215,85 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
             (void)a;
             return b == 250ms;
         })).Exactly(2);
-        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(3);
-        REQUIRE(will_accept_packets.count(*heartbeat) == 1);
+        fakeit::Verify(Method(mock_filter, will_accept)).Once();
+        REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
+        fakeit::Verify(Method(spy_pool, add)).Once();
+    }
+    SECTION("Multiple packets received (same IP and MAVLink addresses).")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            // Load 127.1 mavlink address into connection.
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).AlwaysDo([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        // Verification
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, receive, receive_type).Matching(
+                [&](auto a, auto b)
+        {
+            (void)a;
+            return b == 250ms;
+        })).Exactly(3);
+        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(2);
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 2);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
+        fakeit::Verify(Method(spy_pool, add)).Once();
+    }
+    SECTION("Multiple packets received (same IP, different MAVLink addresses).")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            // Load 127.1 mavlink address into connection.
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(MissionSetCurrentV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        // Verification
+        fakeit::Verify(
+            OverloadedMethod(mock_socket, receive, receive_type).Matching(
+                [&](auto a, auto b)
+        {
+            (void)a;
+            return b == 250ms;
+        })).Exactly(3);
+        fakeit::Verify(Method(mock_filter, will_accept)).Exactly(3);
+        REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
+        REQUIRE(will_accept_packets.count(*mission_set_current) == 2);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
         REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Once();
@@ -270,6 +304,13 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into connection.
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
             std::copy(vec.begin(), vec.end(), a);
@@ -277,11 +318,12 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         }).Do([](auto a, auto b)
         {
             (void)b;
-            auto vec = to_vector(HeartbeatV2());
+            auto vec = to_vector(MissionSetCurrentV2());
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4001");
         });
         // Test
+        udp.receive_packet(timeout);
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
         // Verification
@@ -291,12 +333,12 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         {
             (void)a;
             return b == 250ms;
-        })).Exactly(2);
+        })).Exactly(3);
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(3);
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
-        REQUIRE(will_accept_packets.count(*heartbeat) == 2);
-        REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 2);
-        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
+        REQUIRE(will_accept_packets.count(*mission_set_current) == 2);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
+        REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Exactly(2);
     }
     SECTION("Partial packets with same IP address should be combined and "
@@ -306,6 +348,13 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into connection.
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
             std::copy(vec.begin(), vec.end() - 10, a);
@@ -320,6 +369,7 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
         // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
@@ -327,10 +377,10 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         {
             (void)a;
             return b == 250ms;
-        })).Exactly(2);
+        })).Exactly(3);
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
-        REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 1);
+        REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Once();
     }
     SECTION("Partial packets with different IP addresses should be dropped.")
@@ -338,6 +388,13 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
+        {
+            // Load 127.1 mavlink address into connection.
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
         {
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
@@ -353,6 +410,7 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         // Test
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
         // Verification
         fakeit::Verify(
             OverloadedMethod(mock_socket, receive, receive_type).Matching(
@@ -360,9 +418,9 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         {
             (void)a;
             return b == 250ms;
-        })).Exactly(2);
+        })).Exactly(3);
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(0);
-        fakeit::Verify(Method(spy_pool, add)).Exactly(0);
+        fakeit::Verify(Method(spy_pool, add)).Once();
     }
 }
 
@@ -429,29 +487,9 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
     {
         // Mocks
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
-                    ).AlwaysDo([](auto a, auto b)
-        {
-            (void)b;
-            auto vec = to_vector(HeartbeatV2());
-            std::copy(vec.begin(), vec.end(), a);
-            return IPAddress("127.0.0.1:4000");
-        });
-        // Test
-        udp.receive_packet(timeout);
-        udp.send_packet(timeout);
-        // Verification
-        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
-        fakeit::Verify(OverloadedMethod(mock_socket, send, send_type)).Once();
-        REQUIRE(send_bytes.size() == 1);
-        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
-        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
-    }
-    SECTION("Single connection, multiple packets.")
-    {
-        // Mocks
-        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into connection.
             (void)b;
             auto vec = to_vector(HeartbeatV2());
             std::copy(vec.begin(), vec.end(), a);
@@ -471,7 +509,43 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
         fakeit::Verify(OverloadedMethod(mock_socket, send, send_type)).Once();
         REQUIRE(send_bytes.size() == 1);
-        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
+        REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
+    }
+    SECTION("Single connection, multiple packets.")
+    {
+        // Mocks
+        fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
+                    ).Do([](auto a, auto b)
+        {
+            // Load 127.1 mavlink address into connection.
+            (void)b;
+            auto vec = to_vector(HeartbeatV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(EncapsulatedDataV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(MissionSetCurrentV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
+        });
+        // Test
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.receive_packet(timeout);
+        udp.send_packet(timeout);
+        // Verification
+        fakeit::Verify(Method(spy_factory, wait_for_packet).Using(1ms)).Once();
+        fakeit::Verify(OverloadedMethod(mock_socket, send, send_type)).Once();
+        REQUIRE(send_bytes.size() == 1);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
         // Test
         udp.send_packet(timeout);
@@ -481,8 +555,8 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::Verify(
             OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
         REQUIRE(send_bytes.size() == 2);
-        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
         REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(MissionSetCurrentV2())) == 1);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 2);
     }
     SECTION("Multiple connections, multiple packets.")
@@ -491,6 +565,7 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into connection.
             (void)b;
             auto vec = to_vector(HeartbeatV2());
             std::copy(vec.begin(), vec.end(), a);
@@ -501,8 +576,15 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
             auto vec = to_vector(EncapsulatedDataV2());
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4001");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(MissionSetCurrentV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4000");
         });
         // Test
+        udp.receive_packet(timeout);
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
         udp.send_packet(timeout);
@@ -512,8 +594,8 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::Verify(
             OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
         REQUIRE(send_bytes.size() == 2);
-        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
         REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(MissionSetCurrentV2())) == 1);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4001")) == 1);
         // Test
@@ -525,8 +607,8 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::Verify(
             OverloadedMethod(mock_socket, send, send_type)).Exactly(3);
         REQUIRE(send_bytes.size() == 3);
-        REQUIRE(send_bytes.count(to_vector(HeartbeatV2())) == 1);
-        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 2);
+        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 1);
+        REQUIRE(send_bytes.count(to_vector(MissionSetCurrentV2())) == 2);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 2);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4001")) == 1);
     }
@@ -538,7 +620,7 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         {
             (void)b;
 
-            if (a.name() == "ENCAPSULATED_DATA")
+            if (a.name() == "MISSION_SET_CURRENT")
             {
                 return std::pair<bool, int>(true, 0);
             }
@@ -548,18 +630,27 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into first connection.
             (void)b;
             auto vec = to_vector(HeartbeatV2());
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         }).Do([](auto a, auto b)
         {
+            // Load 224.255 mavlink address into second connection.
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4001");
+        }).Do([](auto a, auto b)
+        {
+            (void)b;
+            auto vec = to_vector(MissionSetCurrentV2());
+            std::copy(vec.begin(), vec.end(), a);
+            return IPAddress("127.0.0.1:4002");
         });
         // Test
+        udp.receive_packet(timeout);
         udp.receive_packet(timeout);
         udp.receive_packet(timeout);
         udp.send_packet(timeout);
@@ -569,7 +660,7 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::Verify(
             OverloadedMethod(mock_socket, send, send_type)).Exactly(2);
         REQUIRE(send_bytes.size() == 2);
-        REQUIRE(send_bytes.count(to_vector(EncapsulatedDataV2())) == 2);
+        REQUIRE(send_bytes.count(to_vector(MissionSetCurrentV2())) == 2);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4000")) == 1);
         REQUIRE(send_addresses.count(IPAddress("127.0.0.1:4001")) == 1);
         // Test
@@ -599,12 +690,14 @@ TEST_CASE("UDPInterace's 'send_packet' method.", "[UPDInterface]")
         fakeit::When(OverloadedMethod(mock_socket, receive, receive_type)
                     ).Do([](auto a, auto b)
         {
+            // Load 127.1 mavlink address into first connection.
             (void)b;
             auto vec = to_vector(HeartbeatV2());
             std::copy(vec.begin(), vec.end(), a);
             return IPAddress("127.0.0.1:4000");
         }).Do([](auto a, auto b)
         {
+            // Load 224.255 mavlink address into second connection.
             (void)b;
             auto vec = to_vector(EncapsulatedDataV2());
             std::copy(vec.begin(), vec.end(), a);

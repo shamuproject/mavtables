@@ -74,16 +74,19 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     int priority = std::numeric_limits<int>::min();
 
     // Loop over addresses.
-    for (const auto &i : pool_->addresses())
+    for (const auto &source : pool_->addresses())
     {
-        // Filter packet/address combination.
-        auto [accept_, priority_] = filter_->will_accept(*packet, i);
-
-        // Update accept/priority.
-        if (accept_)
+        if (packet->source() != source)
         {
-            accept = accept_;
-            priority = std::max(priority, priority_);
+            // Filter packet/address combination.
+            auto [accept_, priority_] = filter_->will_accept(*packet, source);
+
+            // Update accept/priority.
+            if (accept_)
+            {
+                accept = accept_;
+                priority = std::max(priority, priority_);
+            }
         }
     }
 
