@@ -30,7 +30,7 @@ tags:
 	ctags -R .
 
 test: debug
-	./test/run_tests.sh
+	./test/unit_tests/run_tests.sh
 
 coverage: COVERAGE = On
 coverage: test

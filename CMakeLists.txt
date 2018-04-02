@@ -50,7 +50,7 @@ install (TARGETS mavtables DESTINATION bin)
 
 # unit_tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_executable (unit_tests test/CMakeLists.txt)
+    add_executable (unit_tests test/unit_tests/CMakeLists.txt)
     target_link_libraries (unit_tests
         Catch
         FakeIt
@@ -65,7 +65,7 @@ endif ()
 # add sources and evaluate test coverage
 add_subdirectory (src)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_subdirectory (test)
+    add_subdirectory (test/unit_tests)
 endif ()
 add_subdirectory (doc)
 add_coverage (mavtables)
