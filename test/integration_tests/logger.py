@@ -47,7 +47,6 @@ def main():
             source_system=args['system'], source_component=args['component'])
     else:
       sys.exit()
-    print(args)
     start_heartbeats(mav)
     while True:
         msg = mav.recv_match(blocking=True)
