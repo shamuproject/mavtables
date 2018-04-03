@@ -18,7 +18,6 @@
 #include <chrono>
 #include <future>
 
-
 #include <catch.hpp>
 
 #include <semaphore.hpp>
@@ -134,9 +133,18 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_for(1ms);
+            return sp.wait_for(2ms);
         });
-        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE_FALSE(future.get());
+        // Ensure subsequent waits don't fail to wait.  Tests for the "always
+        // decrement" bug.
+        future = std::async(std::launch::async, [&]()
+        {
+            return sp.wait_for(2ms);
+        });
+        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
@@ -159,7 +167,16 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_for(1ms) && sp.wait_for(1ms);
+            return sp.wait_for(2ms) && sp.wait_for(2ms);
+        });
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE_FALSE(future.get());
+        // Ensure subsequent waits don't fail to wait.  Tests for the "always
+        // decrement" bug.
+        future = std::async(std::launch::async, [&]()
+        {
+            return sp.wait_for(2ms) && sp.wait_for(2ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
@@ -189,9 +206,18 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_until(std::chrono::steady_clock::now() + 1ms);
+            return sp.wait_until(std::chrono::steady_clock::now() + 2ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE_FALSE(future.get());
+        // Ensure subsequent waits don't fail to wait.  Tests for the "always
+        // decrement" bug.
+        future = std::async(std::launch::async, [&]()
+        {
+            return sp.wait_until(std::chrono::steady_clock::now() + 2ms);
+        });
+        REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
@@ -214,6 +240,16 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
     {
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
+        {
+            return sp.wait_until(std::chrono::steady_clock::now() + 1ms) &&
+                   sp.wait_until(std::chrono::steady_clock::now() + 1ms);
+        });
+        REQUIRE(future.wait_for(0ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE_FALSE(future.get());
+        // Ensure subsequent waits don't fail to wait.  Tests for the "always
+        // decrement" bug.
+        future = std::async(std::launch::async, [&]()
         {
             return sp.wait_until(std::chrono::steady_clock::now() + 1ms) &&
                    sp.wait_until(std::chrono::steady_clock::now() + 1ms);
