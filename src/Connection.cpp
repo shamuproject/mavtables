@@ -74,12 +74,53 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     int priority = std::numeric_limits<int>::min();
 
     // Loop over addresses.
-    for (const auto &source : pool_->addresses())
+    for (const auto &dest : pool_->addresses())
     {
-        if (packet->source() != source)
+        if (packet->source() != dest)
         {
             // Filter packet/address combination.
-            auto [accept_, priority_] = filter_->will_accept(*packet, source);
+            auto [accept_, priority_] = filter_->will_accept(*packet, dest);
+
+            // Update accept/priority.
+            if (accept_)
+            {
+                accept = accept_;
+                priority = std::max(priority, priority_);
+            }
+        }
+    }
+
+    // Add packet to the queue.
+    if (accept)
+    {
+        queue_->push(std::move(packet), priority);
+    }
+}
+
+
+/** Send a packet to every component of a system reachable on the connection.
+ *
+ *  Packets are ran through the contained \ref Filter before being placed into
+ *  the \ref PacketQueue given in the constructor.  Packets are read from the
+ *  queue (for sending) by using the \ref next_packet method.
+ *
+ *  \note This disregards the destination address of the packet.
+ *
+ *  \param packet The packet to send.
+ */
+void Connection::send_to_system_(
+    std::shared_ptr<const Packet> packet, unsigned int system)
+{
+    bool accept = false;
+    int priority = std::numeric_limits<int>::min();
+
+    // Loop over addresses.
+    for (const auto &dest : pool_->addresses())
+    {
+        if (packet->source() != dest && system == dest.system())
+        {
+            // Filter packet/address combination.
+            auto [accept_, priority_] = filter_->will_accept(*packet, dest);
 
             // Update accept/priority.
             if (accept_)
@@ -197,12 +238,19 @@ void Connection::send(std::shared_ptr<const Packet> packet)
 
     auto dest = packet->dest();
 
-    if (dest && dest.value() != MAVAddress(0, 0) && !mirror_)
-    {
-        send_to_address_(std::move(packet), dest.value());
-    }
-    else
+    // Broadcast to all.
+    if (!dest.has_value() || dest.value() == MAVAddress(0, 0) || mirror_)
     {
         send_to_all_(std::move(packet));
+    }
+    // Broadcast to all components of given system.
+    else if (dest->component() == 0)
+    {
+        send_to_system_(std::move(packet), dest->system());
+    }
+    // Send to particular system and component.
+    else
+    {
+        send_to_address_(std::move(packet), dest.value());
     }
 }
