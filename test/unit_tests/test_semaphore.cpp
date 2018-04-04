@@ -226,14 +226,14 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_until(std::chrono::steady_clock::now() + 20ms) &&
-                   sp.wait_until(std::chrono::steady_clock::now() + 20ms);
+            return sp.wait_until(std::chrono::steady_clock::now() + 100ms) &&
+                   sp.wait_until(std::chrono::steady_clock::now() + 100ms);
         });
         REQUIRE(future.wait_for(0ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(5ms) != std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) != std::future_status::ready);
         sp.notify();
-        REQUIRE(future.wait_for(5ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
         REQUIRE(future.get());
     }
     SECTION("Multiple wait (timeout).")
