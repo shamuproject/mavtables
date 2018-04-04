@@ -133,7 +133,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         semaphore sp;
         auto future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_for(2ms);
+            return sp.wait_for(5ms);
         });
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
@@ -142,7 +142,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
         // decrement" bug.
         future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_for(2ms);
+            return sp.wait_for(5ms);
         });
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
         REQUIRE(future.wait_for(10ms) == std::future_status::ready);
