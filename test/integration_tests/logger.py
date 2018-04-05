@@ -1,4 +1,8 @@
-#!/bin/env python3
+#!/bin/env python
+
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from builtins import *
 
 import os
 import sys
@@ -47,8 +51,8 @@ def main():
     if args['udp']:
         mav = mavutil.mavlink_connection('udpout:' + args['udp'],
             source_system=args['system'], source_component=args['component'])
-    elif args['']:
-        mav = mavutil.mavlink_connection(args['serial'],
+    elif args['serial']:
+        mav = mavutil.mavlink_connection(args['serial'], baud=9600,
             source_system=args['system'], source_component=args['component'])
     else:
       sys.exit()
@@ -67,6 +71,7 @@ def main():
             print(msg_string)
         else:
             print(msg.get_type())
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':

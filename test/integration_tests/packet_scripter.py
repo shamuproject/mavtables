@@ -1,4 +1,8 @@
-#!/bin/env python3
+#!/bin/env python
+
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from builtins import *
 
 import os
 import sys
@@ -33,7 +37,7 @@ def parse_args():
 
 def send_packet(mav, packet, system=0, component=0):
     def a(n):
-        return list(range(0, n))
+        return tuple(range(0, n))
     def b(n):
         return bytes(range(0, n))
     if packet == 'SYS_STATUS': # 1
@@ -41,9 +45,11 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'SYSTEM_TIME': # 2
         mav.mav.system_time_send(*a(2))
     elif packet == 'PING': # 4
-        mav.mav.ping_send(*a(2), system, component)
+        args = a(2) + (system, component)
+        mav.mav.ping_send(*args)
     elif packet == 'CHANGE_OPERATOR_CONTROL': # 5
-        mav.mav.change_operator_control_send(system, *a(2), b(25))
+        args = (system,) + a(2) + (b(25),)
+        mav.mav.change_operator_control_send(*args)
     elif packet == 'CHANGE_OPERATOR_CONTROL_ACK': # 6
         mav.mav.change_operator_control_ack_send(*a(3))
     elif packet == 'AUTH_KEY': # 7
@@ -91,47 +97,83 @@ def send_packet(mav, packet, system=0, component=0):
         else:
             mav.mav.servo_output_raw_send(*a(10))
     elif packet == 'MISSION_REQUEST_PARTIAL_LIST': # 37
-        mav.mav.mission_request_partial_list_send(system, component, *a(3))
+        if mav.mavlink20():
+            mav.mav.mission_request_partial_list_send(system, component, *a(3))
+        else:
+            mav.mav.mission_request_partial_list_send(system, component, *a(2))
     elif packet == 'MISSION_WRITE_PARTIAL_LIST': # 38
-        mav.mav.mission_write_partial_list_send(system, component, *a(3))
+        if mav.mavlink20():
+            mav.mav.mission_write_partial_list_send(system, component, *a(3))
+        else:
+            mav.mav.mission_write_partial_list_send(system, component, *a(2))
     elif packet == 'MISSION_ITEM': # 39
-        mav.mav.mission_item_send(system, component, *a(13))
+        if mav.mavlink20():
+            mav.mav.mission_item_send(system, component, *a(13))
+        else:
+            mav.mav.mission_item_send(system, component, *a(12))
     elif packet == 'MISSION_REQUEST': # 40
-        mav.mav.mission_request_send(system, component, *a(2))
+        if mav.mavlink20():
+            mav.mav.mission_request_send(system, component, *a(2))
+        else:
+            mav.mav.mission_request_send(system, component, 1)
     elif packet == 'MISSION_SET_CURRENT': # 41
         mav.mav.mission_set_current_send(system, component, 1)
     elif packet == 'MISSION_CURRENT': # 42
         mav.mav.mission_current_send(1)
     elif packet == 'MISSION_REQUEST_LIST': # 43
-        mav.mav.mission_request_list_send(system, component, 1)
+        if mav.mavlink20():
+            mav.mav.mission_request_list_send(system, component, 1)
+        else:
+            mav.mav.mission_request_list_send(system, component)
     elif packet == 'MISSION_COUNT': # 44
-        mav.mav.mission_count_send(system, component, *a(2))
+        if mav.mavlink20():
+            mav.mav.mission_count_send(system, component, *a(2))
+        else:
+            mav.mav.mission_count_send(system, component, 1)
     elif packet == 'MISSION_CLEAR_ALL': # 45
-        mav.mav.mission_clear_all_send(system, component, 1)
+        if mav.mavlink20():
+            mav.mav.mission_clear_all_send(system, component, 1)
+        else:
+            mav.mav.mission_clear_all_send(system, component)
     elif packet == 'MISSION_ITEM_REACHED': # 46
         mav.mav.mission_item_reached_send(1)
     elif packet == 'MISSION_ACK': # 47
-        mav.mav.mission_ack_send(system, component, *a(2))
+        if mav.mavlink20():
+            mav.mav.mission_ack_send(system, component, *a(2))
+        else:
+            mav.mav.mission_ack_send(system, component, 1)
     elif packet == 'SET_GPS_GLOBAL_ORIGIN': # 48
-        mav.mav.set_gps_global_origin_send(system, *a(4))
+        if mav.mavlink20():
+            mav.mav.set_gps_global_origin_send(system, *a(4))
+        else:
+            mav.mav.set_gps_global_origin_send(system, *a(3))
     elif packet == 'GPS_GLOBAL_ORIGIN': # 49
-        mav.mav.gps_global_origin_send(*a(4))
+        if mav.mavlink20():
+            mav.mav.gps_global_origin_send(*a(4))
+        else:
+            mav.mav.gps_global_origin_send(*a(3))
     elif packet == 'PARAM_MAP_RC': # 50
         mav.mav.param_map_rc_send(system, component, b(16), *a(6))
     elif packet == 'MISSION_REQUEST_INT': # 51
-        mav.mav.mission_request_int_send(system, component, *a(2))
+        if mav.mavlink20():
+            mav.mav.mission_request_int_send(system, component, *a(2))
+        else:
+            mav.mav.mission_request_int_send(system, component, 1)
     elif packet == 'SAFETY_SET_ALLOWED_AREA': # 54
         mav.mav.safety_set_allowed_area_send(system, component, *a(7))
     elif packet == 'SAFETY_ALLOWED_AREA': # 55
         mav.mav.safety_allowed_area_send(*a(7))
     elif packet == 'ATTITUDE_QUATERNION_COV': # 61
-        mav.mav.attitude_quaternion_cov_send(1, b(4), *a(3), b(9))
+        args = (1, b(4)) + a(3) + (b(9),)
+        mav.mav.attitude_quaternion_cov_send(*args)
     elif packet == 'NAV_CONTROLLER_OUTPUT': # 62
         mav.mav.nav_controller_output_send(*a(8))
     elif packet == 'GLOBAL_POSITION_INT_COV': # 63
-        mav.mav.global_position_int_cov_send(*a(9), b(36))
+        args = a(9) + (b(36),)
+        mav.mav.global_position_int_cov_send(*args)
     elif packet == 'LOCAL_POSITION_NED_COV': # 64
-        mav.mav.local_position_ned_cov_send(*a(11), b(45))
+        args = a(11) + (b(45),)
+        mav.mav.local_position_ned_cov_send(*args)
     elif packet == 'RC_CHANNELS': # 65
         mav.mav.rc_channels_send(*a(21))
     elif packet == 'REQUEST_DATA_STREAM': # 66
@@ -143,7 +185,10 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'RC_CHANNELS_OVERRIDE': # 70
         mav.mav.rc_channels_override_send(system, component, *a(8))
     elif packet == 'MISSION_ITEM_INT': # 73
-        mav.mav.mission_item_int_send(system, component, *a(13))
+        if mav.mavlink20():
+            mav.mav.mission_item_int_send(system, component, *a(13))
+        else:
+            mav.mav.mission_item_int_send(system, component, *a(12))
     elif packet == 'VFR_HUD': # 74
         mav.mav.vfr_hud_send(*a(6))
     elif packet == 'COMMAND_INT': # 75
@@ -157,7 +202,8 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'SET_ATTITUDE_TARGET': # 82
         mav.mav.set_attitude_target_send(1, system, component, 1, b(4), *a(4))
     elif packet == 'ATTITUDE_TARGET': # 83
-        mav.mav.attitude_target_send(*a(2), b(4), *a(4))
+        args = a(2) + (b(4), ) + a(4)
+        mav.mav.attitude_target_send(*args)
     elif packet == 'SET_POSITION_TARGET_LOCAL_NED': # 84
         mav.mav.set_position_target_local_ned_send(
             1, system, component, *a(13))
@@ -177,20 +223,36 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'HIL_RC_INPUTS_RAW': # 92
         mav.mav.hil_rc_inputs_raw_send(*a(14))
     elif packet == 'HIL_ACTUATOR_CONTROLS': # 93
-        mav.mav.hil_actuator_controls_send(1, a(16), *a(2))
+        mav.mav.hil_actuator_controls_send(1, b(16), *a(2))
     elif packet == 'OPTICAL_FLOW': # 100
         if mav.mavlink20():
             mav.mav.optical_flow_send(*a(10))
         else:
             mav.mav.optical_flow_send(*a(8))
     elif packet == 'GLOBAL_VISION_POSITION_ESTIMATE': # 101
-        mav.mav.global_vision_position_estimate_send(*a(8))
+        if mav.mavlink20():
+            args = a(7) + (b(21),)
+            mav.mav.global_vision_position_estimate_send(*args)
+        else:
+            mav.mav.global_vision_position_estimate_send(*a(7))
     elif packet == 'VISION_POSITION_ESTIMATE': # 102
-        mav.mav.vision_position_estimate_send(*a(7), a(21))
+        if mav.mavlink20():
+            args = a(7) + (b(21),)
+            mav.mav.vision_position_estimate_send(*args)
+        else:
+            mav.mav.vision_position_estimate_send(*a(7))
     elif packet == 'VISION_SPEED_ESTIMATE': # 103
-        mav.mav.vision_speed_estimate_send(*a(4), a(9))
+        if mav.mavlink20():
+            args = a(4) + (b(9),)
+            mav.mav.vision_speed_estimate_send(*args)
+        else:
+            mav.mav.vision_speed_estimate_send(*a(4))
     elif packet == 'VICON_POSITION_ESTIMATE': # 104
-        mav.mav.vicon_position_estimate_send(*a(7), a(21))
+        if mav.mavlink20():
+            args = a(7) + (b(21),)
+            mav.mav.vicon_position_estimate_send(*args)
+        else:
+            mav.mav.vicon_position_estimate_send(*a(7))
     elif packet == 'HIGHRES_IMU': # 105
         mav.mav.highres_imu_send(*a(15))
     elif packet == 'OPTICAL_FLOW_RAD': # 106
@@ -222,7 +284,8 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'LOG_REQUEST_DATA': # 119
         mav.mav.log_request_data_send(system, component, *a(3))
     elif packet == 'LOG_DATA': # 120
-        mav.mav.log_data_send(*a(3), a(90))
+        args = a(3) + (b(90),)
+        mav.mav.log_data_send(*args)
     elif packet == 'LOG_ERASE': # 121
         mav.mav.log_erase_send(system, component)
     elif packet == 'LOG_REQUEST_END': # 122
@@ -234,7 +297,8 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'POWER_STATUS': # 125
         mav.mav.power_status_send(*a(3))
     elif packet == 'SERIAL_CONTROL': # 126
-        mav.mav.serial_control_send(*a(5), a(70))
+        args = a(5) + (b(70),)
+        mav.mav.serial_control_send(*args)
     elif packet == 'GPS_RTK': # 127
         mav.mav.gps_rtk_send(*a(13))
     elif packet == 'GPS2_RTK': # 128
@@ -244,13 +308,14 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'DATA_TRANSMISSION_HANDSHAKE': # 130
         mav.mav.data_transmission_handshake_send(*a(7))
     elif packet == 'ENCAPSULATED_DATA': # 131
-        mav.mav.encapsulated_data_send(1, a(253))
+        mav.mav.encapsulated_data_send(1, b(253))
     elif packet == 'DISTANCE_SENSOR': # 132
         mav.mav.distance_sensor_send(*a(8))
     elif packet == 'TERRAIN_REQUEST': # 133
         mav.mav.terrain_request_send(*a(4))
     elif packet == 'TERRAIN_DATA': # 134
-        mav.mav.terrain_data_send(*a(4), a(16))
+        args = a(4) + (b(16),)
+        mav.mav.terrain_data_send(*args)
     elif packet == 'TERRAIN_CHECK': # 135
         mav.mav.terrain_check_send(*a(2))
     elif packet == 'TERRAIN_REPORT': # 136
@@ -258,29 +323,44 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'SCALED_PRESSURE2': # 137
         mav.mav.scaled_pressure2_send(*a(4))
     elif packet == 'ATT_POS_MOCAP': # 138
-        mav.mav.att_pos_mocap_send(1, a(4), *a(3), a(21))
+        if mav.mavlink20():
+            args = (1, b(4)) + a(3) + (b(21),)
+            mav.mav.att_pos_mocap_send(*args)
+        else:
+            mav.mav.att_pos_mocap_send(1, b(4), *a(3))
     elif packet == 'SET_ACTUATOR_CONTROL_TARGET': # 139
-        mav.mav.set_actuator_control_target_send(
-            *a(2), system, component, a(8))
+        args = a(2) + (system, component, b(8))
+        mav.mav.set_actuator_control_target_send(*args)
     elif packet == 'ACTUATOR_CONTROL_TARGET': # 140
-        mav.mav.actuator_control_target_send(*a(2), a(8))
+        args = a(2) + (b(8),)
+        mav.mav.actuator_control_target_send(*args)
     elif packet == 'ALTITUDE': # 141
         mav.mav.altitude_send(*a(7))
     elif packet == 'RESOURCE_REQUEST': # 142
-        mav.mav.resource_request_send(*a(2), a(120), 1, a(120))
+        args = a(2) + (b(120), 1, b(120))
+        mav.mav.resource_request_send(*args)
     elif packet == 'SCALED_PRESSURE3': # 143
         mav.mav.scaled_pressure3_send(*a(4))
     elif packet == 'FOLLOW_TARGET': # 144
-        mav.mav.follow_target_send(*a(5), a(3), a(3), a(4), a(3), a(3), 1)
+        args = a(5) + (b(3), b(3), b(4), b(3), b(3), 1)
+        mav.mav.follow_target_send(*args)
     elif packet == 'CONTROL_SYSTEM_STATE': # 146
-        mav.mav.control_system_state_send(*a(11), a(3), a(3), a(4), *a(3))
+        args = a(11) + (b(3), b(3), b(4)) + a(3)
+        mav.mav.control_system_state_send(*args)
     elif packet == 'BATTERY_STATUS': # 147
-        mav.mav.battery_status_send(*a(4), b(10), *a(4))
+        args = a(4) + (b(10),) + a(4)
+        mav.mav.battery_status_send(*args)
     elif packet == 'AUTOPILOT_VERSION': # 148
-        mav.mav.autopilot_version_send(*a(5), a(8), a(8), a(8), *a(3), a(18))
+        if mav.mavlink20():
+            args = a(5) + (b(8), b(8), b(8)) + a(3) + (b(18),)
+            mav.mav.autopilot_version_send(*args)
+        else:
+            args = a(5) + (b(8), b(8), b(8)) + a(3)
+            mav.mav.autopilot_version_send(*args)
     elif packet == 'LANDING_TARGET': # 149
         if mav.mavlink20():
-            mav.mav.landing_target_send(*a(11), b(4), *a(2))
+            args = a(11) + (b(4),) + a(2)
+            mav.mav.landing_target_send(*args)
         else:
             mav.mav.landing_target_send(*a(8))
     elif packet == 'ESTIMATOR_STATUS': # 230
@@ -290,27 +370,40 @@ def send_packet(mav, packet, system=0, component=0):
     elif packet == 'GPS_INPUT': # 232
         mav.mav.gps_input_send(*a(18))
     elif packet == 'GPS_RTCM_DATA': # 233
-        mav.mav.gps_rtcm_data_send(*a(2), a(180))
+        args = a(2) + (b(180),)
+        mav.mav.gps_rtcm_data_send(*args)
     elif packet == 'HIGH_LATENCY': # 234
         mav.mav.high_latency_send(*a(24))
     elif packet == 'VIBRATION': # 241
         mav.mav.vibration_send(*a(7))
     elif packet == 'HOME_POSITION': # 242
-        mav.mav.home_position_send(*a(6), b(4), *a(4))
+        if mav.mavlink20():
+            args = a(6) + (b(4),) + a(4)
+            mav.mav.home_position_send(*args)
+        else:
+            args = a(6) + (b(4),) + a(3)
+            mav.mav.home_position_send(*args)
     elif packet == 'SET_HOME_POSITION': # 243
-        mav.mav.set_home_position_send(system, *a(6), b(4), *a(4))
+        if mav.mavlink20():
+            args = (system,) + a(6) + (b(4),) + a(4)
+            mav.mav.set_home_position_send(*args)
+        else:
+            args = (system,) + a(6) + (b(4),) + a(3)
+            mav.mav.set_home_position_send(*args)
     elif packet == 'MESSAGE_INTERVAL': # 244
         mav.mav.message_interval_send(*a(2))
     elif packet == 'EXTENDED_SYS_STATE': # 245
         mav.mav.extended_sys_state_send(*a(2))
     elif packet == 'ADSB_VEHICLE': # 246
-        mav.mav.adsb_vehicle_send(*a(8), b(9), *a(4))
+        args = a(8) + (b(9),) + a(4)
+        mav.mav.adsb_vehicle_send(*args)
     elif packet == 'COLLISION': # 247
         mav.mav.collision_send(*a(7))
     elif packet == 'V2_EXTENSION': # 248
         mav.mav.v2_extension_send(1, system, component, 1, a(249))
     elif packet == 'MEMORY_VECT': # 249
-        mav.mav.memory_vect_send(*a(3), a(32))
+        args = a(3) + (b(32),)
+        mav.mav.memory_vect_send(*args)
     elif packet == 'DEBUG_VECT': # 250
         mav.mav.debug_vect_send(b(10), *a(4))
     elif packet == 'NAMED_VALUE_FLOAT': # 251
@@ -327,36 +420,34 @@ def send_packet(mav, packet, system=0, component=0):
         mav.mav.button_change_send(*a(3))
     elif packet == 'PLAY_TUNE': # 258
         mav.mav.play_tune_send(system, component, b(30))
-    elif packet == 'CAMERA_INFORMATION': # 259
-        mav.mav.camera_information_send(*a(2), b(32), b(32), *a(6))
-    elif packet == 'CAMERA_SETTINGS': # 260
-        mav.mav.camera_settings_send(*a(13))
-    elif packet == 'STORAGE_INFORMATION': # 261
-        mav.mav.storage_information_send(*a(8))
-    elif packet == 'CAMERA_CAPTURE_STATUS': # 262
-        mav.mav.camera_capture_status_send(*a(12))
     elif packet == 'CAMERA_IMAGE_CAPTURED': # 263
-        mav.mav.camera_image_captured_send(*a(7), b(4), *a(2), b(205))
+        args = a(7) + (b(4),) + a(2) + (b(205),)
+        mav.mav.camera_image_captured_send(*args)
     elif packet == 'FLIGHT_INFORMATION': # 264
         mav.mav.flight_information_send(*a(4))
     elif packet == 'MOUNT_ORIENTATION': # 265
         mav.mav.mount_orientation_send(*a(4))
     elif packet == 'LOGGING_DATA': # 266
-        mav.mav.logging_data_send(system, component, *a(3), b(249))
+        args = (system, component) + a(3) + (b(249),)
+        mav.mav.logging_data_send(*args)
     elif packet == 'LOGGING_DATA_ACKED': # 267
-        mav.mav.logging_data_acked_send(system, component, *a(3), b(249))
+        args = (system, component) + a(3) + (b(249),)
+        mav.mav.logging_data_acked_send(*args)
     elif packet == 'LOGGING_ACK': # 268
         mav.mav.logging_ack_send(system, component, 1)
     elif packet == 'WIFI_CONFIG_AP': # 299
         mav.mav.wifi_config_ap_send(b(32), b(64))
     elif packet == 'PROTOCOL_VERSION': # 300
-        mav.mav.protocol_version_send(*a(3), b(8), b(8))
+        args = a(3) + (b(8), b(8))
+        mav.mav.protocol_version_send(*args)
     elif packet == 'UAVCAN_NODE_STATUS': # 310
         mav.mav.uavcan_node_status_send(*a(6))
     elif packet == 'UAVCAN_NODE_INFO': # 311
-        mav.mav.uavcan_node_info_send(*a(2), b(80), *a(2), b(16), *a(3))
+        args = a(2) + (b(80),) + a(2) + (b(16),) + a(3)
+        mav.mav.uavcan_node_info_send(*args)
     elif packet == 'OBSTACLE_DISTANCE': # 330
-        mav.mav.obstacle_distance_send(*a(2), b(72), *a(3))
+        args = a(2) + (b(72),) + a(3)
+        mav.mav.obstacle_distance_send(*args)
     else:
         print('unknown packet type {:s}'.format(packet))
         sys.exit(1)
