@@ -960,51 +960,51 @@ TEST_CASE("ConfigParser can parse a file.", "[ConfigParser]")
 {
     SECTION("When the file exists and is valid.")
     {
-        REQUIRE_NOTHROW(ConfigParser("examples/test.conf"));
+        REQUIRE_NOTHROW(ConfigParser("test/mavtables.conf"));
     }
     SECTION("Throws an error if the file does not exist.")
     {
         REQUIRE_THROWS(
-            ConfigParser("examples/file_that_does_not_exist.conf"));
+            ConfigParser("file_that_does_not_exist.conf"));
     }
 }
 
 
 TEST_CASE("ConfigParser are printable.", "[ConfigParser]")
 {
-    ConfigParser config("examples/test.conf");
+    ConfigParser config("test/mavtables.conf");
     REQUIRE(
         str(config) ==
-        "examples/test.conf:001:  default_action\n"
-        "examples/test.conf:001:  |  accept\n"
-        "examples/test.conf:004:  udp\n"
-        "examples/test.conf:005:  |  port 14500\n"
-        "examples/test.conf:006:  |  address 127.0.0.1\n"
-        "examples/test.conf:010:  serial\n"
-        "examples/test.conf:011:  |  device ./ttyS0\n"
-        "examples/test.conf:012:  |  baudrate 115200\n"
-        "examples/test.conf:013:  |  flow_control yes\n"
-        "examples/test.conf:017:  chain default\n"
-        "examples/test.conf:019:  |  call some_chain10\n"
-        "examples/test.conf:019:  |  |  condition\n"
-        "examples/test.conf:019:  |  |  |  source 127.1\n"
-        "examples/test.conf:019:  |  |  |  dest 192.0\n"
-        "examples/test.conf:020:  |  reject\n"
-        "examples/test.conf:024:  chain some_chain10\n"
-        "examples/test.conf:026:  |  accept\n"
-        "examples/test.conf:026:  |  |  priority 99\n"
-        "examples/test.conf:026:  |  |  condition\n"
-        "examples/test.conf:026:  |  |  |  dest 192.0\n"
-        "examples/test.conf:027:  |  accept\n"
-        "examples/test.conf:027:  |  |  condition\n"
-        "examples/test.conf:027:  |  |  |  packet_type PING\n"
-        "examples/test.conf:028:  |  accept\n");
+        ":001:  default_action\n"
+        ":001:  |  accept\n"
+        ":004:  udp\n"
+        ":005:  |  port 14500\n"
+        ":006:  |  address 127.0.0.1\n"
+        ":010:  serial\n"
+        ":011:  |  device ./ttyS0\n"
+        ":012:  |  baudrate 115200\n"
+        ":013:  |  flow_control yes\n"
+        ":017:  chain default\n"
+        ":019:  |  call some_chain10\n"
+        ":019:  |  |  condition\n"
+        ":019:  |  |  |  source 127.1\n"
+        ":019:  |  |  |  dest 192.0\n"
+        ":020:  |  reject\n"
+        ":024:  chain some_chain10\n"
+        ":026:  |  accept\n"
+        ":026:  |  |  priority 99\n"
+        ":026:  |  |  condition\n"
+        ":026:  |  |  |  dest 192.0\n"
+        ":027:  |  accept\n"
+        ":027:  |  |  condition\n"
+        ":027:  |  |  |  packet_type PING\n"
+        ":028:  |  accept\n");
 }
 
 TEST_CASE("ConfigParser's 'make_app' method returns an application object.",
           "[ConfigParser]")
 {
-    ConfigParser config("examples/test.conf");
+    ConfigParser config("test/mavtables.conf");
     std::unique_ptr<App> app;
     REQUIRE_NOTHROW(app = config.make_app());
     REQUIRE(app != nullptr);

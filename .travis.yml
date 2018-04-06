@@ -18,9 +18,10 @@ jobs:
             - socat
       script: make COVERAGE=On test
       before_install:
+        - pip install --user cpp-coveralls
+        - pip install --user -r test/integration_tests/requirements.txt
         - CC=gcc-7
         - CXX=g++-7
-        - pip install --user cpp-coveralls
       after_success:
         - coveralls -e lib -e test -e cmake --gcov-options '\-lp'
 
@@ -41,6 +42,7 @@ jobs:
             - socat
       script: make test
       before_install:
+        - pip install --user -r test/integration_tests/requirements.txt
         - CC=clang-5.0
         - CXX=clang++-5.0
 
@@ -61,6 +63,7 @@ jobs:
             - socat
       script: make test
       before_install:
+        - pip install --user -r test/integration_tests/requirements.txt
         - CC=clang-6.0
         - CXX=clang++-6.0
 
@@ -74,5 +77,6 @@ jobs:
         - brew install ctags
         - brew install llvm
         - brew install socat
+        - pip install --user -r test/integration_tests/requirements.txt
         - CC=/usr/local/opt/llvm/bin/clang
         - CXX=/usr/local/opt/llvm/bin/clang++

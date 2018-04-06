@@ -136,7 +136,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
             return sp.wait_for(5ms);
         });
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(20ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
         // Ensure subsequent waits don't fail to wait.  Tests for the "always
         // decrement" bug.
@@ -145,7 +145,7 @@ TEST_CASE("semaphore's 'wait_for' method waits until the semaphore can be "
             return sp.wait_for(5ms);
         });
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(20ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
     SECTION("Multiple wait (no timeout).")

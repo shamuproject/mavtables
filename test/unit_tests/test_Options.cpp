@@ -409,11 +409,11 @@ TEST_CASE("Options's class sets run to false and ast to true when the --ast "
     // Construct Options object.
     int argc = 4;
     const char *argv[4] = {
-        "mavtables", "--ast", "--config", "examples/test.conf"};
+        "mavtables", "--ast", "--config", "test/mavtables.conf"};
     std::stringstream ss;
     Options options(argc, argv, ss);
     // Verify Options object.
-    REQUIRE(options.config_file() == "examples/test.conf");
+    REQUIRE(options.config_file() == "test/mavtables.conf");
     REQUIRE(options);
     REQUIRE(options.ast());
     REQUIRE_FALSE(options.run());

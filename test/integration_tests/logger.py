@@ -6,10 +6,15 @@ from builtins import *
 
 import os
 import sys
+import signal
 from time import sleep
 from argparse import ArgumentParser
 from threading import Thread
 from pymavlink import mavutil
+
+
+def signal_handler(signal, frame):
+    sys.exit(0)
 
 
 def parse_args():
@@ -45,6 +50,7 @@ def start_heartbeats(mav):
 
 
 def main():
+    signal.signal(signal.SIGINT, signal_handler)
     os.environ['MAVLINK20'] = '1'
     mavutil.set_dialect('common')
     args = parse_args()

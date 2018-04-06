@@ -179,8 +179,7 @@ namespace config
             // Print location.
             if (print_location)
             {
-                os << node.begin().source << ":"
-                   << std::setfill('0') << std::setw(3)
+                os << ":" << std::setfill('0') << std::setw(3)
                    << node.begin().line << ":  ";
             }
 

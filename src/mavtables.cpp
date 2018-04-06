@@ -44,6 +44,8 @@ int main(int argc, const char *argv[])
             auto config = std::make_unique<ConfigParser>(options.config_file());
             if (options.ast())
             {
+                std::cout << "===== " << options.config_file()
+                    << " =====" << std::endl;
                 std::cout << *config;
             }
             if (options.run())

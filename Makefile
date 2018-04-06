@@ -29,8 +29,15 @@ debug: tags
 tags:
 	ctags -R .
 
+unit_tests: debug
+	./test/unit_tests/run_tests.sh
+
+integration_tests: debug
+	./test/integration_tests/run_tests.sh
+
 test: debug
 	./test/unit_tests/run_tests.sh
+	./test/integration_tests/run_tests.sh
 
 coverage: COVERAGE = On
 coverage: test
@@ -72,5 +79,6 @@ remove-subs:
 	$(MAKE) -C lib remove-subs
 	$(MAKE) -C cmake remove-subs
 
-.PHONY: style debug release test unit_tests coverage style doc gh-pages clean remove-subs
+.PHONY: debug release test unit_tests integration_tests coverage
+.PHONY: style doc gh-pages clean remove-subs 
 .SILENT:

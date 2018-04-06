@@ -31,12 +31,12 @@ TEST_CASE("Filesystem's 'exist' method determines the existence of a file.",
     SECTION("Returns 'true' when the file exists.")
     {
         Filesystem filesystem;
-        REQUIRE(filesystem.exists("examples/test.conf"));
+        REQUIRE(filesystem.exists("test/mavtables.conf"));
     }
     SECTION("Returns 'false' when the file does not exist.")
     {
         auto filesystem = std::make_unique<Filesystem>();
         REQUIRE_FALSE(
-            filesystem->exists("examples/file_that_does_not_exist.conf"));
+            filesystem->exists("file_that_does_not_exist.conf"));
     }
 }
