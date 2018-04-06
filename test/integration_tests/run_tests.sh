@@ -34,7 +34,7 @@ function shutdown_background() {
         echo $i
         ps -p $i -o comm=
         kill -SIGINT ${array[i]} >/dev/null
-        sleep 0.5
+        sleep 1.0
     done
 }
 
@@ -59,10 +59,10 @@ function test_all_v1_packets_udp() {
         > "$(dir)/all_v1_packets_udp_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v1_packets_udp_to_serial.log" &
-    sleep 0.5
+    sleep 1.0
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 0.5
+    sleep 1.0
     shutdown_background
 }
 
@@ -74,10 +74,10 @@ function test_all_v2_packets_udp() {
         > "$(dir)/all_v2_packets_udp_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v2_packets_udp_to_serial.log" &
-    sleep 0.5
+    sleep 1.0
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500
-    sleep 0.5
+    sleep 1.0
     shutdown_background
 }
 
@@ -90,10 +90,10 @@ function test_all_v1_packets_serial() {
         > "$(dir)/all_v1_packets_serial_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v1_packets_serial_to_serial.log" &
-    sleep 0.5
+    sleep 1.0
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 0.5
+    sleep 1.0
     shutdown_background
 }
 
@@ -106,10 +106,10 @@ function test_all_v2_packets_serial() {
         > "$(dir)/all_v2_packets_serial_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v2_packets_serial_to_serial.log" &
-    sleep 0.5
+    sleep 1.0
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 0.5
+    sleep 1.0
     shutdown_background
 }
 
