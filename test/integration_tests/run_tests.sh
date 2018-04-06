@@ -18,6 +18,7 @@ function run_test() {
     if [ "$DIFF" != "" ]; then
         printf "%*.*s" 0 $((67 - ${#1})) "$PAD"
         printf "  ${_RED}%s${ANSI_RESET}\n" "[FAILED]"
+        echo "$DIFF"
         return 1
     else
         printf "%*.*s" 0 $((66 - ${#1})) "$PAD"
