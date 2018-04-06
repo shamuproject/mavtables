@@ -46,7 +46,7 @@ function test_ast_printing() {
 function test_complex_ast_printing() {
     "$(dir)/../../build/mavtables" --ast \
         --conf "$(dir)/complex_config.conf" \
-        | tail --lines=+2 > "$(dir)/complex_config.log"
+        | tail -n +2 > "$(dir)/complex_config.log"
 }
 
 
