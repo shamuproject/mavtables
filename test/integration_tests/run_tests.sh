@@ -14,7 +14,7 @@ function run_test() {
     PAD=$(printf '%0.1s' "."{1..80})
     printf "${_BOLD}%s" "$1  "
     $2
-    DIFF=$(diff "$(dir)/$3" "$(dir)/$4")
+    DIFF=$(diff "$(dir)/$4" "$(dir)/$3")
     if [ "$DIFF" != "" ]; then
         printf "%*.*s" 0 $((67 - ${#1})) "$PAD"
         printf "  ${_RED}%s${ANSI_RESET}\n" "[FAILED]"
@@ -57,10 +57,10 @@ function test_all_v1_packets_udp() {
         > "$(dir)/all_v1_packets_udp_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v1_packets_udp_to_serial.log" &
-    sleep 0.1
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 0.1
+    sleep 0.5
     shutdown_background
 }
 
@@ -72,10 +72,10 @@ function test_all_v2_packets_udp() {
         > "$(dir)/all_v2_packets_udp_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v2_packets_udp_to_serial.log" &
-    sleep 0.1
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500
-    sleep 0.1
+    sleep 0.5
     shutdown_background
 }
 
@@ -88,10 +88,10 @@ function test_all_v1_packets_serial() {
         > "$(dir)/all_v1_packets_serial_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v1_packets_serial_to_serial.log" &
-    sleep 0.1
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 0.1
+    sleep 0.5
     shutdown_background
 }
 
@@ -104,10 +104,10 @@ function test_all_v2_packets_serial() {
         > "$(dir)/all_v2_packets_serial_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v2_packets_serial_to_serial.log" &
-    sleep 0.1
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 0.1
+    sleep 0.5
     shutdown_background
 }
 
