@@ -18,7 +18,7 @@ function run_test() {
     if [ "$DIFF" != "" ]; then
         printf "%*.*s" 0 $((67 - ${#1})) "$PAD"
         printf "  ${_RED}%s${ANSI_RESET}\n" "[FAILED]"
-        echo "$DIFF" | tail --lines=+2
+        echo "$DIFF" | tail -n +2
         return 1
     else
         printf "%*.*s" 0 $((66 - ${#1})) "$PAD"
@@ -39,7 +39,7 @@ function shutdown_background() {
 
 function test_ast_printing() {
     "$(dir)/../../build/mavtables" --ast --conf "$(dir)/../mavtables.conf" \
-        | tail --lines=+2 > "$(dir)/mavtables.log"
+        | tail -n +2 > "$(dir)/mavtables.log"
 }
 
 
