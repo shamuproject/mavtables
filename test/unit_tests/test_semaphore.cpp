@@ -215,10 +215,10 @@ TEST_CASE("semaphore's 'wait_until' method waits until the semaphore can be "
         // decrement" bug.
         future = std::async(std::launch::async, [&]()
         {
-            return sp.wait_until(std::chrono::steady_clock::now() + 2ms);
+            return sp.wait_until(std::chrono::steady_clock::now() + 5ms);
         });
         REQUIRE(future.wait_for(1ms) != std::future_status::ready);
-        REQUIRE(future.wait_for(10ms) == std::future_status::ready);
+        REQUIRE(future.wait_for(20ms) == std::future_status::ready);
         REQUIRE_FALSE(future.get());
     }
     SECTION("Multiple wait (no timeout).")
