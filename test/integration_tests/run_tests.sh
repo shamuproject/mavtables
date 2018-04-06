@@ -11,6 +11,7 @@ source "$(dir)/../ansi_codes.sh"
 
 
 function run_test() {
+    ps
     PAD=$(printf '%0.1s' "."{1..80})
     printf "${_BOLD}%s" "$1  "
     $2
