@@ -18,7 +18,7 @@ function run_test() {
     if [ "$DIFF" != "" ]; then
         printf "%*.*s" 0 $((67 - ${#1})) "$PAD"
         printf "  ${_RED}%s${ANSI_RESET}\n" "[FAILED]"
-        echo "$DIFF"
+        echo "$DIFF" | tail --lines=+2
         return 1
     else
         printf "%*.*s" 0 $((66 - ${#1})) "$PAD"
@@ -112,13 +112,12 @@ function test_all_v2_packets_serial() {
 }
 
 
-echo -en "${_BOLD}${_BLUE}"
-echo -en "*---------------------------------------"
+echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
-echo -en "|                              "
+echo -en "${_BOLD}${_BLUE}|                              "
 echo -en "Integration Tests"
 echo -en "                              |\n"
-echo -en "*---------------------------------------"
+echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
 echo -en "${ANSI_RESET}"
 

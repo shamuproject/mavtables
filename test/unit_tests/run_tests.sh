@@ -19,13 +19,12 @@ function shutdown_background() {
 }
 
 
-echo -en "${_BOLD}${_BLUE}"
-echo -en "*---------------------------------------"
+echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
-echo -en "|                                  "
+echo -en "${_BOLD}${_BLUE}|                                  "
 echo -en "Unit Tests"
 echo -en "                                 |\n"
-echo -en "*---------------------------------------"
+echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
 echo -en "${ANSI_RESET}"
 
