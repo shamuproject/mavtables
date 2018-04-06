@@ -28,13 +28,11 @@ function run_test() {
 }
 
 
-function shutdown_background() {
-    array=($(jobs -p))
+function shutdown_pids() {
+    array=("$@")
     for ((i = ${#array[@]} - 1; i >= 0; i--)); do
-        echo $i
-        ps -p $i -o comm=
         kill -SIGINT ${array[i]} >/dev/null
-        sleep 1.0
+        sleep 0.5
     done
 }
 
@@ -53,64 +51,86 @@ function test_complex_ast_printing() {
 
 
 function test_all_v1_packets_udp() {
+    PIDS=()
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    PIDS+=($!)
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_udp.conf" &
+    PIDS+=($!)
     "$(dir)/logger.py" 20 10 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v1_packets_udp_to_udp.log" &
+    PIDS+=($!)
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v1_packets_udp_to_serial.log" &
-    sleep 1.0
+    PIDS+=($!)
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 1.0
-    shutdown_background
+    sleep 0.5
+    shutdown_pids "${PIDS[@]}"
 }
 
 
 function test_all_v2_packets_udp() {
+    PIDS=()
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    PIDS+=($!)
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_udp.conf" &
+    PIDS+=($!)
     "$(dir)/logger.py" 20 10 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v2_packets_udp_to_udp.log" &
+    PIDS+=($!)
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v2_packets_udp_to_serial.log" &
-    sleep 1.0
+    PIDS+=($!)
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500
-    sleep 1.0
-    shutdown_background
+    sleep 0.5
+    shutdown_pids "${PIDS[@]}"
 }
 
 
 function test_all_v1_packets_serial() {
+    PIDS=()
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    PIDS+=($!)
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
+    PIDS+=($!)
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_serial.conf" &
+    PIDS+=($!)
     "$(dir)/logger.py" 20 10 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v1_packets_serial_to_udp.log" &
+    PIDS+=($!)
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v1_packets_serial_to_serial.log" &
-    sleep 1.0
+    PIDS+=($!)
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 1.0
-    shutdown_background
+    sleep 0.5
+    shutdown_pids "${PIDS[@]}"
 }
 
 
 function test_all_v2_packets_serial() {
+    PIDS=()
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    PIDS+=($!)
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
+    PIDS+=($!)
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_serial.conf" &
+    PIDS+=($!)
     "$(dir)/logger.py" 20 10 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v2_packets_serial_to_udp.log" &
+    PIDS+=($!)
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
         > "$(dir)/all_v2_packets_serial_to_serial.log" &
-    sleep 1.0
+    PIDS+=($!)
+    sleep 0.5
     "$(dir)/packet_scripter.py" 3 10 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 1.0
-    shutdown_background
+    sleep 0.5
+    shutdown_pids "${PIDS[@]}"
 }
 
 
