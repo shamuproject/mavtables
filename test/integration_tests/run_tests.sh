@@ -31,6 +31,8 @@ function run_test() {
 function shutdown_background() {
     array=($(jobs -p))
     for ((i = ${#array[@]} - 1; i >= 0; i--)); do
+        echo $i
+        ps -p $i -o comm=
         kill -SIGINT ${array[i]} >/dev/null
         sleep 0.5
     done
