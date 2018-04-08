@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <fakeit.hpp>
 
+#include "PartialSendError.hpp"
 #include "UnixSyscalls.hpp"
 #include "UnixSerialPort.hpp"
 #include "util.hpp"
@@ -765,7 +766,7 @@ TEST_CASE("UnixSerialPort's 'write' method sends data over the serial port.",
         fakeit::When(Method(mock_sys, write)).AlwaysReturn(3);
         // Test
         std::vector<uint8_t> vec = {1, 3, 3, 7};
-        REQUIRE_THROWS_AS(port.write(vec), std::runtime_error);
+        REQUIRE_THROWS_AS(port.write(vec), PartialSendError);
         REQUIRE_THROWS_WITH(port.write(vec), "Could only write 3 of 4 bytes.");
     }
     SECTION("Emits errors from 'write' system call.")

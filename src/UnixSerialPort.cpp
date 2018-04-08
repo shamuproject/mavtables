@@ -26,6 +26,7 @@
 #include <vector>
 
 
+#include "PartialSendError.hpp"
 #include "UnixSerialPort.hpp"
 #include "UnixSyscalls.hpp"
 
@@ -109,6 +110,7 @@ std::vector<uint8_t> UnixSerialPort::read(
 void UnixSerialPort::write(const std::vector<uint8_t> &data)
 {
     // Write the data.
+    tcdrain(port_);
     auto err = syscalls_->write(port_, data.data(), data.size());
 
     // Handle system call errors.
@@ -120,23 +122,20 @@ void UnixSerialPort::write(const std::vector<uint8_t> &data)
     // Could not write all data.
     if (static_cast<size_t>(err) < data.size())
     {
-        throw std::runtime_error(
-            "Could only write " + std::to_string(err) + " of " +
-            std::to_string(data.size()) + " bytes.");
+        throw PartialSendError(static_cast<unsigned long>(err), data.size());
     }
 }
 
-
 /** Configure serial port.
  *
- *  \param buad_rate The bitrate to configure for the port.
+ *  \param baud_rate The bitrate to configure for the port.
  *  \param features A bitmask representing the features to use.  See \ref
  *      SerialPort::Feature for documentation.
  *  \throws std::invalid_argument if the baud rate is not supported.
  *  \throws std::system_error if a system call produces an error.
  */
 void UnixSerialPort::configure_port_(
-    unsigned long buad_rate, SerialPort::Feature features)
+    unsigned long baud_rate, SerialPort::Feature features)
 {
     // Get attribute structure.
     struct termios tty;
@@ -147,7 +146,7 @@ void UnixSerialPort::configure_port_(
     }
 
     // Set baud rate.
-    speed_t speed = speed_constant_(buad_rate);
+    speed_t speed = speed_constant_(baud_rate);
 
     if (cfsetispeed(&tty, speed) < 0)
     {

@@ -13,28 +13,6 @@ from pymavlink import mavutil
 from datetime import datetime, timedelta
 
 
-def parse_args():
-    parser = ArgumentParser(description='Send mavlink packets from file.')
-    parser.add_argument('system', type=int, help='system ID')
-    parser.add_argument('component', type=int, help='component ID')
-    parser.add_argument('script', help='script file to run')
-    parser.add_argument(
-        '--mavlink1', action='store_true',
-        help='force MAVLink v1.0 instead of v2.0')
-    parser.add_argument(
-        '--udp', action='store', help='UDP address:port to connect to')
-    parser.add_argument(
-        '--serial', action='store', help='serial port device string')
-    args = vars(parser.parse_args())
-    if not args['udp'] and not args['serial']:
-        print('expected --udp or --serial option')
-        sys.exit()
-    if args['udp'] and args['serial']:
-        print('expected --udp or --serial option, but not both')
-        sys.exit()
-    return args
-
-
 def send_packet(mav, packet, system=0, component=0):
     def a(n):
         return tuple(range(0, n))
@@ -478,24 +456,55 @@ def start_connection(args):
         mav = mavutil.mavlink_connection('udpout:' + args['udp'],
             source_system=args['system'], source_component=args['component'])
     elif args['serial']:
-        mav = mavutil.mavlink_connection(args['serial'],
+        mav = mavutil.mavlink_connection(args['serial'], baud=57600,
             source_system=args['system'], source_component=args['component'])
     else:
         sys.exit()
     return mav
 
 
+def parse_args():
+    parser = ArgumentParser(description='Send mavlink packets from file.')
+    parser.add_argument('system', type=int, help='system ID')
+    parser.add_argument('component', type=int, help='component ID')
+    parser.add_argument('script', help='script file to run')
+    parser.add_argument(
+        '--rate', action='store', default=1000, help='packets per second')
+    parser.add_argument(
+        '--mavlink1', action='store_true',
+        help='force MAVLink v1.0 instead of v2.0')
+    parser.add_argument(
+        '--udp', action='store', help='UDP address:port to connect to')
+    parser.add_argument(
+        '--serial', action='store', help='serial port device string')
+    args = vars(parser.parse_args())
+    if not args['udp'] and not args['serial']:
+        print('expected --udp or --serial option')
+        sys.exit()
+    if args['udp'] and args['serial']:
+        print('expected --udp or --serial option, but not both')
+        sys.exit()
+    return args
+
+
 def main():
     args = parse_args()
     packets = parse_file(args['script'])
     mav = start_connection(args)
-    last = datetime.now() - timedelta(seconds=180)
+    last_heartbeat = datetime.now() - timedelta(seconds=180)
+    last_packet = datetime.now()
+    sleep_time = 1/args['rate'];
     for packet, system, component in packets:
-        if ((datetime.now() - last) > timedelta(seconds=120)):
-            last = datetime.now()
+        if ((datetime.now() - last_heartbeat) > timedelta(seconds=120)):
+            last_heartbeat = datetime.now()
             mav.mav.heartbeat_send(0, 0, 0, 0, 0)
         send_packet(mav, packet, system, component)
-        sleep(0.001)
+        to_sleep = sleep_time - (datetime.now() - last_packet).total_seconds()
+        if to_sleep > 0:
+            sleep(to_sleep)
+            # print(to_sleep)
+        last_packet = datetime.now()
+        # sleep(0.0001)
 
 
 if __name__ == '__main__':

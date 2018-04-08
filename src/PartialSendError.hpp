@@ -15,20 +15,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef RECURSIONERROR_HPP_
-#define RECURSIONERROR_HPP_
+#ifndef PARTIALSENDERROR_HPP_
+#define PARTIALSENDERROR_HPP_
 
 
 #include <string>
 #include <exception>
 
 
-/** Exception type emmited by a recursion guard.
+/** Exception type emmited when an interface failes to send a complete packet.
  */
-class RecursionError : public std::exception
+class PartialSendError : public std::exception
 {
     public:
-        RecursionError(std::string message);
+        PartialSendError(unsigned long bytes_sent, unsigned long total_bytes);
         const char *what() const noexcept;
 
     private:
@@ -36,4 +36,4 @@ class RecursionError : public std::exception
 };
 
 
-#endif // RECURSIONERROR_HPP_
+#endif // PARTIALSENDRROR_HPP_

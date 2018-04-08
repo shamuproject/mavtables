@@ -15,25 +15,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef RECURSIONERROR_HPP_
-#define RECURSIONERROR_HPP_
-
-
 #include <string>
-#include <exception>
+#include <utility>
+
+#include "PartialSendError.hpp"
 
 
-/** Exception type emmited by a recursion guard.
+/** Construct a PartialSendError..
+ *
+ *  \param bytes_sent Number of bytes there were sent.
+ *  \param total_bytes Number of bytes in the packet.
  */
-class RecursionError : public std::exception
+PartialSendError::PartialSendError(
+    unsigned long bytes_sent, unsigned long total_bytes)
 {
-    public:
-        RecursionError(std::string message);
-        const char *what() const noexcept;
-
-    private:
-        std::string message_;
-};
+    message_ = "Could only write " + std::to_string(bytes_sent) +
+               " of " + std::to_string(total_bytes) + " bytes.";
+}
 
 
-#endif // RECURSIONERROR_HPP_
+/** Return error message string.
+ *
+ *  \return Error message string.
+ */
+const char *PartialSendError::what() const noexcept
+{
+    return message_.c_str();
+}
