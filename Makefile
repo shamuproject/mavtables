@@ -74,6 +74,7 @@ gh-pages: doc
 clean:
 	rm -rf build
 	find . -name "*.orig" -delete
+	$(MAKE) -C test/unit_tests clean
 
 remove-subs:
 	$(MAKE) -C lib remove-subs

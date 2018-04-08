@@ -160,6 +160,29 @@ function test_multiple_senders_v2_packets() {
 }
 
 
+function test_large_packets() {
+    perl -e 'for$i(1..1000){print "ENCAPSULATED_DATA\n"}' \
+        > "$(dir)/large_packets.tmp"
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
+    sleep 0.5
+    "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
+    "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
+        > "$(dir)/large_packets_to_udp.log" &
+    "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
+        > "$(dir)/large_packets_to_serial.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 192 168 "$(dir)/large_packets.tmp" \
+        --udp 127.0.0.1:14500 &
+    "$(dir)/packet_scripter.py" 172 128 "$(dir)/large_packets.tmp" \
+        --serial ./ttyS3
+    sleep 0.5
+    perl -e 'for$i(1..1000){print "ENCAPSULATED_DATA\n"}' \
+        >> "$(dir)/large_packets.tmp"
+    shutdown_background
+}
+
+
 echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
 echo -en "${_BOLD}${_BLUE}|                              "
@@ -261,6 +284,12 @@ run_test "Multiple senders with MAVLink v2.0 packets to serial port" \
     test_multiple_senders_v2_packets \
     multiple_senders_v2_packets.cmp \
     multiple_senders_v2_packets_to_serial.log
+
+
+run_test "Many large packets with multiple senders to UDP" \
+    test_large_packets large_packets.tmp large_packets_to_udp.log
+run_test "Many large packets with multiple senders to serial port" \
+    test_large_packets large_packets.tmp large_packets_to_serial.log
 
 
 if [ "$FAIL" -ne "0" ]; then
