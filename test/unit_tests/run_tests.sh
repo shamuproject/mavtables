@@ -30,7 +30,7 @@ echo -en "${ANSI_RESET}"
 
 
 socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-sleep 1
+sleep 3
 
 ./build/unit_tests
 UNIT_TESTS_EXIT=$?
