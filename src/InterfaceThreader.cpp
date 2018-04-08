@@ -40,7 +40,7 @@ void InterfaceThreader::tx_runner_()
         // Ignore partial write errors on shutdown.
         // TODO: A better way to handle this error might be in order.  Not even
         //       sure exactly why it happens on close.
-        catch (PartialSendError)
+        catch (const PartialSendError&)
         {
             if (running_.load())
             {
