@@ -15,17 +15,17 @@ source "$(dir)/../ansi_codes.sh"
 
 function run_test() {
     PAD=$(printf '%0.1s' "."{1..80})
-    printf "${_BOLD}%s" "$1  "
+    printf "${_BOLD}%s${ANSI_RESET}" "$1  "
     $2
     DIFF=$(diff "$(dir)/$4" "$(dir)/$3")
     if [ "$DIFF" != "" ]; then
         printf "%*.*s" 0 $((67 - ${#1})) "$PAD"
-        printf "  ${_RED}%s${ANSI_RESET}\n" "[FAILED]"
+        printf "  ${_BOLD}${_RED}%s${ANSI_RESET}\n" "[FAILED]"
         echo "$DIFF"
         FAIL=1
     else
         printf "%*.*s" 0 $((66 - ${#1})) "$PAD"
-        printf "  ${_GREEN}%s${ANSI_RESET}\n" "[SUCCESS]"
+        printf "  ${_BOLD}${_GREEN}%s${ANSI_RESET}\n" "[SUCCESS]"
     fi
 }
 
@@ -34,8 +34,13 @@ function shutdown_background() {
     array=($(jobs -p))
     for ((i = ${#array[@]} - 1; i >= 0; i--)); do
         kill -SIGINT ${array[i]} 2>/dev/null
-        sleep 0.5
+        sleep 2
     done
+}
+
+
+function do_nothing() {
+    echo "do nothing" >/dev/null
 }
 
 
@@ -183,6 +188,42 @@ function test_large_packets() {
 }
 
 
+function test_routing_v1_packets() {
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 0.5
+    "$(dir)/../../build/mavtables" --conf "$(dir)/routing.conf" &
+    "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 \
+        > "$(dir)/routing_v1_packets_127.1.log" &
+    "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 \
+        > "$(dir)/routing_v1_packets_192.168.log" &
+    "$(dir)/logger.py" 172 128 --serial ./ttyS1 \
+        > "$(dir)/routing_v1_packets_172.128.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
+        --udp 127.0.0.1:14500 --mavlink1
+    sleep 0.5
+    shutdown_background
+}
+
+
+function test_routing_v2_packets() {
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 0.5
+    "$(dir)/../../build/mavtables" --conf "$(dir)/routing.conf" &
+    "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 \
+        > "$(dir)/routing_v2_packets_127.1.log" &
+    "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 \
+        > "$(dir)/routing_v2_packets_192.168.log" &
+    "$(dir)/logger.py" 172 128 --serial ./ttyS1 \
+        > "$(dir)/routing_v2_packets_172.128.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
+        --udp 127.0.0.1:14500
+    sleep 0.5
+    shutdown_background
+}
+
+
 echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
 echo -en "${_BOLD}${_BLUE}|                              "
@@ -237,7 +278,7 @@ run_test "All MAVLink v1.0 packets from UDP to UDP" \
     all_v1_packets.pks \
     all_v1_packets_udp_to_udp.log
 run_test "All MAVLink v1.0 packets from UDP to serial port" \
-    test_all_v1_packets_udp \
+    do_nothing \
     all_v1_packets.pks \
     all_v1_packets_udp_to_serial.log
 run_test "All MAVLink v2.0 packets from UDP to UDP" \
@@ -245,7 +286,7 @@ run_test "All MAVLink v2.0 packets from UDP to UDP" \
     all_v2_packets.pks \
     all_v2_packets_udp_to_udp.log
 run_test "All MAVLink v2.0 packets from UDP to serial port" \
-    test_all_v2_packets_udp \
+    do_nothing \
     all_v2_packets.pks \
     all_v2_packets_udp_to_serial.log
 
@@ -255,7 +296,7 @@ run_test "All MAVLink v1.0 packets from serial port to UDP" \
     all_v1_packets.pks \
     all_v1_packets_serial_to_udp.log
 run_test "All MAVLink v1.0 packets from serial port to serial port" \
-    test_all_v1_packets_serial \
+    do_nothing \
     all_v1_packets.pks \
     all_v1_packets_serial_to_serial.log
 run_test "All MAVLink v2.0 packets from serial port to UDP" \
@@ -263,7 +304,7 @@ run_test "All MAVLink v2.0 packets from serial port to UDP" \
     all_v2_packets.pks \
     all_v2_packets_serial_to_udp.log
 run_test "All MAVLink v2.0 packets from serial port to serial port" \
-    test_all_v2_packets_serial \
+    do_nothing \
     all_v2_packets.pks \
     all_v2_packets_serial_to_serial.log
 
@@ -273,7 +314,7 @@ run_test "Multiple senders with MAVLink v1.0 packets to UDP" \
     multiple_senders_v1_packets.cmp \
     multiple_senders_v1_packets_to_udp.log
 run_test "Multiple senders with MAVLink v1.0 packets to serial port" \
-    test_multiple_senders_v1_packets \
+    do_nothing \
     multiple_senders_v1_packets.cmp \
     multiple_senders_v1_packets_to_serial.log
 run_test "Multiple senders with MAVLink v2.0 packets to UDP" \
@@ -281,7 +322,7 @@ run_test "Multiple senders with MAVLink v2.0 packets to UDP" \
     multiple_senders_v2_packets.cmp \
     multiple_senders_v2_packets_to_udp.log
 run_test "Multiple senders with MAVLink v2.0 packets to serial port" \
-    test_multiple_senders_v2_packets \
+    do_nothing \
     multiple_senders_v2_packets.cmp \
     multiple_senders_v2_packets_to_serial.log
 
@@ -289,8 +330,27 @@ run_test "Multiple senders with MAVLink v2.0 packets to serial port" \
 run_test "Many large packets with multiple senders to UDP" \
     test_large_packets large_packets.tmp large_packets_to_udp.log
 run_test "Many large packets with multiple senders to serial port" \
-    test_large_packets large_packets.tmp large_packets_to_serial.log
+    do_nothing large_packets.tmp large_packets_to_serial.log
 
+
+run_test "Routing MAVLink v1.0 packets (part 1)" \
+    test_routing_v1_packets routing_127.1.cmp routing_v1_packets_127.1.log
+run_test "Routing MAVLink v1.0 packets (part 2)" \
+    do_nothing routing_192.168.cmp routing_v1_packets_192.168.log
+run_test "Routing MAVLink v1.0 packets (part 3)" \
+    do_nothing routing_172.128.cmp routing_v1_packets_172.128.log
+
+
+run_test "Routing MAVLink v2.0 packets (part 1)" \
+    test_routing_v2_packets routing_127.1.cmp routing_v2_packets_127.1.log
+run_test "Routing MAVLink v2.0 packets (part 2)" \
+    do_nothing routing_192.168.cmp routing_v2_packets_192.168.log
+run_test "Routing MAVLink v2.0 packets (part 3)" \
+    do_nothing routing_172.128.cmp routing_v2_packets_172.128.log
+
+# test_routing_v1_packets
+# run_test "Many large packets with multiple senders to serial port" \
+#     test_large_packets large_packets.tmp large_packets_to_serial.log
 
 if [ "$FAIL" -ne "0" ]; then
     echo -en "\n"
