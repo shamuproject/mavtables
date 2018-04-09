@@ -68,7 +68,7 @@ function test_all_v1_packets_udp() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -84,7 +84,7 @@ function test_all_v2_packets_udp() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -101,7 +101,7 @@ function test_all_v1_packets_serial() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -118,7 +118,7 @@ function test_all_v2_packets_serial() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -139,7 +139,7 @@ function test_multiple_senders_v1_packets() {
         --udp 127.0.0.1:14500 --mavlink1 &
     "$(dir)/packet_scripter.py" 127 1 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -160,7 +160,7 @@ function test_multiple_senders_v2_packets() {
         --udp 127.0.0.1:14500 &
     "$(dir)/packet_scripter.py" 127 1 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -181,7 +181,7 @@ function test_large_packets() {
         --udp 127.0.0.1:14500 &
     "$(dir)/packet_scripter.py" 172 128 "$(dir)/large_packets.tmp" \
         --serial ./ttyS3
-    sleep 0.5
+    sleep 2
     perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
         >> "$(dir)/large_packets.tmp"
     shutdown_background
@@ -201,7 +201,7 @@ function test_routing_v1_packets() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -219,7 +219,7 @@ function test_routing_v2_packets() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500
-    sleep 0.5
+    sleep 2
     shutdown_background
 }
 
@@ -333,19 +333,19 @@ run_test "Many large packets with multiple senders to serial port" \
     do_nothing large_packets.tmp large_packets_to_serial.log
 
 
-run_test "Routing MAVLink v1.0 packets (part 1)" \
+run_test "Routing MAVLink v1.0 packets (127.1)" \
     test_routing_v1_packets routing_127.1.cmp routing_v1_packets_127.1.log
-run_test "Routing MAVLink v1.0 packets (part 2)" \
+run_test "Routing MAVLink v1.0 packets (192.168)" \
     do_nothing routing_192.168.cmp routing_v1_packets_192.168.log
-run_test "Routing MAVLink v1.0 packets (part 3)" \
+run_test "Routing MAVLink v1.0 packets (172.128)" \
     do_nothing routing_172.128.cmp routing_v1_packets_172.128.log
 
 
-run_test "Routing MAVLink v2.0 packets (part 1)" \
+run_test "Routing MAVLink v2.0 packets (127.1)" \
     test_routing_v2_packets routing_127.1.cmp routing_v2_packets_127.1.log
-run_test "Routing MAVLink v2.0 packets (part 2)" \
+run_test "Routing MAVLink v2.0 packets (192.168)" \
     do_nothing routing_192.168.cmp routing_v2_packets_192.168.log
-run_test "Routing MAVLink v2.0 packets (part 3)" \
+run_test "Routing MAVLink v2.0 packets (172.128)" \
     do_nothing routing_172.128.cmp routing_v2_packets_172.128.log
 
 # test_routing_v1_packets

@@ -32,8 +32,6 @@ def send_packet(mav, packet, system=0, component=0):
         mav.mav.change_operator_control_ack_send(*a(3))
     elif packet == 'AUTH_KEY': # 7
         mav.mav.auth_key_send(b(32))
-    elif packet == 'SET_MODE': # 11
-        mav.mav.set_mode_send(system, *a(2))
     elif packet == 'PARAM_REQUEST_READ': # 20
         mav.mav.param_request_read_send(system, component, b(16), 1)
     elif packet == 'PARAM_REQUEST_LIST': # 21
@@ -154,10 +152,6 @@ def send_packet(mav, packet, system=0, component=0):
         mav.mav.local_position_ned_cov_send(*args)
     elif packet == 'RC_CHANNELS': # 65
         mav.mav.rc_channels_send(*a(21))
-    elif packet == 'REQUEST_DATA_STREAM': # 66
-        mav.mav.request_data_stream_send(system, component, *a(3))
-    elif packet == 'DATA_STREAM': # 67
-        mav.mav.data_stream_send(*a(3))
     elif packet == 'MANUAL_CONTROL': # 69
         mav.mav.manual_control_send(system, *a(5))
     elif packet == 'RC_CHANNELS_OVERRIDE': # 70
@@ -194,8 +188,6 @@ def send_packet(mav, packet, system=0, component=0):
         mav.mav.position_target_global_int_send(*a(14))
     elif packet == 'LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET': # 89
         mav.mav.local_position_ned_system_global_offset_send(*a(7))
-    elif packet == 'HIL_STATE': # 90
-        mav.mav.hil_state_send(*a(16))
     elif packet == 'HIL_CONTROLS': # 91
         mav.mav.hil_controls_send(*a(11))
     elif packet == 'HIL_RC_INPUTS_RAW': # 92
@@ -469,7 +461,7 @@ def parse_args():
     parser.add_argument('component', type=int, help='component ID')
     parser.add_argument('script', help='script file to run')
     parser.add_argument(
-        '--rate', action='store', default=250, help='packets per second')
+        '--rate', action='store', default=1000, help='packets per second')
     parser.add_argument(
         '--mavlink1', action='store_true',
         help='force MAVLink v1.0 instead of v2.0')
