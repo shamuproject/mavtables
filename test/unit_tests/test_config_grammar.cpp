@@ -1058,6 +1058,21 @@ TEST_CASE("Packet type condition.", "[config]")
             ":002:  |  |  condition\n"
             ":002:  |  |  |  packet_type PING\n");
     }
+    SECTION("Parses packet type condition (with number).")
+    {
+        tao::pegtl::string_input<> in(
+            "chain default {\n"
+            "    accept if SCALED_PRESSURE3;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  chain default\n"
+            ":002:  |  accept\n"
+            ":002:  |  |  condition\n"
+            ":002:  |  |  |  packet_type SCALED_PRESSURE3\n");
+    }
     SECTION("Parses packet type condition (with comments).")
     {
         tao::pegtl::string_input<> in(
@@ -1088,7 +1103,7 @@ TEST_CASE("Packet type condition.", "[config]")
     {
         tao::pegtl::string_input<> in(
             "chain default {\n"
-            "    accept if 4;\n"
+            "    accept if @;\n"
             "}", "");
         REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
         REQUIRE_THROWS_WITH(

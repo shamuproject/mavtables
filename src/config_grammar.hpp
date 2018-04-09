@@ -181,7 +181,7 @@ namespace config
         : seq<mavaddr, opt<sor<full_mask, forward_mask, backward_mask>>> {};
 
     // Conditional.
-    struct packet_type : plus<sor<upper, one<'_'>>> {};
+    struct packet_type : plus<sor<upper, digit, one<'_'>>> {};
     template<> struct store<packet_type> : yes<packet_type> {};
     struct source : mavmask {};
     template<> struct store<source> : yes<source> {};
