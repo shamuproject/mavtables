@@ -469,7 +469,7 @@ def parse_args():
     parser.add_argument('component', type=int, help='component ID')
     parser.add_argument('script', help='script file to run')
     parser.add_argument(
-        '--rate', action='store', default=1000, help='packets per second')
+        '--rate', action='store', default=500, help='packets per second')
     parser.add_argument(
         '--mavlink1', action='store_true',
         help='force MAVLink v1.0 instead of v2.0')
