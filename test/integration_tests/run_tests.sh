@@ -333,24 +333,21 @@ run_test "Many large packets with multiple senders to serial port" \
     do_nothing large_packets.tmp large_packets_to_serial.log
 
 
-run_test "Routing MAVLink v1.0 packets (127.1)" \
+run_test "Routing MAVLink v1.0 packets (part 1 - 127.1)" \
     test_routing_v1_packets routing_127.1.cmp routing_v1_packets_127.1.log
-run_test "Routing MAVLink v1.0 packets (192.168)" \
+run_test "Routing MAVLink v1.0 packets (part 2 - 192.168)" \
     do_nothing routing_192.168.cmp routing_v1_packets_192.168.log
-run_test "Routing MAVLink v1.0 packets (172.128)" \
+run_test "Routing MAVLink v1.0 packets (part 3 - 172.128)" \
     do_nothing routing_172.128.cmp routing_v1_packets_172.128.log
 
 
-run_test "Routing MAVLink v2.0 packets (127.1)" \
+run_test "Routing MAVLink v2.0 packets (part 1 - 127.1)" \
     test_routing_v2_packets routing_127.1.cmp routing_v2_packets_127.1.log
-run_test "Routing MAVLink v2.0 packets (192.168)" \
+run_test "Routing MAVLink v2.0 packets (part 2 - 192.168)" \
     do_nothing routing_192.168.cmp routing_v2_packets_192.168.log
-run_test "Routing MAVLink v2.0 packets (172.128)" \
+run_test "Routing MAVLink v2.0 packets (part 3 - 172.128)" \
     do_nothing routing_172.128.cmp routing_v2_packets_172.128.log
 
-# test_routing_v1_packets
-# run_test "Many large packets with multiple senders to serial port" \
-#     test_large_packets large_packets.tmp large_packets_to_serial.log
 
 if [ "$FAIL" -ne "0" ]; then
     echo -en "\n"
