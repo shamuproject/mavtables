@@ -126,13 +126,17 @@ namespace config
     // Signed integer value.
     struct signed_integer : seq<opt<one<'+', '-'>>, integer> {};
 
+    // Port number.
+    struct port : integer {};
+    template<> struct store<port> : yes<port> {};
+
     // IP address.
     struct address : seq<integer, rep<3, seq<one<'.'>, integer>>> {};
     template<> struct store<address> : yes<address> {};
 
-    // Port number.
-    struct port : seq<integer> {};
-    template<> struct store<port> : yes<port> {};
+    // Maximum bitrate number.
+    struct max_bitrate : integer {};
+    template<> struct store<max_bitrate> : yes<max_bitrate> {};
 
     // Serial port device name.
     struct device : plus<sor<alnum, one<'.', '_', '/'>>> {};
@@ -240,15 +244,19 @@ namespace config
     // Default filter action (keep node, no content).
     struct default_action_option : sor<accept, reject> {};
     struct default_action
-    : a1_statement<TAO_PEGTL_STRING("default_action"), default_action_option> {};
+    : a1_statement<TAO_PEGTL_STRING("default_action"),
+      default_action_option> {};
     template<> struct store<default_action>
         : yes_without_content<default_action> {};
 
     // UDP connection block.
     struct s_port : a1_statement<TAO_PEGTL_STRING("port"), port> {};
     struct s_address : a1_statement<TAO_PEGTL_STRING("address"), address> {};
+    struct s_max_bitrate
+        : a1_statement<TAO_PEGTL_STRING("max_bitrate"), max_bitrate> {};
     struct udp
-    : t_block<TAO_PEGTL_STRING("udp"), s_port, s_address, s_catch> {};
+    : t_block<TAO_PEGTL_STRING("udp"),
+      s_port, s_address, s_max_bitrate, s_catch> {};
     template<> struct store<udp> : yes_without_content<udp> {};
 
     // Serial port block.
@@ -296,6 +304,9 @@ namespace config
 
     template<>
     const std::string error<address>::error_message;
+
+    template<>
+    const std::string error<max_bitrate>::error_message;
 
     template<>
     const std::string error<device>::error_message;

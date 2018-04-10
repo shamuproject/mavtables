@@ -75,6 +75,10 @@ namespace config
            "expected a valid IP address";
 
     template<>
+    const std::string error<max_bitrate>::error_message =
+           "expected a valid bitrate";
+
+    template<>
     const std::string error<device>::error_message =
            "expected a valid serial port device name";
 

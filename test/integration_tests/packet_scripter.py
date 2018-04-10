@@ -461,8 +461,6 @@ def parse_args():
     parser.add_argument('component', type=int, help='component ID')
     parser.add_argument('script', help='script file to run')
     parser.add_argument(
-        '--rate', action='store', default=1000, help='packets per second')
-    parser.add_argument(
         '--mavlink1', action='store_true',
         help='force MAVLink v1.0 instead of v2.0')
     parser.add_argument(
@@ -484,19 +482,11 @@ def main():
     packets = parse_file(args['script'])
     mav = start_connection(args)
     last_heartbeat = datetime.now() - timedelta(seconds=180)
-    last_packet = datetime.now()
-    sleep_time = 1/args['rate'];
     for packet, system, component in packets:
         if ((datetime.now() - last_heartbeat) > timedelta(seconds=120)):
             last_heartbeat = datetime.now()
             mav.mav.heartbeat_send(0, 0, 0, 0, 0)
         send_packet(mav, packet, system, component)
-        to_sleep = sleep_time - (datetime.now() - last_packet).total_seconds()
-        if to_sleep > 0:
-            sleep(to_sleep)
-            # print(to_sleep)
-        last_packet = datetime.now()
-        # sleep(0.0001)
 
 
 if __name__ == '__main__':

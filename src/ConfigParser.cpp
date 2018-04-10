@@ -380,6 +380,7 @@ std::unique_ptr<UDPInterface> parse_udp(
 {
     unsigned int port = 14444;
     std::optional<IPAddress> address;
+    unsigned long max_bitrate = 0;
 
     // Loop over options for UDP interface.
     for (auto &node : root.children)
@@ -394,10 +395,16 @@ std::unique_ptr<UDPInterface> parse_udp(
         {
             address = IPAddress(node->content());
         }
+        // Parse bitrate limit.
+        else if (node->name() == "config::max_bitrate")
+        {
+            max_bitrate = static_cast<unsigned long>(
+                    std::stoll(node->content()));
+        }
     }
 
     // Construct the UDP interface.
-    auto socket = std::make_unique<UnixUDPSocket>(port, address);
+    auto socket = std::make_unique<UnixUDPSocket>(port, address, max_bitrate);
     auto factory = std::make_unique<ConnectionFactory<>>(filter, false);
     return std::make_unique<UDPInterface>(
         std::move(socket), pool, std::move(factory));

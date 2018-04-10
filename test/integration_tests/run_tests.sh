@@ -181,7 +181,7 @@ function test_large_packets() {
         --udp 127.0.0.1:14500 &
     "$(dir)/packet_scripter.py" 172 128 "$(dir)/large_packets.tmp" \
         --serial ./ttyS3
-    sleep 2
+    sleep 5
     perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
         >> "$(dir)/large_packets.tmp"
     shutdown_background

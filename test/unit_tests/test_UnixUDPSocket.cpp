@@ -57,7 +57,7 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
         fakeit::When(Method(mock_sys, close)).Return(0);
         {
             // Construct socket.
-            UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
+            UnixUDPSocket socket(14050, {}, 0, mock_unique(mock_sys));
             fakeit::Verify(Method(mock_sys, socket).Matching(
                                [&](auto family, auto type, auto protocol)
             {
@@ -97,7 +97,7 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
         fakeit::When(Method(mock_sys, close)).Return(0);
         {
             UnixUDPSocket socket(
-                14050, IPAddress(1234567890), mock_unique(mock_sys));
+                14050, IPAddress(1234567890), 0, mock_unique(mock_sys));
             fakeit::Verify(Method(mock_sys, socket).Matching(
                                [&](auto family, auto type, auto protocol)
             {
@@ -140,7 +140,7 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
         {
             errno = error;
             REQUIRE_THROWS_AS(
-                UnixUDPSocket(14050, {}, mock_unique(mock_sys)),
+                UnixUDPSocket(14050, {}, 0, mock_unique(mock_sys)),
                 std::system_error);
         }
     }
@@ -169,7 +169,7 @@ TEST_CASE("UnixUDPSocket's create and bind a UDP socket on construction and "
         {
             errno = error;
             REQUIRE_THROWS_AS(
-                UnixUDPSocket(14050, {}, mock_unique(mock_sys)),
+                UnixUDPSocket(14050, {}, 0, mock_unique(mock_sys)),
                 std::system_error);
         }
     }
@@ -187,9 +187,9 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
     fakeit::When(Method(mock_sys, bind)).Return(0);
     // Mock 'close'.
     fakeit::When(Method(mock_sys, close)).Return(0);
-    UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
     SECTION("Without error.")
     {
+        UnixUDPSocket socket(14050, {}, 0, mock_unique(mock_sys));
         // Mock 'sendto'
         std::vector<uint8_t> sent;
         struct sockaddr_in address;
@@ -227,8 +227,24 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
             REQUIRE(address.sin_zero[i] == '\0');
         }
     }
+    SECTION("Bitrate limit prevents writing packets too fast.")
+    {
+        UnixUDPSocket socket(14050, {}, 128, mock_unique(mock_sys));
+        fakeit::Fake(Method(mock_sys, sendto));
+        std::vector<uint8_t> vec = {1, 3, 3, 7}; // 4*8/128 = 0.25 seconds
+        socket.send(vec, IPAddress(1234567890, 14050));
+        fakeit::Verify(Method(mock_sys, sendto)).Once();
+        auto tic = std::chrono::steady_clock::now();
+        socket.send(vec, IPAddress(1234567890, 14050));
+        auto toc = std::chrono::steady_clock::now();
+        REQUIRE(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                toc - tic).count() >= 250);
+        fakeit::Verify(Method(mock_sys, sendto)).Exactly(2);
+    }
     SECTION("Emmits errors from 'sendto' system call.")
     {
+        UnixUDPSocket socket(14050, {}, 0, mock_unique(mock_sys));
         fakeit::When(Method(mock_sys, sendto)).AlwaysReturn(-1);
         std::array<int, 18> errors{{
                 EACCES,
@@ -274,7 +290,7 @@ TEST_CASE("UnixUDPSocket's 'receive' method receives data on the socket.",
     // Mock 'close'.
     fakeit::When(Method(mock_sys, close)).AlwaysReturn(0);
     // Construct socket.
-    UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
+    UnixUDPSocket socket(14050, {}, 0, mock_unique(mock_sys));
     SECTION("Timeout, no packet (no errors).")
     {
         // Mock 'poll'.
@@ -718,7 +734,7 @@ TEST_CASE("UnixUDPSocket's are printable.", "[UnixUDPSocket]")
     fakeit::When(Method(mock_sys, close)).Return(0);
     SECTION("Without explicit IP address.")
     {
-        UnixUDPSocket socket(14050, {}, mock_unique(mock_sys));
+        UnixUDPSocket socket(14050, {}, 0, mock_unique(mock_sys));
         REQUIRE(
             str(socket) ==
             "udp {\n"
@@ -728,12 +744,34 @@ TEST_CASE("UnixUDPSocket's are printable.", "[UnixUDPSocket]")
     SECTION("With explicit IP address.")
     {
         UnixUDPSocket socket(
-            14050, IPAddress("127.0.0.1"), mock_unique(mock_sys));
+            14050, IPAddress("127.0.0.1"), 0, mock_unique(mock_sys));
         REQUIRE(
             str(socket) ==
             "udp {\n"
             "    port 14050;\n"
             "    address 127.0.0.1;\n"
+            "}");
+    }
+    SECTION("Without explicit IP address (and maximum bitrate).")
+    {
+        UnixUDPSocket socket(14050, {}, 8192, mock_unique(mock_sys));
+        REQUIRE(
+            str(socket) ==
+            "udp {\n"
+            "    port 14050;\n"
+            "    max_bitrate 8192;\n"
+            "}");
+    }
+    SECTION("With explicit IP address (and maximum bitrate).")
+    {
+        UnixUDPSocket socket(
+            14050, IPAddress("127.0.0.1"), 8192, mock_unique(mock_sys));
+        REQUIRE(
+            str(socket) ==
+            "udp {\n"
+            "    port 14050;\n"
+            "    address 127.0.0.1;\n"
+            "    max_bitrate 8192;\n"
             "}");
     }
 }

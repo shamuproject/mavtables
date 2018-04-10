@@ -399,6 +399,68 @@ TEST_CASE("UDP IP address setting.", "[config]")
 }
 
 
+TEST_CASE("UDP max_bitrate setting.", "[config]")
+{
+    SECTION("Parses max bitrate setting.")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {\n"
+            "    max_bitrate 8192;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  udp\n"
+            ":002:  |  max_bitrate 8192\n");
+    }
+    SECTION("Parses max bitrate setting (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {# comment\n"
+            "    max_bitrate 8192;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  udp\n"
+            ":002:  |  max_bitrate 8192\n");
+    }
+    SECTION("Missing end of statement.")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {\n"
+            "    max_bitrate 8192\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":3:0(27): expected end of statement ';' character");
+    }
+    SECTION("Invalid bitrate.")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {\n"
+            "    max_bitrate a512;\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in), ":2:16(22): expected a valid bitrate");
+    }
+    SECTION("Missing bitrate.")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {\n"
+            "    max_bitrate;\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in), ":2:15(21): expected a valid bitrate");
+    }
+}
+
+
 TEST_CASE("Serial port configuration block.", "[config]")
 {
     SECTION("Empty serial port blocks are allowed (single line).")
