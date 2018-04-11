@@ -63,7 +63,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/mavlink.hpp.in"
+    "${CMAKE_CURRENT_LIST_DIR}/mavlink.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Options.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
@@ -120,8 +120,4 @@ endif ()
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/config.hpp.in"
     "${PROJECT_BINARY_DIR}/config.hpp"
-)
-configure_file (
-    "${PROJECT_SOURCE_DIR}/src/mavlink.hpp.in"
-    "${PROJECT_BINARY_DIR}/mavlink.hpp"
 )

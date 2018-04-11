@@ -23,7 +23,7 @@ extern "C"
 {
 
 #define MAVLINK_USE_MESSAGE_INFO
-#include "@MAVLINK_INCLUDE_PATH@/mavlink.h"
+#include "mavlink.h"
 
 }
 
