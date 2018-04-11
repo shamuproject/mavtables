@@ -205,6 +205,32 @@ function test_routing_v2_packets() {
 }
 
 
+function test_priority() {
+    perl -e 'for$i(1..50){print "ENCAPSULATED_DATA\n"}' \
+        > "$(dir)/priority.tmp"
+    perl -e 'for$i(1..100){print "ATTITUDE\n"}' \
+        >> "$(dir)/priority.tmp"
+    perl -e 'for$i(1..100){print "GLOBAL_POSITION_INT\n"}' \
+        >> "$(dir)/priority.tmp"
+    perl -e 'for$i(1..50){print "ENCAPSULATED_DATA\n"}' \
+        >> "$(dir)/priority.tmp"
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 0.5
+    "$(dir)/../../build/mavtables" --conf "$(dir)/priority.conf" &
+    "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 > "$(dir)/priority.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 "$(dir)/priority.tmp" --serial ./ttyS1
+    sleep 2
+    perl -e 'for$i(1..100){print "ENCAPSULATED_DATA\n"}' \
+        > "$(dir)/priority.tmp"
+    perl -e 'for$i(1..100){print "GLOBAL_POSITION_INT\n"}' \
+        >> "$(dir)/priority.tmp"
+    perl -e 'for$i(1..100){print "ATTITUDE\n"}' \
+        >> "$(dir)/priority.tmp"
+    shutdown_background
+}
+
+
 function test_large_packets() {
     perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
         > "$(dir)/large_packets.tmp"
@@ -345,6 +371,10 @@ run_test "Routing MAVLink v2.0 packets (part 2 - 192.168)" \
     do_nothing routing_192.168.cmp routing_v2_packets_192.168.log
 run_test "Routing MAVLink v2.0 packets (part 3 - 172.128)" \
     do_nothing routing_172.128.cmp routing_v2_packets_172.128.log
+
+
+run_test "Packet prioritization." \
+    test_priority priority.tmp priority.log
 
 
 run_test "Many large packets with multiple senders to UDP" \
