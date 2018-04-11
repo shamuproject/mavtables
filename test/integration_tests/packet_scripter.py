@@ -487,6 +487,7 @@ def main():
             last_heartbeat = datetime.now()
             mav.mav.heartbeat_send(0, 0, 0, 0, 0)
         send_packet(mav, packet, system, component)
+        sleep(0.0002)
 
 
 if __name__ == '__main__':
