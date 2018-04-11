@@ -129,9 +129,11 @@ function test_multiple_senders_v1_packets() {
     sleep 0.5
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 --verbose \
-        | sort > "$(dir)/multiple_senders_v1_packets_to_udp.log" &
+        | sort --version-sort \
+        > "$(dir)/multiple_senders_v1_packets_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 --verbose \
-        | sort > "$(dir)/multiple_senders_v1_packets_to_serial.log" &
+        | sort --version-sort \
+        > "$(dir)/multiple_senders_v1_packets_to_serial.log" &
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1 &
@@ -150,9 +152,11 @@ function test_multiple_senders_v2_packets() {
     sleep 0.5
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 --verbose \
-        | sort > "$(dir)/multiple_senders_v2_packets_to_udp.log" &
+        | sort --version-sort \
+        > "$(dir)/multiple_senders_v2_packets_to_udp.log" &
     "$(dir)/logger.py" 10 20 --serial ./ttyS1 --verbose \
-        | sort > "$(dir)/multiple_senders_v2_packets_to_serial.log" &
+        | sort --version-sort \
+        > "$(dir)/multiple_senders_v2_packets_to_serial.log" &
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500 &
