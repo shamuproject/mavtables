@@ -169,29 +169,6 @@ function test_multiple_senders_v2_packets() {
 }
 
 
-function test_large_packets() {
-    perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
-        > "$(dir)/large_packets.tmp"
-    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
-    sleep 0.5
-    "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
-    "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
-        > "$(dir)/large_packets_to_udp.log" &
-    "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
-        > "$(dir)/large_packets_to_serial.log" &
-    sleep 0.5
-    "$(dir)/packet_scripter.py" 192 168 "$(dir)/large_packets.tmp" \
-        --udp 127.0.0.1:14500 &
-    "$(dir)/packet_scripter.py" 172 128 "$(dir)/large_packets.tmp" \
-        --serial ./ttyS3
-    sleep 40
-    perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
-        >> "$(dir)/large_packets.tmp"
-    shutdown_background
-}
-
-
 function test_routing_v1_packets() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
     sleep 0.5
@@ -224,6 +201,29 @@ function test_routing_v2_packets() {
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500
     sleep 2
+    shutdown_background
+}
+
+
+function test_large_packets() {
+    perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
+        > "$(dir)/large_packets.tmp"
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
+    sleep 0.5
+    "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
+    "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
+        > "$(dir)/large_packets_to_udp.log" &
+    "$(dir)/logger.py" 10 20 --serial ./ttyS1 \
+        > "$(dir)/large_packets_to_serial.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 192 168 "$(dir)/large_packets.tmp" \
+        --udp 127.0.0.1:14500 &
+    "$(dir)/packet_scripter.py" 172 128 "$(dir)/large_packets.tmp" \
+        --serial ./ttyS3
+    sleep 60
+    perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
+        >> "$(dir)/large_packets.tmp"
     shutdown_background
 }
 
@@ -331,12 +331,6 @@ run_test "Multiple senders with MAVLink v2.0 packets to serial port" \
     multiple_senders_v2_packets_to_serial.log
 
 
-run_test "Many large packets with multiple senders to UDP" \
-    test_large_packets large_packets.tmp large_packets_to_udp.log
-run_test "Many large packets with multiple senders to serial port" \
-    do_nothing large_packets.tmp large_packets_to_serial.log
-
-
 run_test "Routing MAVLink v1.0 packets (part 1 - 127.1)" \
     test_routing_v1_packets routing_127.1.cmp routing_v1_packets_127.1.log
 run_test "Routing MAVLink v1.0 packets (part 2 - 192.168)" \
@@ -351,6 +345,12 @@ run_test "Routing MAVLink v2.0 packets (part 2 - 192.168)" \
     do_nothing routing_192.168.cmp routing_v2_packets_192.168.log
 run_test "Routing MAVLink v2.0 packets (part 3 - 172.128)" \
     do_nothing routing_172.128.cmp routing_v2_packets_172.128.log
+
+
+run_test "Many large packets with multiple senders to UDP" \
+    test_large_packets large_packets.tmp large_packets_to_udp.log
+run_test "Many large packets with multiple senders to serial port" \
+    do_nothing large_packets.tmp large_packets_to_serial.log
 
 
 if [ "$FAIL" -ne "0" ]; then
