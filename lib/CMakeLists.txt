@@ -50,19 +50,34 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 
+# Set MAVLink dialect from DIALECT environment variable.
+if ("$ENV{DIALECT}" STREQUAL "")
+    set (
+        MAVLINK_DIALECT "common"
+        CACHE INTERNAL "Use default (common) MAVLink dialect."
+    )
+else ()
+    set (
+        MAVLINK_DIALECT "$ENV{DIALECT}"
+        CACHE INTERNAL "Dialect set in environment variable."
+    )
+endif ()
+
+
 # Set MAVLink include path from MDIR environment variable.
 if ("$ENV{MDIR}" STREQUAL "")
     set (
         MAVLINK_INCLUDE_DIR
-            "${PROJECT_SOURCE_DIR}/lib/mavlink/mavlink/v2.0/common"
+        "${PROJECT_SOURCE_DIR}/lib/mavlink/mavlink/v2.0/${MAVLINK_DIALECT}"
         CACHE INTERNAL "Use default MAVLink implementation."
     )
 else ()
     set (
-        MAVLINK_INCLUDE_DIR "$ENV{MDIR}"
+        MAVLINK_INCLUDE_DIR "$ENV{MDIR}/${MAVLINK_DIALECT}"
         CACHE INTERNAL "Copied from environment variable."
     )
 endif ()
+MESSAGE(${MAVLINK_INCLUDE_DIR})
 
 
 # Pull down mavlink if it does not exist.

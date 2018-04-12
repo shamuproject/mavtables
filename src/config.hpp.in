@@ -21,6 +21,9 @@
 #define VERSION_MINOR @VERSION_MINOR@
 #define VERSION_PATCH @VERSION_PATCH@
 #cmakedefine PREFIX "@PREFIX@"
+#ifndef PREFIX
+#define PREFIX
+#endif
 #cmakedefine UNIX
 #cmakedefine WIN32
 #cmakedefine TEST_VIRTUAL @TEST_VIRTUAL@

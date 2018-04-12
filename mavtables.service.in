@@ -1,0 +1,11 @@
+[Unit]
+Description=mavtables MAVLink router and firewall
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=@PREFIX@/bin/mavtables
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

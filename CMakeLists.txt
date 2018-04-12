@@ -7,7 +7,11 @@ set (VERSION_MINOR 1)
 set (VERSION_PATCH 4)
 
 # set prefix
-set (PREFIX ${CMAKE_INSTALL_PREFIX})
+set (PREFIX "${CMAKE_INSTALL_PREFIX}")
+configure_file (
+    "${PROJECT_SOURCE_DIR}/mavtables.service.in"
+    "${PROJECT_BINARY_DIR}/mavtables.service"
+)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -50,7 +54,16 @@ target_link_libraries (mavtables
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
 install (TARGETS mavtables DESTINATION bin CONFIGURATIONS Release)
-install (FILES examples/mavtables.conf DESTINATION etc CONFIGURATIONS Release)
+install (
+    FILES "${CMAKE_SOURCE_DIR}/examples/mavtables.conf"
+    DESTINATION etc
+    CONFIGURATIONS Release
+)
+install (
+    FILES "${CMAKE_BINARY_DIR}/mavtables.service"
+    DESTINATION lib/systemd/system
+    CONFIGURATIONS Release
+)
 
 # unit_tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
