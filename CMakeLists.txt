@@ -6,6 +6,9 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (VERSION_PATCH 4)
 
+# set prefix
+set (PREFIX ${CMAKE_INSTALL_PREFIX})
+
 # compiler
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRE ON)
@@ -46,7 +49,8 @@ target_link_libraries (mavtables
     PEGTL
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
-install (TARGETS mavtables DESTINATION bin)
+install (TARGETS mavtables DESTINATION bin CONFIGURATIONS Release)
+install (FILES examples/mavtables.conf DESTINATION etc CONFIGURATIONS Release)
 
 # unit_tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
