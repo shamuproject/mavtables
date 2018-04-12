@@ -2,7 +2,7 @@
 find_path (CODECOV_MODULE_DIR Findcodecov.cmake HINTS codecov/cmake)
 if ((NOT CODECOV_MODULE_DIR) OR (NOT EXISTS "${CODECOV_INCLUDE_DIR}"))
     execute_process (
-        COMMAND git submodule update --init --recursive
+        COMMAND git submodule update --init codecov
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
     )
 endif ()

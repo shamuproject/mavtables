@@ -1,52 +1,62 @@
 # Catch (a unit testing framework)
-find_path (CATCH_INCLUDE_DIR catch.hpp HINTS catch/single_include)
-if ((NOT CATCH_INCLUDE_DIR) OR (NOT EXISTS "${CATCH_INCLUDE_DIR}"))
-    execute_process (
-        COMMAND git submodule update --init --recursive
-        WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
-    )
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_path (CATCH_INCLUDE_DIR catch.hpp HINTS catch/single_include)
+    if ((NOT CATCH_INCLUDE_DIR) OR (NOT EXISTS "${CATCH_INCLUDE_DIR}"))
+        execute_process (
+            COMMAND git submodule update --init catch
+            WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+        )
+    endif ()
+    set (CATCH_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/catch/single_include")
+    list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/catch/*')
+    add_library (Catch INTERFACE)
+    target_include_directories (Catch SYSTEM INTERFACE "${CATCH_INCLUDE_DIR}")
 endif ()
-set (CATCH_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/catch/single_include")
-list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/catch/*')
-add_library (Catch INTERFACE)
-target_include_directories (Catch SYSTEM INTERFACE "${CATCH_INCLUDE_DIR}")
 
 
 # FakeIt (a mocking library)
-find_path (
-    FAKEIT_INCLUDE_DIR fakeit.hpp
-    HINTS ${CMAKE_CURRENT_LIST_DIR}/fakeit/single_header/catch
-)
-if ((NOT FAKEIT_INCLUDE_DIR) OR (NOT EXISTS "${FAKEIT_INCLUDE_DIR}"))
-    execute_process (
-        COMMAND git submodule update --init --recursive
-        WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_path (
+        FAKEIT_INCLUDE_DIR fakeit.hpp
+        HINTS ${CMAKE_CURRENT_LIST_DIR}/fakeit/single_header/catch
     )
+    if ((NOT FAKEIT_INCLUDE_DIR) OR (NOT EXISTS "${FAKEIT_INCLUDE_DIR}"))
+        execute_process (
+            COMMAND git submodule update --init fakeit
+            WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+        )
+    endif ()
+    set (
+        FAKEIT_INCLUDE_DIR
+        "${CMAKE_CURRENT_LIST_DIR}/fakeit/single_header/catch"
+    )
+    list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fakeit/*')
+    add_library (FakeIt INTERFACE)
+    target_include_directories (FakeIt SYSTEM INTERFACE "${FAKEIT_INCLUDE_DIR}")
 endif ()
-set (FAKEIT_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/fakeit/single_header/catch")
-list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fakeit/*')
-add_library (FakeIt INTERFACE)
-target_include_directories (FakeIt SYSTEM INTERFACE "${FAKEIT_INCLUDE_DIR}")
 
 
 # fake_clock (a fake TrivialClock used for testing)
-find_path (
-    FAKE_CLOCK_INCLUDE_DIR fake_clock.hh
-    HINTS ${CMAKE_CURRENT_LIST_DIR}/fake_clock
-)
-if ((NOT FAKE_CLOCK_INCLUDE_DIR) OR (NOT EXISTS "${FAKE_CLOCK_INCLUDE_DIR}"))
-    execute_process (
-        COMMAND git submodule update --init --recursive
-        WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
-    )
-endif ()
-set (FAKE_CLOCK_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/fake_clock")
-list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fake_clock/*')
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_library (FakeClock STATIC "${FAKE_CLOCK_INCLUDE_DIR}/fake_clock.cc")
-    target_include_directories (
-        FakeClock SYSTEM INTERFACE "${FAKE_CLOCK_INCLUDE_DIR}")
-    target_compile_options(FakeClock PRIVATE "-Wno-reserved-id-macro")
+    find_path (
+        FAKE_CLOCK_INCLUDE_DIR fake_clock.hh
+        HINTS ${CMAKE_CURRENT_LIST_DIR}/fake_clock
+    )
+    if ((NOT FAKE_CLOCK_INCLUDE_DIR) OR 
+        (NOT EXISTS "${FAKE_CLOCK_INCLUDE_DIR}"))
+        execute_process (
+            COMMAND git submodule update --init fake_clock
+            WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+        )
+    endif ()
+    set (FAKE_CLOCK_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/fake_clock")
+    list (APPEND LCOV_REMOVE_LOCAL '${PROJECT_SOURCE_DIR}/lib/fake_clock/*')
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_library (FakeClock STATIC "${FAKE_CLOCK_INCLUDE_DIR}/fake_clock.cc")
+        target_include_directories (
+            FakeClock SYSTEM INTERFACE "${FAKE_CLOCK_INCLUDE_DIR}")
+        target_compile_options(FakeClock PRIVATE "-Wno-reserved-id-macro")
+    endif ()
 endif ()
 
 
@@ -83,7 +93,7 @@ MESSAGE("Using MAVLink implementation at ${MAVLINK_INCLUDE_DIR}.")
 # Pull down mavlink if it does not exist.
 if (NOT EXISTS "${MAVLINK_INCLUDE_DIR}")
     execute_process (
-        COMMAND git submodule update --init --recursive
+        COMMAND git submodule update --init mavlink/mavlink/v2.0
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
     )
 endif ()
@@ -101,7 +111,7 @@ find_path (
 )
 if ((NOT PEGTL_INCLUDE_DIR) OR (NOT EXISTS "${PEGTL_INCLUDE_DIR}"))
     execute_process (
-        COMMAND git submodule update --init --recursive
+        COMMAND git submodule update --init pegtl
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
     )
 endif ()
