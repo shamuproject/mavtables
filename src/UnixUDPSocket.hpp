@@ -38,6 +38,7 @@ class UnixUDPSocket : public UDPSocket
     public:
         UnixUDPSocket(
             unsigned int port, std::optional<IPAddress> address = {},
+            unsigned long max_bitrate = 0,
             std::unique_ptr<UnixSyscalls> syscalls =
                 std::make_unique<UnixSyscalls>());
         virtual ~UnixUDPSocket();
@@ -54,8 +55,10 @@ class UnixUDPSocket : public UDPSocket
         // Variables
         unsigned int port_;
         std::optional<IPAddress> address_;
+        unsigned long max_bitrate_;
         std::unique_ptr<UnixSyscalls> syscalls_;
         int socket_;
+        std::chrono::time_point<std::chrono::steady_clock> next_time_;
         // Methods
         void create_socket_();
         std::pair<std::vector<uint8_t>, IPAddress> receive_();

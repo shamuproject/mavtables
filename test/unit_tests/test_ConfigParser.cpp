@@ -892,6 +892,52 @@ TEST_CASE("'parse_udp' parses a UDP interface from a UDP interface AST node.",
             "    address 127.0.0.1;\n"
             "}");
     }
+    SECTION("Without specific IP address (with bitrate limit).")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {\n"
+            "    port 14500;\n"
+            "    max_bitrate 8192;\n"
+            "}\n", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE_FALSE(root->children.empty());
+        REQUIRE(root->children[0] != nullptr);
+        auto filter = std::make_shared<Filter>(Chain("default"));
+        auto connection_pool = std::make_shared<ConnectionPool>();
+        auto udp_socket =
+            parse_udp(*root->children[0], filter, connection_pool);
+        REQUIRE(
+            str(*udp_socket) ==
+            "udp {\n"
+            "    port 14500;\n"
+            "    max_bitrate 8192;\n"
+            "}");
+    }
+    SECTION("With specific IP address (with bitrate limit).")
+    {
+        tao::pegtl::string_input<> in(
+            "udp {\n"
+            "    port 14500;\n"
+            "    address 127.0.0.1;\n"
+            "    max_bitrate 8192;\n"
+            "}\n", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE_FALSE(root->children.empty());
+        REQUIRE(root->children[0] != nullptr);
+        auto filter = std::make_shared<Filter>(Chain("default"));
+        auto connection_pool = std::make_shared<ConnectionPool>();
+        auto udp_socket =
+            parse_udp(*root->children[0], filter, connection_pool);
+        REQUIRE(
+            str(*udp_socket) ==
+            "udp {\n"
+            "    port 14500;\n"
+            "    address 127.0.0.1;\n"
+            "    max_bitrate 8192;\n"
+            "}");
+    }
 }
 
 
@@ -916,14 +962,25 @@ TEST_CASE("'parse_interfaces' parses serial port and UDP interfaces from "
         "}\n"
         "\n"
         "udp {\n"
-        "    port 8000;\n"
+        "    port 14501;\n"
         "    address 127.0.0.1;\n"
+        "}\n"
+        "\n"
+        "udp {\n"
+        "    port 14502;\n"
+        "    max_bitrate 8192;\n"
+        "}\n"
+        "\n"
+        "udp {\n"
+        "    port 14503;\n"
+        "    address 127.0.0.1;\n"
+        "    max_bitrate 8192;\n"
         "}\n", "");
     auto root = config::parse(in);
     REQUIRE(root != nullptr);
     auto filter = std::make_unique<Filter>(Chain("default"));
     auto interfaces = parse_interfaces(*root, std::move(filter));
-    REQUIRE(interfaces.size() == 4);
+    REQUIRE(interfaces.size() == 6);
     REQUIRE(interfaces[0] != nullptr);
     REQUIRE(
         str(*interfaces[0]) ==
@@ -950,8 +1007,23 @@ TEST_CASE("'parse_interfaces' parses serial port and UDP interfaces from "
     REQUIRE(
         str(*interfaces[3]) ==
         "udp {\n"
-        "    port 8000;\n"
+        "    port 14501;\n"
         "    address 127.0.0.1;\n"
+        "}");
+    REQUIRE(interfaces[4] != nullptr);
+    REQUIRE(
+        str(*interfaces[4]) ==
+        "udp {\n"
+        "    port 14502;\n"
+        "    max_bitrate 8192;\n"
+        "}");
+    REQUIRE(interfaces[5] != nullptr);
+    REQUIRE(
+        str(*interfaces[5]) ==
+        "udp {\n"
+        "    port 14503;\n"
+        "    address 127.0.0.1;\n"
+        "    max_bitrate 8192;\n"
         "}");
 }
 
@@ -960,51 +1032,53 @@ TEST_CASE("ConfigParser can parse a file.", "[ConfigParser]")
 {
     SECTION("When the file exists and is valid.")
     {
-        REQUIRE_NOTHROW(ConfigParser("examples/test.conf"));
+        REQUIRE_NOTHROW(ConfigParser("test/mavtables.conf"));
     }
     SECTION("Throws an error if the file does not exist.")
     {
         REQUIRE_THROWS(
-            ConfigParser("examples/file_that_does_not_exist.conf"));
+            ConfigParser("file_that_does_not_exist.conf"));
     }
 }
 
 
 TEST_CASE("ConfigParser are printable.", "[ConfigParser]")
 {
-    ConfigParser config("examples/test.conf");
+    ConfigParser config("test/mavtables.conf");
     REQUIRE(
         str(config) ==
-        "examples/test.conf:001:  default_action\n"
-        "examples/test.conf:001:  |  accept\n"
-        "examples/test.conf:004:  udp\n"
-        "examples/test.conf:005:  |  port 14500\n"
-        "examples/test.conf:006:  |  address 127.0.0.1\n"
-        "examples/test.conf:010:  serial\n"
-        "examples/test.conf:011:  |  device ./ttyS0\n"
-        "examples/test.conf:012:  |  baudrate 115200\n"
-        "examples/test.conf:013:  |  flow_control yes\n"
-        "examples/test.conf:017:  chain default\n"
-        "examples/test.conf:019:  |  call some_chain10\n"
-        "examples/test.conf:019:  |  |  condition\n"
-        "examples/test.conf:019:  |  |  |  source 127.1\n"
-        "examples/test.conf:019:  |  |  |  dest 192.0\n"
-        "examples/test.conf:020:  |  reject\n"
-        "examples/test.conf:024:  chain some_chain10\n"
-        "examples/test.conf:026:  |  accept\n"
-        "examples/test.conf:026:  |  |  priority 99\n"
-        "examples/test.conf:026:  |  |  condition\n"
-        "examples/test.conf:026:  |  |  |  dest 192.0\n"
-        "examples/test.conf:027:  |  accept\n"
-        "examples/test.conf:027:  |  |  condition\n"
-        "examples/test.conf:027:  |  |  |  packet_type PING\n"
-        "examples/test.conf:028:  |  accept\n");
+        ":001:  default_action\n"
+        ":001:  |  accept\n"
+        ":004:  udp\n"
+        ":005:  |  port 14500\n"
+        ":006:  |  address 127.0.0.1\n"
+        ":007:  |  max_bitrate 8388608\n"
+        ":011:  serial\n"
+        ":012:  |  device ./ttyS0\n"
+        ":013:  |  baudrate 115200\n"
+        ":014:  |  flow_control yes\n"
+        ":018:  chain default\n"
+        ":020:  |  call some_chain10\n"
+        ":020:  |  |  condition\n"
+        ":020:  |  |  |  source 127.1\n"
+        ":020:  |  |  |  dest 192.0\n"
+        ":021:  |  reject\n"
+        ":025:  chain some_chain10\n"
+        ":027:  |  accept\n"
+        ":027:  |  |  priority 99\n"
+        ":027:  |  |  condition\n"
+        ":027:  |  |  |  dest 192.0\n"
+        ":028:  |  accept\n"
+        ":028:  |  |  condition\n"
+        ":028:  |  |  |  packet_type PING\n"
+        ":029:  |  accept\n");
 }
+
 
 TEST_CASE("ConfigParser's 'make_app' method returns an application object.",
           "[ConfigParser]")
 {
-    ConfigParser config("examples/test.conf");
+    ConfigParser config("test/mavtables.conf");
     std::unique_ptr<App> app;
     REQUIRE_NOTHROW(app = config.make_app());
     REQUIRE(app != nullptr);

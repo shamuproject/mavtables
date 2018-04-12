@@ -25,6 +25,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PartialSendError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.cpp"
@@ -62,7 +63,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/macros.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/mavlink.hpp.in"
+    "${CMAKE_CURRENT_LIST_DIR}/mavlink.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Options.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
@@ -71,6 +72,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/parse_tree.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PartialSendError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.hpp"
@@ -118,8 +120,4 @@ endif ()
 configure_file (
     "${PROJECT_SOURCE_DIR}/src/config.hpp.in"
     "${PROJECT_BINARY_DIR}/config.hpp"
-)
-configure_file (
-    "${PROJECT_SOURCE_DIR}/src/mavlink.hpp.in"
-    "${PROJECT_BINARY_DIR}/mavlink.hpp"
 )

@@ -15,28 +15,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <memory>
+#include <string>
+#include <utility>
 
-#include <catch.hpp>
-#include <fakeit.hpp>
-
-#include "Filesystem.hpp"
+#include "PartialSendError.hpp"
 
 
-TEST_CASE("Filesystem's 'exist' method determines the existence of a file.",
-          "[Filesystem]")
+/** Construct a PartialSendError..
+ *
+ *  \param bytes_sent Number of bytes there were sent.
+ *  \param total_bytes Number of bytes in the packet.
+ */
+PartialSendError::PartialSendError(
+    unsigned long bytes_sent, unsigned long total_bytes)
 {
-    // Note: both compile time and dynamic construction used for complete
-    //       coverage.
-    SECTION("Returns 'true' when the file exists.")
-    {
-        Filesystem filesystem;
-        REQUIRE(filesystem.exists("examples/test.conf"));
-    }
-    SECTION("Returns 'false' when the file does not exist.")
-    {
-        auto filesystem = std::make_unique<Filesystem>();
-        REQUIRE_FALSE(
-            filesystem->exists("examples/file_that_does_not_exist.conf"));
-    }
+    message_ = "Could only write " + std::to_string(bytes_sent) +
+               " of " + std::to_string(total_bytes) + " bytes.";
+}
+
+
+/** Return error message string.
+ *
+ *  \return Error message string.
+ */
+const char *PartialSendError::what() const noexcept
+{
+    return message_.c_str();
 }

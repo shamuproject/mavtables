@@ -1,0 +1,268 @@
+:001:  default_action
+:001:  |  accept
+:002:  default_action
+:002:  |  reject
+:006:  udp
+:007:  |  port 14500
+:008:  |  address 127.0.0.1
+:009:  |  max_bitrate 8388608
+:014:  serial
+:015:  |  device /dev/ttyUSB0
+:016:  |  baudrate 115200
+:017:  |  flow_control yes
+:022:  serial
+:023:  |  device COM1
+:024:  |  baudrate 9600
+:025:  |  flow_control no
+:030:  chain default
+:032:  |  call some_chain10
+:033:  |  call some_chain10
+:033:  |  |  condition
+:033:  |  |  |  packet_type PING
+:034:  |  call some_chain10
+:034:  |  |  condition
+:034:  |  |  |  packet_type PING
+:034:  |  |  |  source 127.1
+:035:  |  call some_chain10
+:035:  |  |  condition
+:035:  |  |  |  packet_type PING
+:035:  |  |  |  dest 192.0
+:036:  |  call some_chain10
+:036:  |  |  condition
+:036:  |  |  |  packet_type PING
+:036:  |  |  |  source 127.1
+:036:  |  |  |  dest 192.0
+:037:  |  call some_chain10
+:037:  |  |  condition
+:037:  |  |  |  source 127.1
+:038:  |  call some_chain10
+:038:  |  |  condition
+:038:  |  |  |  dest 192.0
+:039:  |  call some_chain10
+:039:  |  |  condition
+:039:  |  |  |  source 127.1
+:039:  |  |  |  dest 192.0
+:040:  |  call some_chain10
+:040:  |  |  priority 99
+:041:  |  call some_chain10
+:041:  |  |  priority 99
+:041:  |  |  condition
+:041:  |  |  |  packet_type PING
+:042:  |  call some_chain10
+:042:  |  |  priority 99
+:042:  |  |  condition
+:042:  |  |  |  packet_type PING
+:042:  |  |  |  source 127.1
+:043:  |  call some_chain10
+:043:  |  |  priority 99
+:043:  |  |  condition
+:043:  |  |  |  packet_type PING
+:043:  |  |  |  dest 192.0
+:044:  |  call some_chain10
+:044:  |  |  priority 99
+:044:  |  |  condition
+:044:  |  |  |  packet_type PING
+:044:  |  |  |  source 127.1
+:044:  |  |  |  dest 192.0
+:045:  |  call some_chain10
+:045:  |  |  priority 99
+:045:  |  |  condition
+:045:  |  |  |  source 127.1
+:046:  |  call some_chain10
+:046:  |  |  priority 99
+:046:  |  |  condition
+:046:  |  |  |  dest 192.0
+:047:  |  call some_chain10
+:047:  |  |  priority 99
+:047:  |  |  condition
+:047:  |  |  |  source 127.1
+:047:  |  |  |  dest 192.0
+:052:  chain some_chain10
+:054:  |  accept
+:055:  |  accept
+:055:  |  |  condition
+:055:  |  |  |  packet_type PING
+:056:  |  accept
+:056:  |  |  condition
+:056:  |  |  |  packet_type PING
+:056:  |  |  |  source 127.1
+:057:  |  accept
+:057:  |  |  condition
+:057:  |  |  |  packet_type PING
+:057:  |  |  |  dest 192.0
+:058:  |  accept
+:058:  |  |  condition
+:058:  |  |  |  packet_type PING
+:058:  |  |  |  source 127.1
+:058:  |  |  |  dest 192.0
+:059:  |  accept
+:059:  |  |  condition
+:059:  |  |  |  source 127.1
+:060:  |  accept
+:060:  |  |  condition
+:060:  |  |  |  dest 192.0
+:061:  |  accept
+:061:  |  |  condition
+:061:  |  |  |  source 127.1
+:061:  |  |  |  dest 192.0
+:062:  |  accept
+:062:  |  |  priority 99
+:063:  |  accept
+:063:  |  |  priority 99
+:063:  |  |  condition
+:063:  |  |  |  packet_type PING
+:064:  |  accept
+:064:  |  |  priority 99
+:064:  |  |  condition
+:064:  |  |  |  packet_type PING
+:064:  |  |  |  source 127.1
+:065:  |  accept
+:065:  |  |  priority 99
+:065:  |  |  condition
+:065:  |  |  |  packet_type PING
+:065:  |  |  |  dest 192.0
+:066:  |  accept
+:066:  |  |  priority 99
+:066:  |  |  condition
+:066:  |  |  |  packet_type PING
+:066:  |  |  |  source 127.1
+:066:  |  |  |  dest 192.0
+:067:  |  accept
+:067:  |  |  priority 99
+:067:  |  |  condition
+:067:  |  |  |  source 127.1
+:068:  |  accept
+:068:  |  |  priority 99
+:068:  |  |  condition
+:068:  |  |  |  dest 192.0
+:069:  |  accept
+:069:  |  |  priority 99
+:069:  |  |  condition
+:069:  |  |  |  source 127.1
+:069:  |  |  |  dest 192.0
+:074:  chain some_chain20
+:076:  |  reject
+:077:  |  reject
+:077:  |  |  condition
+:077:  |  |  |  packet_type PING
+:078:  |  reject
+:078:  |  |  condition
+:078:  |  |  |  packet_type PING
+:078:  |  |  |  source 127.1
+:079:  |  reject
+:079:  |  |  condition
+:079:  |  |  |  packet_type PING
+:079:  |  |  |  dest 192.0
+:080:  |  reject
+:080:  |  |  condition
+:080:  |  |  |  packet_type PING
+:080:  |  |  |  source 127.1
+:080:  |  |  |  dest 192.0
+:081:  |  reject
+:081:  |  |  condition
+:081:  |  |  |  source 127.1
+:082:  |  reject
+:082:  |  |  condition
+:082:  |  |  |  dest 192.0
+:083:  |  reject
+:083:  |  |  condition
+:083:  |  |  |  source 127.1
+:083:  |  |  |  dest 192.0
+:084:  |  reject
+:084:  |  |  priority 99
+:085:  |  reject
+:085:  |  |  priority 99
+:085:  |  |  condition
+:085:  |  |  |  packet_type PING
+:086:  |  reject
+:086:  |  |  priority 99
+:086:  |  |  condition
+:086:  |  |  |  packet_type PING
+:086:  |  |  |  source 127.1
+:087:  |  reject
+:087:  |  |  priority 99
+:087:  |  |  condition
+:087:  |  |  |  packet_type PING
+:087:  |  |  |  dest 192.0
+:088:  |  reject
+:088:  |  |  priority 99
+:088:  |  |  condition
+:088:  |  |  |  packet_type PING
+:088:  |  |  |  source 127.1
+:088:  |  |  |  dest 192.0
+:089:  |  reject
+:089:  |  |  priority 99
+:089:  |  |  condition
+:089:  |  |  |  source 127.1
+:090:  |  reject
+:090:  |  |  priority 99
+:090:  |  |  condition
+:090:  |  |  |  dest 192.0
+:091:  |  reject
+:091:  |  |  priority 99
+:091:  |  |  condition
+:091:  |  |  |  source 127.1
+:091:  |  |  |  dest 192.0
+:096:  chain some_chain30
+:098:  |  goto some_chain20
+:099:  |  goto some_chain20
+:099:  |  |  condition
+:099:  |  |  |  packet_type PING
+:100:  |  goto some_chain20
+:100:  |  |  condition
+:100:  |  |  |  packet_type PING
+:100:  |  |  |  source 127.1
+:101:  |  goto some_chain20
+:101:  |  |  condition
+:101:  |  |  |  packet_type PING
+:101:  |  |  |  dest 192.0
+:102:  |  goto some_chain20
+:102:  |  |  condition
+:102:  |  |  |  packet_type PING
+:102:  |  |  |  source 127.1
+:102:  |  |  |  dest 192.0
+:103:  |  goto some_chain20
+:103:  |  |  condition
+:103:  |  |  |  source 127.1
+:104:  |  goto some_chain20
+:104:  |  |  condition
+:104:  |  |  |  dest 192.0
+:105:  |  goto some_chain20
+:105:  |  |  condition
+:105:  |  |  |  source 127.1
+:105:  |  |  |  dest 192.0
+:106:  |  goto some_chain20
+:106:  |  |  priority 99
+:107:  |  goto some_chain20
+:107:  |  |  priority 99
+:107:  |  |  condition
+:107:  |  |  |  packet_type PING
+:108:  |  goto some_chain20
+:108:  |  |  priority 99
+:108:  |  |  condition
+:108:  |  |  |  packet_type PING
+:108:  |  |  |  source 127.1
+:109:  |  goto some_chain20
+:109:  |  |  priority 99
+:109:  |  |  condition
+:109:  |  |  |  packet_type PING
+:109:  |  |  |  dest 192.0
+:110:  |  goto some_chain20
+:110:  |  |  priority 99
+:110:  |  |  condition
+:110:  |  |  |  packet_type PING
+:110:  |  |  |  source 127.1
+:110:  |  |  |  dest 192.0
+:111:  |  goto some_chain20
+:111:  |  |  priority 99
+:111:  |  |  condition
+:111:  |  |  |  source 127.1
+:112:  |  goto some_chain20
+:112:  |  |  priority 99
+:112:  |  |  condition
+:112:  |  |  |  dest 192.0
+:113:  |  goto some_chain20
+:113:  |  |  priority 99
+:113:  |  |  condition
+:113:  |  |  |  source 127.1
+:113:  |  |  |  dest 192.0

@@ -15,25 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef RECURSIONERROR_HPP_
-#define RECURSIONERROR_HPP_
+#include <memory>
+
+#include <catch.hpp>
+#include <fakeit.hpp>
+
+#include "Filesystem.hpp"
 
 
-#include <string>
-#include <exception>
-
-
-/** Exception type emmited by a recursion guard.
- */
-class RecursionError : public std::exception
+TEST_CASE("Filesystem's 'exist' method determines the existence of a file.",
+          "[Filesystem]")
 {
-    public:
-        RecursionError(std::string message);
-        const char *what() const noexcept;
-
-    private:
-        std::string message_;
-};
-
-
-#endif // RECURSIONERROR_HPP_
+    // Note: both compile time and dynamic construction used for complete
+    //       coverage.
+    SECTION("Returns 'true' when the file exists.")
+    {
+        Filesystem filesystem;
+        REQUIRE(filesystem.exists("test/mavtables.conf"));
+    }
+    SECTION("Returns 'false' when the file does not exist.")
+    {
+        auto filesystem = std::make_unique<Filesystem>();
+        REQUIRE_FALSE(
+            filesystem->exists("file_that_does_not_exist.conf"));
+    }
+}

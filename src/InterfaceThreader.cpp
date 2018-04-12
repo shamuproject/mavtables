@@ -14,13 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+#include <iostream>
 #include <chrono>
 #include <memory>
 #include <utility>
+#include <stdexcept>
 
 #include "Interface.hpp"
 #include "InterfaceThreader.hpp"
+#include "PartialSendError.hpp"
 
 
 /** The transmitting thread runner.
@@ -31,7 +33,20 @@ void InterfaceThreader::tx_runner_()
 {
     while (running_.load())
     {
-        interface_->send_packet(timeout_);
+        try
+        {
+            interface_->send_packet(timeout_);
+        }
+        // Ignore partial write errors on shutdown.
+        // TODO: A better way to handle this error might be in order.  Not even
+        //       sure exactly why it happens on close.
+        catch (const PartialSendError&)
+        {
+            if (running_.load())
+            {
+                throw;
+            }
+        }
     }
 }
 

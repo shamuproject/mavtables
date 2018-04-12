@@ -24,6 +24,7 @@
 #include <optional>
 #include <stdexcept>
 #include <system_error>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -35,6 +36,9 @@
 #include "UnixUDPSocket.hpp"
 
 
+using namespace std::chrono_literals;
+
+
 /** Construct a UDP socket.
  *
  *  \param port The port number to listen on.
@@ -42,12 +46,15 @@
  *      ignored).  The default is to listen on any address.
  *  \param syscalls The object to use for Unix system calls.  It is default
  *      constructed to the production implementation.
+ *  \param max_bitrate The maximum number of bits per second to transmit on the
+ *      UDP interface.  The default is 0, which indicates no limit.
  */
 UnixUDPSocket::UnixUDPSocket(
     unsigned int port, std::optional<IPAddress> address,
-    std::unique_ptr<UnixSyscalls> syscalls)
-    : port_(port), address_(std::move(address)),
-      syscalls_(std::move(syscalls)), socket_(-1)
+    unsigned long max_bitrate, std::unique_ptr<UnixSyscalls> syscalls)
+    : port_(port), address_(std::move(address)), max_bitrate_(max_bitrate),
+      syscalls_(std::move(syscalls)), socket_(-1), 
+      next_time_(std::chrono::steady_clock::now())
 {
     create_socket_();
 }
@@ -70,6 +77,17 @@ UnixUDPSocket::~UnixUDPSocket()
 void UnixUDPSocket::send(
     const std::vector<uint8_t> &data, const IPAddress &address)
 {
+    if (max_bitrate_ != 0)
+    {
+        // Implement rate limit.
+        auto now = std::chrono::steady_clock::now();
+        if (now < next_time_)
+        {
+            std::this_thread::sleep_for(next_time_ - now);
+        }
+        next_time_ = now + (1000*1000*data.size()*8)/max_bitrate_ * 1us;
+    }
+
     // Destination address structure.
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -77,6 +95,7 @@ void UnixUDPSocket::send(
     addr.sin_addr.s_addr =
         htonl(static_cast<uint32_t>(address.address()));
     std::memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
+
     // Send the packet.
     auto err = syscalls_->sendto(
                    socket_, data.data(), data.size(), 0,
@@ -221,6 +240,10 @@ std::ostream &UnixUDPSocket::print_(std::ostream &os) const
     if (address_.has_value())
     {
         os << "    address " << address_.value() << ";" << std::endl;
+    }
+    if (max_bitrate_ != 0)
+    {
+        os << "    max_bitrate " << max_bitrate_ << ";" << std::endl;
     }
     os << "}";
     return os;

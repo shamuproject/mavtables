@@ -1,0 +1,25 @@
+:001:  default_action
+:001:  |  accept
+:004:  udp
+:005:  |  port 14500
+:006:  |  address 127.0.0.1
+:007:  |  max_bitrate 8388608
+:011:  serial
+:012:  |  device ./ttyS0
+:013:  |  baudrate 115200
+:014:  |  flow_control yes
+:018:  chain default
+:020:  |  call some_chain10
+:020:  |  |  condition
+:020:  |  |  |  source 127.1
+:020:  |  |  |  dest 192.0
+:021:  |  reject
+:025:  chain some_chain10
+:027:  |  accept
+:027:  |  |  priority 99
+:027:  |  |  condition
+:027:  |  |  |  dest 192.0
+:028:  |  accept
+:028:  |  |  condition
+:028:  |  |  |  packet_type PING
+:029:  |  accept

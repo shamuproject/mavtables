@@ -70,7 +70,10 @@ bool semaphore::wait_for(const std::chrono::duration<Rep, Period> &rel_time)
     {
         return value_ > 0;
     });
-    --value_;
+    if (result)
+    {
+        --value_;
+    }
     return result;
 }
 
@@ -90,7 +93,10 @@ bool semaphore::wait_until(
     {
         return value_ > 0;
     });
-    --value_;
+    if (result)
+    {
+        --value_;
+    }
     return result;
 }
 

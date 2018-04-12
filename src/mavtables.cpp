@@ -44,6 +44,8 @@ int main(int argc, const char *argv[])
             auto config = std::make_unique<ConfigParser>(options.config_file());
             if (options.ast())
             {
+                std::cout << "===== " << options.config_file()
+                    << " =====" << std::endl;
                 std::cout << *config;
             }
             if (options.run())
@@ -55,7 +57,7 @@ int main(int argc, const char *argv[])
     }
     catch (const std::exception &e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << "error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 

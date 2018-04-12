@@ -75,6 +75,10 @@ namespace config
            "expected a valid IP address";
 
     template<>
+    const std::string error<max_bitrate>::error_message =
+           "expected a valid bitrate";
+
+    template<>
     const std::string error<device>::error_message =
            "expected a valid serial port device name";
 
@@ -179,8 +183,7 @@ namespace config
             // Print location.
             if (print_location)
             {
-                os << node.begin().source << ":"
-                   << std::setfill('0') << std::setw(3)
+                os << ":" << std::setfill('0') << std::setw(3)
                    << node.begin().line << ":  ";
             }
 

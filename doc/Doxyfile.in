@@ -794,6 +794,8 @@ WARN_LOGFILE           =
 INPUT                  = "@PROJECT_SOURCE_DIR@/src" \
                          "@PROJECT_SOURCE_DIR@/doc" \
                          "@PROJECT_SOURCE_DIR@/test" \
+                         "@PROJECT_SOURCE_DIR@/test/unit_tests" \
+                         "@PROJECT_SOURCE_DIR@/test/integration_tests" \
                          "@PROJECT_SOURCE_DIR@/LICENSE.md" \
                          "@PROJECT_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@PROJECT_SOURCE_DIR@/README.md" \
@@ -855,6 +857,7 @@ FILE_PATTERNS          = *.c \
                          *.dox \
                          *.py \
                          *.pyw \
+                         *.sh \
                          *.f90 \
                          *.f95 \
                          *.f03 \

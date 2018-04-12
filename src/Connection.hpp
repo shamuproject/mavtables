@@ -63,6 +63,8 @@ class Connection
         void send_to_address_(
             std::shared_ptr<const Packet> packet, const MAVAddress &dest);
         void send_to_all_(std::shared_ptr<const Packet> packet);
+        void send_to_system_(
+            std::shared_ptr<const Packet> packet, unsigned int system);
 };
 
 

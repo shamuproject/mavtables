@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  %If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include <cstddef>
@@ -186,7 +186,7 @@ namespace packet_v1
             }
 
             // Construct MAVLink address.
-            if (dest_system >= 0 && dest_component >= 0)
+            if (dest_system >= 0)
             {
                 return MAVAddress(static_cast<unsigned int>(dest_system),
                                   static_cast<unsigned int>(dest_component));

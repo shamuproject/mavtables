@@ -215,7 +215,7 @@ namespace packet_v2
             }
 
             // Construct MAVLink address.
-            if (dest_system >= 0 && dest_component >= 0)
+            if (dest_system >= 0)
             {
                 return MAVAddress(static_cast<unsigned int>(dest_system),
                                   static_cast<unsigned int>(dest_component));
