@@ -77,7 +77,7 @@ else ()
         CACHE INTERNAL "Copied from environment variable."
     )
 endif ()
-MESSAGE(${MAVLINK_INCLUDE_DIR})
+MESSAGE("Using MAVLink implementation at ${MAVLINK_INCLUDE_DIR}.")
 
 
 # Pull down mavlink if it does not exist.
