@@ -5,7 +5,7 @@ COVERAGE = Off
 
 default: release
 
-install: release
+install:
 	$(MAKE) -C build install
 
 release:
