@@ -373,7 +373,7 @@ run_test "Routing MAVLink v2.0 packets (part 3 - 172.128)" \
     do_nothing routing_172.128.cmp routing_v2_packets_172.128.log
 
 
-run_test "Packet prioritization." \
+run_test "High priority packets are transmitted first" \
     test_priority priority.tmp priority.log
 
 

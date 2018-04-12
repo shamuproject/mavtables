@@ -239,10 +239,10 @@ TEST_CASE("UnixUDPSocket's 'send' method sends data on the socket.",
         auto toc = std::chrono::steady_clock::now();
         REQUIRE(
             std::chrono::duration_cast<std::chrono::milliseconds>(
-                toc - tic).count() >= 200);
+                toc - tic).count() >= 150);
         REQUIRE(
             std::chrono::duration_cast<std::chrono::milliseconds>(
-                toc - tic).count() <= 300);
+                toc - tic).count() <= 350);
         fakeit::Verify(Method(mock_sys, sendto)).Exactly(2);
     }
     SECTION("Emmits errors from 'sendto' system call.")
