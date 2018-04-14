@@ -161,7 +161,7 @@ Options::operator bool() const
  *  1. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
  *  2. `.mavtablesrc` in the current directory.
  *  3. `.mavtablesrc` at `$HOME/.mavtablesrc`.
- *  4. The main configuration file at `/etc/mavtables.conf`.
+ *  4. The main configuration file at `PREFIX/etc/mavtables.conf`.
  *
  *  \param filesystem A filesystem instance.  The default is to construct an
  *      instance.
@@ -197,10 +197,10 @@ std::optional<std::string> find_config(const Filesystem &filesystem)
         }
     }
 
-    // Check for /etc/mavtables.conf.
-    if (filesystem.exists("/etc/mavtables.conf"))
+    // Check for PREFIX/etc/mavtables.conf.
+    if (filesystem.exists(PREFIX "/etc/mavtables.conf"))
     {
-        return "/etc/mavtables.conf";
+        return PREFIX "/etc/mavtables.conf";
     }
 
     return {};

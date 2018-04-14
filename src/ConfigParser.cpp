@@ -378,7 +378,7 @@ std::unique_ptr<UDPInterface> parse_udp(
     std::shared_ptr<Filter> filter,
     std::shared_ptr<ConnectionPool> pool)
 {
-    unsigned int port = 14444;
+    unsigned int port = 14500;
     std::optional<IPAddress> address;
     unsigned long max_bitrate = 0;
 

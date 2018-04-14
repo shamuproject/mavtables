@@ -87,26 +87,26 @@ TEST_CASE("'find_config' returns the path to the highest priority "
         REQUIRE(paths[1] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[2] == Filesystem::path(home_path));
     }
-    SECTION("First found is /etc/mavtables.conf.")
+    SECTION("First found is PREFIX/etc/mavtables.conf.")
     {
         Filesystem::path home_path(std::getenv("HOME"));
         home_path /= Filesystem::path(".mavtablesrc");
         fakeit::When(Method(fs_mock, exists)).AlwaysDo([&](auto p)
         {
             paths.push_back(p);
-            return p == "/etc/mavtables.conf";
+            return p == (PREFIX "/etc/mavtables.conf");
         });
         setenv("MAVTABLES_CONFIG_PATH", "mtbls.conf", true);
         auto config_file = find_config(fs_mock.get());
         REQUIRE(config_file.has_value());
-        REQUIRE(config_file.value() == "/etc/mavtables.conf");
+        REQUIRE(config_file.value() == (PREFIX "/etc/mavtables.conf"));
         unsetenv("MAVTABLES_CONFIG_PATH");
         fakeit::Verify(Method(fs_mock, exists)).Exactly(4);
         REQUIRE(paths.size() == 4);
         REQUIRE(paths[0] == Filesystem::path("mtbls.conf"));
         REQUIRE(paths[1] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[2] == Filesystem::path(home_path));
-        REQUIRE(paths[3] == Filesystem::path("/etc/mavtables.conf"));
+        REQUIRE(paths[3] == Filesystem::path(PREFIX "/etc/mavtables.conf"));
     }
     SECTION("Failed to find any configuration file.")
     {
@@ -126,7 +126,7 @@ TEST_CASE("'find_config' returns the path to the highest priority "
         REQUIRE(paths[0] == Filesystem::path("mtbls.conf"));
         REQUIRE(paths[1] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[2] == Filesystem::path(home_path));
-        REQUIRE(paths[3] == Filesystem::path("/etc/mavtables.conf"));
+        REQUIRE(paths[3] == Filesystem::path(PREFIX "/etc/mavtables.conf"));
     }
 }
 
@@ -331,7 +331,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(paths[1] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[2] == Filesystem::path(home_path));
     }
-    SECTION("First found is /etc/mavtables.conf.")
+    SECTION("First found is PREFIX/etc/mavtables.conf.")
     {
         // Setup mocks.
         Filesystem::path home_path(std::getenv("HOME"));
@@ -339,7 +339,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         fakeit::When(Method(fs_mock, exists)).AlwaysDo([&](auto p)
         {
             paths.push_back(p);
-            return p == "/etc/mavtables.conf";
+            return p == (PREFIX "/etc/mavtables.conf");
         });
         setenv("MAVTABLES_CONFIG_PATH", "mtbls.conf", true);
         // Construct Options object.
@@ -349,7 +349,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         Options options(argc, argv, ss, fs_mock.get());
         unsetenv("MAVTABLES_CONFIG_PATH");
         // Verify Options object.
-        REQUIRE(options.config_file() == "/etc/mavtables.conf");
+        REQUIRE(options.config_file() == (PREFIX "/etc/mavtables.conf"));
         REQUIRE(options);
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
@@ -361,7 +361,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(paths[0] == Filesystem::path("mtbls.conf"));
         REQUIRE(paths[1] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[2] == Filesystem::path(home_path));
-        REQUIRE(paths[3] == Filesystem::path("/etc/mavtables.conf"));
+        REQUIRE(paths[3] == Filesystem::path(PREFIX "/etc/mavtables.conf"));
     }
     SECTION("Failed to find any configuration file.")
     {
@@ -391,11 +391,11 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE(paths[0] == Filesystem::path("mtbls.conf"));
         REQUIRE(paths[1] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[2] == Filesystem::path(home_path));
-        REQUIRE(paths[3] == Filesystem::path("/etc/mavtables.conf"));
+        REQUIRE(paths[3] == Filesystem::path(PREFIX "/etc/mavtables.conf"));
         REQUIRE(paths[4] == Filesystem::path("mtbls.conf"));
         REQUIRE(paths[5] == Filesystem::path(".mavtablesrc"));
         REQUIRE(paths[6] == Filesystem::path(home_path));
-        REQUIRE(paths[7] == Filesystem::path("/etc/mavtables.conf"));
+        REQUIRE(paths[7] == Filesystem::path(PREFIX "/etc/mavtables.conf"));
     }
 }
 

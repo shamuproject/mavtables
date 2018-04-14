@@ -4,7 +4,14 @@ cmake_minimum_required (VERSION 3.8.2) # required for C++17
 project (mavtables)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
-set (VERSION_PATCH 4)
+set (VERSION_PATCH 5)
+
+# set prefix
+set (PREFIX "${CMAKE_INSTALL_PREFIX}")
+configure_file (
+    "${PROJECT_SOURCE_DIR}/mavtables.service.in"
+    "${PROJECT_BINARY_DIR}/mavtables.service"
+)
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
@@ -32,7 +39,9 @@ endif ()
 # packages
 add_subdirectory (cmake)
 find_package (Threads)
-find_package (codecov)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_package (codecov)
+endif ()
 find_package (Boost 1.54 REQUIRED COMPONENTS filesystem program_options)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
@@ -46,7 +55,17 @@ target_link_libraries (mavtables
     PEGTL
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT})
-install (TARGETS mavtables DESTINATION bin)
+install (TARGETS mavtables DESTINATION bin CONFIGURATIONS Release)
+install (
+    FILES "${CMAKE_SOURCE_DIR}/examples/mavtables.conf"
+    DESTINATION etc
+    CONFIGURATIONS Release
+)
+install (
+    FILES "${CMAKE_BINARY_DIR}/mavtables.service"
+    DESTINATION lib/systemd/system
+    CONFIGURATIONS Release
+)
 
 # unit_tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -68,8 +87,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory (test/unit_tests)
 endif ()
 add_subdirectory (doc)
-add_coverage (mavtables)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_coverage (mavtables)
     add_coverage (unit_tests)
+    coverage_evaluate ()
 endif ()
-coverage_evaluate ()
