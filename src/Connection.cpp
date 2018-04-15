@@ -66,7 +66,7 @@ void Connection::send_to_address_(
  *
  *  \note This disregards the destination address of the packet.
  *
- *  \param packet The packet to send.
+ *  \param packet The packet to send.  Cannot be nullptr.
  */
 void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
 {
@@ -76,17 +76,14 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     // Loop over addresses.
     for (const auto &dest : pool_->addresses())
     {
-        if (packet->source() != dest)
-        {
-            // Filter packet/address combination.
-            auto [accept_, priority_] = filter_->will_accept(*packet, dest);
+        // Filter packet/address combination.
+        auto [accept_, priority_] = filter_->will_accept(*packet, dest);
 
-            // Update accept/priority.
-            if (accept_)
-            {
-                accept = accept_;
-                priority = std::max(priority, priority_);
-            }
+        // Update accept/priority.
+        if (accept_)
+        {
+            accept = accept_;
+            priority = std::max(priority, priority_);
         }
     }
 
@@ -234,6 +231,12 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     if (packet == nullptr)
     {
         throw std::invalid_argument("Given packet pointer is null.");
+    }
+
+    // Drop packet if the source is reachable on this connection.
+    if (pool_->contains(packet->source()))
+    {
+        return;
     }
 
     auto dest = packet->dest();

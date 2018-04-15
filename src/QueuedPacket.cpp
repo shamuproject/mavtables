@@ -93,9 +93,6 @@ bool operator!=(const QueuedPacket &lhs, const QueuedPacket &rhs)
 }
 
 
-#include <iostream>
-
-
 /** Less than comparison.
  *
  *  The priority is considered first, followed by the ticket number in reverse
