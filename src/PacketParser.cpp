@@ -15,9 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
+#include "InvalidPacketIDError.hpp"
 #include "mavlink.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
@@ -179,17 +182,25 @@ std::unique_ptr<Packet> PacketParser::waiting_for_packet_(uint8_t byte)
     {
         std::unique_ptr<Packet> packet;
 
-        switch (version_)
+        try
         {
-            case packet_v1::VERSION:
-                packet = std::make_unique<packet_v1::Packet>(
-                             std::move(buffer_));
-                break;
+            switch (version_)
+            {
+                case packet_v1::VERSION:
+                    packet = std::make_unique<packet_v1::Packet>(
+                                 std::move(buffer_));
+                    break;
 
-            case packet_v2::VERSION:
-                packet = std::make_unique<packet_v2::Packet>(
-                             std::move(buffer_));
-                break;
+                case packet_v2::VERSION:
+                    packet = std::make_unique<packet_v2::Packet>(
+                                 std::move(buffer_));
+                    break;
+            }
+        }
+        catch (const InvalidPacketIDError &err)
+        {
+            packet = nullptr;
+            std::cerr << err.what() << std::endl;
         }
 
         clear();

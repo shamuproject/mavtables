@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,19 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// build time configuration options (set by CMake)
-#define NAME "@PROJECT_NAME@"
-#define VERSION_MAJOR @VERSION_MAJOR@
-#define VERSION_MINOR @VERSION_MINOR@
-#define VERSION_PATCH @VERSION_PATCH@
-#cmakedefine MAVLINK_DIALECT "@MAVLINK_DIALECT@"
-#cmakedefine PREFIX "@PREFIX@"
-#ifndef PREFIX
-#define PREFIX
-#endif
-#cmakedefine UNIX
-#cmakedefine WIN32
-#cmakedefine TEST_VIRTUAL @TEST_VIRTUAL@
-#ifndef TEST_VIRTUAL
-#define TEST_VIRTUAL
-#endif
+#include <string>
+
+#include "config.hpp"
+#include "InvalidPacketIDError.hpp"
+
+
+/** Construct a InvalidPacketIDError given a packet ID.
+ *
+ *  \param id The packet ID.
+ */
+InvalidPacketIDError::InvalidPacketIDError(unsigned long id)
+{
+    message_ = "Packet ID (#" + std::to_string(id) +
+        ") is not part of the '" MAVLINK_DIALECT "' MAVLink dialect.";
+}
+
+
+/** Return error message string.
+ *
+ *  \return Error message string.
+ */
+const char *InvalidPacketIDError::what() const noexcept
+{
+    return message_.c_str();
+}

@@ -15,7 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <iostream>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <utility>
 
 #include "fakeit.hpp"
@@ -45,3 +48,36 @@ std::unique_ptr<T> mock_unique(fakeit::Mock<T> &mock){
     std::unique_ptr<T> ptr(&mock.get());
     return std::move(ptr);
 }
+
+
+/** RAII class to replace std::cerr with a mocked buffer.
+ */
+class MockCErr
+{
+    public:
+        /** Replace std::cerr with this mock.
+         */
+        MockCErr()
+            : sbuf_(std::cerr.rdbuf())
+        {
+            std::cerr.rdbuf(buffer_.rdbuf());
+        }
+        /** Restore std::cerr.
+         */
+        ~MockCErr()
+        {
+            std::cerr.rdbuf(sbuf_);
+        }
+        /** Return the contents of the mocked std::cerr buffer as a string.
+         *
+         *  \returns The contents of the mocked buffer.
+         */
+        std::string buffer()
+        {
+            return buffer_.str();
+        }
+
+    private:
+        std::stringstream buffer_;
+        std::streambuf *sbuf_;
+};

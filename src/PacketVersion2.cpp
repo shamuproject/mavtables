@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include "InvalidPacketIDError.hpp"
 #include "mavlink.hpp"
 #include "PacketVersion2.hpp"
 
@@ -78,9 +79,7 @@ namespace packet_v2
         if (mavlink_get_message_info_by_id(header(packet_data)->msgid) ==
                 nullptr)
         {
-            throw std::runtime_error(
-                "Invalid packet ID (#" +
-                std::to_string(header(packet_data)->msgid) + ").");
+            throw InvalidPacketIDError(header(packet_data)->msgid);
         }
 
         // Ensure a complete packet was given.
@@ -143,9 +142,7 @@ namespace packet_v2
         // ID was checked in the constructor.  It is here just in case the
         // MAVLink C library has an error in it.
         // LCOV_EXCL_START
-        throw std::runtime_error(
-            "Invalid packet ID (#" +
-            std::to_string(header(data())->msgid) + ").");
+        throw InvalidPacketIDError(header(data())->msgid);
         // LCOV_EXCL_STOP
     }
 
@@ -229,9 +226,7 @@ namespace packet_v2
         // ID was checked in the constructor.  It is here just in case the
         // MAVLink C library has an error in it.
         // LCOV_EXCL_START
-        throw std::runtime_error(
-            "Invalid packet ID (#" +
-            std::to_string(header(data())->msgid) + ").");
+        throw InvalidPacketIDError(header(data())->msgid);
         // LCOV_EXCL_STOP
     }
 
