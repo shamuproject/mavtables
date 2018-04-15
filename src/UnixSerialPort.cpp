@@ -186,6 +186,8 @@ void UnixSerialPort::configure_port_(
 
     // Use raw input.
     tty.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO | ECHOE | ISIG));
+    tty.c_iflag &= static_cast<tcflag_t>(~(IGNBRK | BRKINT | PARMRK | ISTRIP));
+    tty.c_iflag &= static_cast<tcflag_t>(~(INLCR | IGNCR | ICRNL));
     // Disable software flow control.
     tty.c_iflag &= static_cast<tcflag_t>(~(IXON | IXOFF | IXANY));
     // Use raw output.
