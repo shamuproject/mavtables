@@ -227,23 +227,24 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
         {
             contains_addresses.insert(a);
-            return true;
+            return a != MAVAddress("192.168");
         });
         conn.send(ping);
         // Get around const reference problem.
         // https://github.com/eranpeer/FakeIt/issues/31#issuecomment-130676043
+        fakeit::Verify(Method(mock_pool, contains)).Exactly(2);
+        REQUIRE(contains_addresses.size() == 2);
+        REQUIRE(contains_addresses.count(MAVAddress("127.1")) == 1);
+        REQUIRE(contains_addresses.count(MAVAddress("192.168")) == 1);
         REQUIRE(will_accept_packets.size() == 1);
         REQUIRE(will_accept_packets.count(*ping) == 1);
         REQUIRE(will_accept_addresses.size() == 1);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
-        REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
         {
             return a != nullptr && *a == *ping && b == 2;
         })).Once();
-        fakeit::Verify(Method(mock_pool, contains)).Once();
     }
     SECTION("Silently drops the packet if the filter rejects it.")
     {
@@ -259,20 +260,21 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
         {
             contains_addresses.insert(a);
-            return true;
+            return a != MAVAddress("192.168");
         });
         conn.send(ping);
         // Get around const reference problem.
         // https://github.com/eranpeer/FakeIt/issues/31#issuecomment-130676043
+        fakeit::Verify(Method(mock_pool, contains)).Exactly(2);
+        REQUIRE(contains_addresses.size() == 2);
+        REQUIRE(contains_addresses.count(MAVAddress("127.1")) == 1);
+        REQUIRE(contains_addresses.count(MAVAddress("192.168")) == 1);
         REQUIRE(will_accept_packets.size() == 1);
         REQUIRE(will_accept_packets.count(*ping) == 1);
         REQUIRE(will_accept_addresses.size() == 1);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
-        REQUIRE(contains_addresses.size() == 1);
-        REQUIRE(contains_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(mock_filter, will_accept)).Once();
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
-        fakeit::Verify(Method(mock_pool, contains)).Once();
     }
     SECTION("Silently drops the packet if the destination cannot be "
             "reached on this connection.")
@@ -285,11 +287,12 @@ TEST_CASE("Connection's 'send' method (with destination address).",
             return false;
         });
         conn.send(ping);
-        REQUIRE(contains_addresses.size() == 1);
+        fakeit::Verify(Method(mock_pool, contains)).Exactly(2);
+        REQUIRE(contains_addresses.size() == 2);
+        REQUIRE(contains_addresses.count(MAVAddress("192.168")) == 1);
         REQUIRE(contains_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(mock_filter, will_accept)).Exactly(0);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
-        fakeit::Verify(Method(mock_pool, contains)).Once();
     }
 }
 
@@ -311,6 +314,22 @@ TEST_CASE("Connection's 'send' method (without destination address).",
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
+    fakeit::When(Method(mock_pool, contains)).AlwaysDo([](MAVAddress addr)
+    {
+        if (addr == MAVAddress("10.10"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("172.16"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("192.168"))
+        {
+            return true;
+        }
+        return false;
+    });
     fakeit::Mock<PacketQueue> mock_queue;
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
@@ -472,6 +491,22 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
+    fakeit::When(Method(mock_pool, contains)).AlwaysDo([](MAVAddress addr)
+    {
+        if (addr == MAVAddress("10.10"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("172.16"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("192.168"))
+        {
+            return true;
+        }
+        return false;
+    });
     fakeit::Mock<PacketQueue> mock_queue;
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
@@ -633,6 +668,26 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
+    fakeit::When(Method(mock_pool, contains)).AlwaysDo([](MAVAddress addr)
+    {
+        if (addr == MAVAddress("10.10"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("123.16"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("123.17"))
+        {
+            return true;
+        }
+        if (addr == MAVAddress("123.168"))
+        {
+            return true;
+        }
+        return false;
+    });
     fakeit::Mock<PacketQueue> mock_queue;
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
