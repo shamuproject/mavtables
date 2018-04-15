@@ -22,6 +22,8 @@
 
 #include <catch.hpp>
 
+#include "config.hpp"
+#include "InvalidPacketIDError.hpp"
 #include "MAVAddress.hpp"
 #include "mavlink.hpp"
 #include "PacketVersion2.hpp"
@@ -394,14 +396,18 @@ TEST_CASE("packet_v2::Packet's can be constructed.", "[packet_v2::Packet]")
     {
         ping.msgid = 255; // ID 255 is not currently valid.
         REQUIRE_THROWS_AS(
-            packet_v2::Packet(to_vector(ping)), std::runtime_error);
+            packet_v2::Packet(to_vector(ping)), InvalidPacketIDError);
         REQUIRE_THROWS_WITH(
-            packet_v2::Packet(to_vector(ping)), "Invalid packet ID (#255).");
+            packet_v2::Packet(to_vector(ping)),
+            "Packet ID (#255) is not part of the '"
+            MAVLINK_DIALECT "' MAVLink dialect.");
         ping.msgid = 5000; // ID 5000 is not currently valid.
         REQUIRE_THROWS_AS(
-            packet_v2::Packet(to_vector(ping)), std::runtime_error);
+            packet_v2::Packet(to_vector(ping)), InvalidPacketIDError);
         REQUIRE_THROWS_WITH(
-            packet_v2::Packet(to_vector(ping)), "Invalid packet ID (#5000).");
+            packet_v2::Packet(to_vector(ping)),
+            "Packet ID (#5000) is not part of the '"
+            MAVLINK_DIALECT "' MAVLink dialect.");
     }
     SECTION("And ensures the packet is the correct length (without signature).")
     {

@@ -16,8 +16,10 @@
 
 
 #include <cstdint>
+// #include <iostream>
 #include <memory>
 #include <optional>
+// #include <sstream>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -25,18 +27,20 @@
 #include <boost/range/irange.hpp>
 #include <catch.hpp>
 
+#include "config.hpp"
 #include "Packet.hpp"
 #include "PacketParser.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
 
+#include "common.hpp"
 #include "common_Packet.hpp"
 
 
 namespace
 {
 
-    // Forward defines of locatl functions.
+    // Forward defines of local functions.
     std::unique_ptr<Packet> test_packet_parser(PacketParser &parser,
             const std::vector<uint8_t> &data, size_t packet_end);
     void add_bytes(std::vector<uint8_t> &data, size_t num_bytes);
@@ -130,6 +134,27 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
                           parser, data,
                           sizeof(PingV2) + packet_v2::SIGNATURE_LENGTH + 3);
         REQUIRE(*packet == packet_v2::Packet(to_vector_with_sig(PingV2())));
+    }
+    SECTION("Prints error and clears buffer if message ID is invalid.")
+    {
+        // std::stringstream buffer;
+        // std::streambuf *sbuf = std::cerr.rdbuf();
+        // std::cerr.rdbuf(buffer.rdbuf());
+        MockCErr mock_cerr;
+        auto data = to_vector(PingV1());
+        data[5] = 255;
+        std::unique_ptr<Packet> packet;
+        for (auto byte : data)
+        {
+            packet = parser.parse_byte(byte);
+        }
+        REQUIRE(packet == nullptr);
+        REQUIRE(
+            mock_cerr.buffer() ==
+            "Packet ID (#255) is not part of the '"
+            MAVLINK_DIALECT "' MAVLink dialect.\n");
+        REQUIRE(parser.bytes_parsed() == 0);
+        // std::cerr.rdbuf(sbuf);
     }
     SECTION("Can parse multiple packets back to back.")
     {

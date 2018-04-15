@@ -1,5 +1,5 @@
 // MAVLink router and firewall.
-// Copyright (C) 2017  Michael R. Shannon <mrshannon.aerospace@gmail.com>
+// Copyright (C) 2018  Michael R. Shannon <mrshannon.aerospace@gmail.com>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,19 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// build time configuration options (set by CMake)
-#define NAME "@PROJECT_NAME@"
-#define VERSION_MAJOR @VERSION_MAJOR@
-#define VERSION_MINOR @VERSION_MINOR@
-#define VERSION_PATCH @VERSION_PATCH@
-#cmakedefine MAVLINK_DIALECT "@MAVLINK_DIALECT@"
-#cmakedefine PREFIX "@PREFIX@"
-#ifndef PREFIX
-#define PREFIX
-#endif
-#cmakedefine UNIX
-#cmakedefine WIN32
-#cmakedefine TEST_VIRTUAL @TEST_VIRTUAL@
-#ifndef TEST_VIRTUAL
-#define TEST_VIRTUAL
-#endif
+#ifndef INVALIDPACKETIDERROR_HPP_
+#define INVALIDPACKETIDERROR_HPP_
+
+
+#include <string>
+#include <exception>
+
+
+/** Exception type emmited when parsing a packet with an invalid ID.
+ */
+class InvalidPacketIDError : public std::exception
+{
+    public:
+        InvalidPacketIDError(unsigned long id);
+        const char *what() const noexcept;
+
+    private:
+        std::string message_;
+};
+
+
+#endif // INVALIDPACKETIDERROR_HPP_
