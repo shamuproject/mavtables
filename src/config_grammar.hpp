@@ -126,6 +126,14 @@ namespace config
     // Signed integer value.
     struct signed_integer : seq<opt<one<'+', '-'>>, integer> {};
 
+    // MAVLink addresses and masks.
+    struct mavaddr : seq<integer, one<'.'>, integer> {};
+    struct full_mask : if_must<one<':'>, mavaddr> {};
+    struct forward_mask : if_must<one<'/'>, integer> {};
+    struct backward_mask : if_must<one<'\\'>, integer> {};
+    struct mavmask
+        : seq<mavaddr, opt<sor<full_mask, forward_mask, backward_mask>>> {};
+
     // Port number.
     struct port : integer {};
     template<> struct store<port> : yes<port> {};
@@ -149,6 +157,10 @@ namespace config
     // Serial port flow control.
     struct flow_control : yesno {};
     template<> struct store<flow_control> : yes<flow_control> {};
+
+    // Serial port address preload.
+    struct preload : mavaddr {};
+    template<> struct store<preload> : yes<preload> {};
 
     // Chain name.
     struct chain_name : identifier {};
@@ -175,14 +187,6 @@ namespace config
         : replace_with_first_child<goto_container> {};
     // generic action
     struct action : sor<accept, reject, call_container, goto_container> {};
-
-    // MAVLink addresses and masks.
-    struct mavaddr : seq<integer, one<'.'>, integer> {};
-    struct full_mask : if_must<one<':'>, mavaddr> {};
-    struct forward_mask : if_must<one<'/'>, integer> {};
-    struct backward_mask : if_must<one<'\\'>, integer> {};
-    struct mavmask
-        : seq<mavaddr, opt<sor<full_mask, forward_mask, backward_mask>>> {};
 
     // Conditional.
     struct packet_type : plus<sor<upper, digit, one<'_'>>> {};
@@ -264,9 +268,10 @@ namespace config
     struct s_baudrate : a1_statement<TAO_PEGTL_STRING("baudrate"), baudrate> {};
     struct s_flow_control
     : a1_statement<TAO_PEGTL_STRING("flow_control"), flow_control> {};
+    struct s_preload : a1_statement<TAO_PEGTL_STRING("preload"), preload> {};
     struct serial
     : t_block<TAO_PEGTL_STRING("serial"),
-      s_device, s_baudrate, s_flow_control, s_catch> {};
+      s_device, s_baudrate, s_flow_control, s_preload, s_catch> {};
     template<> struct store<serial> : yes_without_content<serial> {};
 
     // Combine grammar.
@@ -316,6 +321,9 @@ namespace config
 
     template<>
     const std::string error<flow_control>::error_message;
+
+    template<>
+    const std::string error<preload>::error_message;
 
     template<>
     const std::string error<chain_name>::error_message;

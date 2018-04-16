@@ -231,7 +231,6 @@ If parse_condition(const config::parse_tree::node &root)
     return condition;
 }
 
-#include <iostream>
 
 /** Parse filter from AST.
  *
@@ -325,6 +324,7 @@ std::unique_ptr<SerialInterface> parse_serial(
     std::optional<std::string> device;
     unsigned long baud_rate = 9600;
     SerialPort::Feature features = SerialPort::DEFAULT;
+    std::vector<MAVAddress> preload;
 
     // Extract settings from AST.
     for (auto &node : root.children)
@@ -347,6 +347,11 @@ std::unique_ptr<SerialInterface> parse_serial(
                 features = SerialPort::FLOW_CONTROL;
             }
         }
+        // Extract preloaded address.
+        else if (node->name() == "config::preload")
+        {
+            preload.push_back(MAVAddress(node->content()));
+        }
     }
 
     // Throw error if no device was given.
@@ -359,6 +364,10 @@ std::unique_ptr<SerialInterface> parse_serial(
     auto port = std::make_unique<UnixSerialPort>(
         device.value(), baud_rate, features);
     auto connection = std::make_unique<Connection>(filter, false);
+    for (const auto &addr : preload)
+    {
+        connection->add_address(addr);
+    }
     return std::make_unique<SerialInterface>(
         std::move(port), pool, std::move(connection));
 }

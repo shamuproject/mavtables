@@ -789,8 +789,8 @@ TEST_CASE("OLD TEST: UDPInterface's 'receive_packet' method receives one or "
           "more MAVLink packets.", "[UPDInterface]")
 {
     using receive_type = IPAddress(
-                             std::back_insert_iterator<std::vector<uint8_t>>,
-                             const std::chrono::nanoseconds &);
+        std::back_insert_iterator<std::vector<uint8_t>>,
+        const std::chrono::nanoseconds &);
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;

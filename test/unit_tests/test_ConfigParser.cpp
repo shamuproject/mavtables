@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <memory>
+
 #include <catch.hpp>
 #include <fakeit.hpp>
 #include <pegtl.hpp>
@@ -842,6 +844,51 @@ TEST_CASE("'parse_serial' parses a serial interface from a serial interface "
             parse_serial(*root->children[0], filter, connection_pool),
             "missing device string");
     }
+    SECTION("With flow control.")
+    {
+        auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+        auto set_mode = std::make_shared<packet_v2::Packet>(
+                to_vector(SetModeV2()));
+        auto param_ext_request_list =
+            std::make_shared<packet_v2::Packet>(
+                    to_vector(ParamExtRequestListV2()));
+        fakeit::Mock<ConnectionPool> mock_pool;
+        std::shared_ptr<Connection> connection;
+        fakeit::When(Method(mock_pool, add)).AlwaysDo([&](auto conn)
+        {
+            connection = conn.lock();
+        });
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    device ./ttyS0;\n"
+            "    preload 127.1;\n"
+            "    preload 32.64;\n"
+            "}\n", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE_FALSE(root->children.empty());
+        REQUIRE(root->children[0] != nullptr);
+        auto filter = std::make_shared<Filter>(Chain("default"), true);
+        auto connection_pool = mock_shared(mock_pool);
+        auto serial_port =
+            parse_serial(*root->children[0], filter, connection_pool);
+        REQUIRE(serial_port != nullptr);
+        fakeit::Verify(Method(mock_pool, add)).Exactly(1);
+        connection->send(ping);
+        connection->send(set_mode);
+        connection->send(param_ext_request_list);
+        // ping packet
+        auto packet = connection->next_packet();
+        REQUIRE(packet != nullptr);
+        REQUIRE(*packet == *ping);
+        // set_mode packet
+        packet = connection->next_packet();
+        REQUIRE(packet != nullptr);
+        REQUIRE(*packet == *param_ext_request_list);
+        // no more packets
+        packet = connection->next_packet();
+        REQUIRE(packet == nullptr);
+    }
 }
 
 
@@ -1055,21 +1102,23 @@ TEST_CASE("ConfigParser are printable.", "[ConfigParser]")
         ":012:  |  device ./ttyS0\n"
         ":013:  |  baudrate 115200\n"
         ":014:  |  flow_control yes\n"
-        ":018:  chain default\n"
-        ":020:  |  call some_chain10\n"
-        ":020:  |  |  condition\n"
-        ":020:  |  |  |  source 127.1\n"
-        ":020:  |  |  |  dest 192.0\n"
-        ":021:  |  reject\n"
-        ":025:  chain some_chain10\n"
-        ":027:  |  accept\n"
-        ":027:  |  |  priority 99\n"
-        ":027:  |  |  condition\n"
-        ":027:  |  |  |  dest 192.0\n"
-        ":028:  |  accept\n"
-        ":028:  |  |  condition\n"
-        ":028:  |  |  |  packet_type PING\n"
-        ":029:  |  accept\n");
+        ":015:  |  preload 1.1\n"
+        ":016:  |  preload 62.34\n"
+        ":020:  chain default\n"
+        ":022:  |  call some_chain10\n"
+        ":022:  |  |  condition\n"
+        ":022:  |  |  |  source 127.1\n"
+        ":022:  |  |  |  dest 192.0\n"
+        ":023:  |  reject\n"
+        ":027:  chain some_chain10\n"
+        ":029:  |  accept\n"
+        ":029:  |  |  priority 99\n"
+        ":029:  |  |  condition\n"
+        ":029:  |  |  |  dest 192.0\n"
+        ":030:  |  accept\n"
+        ":030:  |  |  condition\n"
+        ":030:  |  |  |  packet_type PING\n"
+        ":031:  |  accept\n");
 }
 
 
