@@ -231,6 +231,20 @@ function test_priority() {
 }
 
 
+function test_preload_addresses() {
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 1
+    "$(dir)/../../build/mavtables" --conf "$(dir)/preload.conf" &
+    "$(dir)/logger.py" 10 10 --noheartbeat --serial ./ttyS1 \
+        > "$(dir)/preload.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 123 123 "$(dir)/routing.pks" \
+        --udp 127.0.0.1:14500
+    sleep 3
+    shutdown_background
+}
+
+
 function test_large_packets() {
     perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
         > "$(dir)/large_packets.tmp"
@@ -375,6 +389,10 @@ run_test "Routing MAVLink v2.0 packets (part 3 - 172.128)" \
 
 run_test "High priority packets are transmitted first" \
     test_priority priority.tmp priority.log
+
+
+run_test "Serial ports can be preloaded with MAVLink addresses" \
+    test_preload_addresses preload.cmp preload.log
 
 
 run_test "Many large packets with multiple senders to UDP" \

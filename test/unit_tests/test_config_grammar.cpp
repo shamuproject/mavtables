@@ -775,6 +775,85 @@ TEST_CASE("Serial port flow control setting.", "[config]")
 }
 
 
+TEST_CASE("Serial address preload.", "[config]")
+{
+    SECTION("Parses a preload address.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    preload 62.34;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  preload 62.34\n");
+    }
+    SECTION("Parses multiple preload address.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    preload 1.1;\n"
+            "    preload 62.34;\n"
+            "}", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  preload 1.1\n"
+            ":003:  |  preload 62.34\n");
+    }
+    SECTION("Parses a preload address (with comments).")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {# comment\n"
+            "    preload 62.34;# comment\n"
+            "}# comment", "");
+        auto root = config::parse(in);
+        REQUIRE(root != nullptr);
+        REQUIRE(
+            str(*root) ==
+            ":001:  serial\n"
+            ":002:  |  preload 62.34\n");
+    }
+    SECTION("Missing end of statement.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    preload 62.34\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":3:0(27): expected end of statement ';' character");
+    }
+    SECTION("Invalid MAVLink address.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    preload 62:34;\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":2:14(23): expected a valid MAVLink address");
+    }
+    SECTION("Missing MAVLink address.")
+    {
+        tao::pegtl::string_input<> in(
+            "serial {\n"
+            "    preload;\n"
+            "}", "");
+        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+        REQUIRE_THROWS_WITH(
+            config::parse(in),
+            ":2:11(20): expected a valid MAVLink address");
+    }
+}
+
+
 TEST_CASE("Chain block.", "[config]")
 {
     SECTION("Empty chain blocks are allowed (single line).")

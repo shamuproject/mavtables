@@ -90,6 +90,10 @@ namespace config
            "expected 'yes' or 'no'";
 
     template<>
+    const std::string error<preload>::error_message =
+           "expected a valid MAVLink address";
+
+    template<>
     const std::string error<chain_name>::error_message =
            "expected a valid chain name";
 
