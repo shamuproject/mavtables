@@ -24,6 +24,8 @@ def parse_args():
     parser.add_argument(
         '--verbose', '-v', action='store_true', help='enable verbosity')
     parser.add_argument(
+        '--noheartbeat', action='store_true', help='disable heartbeat')
+    parser.add_argument(
         '--udp', action='store', help='UDP address:port to connect to')
     parser.add_argument(
         '--serial', action='store', help='serial port device string')
@@ -61,8 +63,9 @@ def main():
         mav = mavutil.mavlink_connection(args['serial'], baud=57600,
             source_system=args['system'], source_component=args['component'])
     else:
-      sys.exit()
-    start_heartbeats(mav)
+        sys.exit(1)
+    if not args['noheartbeat']:
+        start_heartbeats(mav)
     while True:
         msg = mav.recv_match(blocking=True)
         if (args['verbose']):
