@@ -63,8 +63,8 @@ endif ()
 # Set MAVLink dialect from DIALECT environment variable.
 if ("$ENV{DIALECT}" STREQUAL "")
     set (
-        MAVLINK_DIALECT "common"
-        CACHE INTERNAL "Use default (common) MAVLink dialect."
+        MAVLINK_DIALECT "ardupilotmega"
+        CACHE INTERNAL "Use default (ArduPilot) MAVLink dialect."
     )
 else ()
     set (
