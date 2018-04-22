@@ -68,7 +68,7 @@ function test_all_v1_packets_udp() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -84,7 +84,7 @@ function test_all_v2_packets_udp() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -101,7 +101,7 @@ function test_all_v1_packets_serial() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -118,7 +118,7 @@ function test_all_v2_packets_serial() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -141,7 +141,7 @@ function test_multiple_senders_v1_packets() {
         --udp 127.0.0.1:14500 --mavlink1 &
     "$(dir)/packet_scripter.py" 127 1 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -164,7 +164,7 @@ function test_multiple_senders_v2_packets() {
         --udp 127.0.0.1:14500 &
     "$(dir)/packet_scripter.py" 127 1 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -182,7 +182,7 @@ function test_routing_v1_packets() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -200,7 +200,7 @@ function test_routing_v2_packets() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500
-    sleep 3
+    sleep 5
     shutdown_background
 }
 
@@ -220,7 +220,7 @@ function test_priority() {
     "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 > "$(dir)/priority.log" &
     sleep 0.5
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/priority.tmp" --serial ./ttyS1
-    sleep 2
+    sleep 5
     perl -e 'for$i(1..100){print "ENCAPSULATED_DATA\n"}' \
         > "$(dir)/priority.tmp"
     perl -e 'for$i(1..100){print "GLOBAL_POSITION_INT\n"}' \
@@ -240,7 +240,7 @@ function test_preload_addresses() {
     sleep 0.5
     "$(dir)/packet_scripter.py" 123 123 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500
-    sleep 3
+    sleep 5
     shutdown_background
 }
 

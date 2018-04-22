@@ -110,7 +110,6 @@ std::vector<uint8_t> UnixSerialPort::read(
 void UnixSerialPort::write(const std::vector<uint8_t> &data)
 {
     // Write the data.
-    tcdrain(port_);
     auto err = syscalls_->write(port_, data.data(), data.size());
 
     // Handle system call errors.
