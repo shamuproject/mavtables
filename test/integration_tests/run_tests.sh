@@ -245,6 +245,27 @@ function test_preload_addresses() {
 }
 
 
+function test_component_broadcast_fallback() {
+    perl -e 'for$i(0..255){print "MISSION_REQUEST_LIST to 1.$i\n"}' \
+        > "$(dir)/component_broadcast_fallback.tmp"
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 1
+    "$(dir)/../../build/mavtables" \
+        --conf "$(dir)/component_broadcast_fallback.conf" &
+    "$(dir)/logger.py" 1 1 --verbose --serial ./ttyS1 \
+        > "$(dir)/component_broadcast_fallback.log" &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 \
+        "$(dir)/component_broadcast_fallback.tmp" \
+        --udp 127.0.0.1:14500
+    perl -e \
+        'for$i(128..255){print "MISSION_REQUEST_LIST from 10.10 to 1.$i\n"}' \
+        > "$(dir)/component_broadcast_fallback.tmp"
+    sleep 3
+    shutdown_background
+}
+
+
 function test_large_packets() {
     perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
         > "$(dir)/large_packets.tmp"
@@ -393,6 +414,12 @@ run_test "High priority packets are transmitted first" \
 
 run_test "Serial ports can be preloaded with MAVLink addresses" \
     test_preload_addresses preload.cmp preload.log
+
+
+run_test "Component broadcast fallback and MAVLink subnets" \
+    test_component_broadcast_fallback \
+    component_broadcast_fallback.tmp \
+    component_broadcast_fallback.log
 
 
 run_test "Many large packets with multiple senders to UDP" \

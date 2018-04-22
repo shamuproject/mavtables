@@ -30,6 +30,9 @@
 
 /** Send a packet to a particular address.
  *
+ *  If the particular address cannot be found it will be sent to every component
+ *  of the system it was sent to.
+ *
  *  Packets are ran through the contained \ref Filter before being placed into
  *  the \ref PacketQueue given in the constructor.  Packets are read from the
  *  queue (for sending) by using the \ref next_packet method.
@@ -55,6 +58,25 @@ void Connection::send_to_address_(
             queue_->push(std::move(packet), priority);
         }
     }
+    // If the component is not reachable, send it to all components on the
+    // system.
+    else
+    {
+        // Loop over addresses.
+        for (const auto &addr : pool_->addresses())
+        {
+            // System can be reached on connection.
+            if (addr.system() == dest.system())
+            {
+                auto [accept, priority] = filter_->will_accept(*packet, dest);
+                if (accept)
+                {
+                    queue_->push(std::move(packet), priority);
+                    return;
+                }
+            }
+        }
+    }
 }
 
 
@@ -74,10 +96,10 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     int priority = std::numeric_limits<int>::min();
 
     // Loop over addresses.
-    for (const auto &dest : pool_->addresses())
+    for (const auto &addr : pool_->addresses())
     {
         // Filter packet/address combination.
-        auto [accept_, priority_] = filter_->will_accept(*packet, dest);
+        auto [accept_, priority_] = filter_->will_accept(*packet, addr);
 
         // Update accept/priority.
         if (accept_)
@@ -112,12 +134,12 @@ void Connection::send_to_system_(
     int priority = std::numeric_limits<int>::min();
 
     // Loop over addresses.
-    for (const auto &dest : pool_->addresses())
+    for (const auto &addr : pool_->addresses())
     {
-        if (packet->source() != dest && system == dest.system())
+        if (system == addr.system())
         {
             // Filter packet/address combination.
-            auto [accept_, priority_] = filter_->will_accept(*packet, dest);
+            auto [accept_, priority_] = filter_->will_accept(*packet, addr);
 
             // Update accept/priority.
             if (accept_)

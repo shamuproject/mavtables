@@ -112,7 +112,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  Below is a table relating the slash postfix to the subnet mask in \<System
  *  mask\>.\<Component mask\> notation.
  *
- *  | Mask with `/` | Mask with `\` | Postfix (\#bits) |
+ *  | Mask with `/` | Mask with `\` | Postfix (#bits) |
  *  | -------------:| -------------:| ----------------:|
  *  |       255.255 |  out of range |               16 |
  *  |       255.254 |  out of range |               15 |
