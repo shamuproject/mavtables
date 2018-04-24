@@ -15,44 +15,46 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-
 #include <algorithm>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
 
 #include "AddressPool.hpp"
 #include "Connection.hpp"
 #include "Filter.hpp"
+#include "Logger.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketQueue.hpp"
 
 
-/** Log
+/** Log an accepted/rejected packet.
+ *
+ *  \param accept Set to true if the packet is accepted, false if the packet is
+ *      rejected.
+ *  \param packet That is to be accepted/rejected.
  */
 void Connection::log_(bool accept, const Packet& packet)
 {
-    std::stringstream ss;
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    ss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
-       << (accept ? " ACCEPT " : " REJECT ")
-       << packet;
-    auto connection = packet.connection();
-    if (connection == nullptr)
+    if (Logger::level() == 3)
     {
-        ss << " source unknown";
+        std::stringstream ss;
+        ss << (accept ? "ACCEPT " : "REJECT ")
+           << packet;
+        auto connection = packet.connection();
+        if (connection == nullptr)
+        {
+            ss << " source unknown";
+        }
+        else
+        {
+            ss << " source " << *connection;
+        }
+        ss << " dest " << name_;
+        Logger::log(ss.str());
     }
-    else
-    {
-        ss << " source " << *connection;
-    }
-    ss << " dest " << name_;
-    std::cout << ss.str() << std::endl;
 }
 
 

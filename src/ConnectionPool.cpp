@@ -24,6 +24,7 @@
 #include "Connection.hpp"
 #include "ConnectionPool.hpp"
 #include "Packet.hpp"
+#include "util.hpp"
 
 
 /** Add a connection to the pool.
@@ -58,10 +59,15 @@ void ConnectionPool::remove(const std::weak_ptr<Connection> &connection)
  *  \note Each connection may decide to ignore the packet based on the filter
  *      rules.
  *
- *  \param packet Send a packet to every connection.
+ *  \param packet Packet to send to every connection, must not be nullptr.
  */
 void ConnectionPool::send(std::unique_ptr<const Packet> packet)
 {
+    if (Logger::level() == 2)
+    {
+        Logger::log(str(*packet));
+    }
+
     std::shared_lock<std::shared_mutex> lock(mutex_);
     std::shared_ptr<const Packet> shared = std::move(packet);
 

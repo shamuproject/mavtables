@@ -15,43 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef OPTIONS_HPP_
-#define OPTIONS_HPP_
+#ifndef LOGGER_HPP_
+#define LOGGER_HPP_
 
 
-#include <iostream>
+#include <mutex>
 #include <string>
-#include <ostream>
-#include <optional>
-
-#include "Filesystem.hpp"
 
 
-/** An options class which is used to parse the command line arguments.
- */
-class Options
+class Logger
 {
     public:
-        Options(
-            int argc, const char *argv[], std::ostream &os = std::cout,
-            const Filesystem &filesystem = Filesystem());
-        bool ast();
-        unsigned int loglevel();
-        std::string config_file();
-        bool run();
-        explicit operator bool() const;
+        static void log(std::string message);
+        static void level(unsigned int level);
+        static unsigned int level();
+        Logger(const Logger &logger) = delete;
+        void operator=(const Logger &logger) = delete;
 
     private:
-        bool continue_;
-        unsigned int loglevel_;
-        std::string config_file_;
-        bool print_ast_;
-        bool run_firewall_;
+        Logger() = default;
+        static unsigned int level_;
+        static std::mutex mutex_;
 };
 
 
-std::optional<std::string> find_config(
-    const Filesystem &filesystem = Filesystem());
-
-
-#endif  // OPTIONS_HPP_
+#endif // LOGGER_HPP_

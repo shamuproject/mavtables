@@ -24,13 +24,10 @@
 
 #include "config.hpp"
 #include "config_grammar.hpp"
-#include "util.hpp"
-#include "Options.hpp"
-
 #include "ConfigParser.hpp"
-
-
-namespace po = boost::program_options;
+#include "Logger.hpp"
+#include "Options.hpp"
+#include "util.hpp"
 
 
 int main(int argc, const char *argv[])
@@ -50,6 +47,7 @@ int main(int argc, const char *argv[])
             }
             if (options.run())
             {
+                Logger::level(options.loglevel());
                 auto app = config->make_app();
                 app->run();
             }

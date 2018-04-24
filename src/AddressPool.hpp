@@ -24,8 +24,10 @@
 #include <mutex>
 #include <vector>
 
+#include "Logger.hpp"
 #include "config.hpp"
 #include "MAVAddress.hpp"
+#include "util.hpp"
 
 
 /** A threadsafe container for addresses that expire after a given time.
@@ -77,6 +79,10 @@ template <class TC>
 void AddressPool<TC>::add(MAVAddress address)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    if (Logger::level() == 1 && addresses_.find(address) == addresses_.end())
+    {
+        Logger::log("New component " + str(address));
+    }
     addresses_.insert_or_assign(std::move(address), TC::now());
 }
 

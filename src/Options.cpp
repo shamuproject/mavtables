@@ -39,7 +39,7 @@ namespace po = boost::program_options;
 Options::Options(
     int argc, const char *argv[], std::ostream &os,
     const Filesystem &filesystem)
-    : continue_(true)
+    : continue_(true), loglevel_(0)
 {
     // Command line options.
     po::options_description options(
@@ -48,7 +48,9 @@ Options::Options(
     ("help,h", "print this message")
     ("config", po::value<std::string>(), "specify configuration file")
     ("ast", "print AST of configuration file (do not run)")
-    ("version", "print version and license information");
+    ("version", "print version and license information")
+    ("loglevel", po::value<unsigned int>(),
+     "level of logging, between 0 and 3");
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, options), vm);
     po::notify(vm);
@@ -106,9 +108,25 @@ Options::Options(
         }
     }
 
+    if (vm.count("loglevel"))
+    {
+        loglevel_ = vm["loglevel"].as<unsigned int>();
+    }
+
     // Determine actions.
     print_ast_ = vm.count("ast");
     run_firewall_ = !print_ast_;
+}
+
+
+/** Determine whether to print the configuration file's AST or not.
+ *
+ *  \retval true Print abstract syntax tree of configuration file.
+ *  \retval false Don't print abstract syntax tree of configuration file.
+ */
+bool Options::ast()
+{
+    return print_ast_;
 }
 
 
@@ -122,14 +140,13 @@ std::string Options::config_file()
 }
 
 
-/** Determine whether to print the configuration file's AST or not.
+/** Get the log level.
  *
- *  \retval true Print abstract syntax tree of configuration file.
- *  \retval false Don't print abstract syntax tree of configuration file.
+ *  \returns The level to log at, between 0 and 3.
  */
-bool Options::ast()
+unsigned int Options::loglevel()
 {
-    return print_ast_;
+    return loglevel_;
 }
 
 

@@ -138,7 +138,8 @@ TEST_CASE("Options's class prints the help message.", "[Options]")
         "  -h [ --help ]         print this message\n"
         "  --config arg          specify configuration file\n"
         "  --ast                 print AST of configuration file (do not run)\n"
-        "  --version             print version and license information\n\n";
+        "  --version             print version and license information\n"
+        "  --loglevel arg        level of logging, between 0 and 3\n\n";
     SECTION("When given the '-h' flag.")
     {
         int argc = 2;

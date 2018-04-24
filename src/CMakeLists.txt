@@ -17,6 +17,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/InterfaceThreader.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/InvalidPacketIDError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/IPAddress.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Logger.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/mavlink.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/MAVSubnet.cpp"
