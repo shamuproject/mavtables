@@ -15,6 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
@@ -26,6 +30,30 @@
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketQueue.hpp"
+
+
+/** Log
+ */
+void Connection::log_(bool accept, const Packet& packet)
+{
+    std::stringstream ss;
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    ss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
+       << (accept ? " ACCEPT " : " REJECT ")
+       << packet;
+    auto connection = packet.connection();
+    if (connection == nullptr)
+    {
+        ss << " source unknown";
+    }
+    else
+    {
+        ss << " source " << *connection;
+    }
+    ss << " dest " << name_;
+    std::cout << ss.str() << std::endl;
+}
 
 
 /** Send a packet to a particular address.
@@ -55,7 +83,12 @@ void Connection::send_to_address_(
         // Add packet to the queue.
         if (accept)
         {
+            log_(true, *packet);
             queue_->push(std::move(packet), priority);
+        }
+        else
+        {
+            log_(false, *packet);
         }
     }
     // If the component is not reachable, send it to all components on the
@@ -71,8 +104,13 @@ void Connection::send_to_address_(
                 auto [accept, priority] = filter_->will_accept(*packet, dest);
                 if (accept)
                 {
+                    log_(true, *packet);
                     queue_->push(std::move(packet), priority);
                     return;
+                }
+                else
+                {
+                    log_(false, *packet);
                 }
             }
         }
@@ -112,7 +150,12 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     // Add packet to the queue.
     if (accept)
     {
+        log_(true, *packet);
         queue_->push(std::move(packet), priority);
+    }
+    else
+    {
+        log_(false, *packet);
     }
 }
 
@@ -153,7 +196,12 @@ void Connection::send_to_system_(
     // Add packet to the queue.
     if (accept)
     {
+        log_(true, *packet);
         queue_->push(std::move(packet), priority);
+    }
+    else
+    {
+        log_(false, *packet);
     }
 }
 
@@ -174,10 +222,12 @@ void Connection::send_to_system_(
  *      then the connection will also be threadsafe.
  */
 Connection::Connection(
+    std::string name,
     std::shared_ptr<Filter> filter, bool mirror,
     std::unique_ptr<AddressPool<>> pool,
     std::unique_ptr<PacketQueue> queue)
-    : filter_(std::move(filter)), pool_(std::move(pool)),
+    : name_(std::move(name)),
+      filter_(std::move(filter)), pool_(std::move(pool)),
       queue_(std::move(queue)), mirror_(mirror)
 {
     if (filter_ == nullptr)
@@ -258,6 +308,7 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     // Drop packet if the source is reachable on this connection.
     if (pool_->contains(packet->source()))
     {
+        log_(false, *packet);
         return;
     }
 
@@ -278,4 +329,20 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     {
         send_to_address_(std::move(packet), dest.value());
     }
+}
+
+
+/** TODO Print the MAVLink address to the given output stream.
+ *
+ *  The format is "<System ID>.<Component ID>".
+ *
+ *  Some examples are:
+ *      - `0.0`
+ *      - `16.8`
+ *      - `128.4`
+ */
+std::ostream &operator<<(std::ostream &os, const Connection &connection)
+{
+    os << connection.name_;
+    return os;
 }

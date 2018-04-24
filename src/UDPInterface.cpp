@@ -26,6 +26,7 @@
 #include "IPAddress.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
+#include "util.hpp"
 
 
 using namespace std::chrono_literals;
@@ -48,7 +49,7 @@ void UDPInterface::update_connections_(
     if (it == connections_.end())
     {
         it = connections_.insert(
-        {ip_address, connection_factory_->get()}).first;
+        {ip_address, connection_factory_->get(str(ip_address))}).first;
         connection_pool_->add(it->second);
     }
 
@@ -152,6 +153,9 @@ void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
             if (packet != nullptr)
             {
                 update_connections_(packet->source(), ip_address);
+                // It is a post condition of update_connections_ that there is a
+                // connection for ip_address.
+                packet->connection(connections_[ip_address]);
                 connection_pool_->send(std::move(packet));
             }
         }

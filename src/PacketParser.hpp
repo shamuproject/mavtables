@@ -48,9 +48,9 @@ class PacketParser
          */
         enum State
         {
-            WAITING_FOR_START_BYTE, //!< Waiting for a magic start byte.
-            WAITING_FOR_HEADER,     //!< Waiting for complete header.
-            WAITING_FOR_PACKET      //!< Waitinf for complete packet.
+            WAITING_FOR_START_BYTE,  //!< Waiting for a magic start byte.
+            WAITING_FOR_HEADER,      //!< Waiting for complete header.
+            WAITING_FOR_PACKET       //!< Waitinf for complete packet.
         };
         // Variables
         std::vector<uint8_t> buffer_;

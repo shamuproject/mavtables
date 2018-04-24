@@ -32,6 +32,7 @@
 #include "Packet.hpp"
 #include "PacketVersion2.hpp"
 #include "PacketQueue.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -54,47 +55,51 @@ TEST_CASE("Connection's can be constructed.", "[Connection]")
     auto queue = mock_unique(mock_queue);
     SECTION("With default arguments.")
     {
-        REQUIRE_NOTHROW(Connection(filter));
+        REQUIRE_NOTHROW(Connection("name", filter));
     }
     SECTION("As a regular connection.")
     {
-        REQUIRE_NOTHROW(Connection(
-                            filter, false, std::move(pool), std::move(queue)));
+        REQUIRE_NOTHROW(
+            Connection(
+                "name", filter, false, std::move(pool), std::move(queue)));
     }
     SECTION("As a mirror connection.")
     {
         REQUIRE_NOTHROW(
-            Connection(filter, true, std::move(pool), std::move(queue)));
+            Connection(
+                "name", filter, true, std::move(pool), std::move(queue)));
     }
     SECTION("Ensures the filter pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(nullptr, false, std::move(pool), std::move(queue)),
+            Connection(
+                "name", nullptr, false, std::move(pool), std::move(queue)),
             std::invalid_argument);
         pool = mock_unique(mock_pool);
         queue = mock_unique(mock_queue);
         REQUIRE_THROWS_WITH(
-            Connection(nullptr, false, std::move(pool), std::move(queue)),
+            Connection(
+                "name", nullptr, false, std::move(pool), std::move(queue)),
             "Given filter pointer is null.");
     }
     SECTION("Ensures the pool pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(filter, false, nullptr, std::move(queue)),
+            Connection("name", filter, false, nullptr, std::move(queue)),
             std::invalid_argument);
         queue = mock_unique(mock_queue);
         REQUIRE_THROWS_WITH(
-            Connection(filter, false, nullptr, std::move(queue)),
+            Connection("name", filter, false, nullptr, std::move(queue)),
             "Given pool pointer is null.");
     }
     SECTION("Ensures the queue pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(filter, false, std::move(pool), nullptr),
+            Connection("name", filter, false, std::move(pool), nullptr),
             std::invalid_argument);
         pool = mock_unique(mock_pool);
         REQUIRE_THROWS_WITH(
-            Connection(filter, false, std::move(pool), nullptr),
+            Connection("name", filter, false, std::move(pool), nullptr),
             "Given queue pointer is null.");
     }
 }
@@ -110,7 +115,7 @@ TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     conn.add_address(MAVAddress("192.168"));
     fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
     {
@@ -128,7 +133,7 @@ TEST_CASE("Connection's 'next_packet' method.", "[Connection]")
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Returns the next packet.")
     {
         fakeit::When(
@@ -179,7 +184,7 @@ TEST_CASE("Connection's 'send' method ensures the given packet is not "
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Ensures the given packet is not nullptr.")
     {
         REQUIRE_THROWS_AS(conn.send(nullptr), std::invalid_argument);
@@ -203,7 +208,7 @@ TEST_CASE("Connection's 'send' method (with destination address).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the destination can be "
             "reached on this connection and the filter allows it.")
     {
@@ -309,7 +314,7 @@ TEST_CASE("Connection's 'send' method (without destination address).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
             "(increasing priority).")
@@ -423,7 +428,7 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
             "(increasing priority).")
@@ -540,7 +545,7 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any reachable component address of the given system address and "
             "favors the higher priority (increasing priority).")
@@ -676,7 +681,7 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if any component of the "
             "system is reachable on the connection and the filter allows it "
             "to the original component.")
@@ -716,4 +721,14 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
         conn.send(ping);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
     }
+}
+
+
+TEST_CASE("Connection's are printable", "[Connection]")
+{
+    fakeit::Mock<Filter> mock_filter;
+    auto filter = mock_shared(mock_filter);
+    REQUIRE(str(Connection("some_name", filter)) == "some_name");
+    REQUIRE(str(Connection("/dev/ttyUSB0", filter)) == "/dev/ttyUSB0");
+    REQUIRE(str(Connection("127.0.0.1:14555", filter)) == "127.0.0.1:14555");
 }

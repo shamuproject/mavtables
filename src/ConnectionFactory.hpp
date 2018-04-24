@@ -21,6 +21,7 @@
 
 #include <chrono>
 #include <memory>
+#include <string>
 
 #include "Connection.hpp"
 #include "config.hpp"
@@ -37,7 +38,7 @@ class ConnectionFactory
     public:
         ConnectionFactory(std::shared_ptr<Filter> filter, bool mirror = false);
         TEST_VIRTUAL ~ConnectionFactory() = default;
-        TEST_VIRTUAL std::unique_ptr<C> get();
+        TEST_VIRTUAL std::unique_ptr<C> get(std::string name = "unknown");
         TEST_VIRTUAL bool wait_for_packet(
             const std::chrono::nanoseconds &timeout);
 
@@ -71,12 +72,14 @@ ConnectionFactory<C, AP, PQ>::ConnectionFactory(
  *
  *  This connection will share a common semaphore with all other connections
  *      made by this factory instance.
+ *
+ *  \param name The name of the new connection.
  */
 template <class C, class AP, class PQ>
-std::unique_ptr<C> ConnectionFactory<C, AP, PQ>::get()
+std::unique_ptr<C> ConnectionFactory<C, AP, PQ>::get(std::string name)
 {
     return std::make_unique<C>(
-               filter_, mirror_,
+               name, filter_, mirror_,
                std::make_unique<AP>(),
                std::make_unique<PQ>([this]()
     {

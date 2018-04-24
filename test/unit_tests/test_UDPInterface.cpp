@@ -814,9 +814,9 @@ TEST_CASE("OLD TEST: UDPInterface's 'receive_packet' method receives one or "
         });
         fakeit::Fake(Method(mock_pool, send));
         fakeit::Fake(Method(mock_pool, add));
-        fakeit::When(Method(mock_factory, get)).AlwaysDo([&]()
+        fakeit::When(Method(mock_factory, get)).AlwaysDo([&](auto a)
         {
-            return std::make_unique<Connection>(filter);
+            return std::make_unique<Connection>(a, filter);
         });
         UDPInterface udp(std::move(socket), pool, std::move(factory));
         std::chrono::nanoseconds timeout = 250ms;
