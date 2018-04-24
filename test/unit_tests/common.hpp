@@ -50,6 +50,39 @@ std::unique_ptr<T> mock_unique(fakeit::Mock<T> &mock){
 }
 
 
+/** RAII class to replace std::cout with a mocked buffer.
+ */
+class MockCOut
+{
+    public:
+        /** Replace std::cout with this mock.
+         */
+        MockCOut()
+            : sbuf_(std::cout.rdbuf())
+        {
+            std::cout.rdbuf(buffer_.rdbuf());
+        }
+        /** Restore std::cout.
+         */
+        ~MockCOut()
+        {
+            std::cout.rdbuf(sbuf_);
+        }
+        /** Return the contents of the mocked std::cout buffer as a string.
+         *
+         *  \returns The contents of the mocked buffer.
+         */
+        std::string buffer()
+        {
+            return buffer_.str();
+        }
+
+    private:
+        std::stringstream buffer_;
+        std::streambuf *sbuf_;
+};
+
+
 /** RAII class to replace std::cerr with a mocked buffer.
  */
 class MockCErr

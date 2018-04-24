@@ -38,19 +38,19 @@
  */
 void Connection::log_(bool accept, const Packet& packet)
 {
-    if (Logger::level() == 3)
+    if (Logger::level() >= 3)
     {
         std::stringstream ss;
-        ss << (accept ? "ACCEPT " : "REJECT ")
-           << packet;
+        ss << (accept ? "accepted " : "rejected ")
+           << packet << " source ";
         auto connection = packet.connection();
         if (connection == nullptr)
         {
-            ss << " source unknown";
+            ss << "unknown";
         }
         else
         {
-            ss << " source " << *connection;
+            ss << *connection;
         }
         ss << " dest " << name_;
         Logger::log(ss.str());
@@ -97,12 +97,16 @@ void Connection::send_to_address_(
     // system.
     else
     {
+        bool system_found = false;
+
         // Loop over addresses.
         for (const auto &addr : pool_->addresses())
         {
             // System can be reached on connection.
             if (addr.system() == dest.system())
             {
+                system_found = true;
+
                 auto [accept, priority] = filter_->will_accept(*packet, dest);
                 if (accept)
                 {
@@ -110,11 +114,12 @@ void Connection::send_to_address_(
                     queue_->push(std::move(packet), priority);
                     return;
                 }
-                else
-                {
-                    log_(false, *packet);
-                }
             }
+        }
+
+        if (system_found)
+        {
+            log_(false, *packet);
         }
     }
 }
@@ -175,6 +180,7 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
 void Connection::send_to_system_(
     std::shared_ptr<const Packet> packet, unsigned int system)
 {
+    bool system_found = false;
     bool accept = false;
     int priority = std::numeric_limits<int>::min();
 
@@ -183,6 +189,8 @@ void Connection::send_to_system_(
     {
         if (system == addr.system())
         {
+            system_found = true;
+
             // Filter packet/address combination.
             auto [accept_, priority_] = filter_->will_accept(*packet, addr);
 
@@ -196,14 +204,17 @@ void Connection::send_to_system_(
     }
 
     // Add packet to the queue.
-    if (accept)
+    if (system_found)
     {
-        log_(true, *packet);
-        queue_->push(std::move(packet), priority);
-    }
-    else
-    {
-        log_(false, *packet);
+        if (accept)
+        {
+            log_(true, *packet);
+            queue_->push(std::move(packet), priority);
+        }
+        else
+        {
+            log_(false, *packet);
+        }
     }
 }
 
@@ -310,7 +321,7 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     // Drop packet if the source is reachable on this connection.
     if (pool_->contains(packet->source()))
     {
-        log_(false, *packet);
+        // log_(false, *packet);
         return;
     }
 
@@ -334,14 +345,12 @@ void Connection::send(std::shared_ptr<const Packet> packet)
 }
 
 
-/** TODO Print the MAVLink address to the given output stream.
- *
- *  The format is "<System ID>.<Component ID>".
+/** Print the connection name to the given output stream.
  *
  *  Some examples are:
- *      - `0.0`
- *      - `16.8`
- *      - `128.4`
+ *      - `/dev/ttyUSB0`
+ *      - `127.0.0.1:8000`
+ *      - `127.0.0.1:14550`
  */
 std::ostream &operator<<(std::ostream &os, const Connection &connection)
 {
