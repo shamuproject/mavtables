@@ -208,7 +208,7 @@ TEST_CASE("Connection's 'send' method ensures the given packet is not "
 TEST_CASE("Connection's 'send' method (with destination address).",
           "[Connection]")
 {
-    Logger::level(0);
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -362,13 +362,14 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         REQUIRE(mock_cout.buffer().empty());
     }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (without destination address).",
           "[Connection]")
 {
-    Logger::level(0);
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
@@ -568,13 +569,14 @@ TEST_CASE("Connection's 'send' method (without destination address).",
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         REQUIRE(mock_cout.buffer().empty());
     }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
           "[Connection]")
 {
-    Logger::level(0);
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
@@ -774,13 +776,14 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         REQUIRE(mock_cout.buffer().empty());
     }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
           "[Connection]")
 {
-    Logger::level(0);
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -1036,13 +1039,14 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         REQUIRE(mock_cout.buffer().empty());
     }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (destination address, system reachable, "
           "component unreachable.", "[Connection]")
 {
-    Logger::level(0);
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -1181,4 +1185,5 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
         REQUIRE(mock_cout.buffer().empty());
     }
+    Logger::level(0);
 }

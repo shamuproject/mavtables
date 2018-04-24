@@ -63,9 +63,20 @@ void ConnectionPool::remove(const std::weak_ptr<Connection> &connection)
  */
 void ConnectionPool::send(std::unique_ptr<const Packet> packet)
 {
-    if (Logger::level() == 2)
+    if (Logger::level() >= 2)
     {
-        Logger::log(str(*packet));
+        std::stringstream ss;
+        ss << "received " << str(*packet) << " source ";
+        auto connection = packet->connection();
+        if (connection == nullptr)
+        {
+            ss << "unknown";
+        }
+        else
+        {
+            ss << *connection;
+        }
+        Logger::log(ss.str());
     }
 
     std::shared_lock<std::shared_mutex> lock(mutex_);
