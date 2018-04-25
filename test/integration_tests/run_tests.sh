@@ -289,6 +289,69 @@ function test_large_packets() {
 }
 
 
+function test_logging_level1() {
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 1
+    "$(dir)/../../build/mavtables" --loglevel 1 --conf "$(dir)/routing.conf" \
+        > "$(dir)/logging_level1.log" &
+    sleep 0.5
+    "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 > /dev/null &
+    sleep 0.5
+    "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 > /dev/null &
+    sleep 0.5
+    "$(dir)/logger.py" 172 128 --serial ./ttyS1 > /dev/null &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
+        --udp 127.0.0.1:14500
+    sleep 0.5
+    sed -i 's/^.....................//' "$(dir)/logging_level1.log"
+    sed -i 's/:[0-9]*//g' "$(dir)/logging_level1.log"
+    shutdown_background
+}
+
+
+function test_logging_level2() {
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 1
+    "$(dir)/../../build/mavtables" --loglevel 2 --conf "$(dir)/routing.conf" \
+        > "$(dir)/logging_level2.log" &
+    sleep 0.5
+    "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 > /dev/null &
+    sleep 0.5
+    "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 > /dev/null &
+    sleep 0.5
+    "$(dir)/logger.py" 172 128 --serial ./ttyS1 > /dev/null &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
+        --udp 127.0.0.1:14500
+    sleep 0.5
+    sed -i 's/^.....................//' "$(dir)/logging_level2.log"
+    sed -i 's/:[0-9]*//g' "$(dir)/logging_level2.log"
+    shutdown_background
+}
+
+
+function test_logging_level3() {
+    socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
+    sleep 1
+    "$(dir)/../../build/mavtables" --loglevel 3 --conf "$(dir)/routing.conf" \
+        > "$(dir)/logging_level3.log" &
+    sleep 0.5
+    "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 > /dev/null &
+    sleep 0.5
+    "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 > /dev/null &
+    sleep 0.5
+    "$(dir)/logger.py" 172 128 --serial ./ttyS1 > /dev/null &
+    sleep 0.5
+    "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
+        --udp 127.0.0.1:14500
+    sleep 0.5
+    sed -i 's/^.....................//' "$(dir)/logging_level3.log"
+    sed -i 's/:[0-9]*//g' "$(dir)/logging_level3.log"
+    shutdown_background
+}
+
+
 echo -en "${_BOLD}${_BLUE}*---------------------------------------"
 echo -en "--------------------------------------*\n"
 echo -en "${_BOLD}${_BLUE}|                              "
@@ -426,6 +489,14 @@ run_test "Many large packets with multiple senders to UDP" \
     test_large_packets large_packets.tmp large_packets_to_udp.log
 run_test "Many large packets with multiple senders to serial port" \
     do_nothing large_packets.tmp large_packets_to_serial.log
+
+
+run_test "Logging level 1" \
+    test_logging_level1 logging_level1.cmp logging_level1.log
+run_test "Logging level 2" \
+    test_logging_level2 logging_level2.cmp logging_level2.log
+run_test "Logging level 3" \
+    test_logging_level3 logging_level3.cmp logging_level3.log
 
 
 if [ "$FAIL" -ne "0" ]; then

@@ -1,0 +1,372 @@
+new component 127.1 on 127.0.0.1
+received HEARTBEAT (#0) from 127.1 (v2.0) source 127.0.0.1
+rejected HEARTBEAT (#0) from 127.1 (v2.0) source 127.0.0.1 dest ./ttyS0
+new component 192.168 on 127.0.0.1
+received HEARTBEAT (#0) from 192.168 (v2.0) source 127.0.0.1
+rejected HEARTBEAT (#0) from 192.168 (v2.0) source 127.0.0.1 dest ./ttyS0
+rejected HEARTBEAT (#0) from 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+new component 172.128 on ./ttyS0
+received HEARTBEAT (#0) from 172.128 (v2.0) source ./ttyS0
+rejected HEARTBEAT (#0) from 172.128 (v2.0) source ./ttyS0 dest 127.0.0.1
+rejected HEARTBEAT (#0) from 172.128 (v2.0) source ./ttyS0 dest 127.0.0.1
+new component 10.10 on 127.0.0.1
+received HEARTBEAT (#0) from 10.10 (v2.0) source 127.0.0.1
+rejected HEARTBEAT (#0) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+rejected HEARTBEAT (#0) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected HEARTBEAT (#0) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1
+rejected POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1
+rejected LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+rejected LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_REQUEST_PARTIAL_LIST (#37) from 10.10 to 172.168 (v2.0) source 127.0.0.1
+rejected MISSION_REQUEST_PARTIAL_LIST (#37) from 10.10 to 172.168 (v2.0) source 127.0.0.1 dest ./ttyS0
+received LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1
+rejected LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MANUAL_CONTROL (#69) from 10.10 (v2.0) source 127.0.0.1
+rejected MANUAL_CONTROL (#69) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted MANUAL_CONTROL (#69) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted MANUAL_CONTROL (#69) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1
+rejected VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1
+rejected LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1
+rejected SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received PARAM_REQUEST_READ (#20) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+accepted PARAM_REQUEST_READ (#20) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ENCAPSULATED_DATA (#131) from 10.10 (v2.0) source 127.0.0.1
+rejected ENCAPSULATED_DATA (#131) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ENCAPSULATED_DATA (#131) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ENCAPSULATED_DATA (#131) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SERIAL_CONTROL (#126) from 10.10 (v2.0) source 127.0.0.1
+rejected SERIAL_CONTROL (#126) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+rejected SERIAL_CONTROL (#126) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected SERIAL_CONTROL (#126) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SET_POSITION_TARGET_GLOBAL_INT (#86) from 10.10 to 0.0 (v2.0) source 127.0.0.1
+rejected SET_POSITION_TARGET_GLOBAL_INT (#86) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SET_POSITION_TARGET_GLOBAL_INT (#86) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SET_POSITION_TARGET_GLOBAL_INT (#86) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1
+rejected VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received POSITION_TARGET_LOCAL_NED (#85) from 10.10 (v2.0) source 127.0.0.1
+rejected POSITION_TARGET_LOCAL_NED (#85) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted POSITION_TARGET_LOCAL_NED (#85) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted POSITION_TARGET_LOCAL_NED (#85) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1
+rejected LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1
+rejected AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SET_HOME_POSITION (#243) from 10.10 to 172.0 (v2.0) source 127.0.0.1
+rejected SET_HOME_POSITION (#243) from 10.10 to 172.0 (v2.0) source 127.0.0.1 dest ./ttyS0
+received MISSION_ITEM_REACHED (#46) from 10.10 (v2.0) source 127.0.0.1
+accepted MISSION_ITEM_REACHED (#46) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted MISSION_ITEM_REACHED (#46) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted MISSION_ITEM_REACHED (#46) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LOG_ERASE (#121) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+accepted LOG_ERASE (#121) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_CLEAR_ALL (#45) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+accepted MISSION_CLEAR_ALL (#45) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1
+rejected VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1
+rejected VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1
+rejected LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SCALED_PRESSURE2 (#137) from 10.10 (v2.0) source 127.0.0.1
+rejected SCALED_PRESSURE2 (#137) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SCALED_PRESSURE2 (#137) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SCALED_PRESSURE2 (#137) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received TERRAIN_CHECK (#135) from 10.10 (v2.0) source 127.0.0.1
+rejected TERRAIN_CHECK (#135) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted TERRAIN_CHECK (#135) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted TERRAIN_CHECK (#135) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS2_RAW (#124) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS2_RAW (#124) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS2_RAW (#124) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS2_RAW (#124) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received PARAM_REQUEST_READ (#20) from 10.10 to 0.0 (v2.0) source 127.0.0.1
+rejected PARAM_REQUEST_READ (#20) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted PARAM_REQUEST_READ (#20) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted PARAM_REQUEST_READ (#20) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GLOBAL_POSITION_INT (#33) from 10.10 (v2.0) source 127.0.0.1
+rejected GLOBAL_POSITION_INT (#33) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GLOBAL_POSITION_INT (#33) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GLOBAL_POSITION_INT (#33) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_SET_CURRENT (#41) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+accepted MISSION_SET_CURRENT (#41) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received PARAM_MAP_RC (#50) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected PARAM_MAP_RC (#50) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received OPTICAL_FLOW (#100) from 10.10 (v2.0) source 127.0.0.1
+rejected OPTICAL_FLOW (#100) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted OPTICAL_FLOW (#100) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted OPTICAL_FLOW (#100) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LOG_REQUEST_DATA (#119) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+rejected LOG_REQUEST_DATA (#119) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1
+rejected SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received COMMAND_INT (#75) from 10.10 to 0.0 (v2.0) source 127.0.0.1
+rejected COMMAND_INT (#75) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted COMMAND_INT (#75) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted COMMAND_INT (#75) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1
+rejected VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VIBRATION (#241) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received DEBUG_VECT (#250) from 10.10 (v2.0) source 127.0.0.1
+rejected DEBUG_VECT (#250) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted DEBUG_VECT (#250) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted DEBUG_VECT (#250) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1
+accepted HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1
+rejected ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SCALED_IMU3 (#129) from 10.10 (v2.0) source 127.0.0.1
+rejected SCALED_IMU3 (#129) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SCALED_IMU3 (#129) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SCALED_IMU3 (#129) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1
+rejected CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1
+rejected ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received PARAM_VALUE (#22) from 10.10 (v2.0) source 127.0.0.1
+rejected PARAM_VALUE (#22) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted PARAM_VALUE (#22) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted PARAM_VALUE (#22) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_REQUEST_INT (#51) from 10.10 to 127.1 (v2.0) source 127.0.0.1
+accepted MISSION_REQUEST_INT (#51) from 10.10 to 127.1 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SAFETY_SET_ALLOWED_AREA (#54) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected SAFETY_SET_ALLOWED_AREA (#54) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1
+rejected LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted LOG_DATA (#120) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received RADIO_STATUS (#109) from 10.10 (v2.0) source 127.0.0.1
+rejected RADIO_STATUS (#109) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted RADIO_STATUS (#109) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted RADIO_STATUS (#109) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_REQUEST_PARTIAL_LIST (#37) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+rejected MISSION_REQUEST_PARTIAL_LIST (#37) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received HIL_ACTUATOR_CONTROLS (#93) from 10.10 (v2.0) source 127.0.0.1
+accepted HIL_ACTUATOR_CONTROLS (#93) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted HIL_ACTUATOR_CONTROLS (#93) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted HIL_ACTUATOR_CONTROLS (#93) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received HIL_CONTROLS (#91) from 10.10 (v2.0) source 127.0.0.1
+rejected HIL_CONTROLS (#91) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted HIL_CONTROLS (#91) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted HIL_CONTROLS (#91) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1
+rejected ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1
+accepted SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received DISTANCE_SENSOR (#132) from 10.10 (v2.0) source 127.0.0.1
+rejected DISTANCE_SENSOR (#132) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted DISTANCE_SENSOR (#132) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted DISTANCE_SENSOR (#132) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received RC_CHANNELS_SCALED (#34) from 10.10 (v2.0) source 127.0.0.1
+rejected RC_CHANNELS_SCALED (#34) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted RC_CHANNELS_SCALED (#34) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted RC_CHANNELS_SCALED (#34) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received HIL_RC_INPUTS_RAW (#92) from 10.10 (v2.0) source 127.0.0.1
+rejected HIL_RC_INPUTS_RAW (#92) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted HIL_RC_INPUTS_RAW (#92) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted HIL_RC_INPUTS_RAW (#92) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_REQUEST_INT (#51) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+accepted MISSION_REQUEST_INT (#51) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SET_ACTUATOR_CONTROL_TARGET (#139) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected SET_ACTUATOR_CONTROL_TARGET (#139) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received GPS_INJECT_DATA (#123) from 10.10 to 0.0 (v2.0) source 127.0.0.1
+rejected GPS_INJECT_DATA (#123) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_INJECT_DATA (#123) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_INJECT_DATA (#123) from 10.10 to 0.0 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_GLOBAL_ORIGIN (#49) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1
+accepted HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted HIGHRES_IMU (#105) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_ITEM_INT (#73) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+rejected MISSION_ITEM_INT (#73) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received RC_CHANNELS_RAW (#35) from 10.10 (v2.0) source 127.0.0.1
+rejected RC_CHANNELS_RAW (#35) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted RC_CHANNELS_RAW (#35) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted RC_CHANNELS_RAW (#35) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1
+rejected POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected POWER_STATUS (#125) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received COMMAND_LONG (#76) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected COMMAND_LONG (#76) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1
+rejected VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1
+rejected LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET (#89) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received OPTICAL_FLOW_RAD (#106) from 10.10 (v2.0) source 127.0.0.1
+rejected OPTICAL_FLOW_RAD (#106) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted OPTICAL_FLOW_RAD (#106) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted OPTICAL_FLOW_RAD (#106) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ALTITUDE (#141) from 10.10 (v2.0) source 127.0.0.1
+accepted ALTITUDE (#141) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ALTITUDE (#141) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ALTITUDE (#141) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1
+rejected ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ATTITUDE_QUATERNION_COV (#61) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received RESOURCE_REQUEST (#142) from 10.10 (v2.0) source 127.0.0.1
+rejected RESOURCE_REQUEST (#142) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted RESOURCE_REQUEST (#142) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted RESOURCE_REQUEST (#142) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SYSTEM_TIME (#2) from 10.10 (v2.0) source 127.0.0.1
+rejected SYSTEM_TIME (#2) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SYSTEM_TIME (#2) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected SYSTEM_TIME (#2) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1
+rejected ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ATTITUDE (#30) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1
+rejected CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted CAMERA_TRIGGER (#112) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_INJECT_DATA (#123) from 10.10 to 127.1 (v2.0) source 127.0.0.1
+accepted GPS_INJECT_DATA (#123) from 10.10 to 127.1 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1
+rejected SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1
+accepted SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SIM_STATE (#108) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SET_POSITION_TARGET_GLOBAL_INT (#86) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected SET_POSITION_TARGET_GLOBAL_INT (#86) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received SAFETY_ALLOWED_AREA (#55) from 10.10 (v2.0) source 127.0.0.1
+rejected SAFETY_ALLOWED_AREA (#55) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SAFETY_ALLOWED_AREA (#55) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SAFETY_ALLOWED_AREA (#55) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1
+rejected ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected ADSB_VEHICLE (#246) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1
+rejected LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+rejected LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected LOCAL_POSITION_NED_COV (#64) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SAFETY_SET_ALLOWED_AREA (#54) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+accepted SAFETY_SET_ALLOWED_AREA (#54) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received ATTITUDE_QUATERNION (#31) from 10.10 (v2.0) source 127.0.0.1
+accepted ATTITUDE_QUATERNION (#31) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted ATTITUDE_QUATERNION (#31) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted ATTITUDE_QUATERNION (#31) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received COMMAND_INT (#75) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected COMMAND_INT (#75) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1
+rejected VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received HIL_STATE_QUATERNION (#115) from 10.10 (v2.0) source 127.0.0.1
+rejected HIL_STATE_QUATERNION (#115) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+rejected HIL_STATE_QUATERNION (#115) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+rejected HIL_STATE_QUATERNION (#115) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1
+rejected GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted GPS_INPUT (#232) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SET_ACTUATOR_CONTROL_TARGET (#139) from 10.10 to 172.128 (v2.0) source 127.0.0.1
+rejected SET_ACTUATOR_CONTROL_TARGET (#139) from 10.10 to 172.128 (v2.0) source 127.0.0.1 dest ./ttyS0
+received MISSION_REQUEST_PARTIAL_LIST (#37) from 10.10 to 192.168 (v2.0) source 127.0.0.1
+rejected MISSION_REQUEST_PARTIAL_LIST (#37) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1
+rejected AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted AUTH_KEY (#7) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received MISSION_ITEM (#39) from 10.10 to 127.1 (v2.0) source 127.0.0.1
+accepted MISSION_ITEM (#39) from 10.10 to 127.1 (v2.0) source 127.0.0.1 dest 127.0.0.1

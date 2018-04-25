@@ -1,0 +1,4 @@
+new component 127.1 on 127.0.0.1
+new component 192.168 on 127.0.0.1
+new component 172.128 on ./ttyS0
+new component 10.10 on 127.0.0.1
