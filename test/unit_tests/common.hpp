@@ -76,6 +76,12 @@ class MockCOut
         {
             return buffer_.str();
         }
+        /** Erase the mocked buffer.
+         */
+        void reset()
+        {
+            buffer_.str("");
+        }
 
     private:
         std::stringstream buffer_;
@@ -108,6 +114,12 @@ class MockCErr
         std::string buffer()
         {
             return buffer_.str();
+        }
+        /** Erase the mocked buffer.
+         */
+        void reset()
+        {
+            buffer_.str("");
         }
 
     private:
