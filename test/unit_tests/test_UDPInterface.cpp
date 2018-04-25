@@ -219,6 +219,9 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Exactly(2);
+        auto it = will_accept_packets.find(*encapsulated_data);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Multiple packets received (same IP and MAVLink addresses).")
     {
@@ -254,6 +257,12 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 2);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
         fakeit::Verify(Method(spy_pool, add)).Exactly(2);
+        auto it = will_accept_packets.find(*encapsulated_data);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
+        it++;
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Multiple packets received (same IP, different MAVLink addresses).")
     {
@@ -296,6 +305,12 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         REQUIRE(will_accept_packets.count(*mission_set_current) == 1);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
         fakeit::Verify(Method(spy_pool, add)).Exactly(2);
+        auto it = will_accept_packets.find(*encapsulated_data);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
+        it = will_accept_packets.find(*mission_set_current);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Multiple packets received (different IP and MAVLink addresses).")
     {
@@ -339,6 +354,15 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 2);
         REQUIRE(will_accept_addresses.count(MAVAddress("224.255")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Exactly(3);
+        auto it = will_accept_packets.find(*encapsulated_data);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
+        it = will_accept_packets.find(*mission_set_current);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
+        it++;
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Partial packets with same IP address should be combined and "
             "parsed.")
@@ -381,6 +405,9 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
         REQUIRE(will_accept_packets.count(*encapsulated_data) == 1);
         REQUIRE(will_accept_addresses.count(MAVAddress("127.1")) == 1);
         fakeit::Verify(Method(spy_pool, add)).Exactly(2);
+        auto it = will_accept_packets.find(*encapsulated_data);
+        REQUIRE(it != will_accept_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Partial packets with different IP addresses should be dropped.")
     {
