@@ -48,4 +48,14 @@ unsigned int Logger::level()
 unsigned int Logger::level_ = 0;
 
 
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wglobal-constructors"
+    #pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+
 std::mutex Logger::mutex_;
+
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif
