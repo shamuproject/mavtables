@@ -27,7 +27,7 @@
 #include "common.hpp"
 
 
-TEST_CASE("The Logger level can be set and retreived with the static 'level' "
+TEST_CASE("The Logger level can be set and retrieved with the static 'level' "
           "method", "[Logger]")
 {
     REQUIRE(Logger::level() == 0);
