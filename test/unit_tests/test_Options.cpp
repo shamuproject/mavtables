@@ -421,3 +421,35 @@ TEST_CASE("Options's class sets run to false and ast to true when the --ast "
     // Verify printing.
     REQUIRE(ss.str() == "");
 }
+
+
+TEST_CASE("Option's class has a loglevel option", "[Options]")
+{
+    // Setup mocks.
+    fakeit::Mock<Filesystem> fs_mock;
+    fakeit::When(Method(fs_mock, exists)).AlwaysReturn(true);
+    SECTION("defaults to loglevel 0")
+    {
+        // Construct Options object.
+        int argc = 1;
+        const char *argv[1] = {"mavtables"};
+        std::stringstream ss;
+        Options options(argc, argv, ss);
+        // Verify Options object.
+        REQUIRE(options.loglevel() == 0);
+        // Verify printing.
+        REQUIRE(ss.str() == "");
+    }
+    SECTION("sets the loglevel when the --loglevel is given")
+    {
+        // Construct Options object.
+        int argc = 3;
+        const char *argv[3] = {"mavtables", "--loglevel", "3"};
+        std::stringstream ss;
+        Options options(argc, argv, ss);
+        // Verify Options object.
+        REQUIRE(options.loglevel() == 3);
+        // Verify printing.
+        REQUIRE(ss.str() == "");
+    }
+}
