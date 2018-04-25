@@ -432,7 +432,7 @@ TEST_CASE("Option's class has a loglevel option", "[Options]")
     {
         // Construct Options object.
         int argc = 1;
-        const char *argv[1] = {"mavtables"};
+        const char *argv[1] = {"mavtables", "--config", "test/mavtables.conf"};
         std::stringstream ss;
         Options options(argc, argv, ss);
         // Verify Options object.
@@ -444,7 +444,8 @@ TEST_CASE("Option's class has a loglevel option", "[Options]")
     {
         // Construct Options object.
         int argc = 3;
-        const char *argv[3] = {"mavtables", "--loglevel", "3"};
+        const char *argv[3] = {
+            "mavtables", "--loglevel", "3", "--config", "test/mavtables.conf"};
         std::stringstream ss;
         Options options(argc, argv, ss);
         // Verify Options object.
