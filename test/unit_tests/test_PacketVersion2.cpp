@@ -21,14 +21,17 @@
 #include <utility>
 
 #include <catch.hpp>
+#include <fakeit.hpp>
 
 #include "config.hpp"
+#include "Connection.hpp"
 #include "InvalidPacketIDError.hpp"
 #include "MAVAddress.hpp"
 #include "mavlink.hpp"
 #include "PacketVersion2.hpp"
 #include "util.hpp"
 
+#include "common.hpp"
 #include "common_Packet.hpp"
 
 
@@ -694,6 +697,27 @@ TEST_CASE("packet_v2::Packet's optionally have a destination address.",
     REQUIRE(
         packet_v2::Packet(param_ext_request_list).dest().value() ==
         MAVAddress("32.64"));
+}
+
+
+TEST_CASE("packet_v2::Packet's optionally have a source connection.", 
+          "[packet_v2::Packet]")
+{
+    auto heartbeat = packet_v2::Packet(to_vector(HeartbeatV2()));
+    SECTION("Defaults to nullptr.")
+    {
+        REQUIRE(heartbeat.connection() == nullptr);
+    }
+    SECTION("Can be set with the 'connection' method.")
+    {
+        fakeit::Mock<Filter> mock_filter;
+        auto filter = mock_shared(mock_filter);
+        auto conn = std::make_shared<Connection>("SOURCE", filter);
+        heartbeat.connection(conn);
+        REQUIRE(heartbeat.connection() != nullptr);
+        REQUIRE(heartbeat.connection() == conn);
+        REQUIRE(str(*heartbeat.connection()) == "SOURCE");
+    }
 }
 
 

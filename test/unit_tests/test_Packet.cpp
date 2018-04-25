@@ -23,11 +23,15 @@
 #include <vector>
 
 #include <catch.hpp>
+#include <fakeit.hpp>
 
+#include "Connection.hpp"
+#include "Filter.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "util.hpp"
 
+#include "common.hpp"
 #include "common_Packet.hpp"
 
 
@@ -185,6 +189,26 @@ TEST_CASE("Packet's have a source address.", "[Packet]")
 TEST_CASE("Packet's optionally have a destination address.", "[Packet]")
 {
     REQUIRE(PacketTestClass({}).dest().value() == MAVAddress("2.71"));
+}
+
+
+TEST_CASE("Packet's optionally have a source connection.", "[Packet]")
+{
+    SECTION("Defaults to nullptr.")
+    {
+        REQUIRE(PacketTestClass({}).connection() == nullptr);
+    }
+    SECTION("Can be set with the 'connection' method.")
+    {
+        fakeit::Mock<Filter> mock_filter;
+        auto filter = mock_shared(mock_filter);
+        auto conn = std::make_shared<Connection>("SOURCE", filter);
+        PacketTestClass packet({});
+        packet.connection(conn);
+        REQUIRE(packet.connection() != nullptr);
+        REQUIRE(packet.connection() == conn);
+        REQUIRE(str(*packet.connection()) == "SOURCE");
+    }
 }
 
 
