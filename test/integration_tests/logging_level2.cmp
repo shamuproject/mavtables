@@ -31,7 +31,7 @@ received MISSION_ITEM_REACHED (#46) from 10.10 (v2.0) source 127.0.0.1
 received SYS_STATUS (#1) from 10.10 (v2.0) source 127.0.0.1
 received LOG_ERASE (#121) from 10.10 to 192.168 (v2.0) source 127.0.0.1
 received MISSION_CLEAR_ALL (#45) from 10.10 to 192.168 (v2.0) source 127.0.0.1
-received VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1
+received SCALED_PRESSURE (#29) from 10.10 (v2.0) source 127.0.0.1
 received GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1
 received VFR_HUD (#74) from 10.10 (v2.0) source 127.0.0.1
 received LANDING_TARGET (#149) from 10.10 (v2.0) source 127.0.0.1

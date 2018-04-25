@@ -104,10 +104,10 @@ received LOG_ERASE (#121) from 10.10 to 192.168 (v2.0) source 127.0.0.1
 accepted LOG_ERASE (#121) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
 received MISSION_CLEAR_ALL (#45) from 10.10 to 192.168 (v2.0) source 127.0.0.1
 accepted MISSION_CLEAR_ALL (#45) from 10.10 to 192.168 (v2.0) source 127.0.0.1 dest 127.0.0.1
-received VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1
-rejected VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
-accepted VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
-accepted VISION_POSITION_ESTIMATE (#102) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+received SCALED_PRESSURE (#29) from 10.10 (v2.0) source 127.0.0.1
+rejected SCALED_PRESSURE (#29) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
+accepted SCALED_PRESSURE (#29) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
+accepted SCALED_PRESSURE (#29) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
 received GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1
 rejected GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest ./ttyS0
 accepted GPS_RTK (#127) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
