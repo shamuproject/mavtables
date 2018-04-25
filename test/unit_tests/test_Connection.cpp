@@ -119,6 +119,7 @@ TEST_CASE("Connection's are printable", "[Connection]")
 TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
           "[Connection]")
 {
+    Logger::level(0);
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
     fakeit::Mock<PacketQueue> mock_queue;
@@ -126,12 +127,56 @@ TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn("name", filter, false, std::move(pool), std::move(queue));
-    conn.add_address(MAVAddress("192.168"));
-    fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+    Connection conn("DEVICE", filter, false, std::move(pool), std::move(queue));
+    SECTION("does not contain address (with logging)")
     {
-        return a == MAVAddress("192.168");
-    })).Once();
+        Logger::level(1);
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(false);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "new component 192.168 on DEVICE\n");
+    }
+    SECTION("does not contain address (without logging)")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(false);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("already contains address (with logging)")
+    {
+        Logger::level(1);
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(true);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("already contains address (without logging)")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(true);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 

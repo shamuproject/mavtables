@@ -28,6 +28,7 @@
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketQueue.hpp"
+#include "util.hpp"
 
 
 /** Log an accepted/rejected packet.
@@ -273,6 +274,10 @@ Connection::Connection(
  */
 void Connection::add_address(MAVAddress address)
 {
+    if (Logger::level() >= 1 && !pool_->contains(address))
+    {
+        Logger::log("new component " + str(address) + " on " + name_);
+    }
     pool_->add(std::move(address));
 }
 

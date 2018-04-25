@@ -23,6 +23,7 @@
 
 #include "Connection.hpp"
 #include "ConnectionPool.hpp"
+#include "Logger.hpp"
 #include "Packet.hpp"
 #include "util.hpp"
 
