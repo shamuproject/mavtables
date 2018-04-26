@@ -33,7 +33,7 @@ class Options
 {
     public:
         Options(
-            int argc, const char *argv[], std::ostream &os = std::cout,
+            int argc, const char *argv[],
             const Filesystem &filesystem = Filesystem());
         bool ast();
         unsigned int loglevel();

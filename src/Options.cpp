@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -29,7 +30,6 @@ namespace po = boost::program_options;
 
 /** Construct an options object.
  *
- *  \param os The output stream to use for printing the help message.
  *  \param argc The number of command line arguments given.
  *  \param argv The command line arguments, as given in the arguments to the
  *      main function.
@@ -37,8 +37,7 @@ namespace po = boost::program_options;
  *      instance.
  */
 Options::Options(
-    int argc, const char *argv[], std::ostream &os,
-    const Filesystem &filesystem)
+    int argc, const char *argv[], const Filesystem &filesystem)
     : continue_(true), loglevel_(0)
 {
     // Command line options.
@@ -58,7 +57,7 @@ Options::Options(
     // Print help.
     if (vm.count("help"))
     {
-        os << options << std::endl;
+        std::cout << options << std::endl;
         continue_ = false;
         return;
     }
@@ -66,16 +65,18 @@ Options::Options(
     // Print version information.
     if (vm.count("version"))
     {
-        os << "mavtables (SHAMU Project) ";
-        os << "v" << std::to_string(VERSION_MAJOR);
-        os << "." << std::to_string(VERSION_MINOR);
-        os << "." << std::to_string(VERSION_PATCH) << "\n";
-        os << "Copyright (C) 2018  Michael R. Shannon\n";
-        os << "\n";
-        os << "License: GPL v2.0 or any later version.\n";
-        os << "This is free software; see the source for copying conditions.  ";
-        os << "There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS ";
-        os << "FOR A PARTICULAR PURPOSE." << std::endl;
+        std::cout << "mavtables (SHAMU Project) ";
+        std::cout << "v" << std::to_string(VERSION_MAJOR);
+        std::cout << "." << std::to_string(VERSION_MINOR);
+        std::cout << "." << std::to_string(VERSION_PATCH) << "\n";
+        std::cout << "Copyright (C) 2018  Michael R. Shannon\n";
+        std::cout << "\n";
+        std::cout << "License: GPL v2.0 or any later version.\n";
+        std::cout <<
+            "This is free software; see the source for copying conditions.  ";
+        std::cout <<
+            "There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS ";
+        std::cout << "FOR A PARTICULAR PURPOSE." << std::endl;
         continue_ = false;
         return;
     }
