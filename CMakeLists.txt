@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 3.8.2) # required for C++17
 # project
 project (mavtables)
 set (VERSION_MAJOR 0)
-set (VERSION_MINOR 1)
-set (VERSION_PATCH 7)
+set (VERSION_MINOR 2)
+set (VERSION_PATCH 0)
 
 # set prefix
 set (PREFIX "${CMAKE_INSTALL_PREFIX}")
