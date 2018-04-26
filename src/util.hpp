@@ -31,11 +31,11 @@
 
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, const std::vector<T>& source);
+    std::vector<T> &dest, const std::vector<T> &source);
 
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, std::vector<T>&& source);
+    std::vector<T> &dest, std::vector<T> &&source);
 
 template <class T>
 std::string str(const T &object);
@@ -60,14 +60,17 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
  */
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, const std::vector<T>& source)
+    std::vector<T> &dest, const std::vector<T> &source)
 {
     typename std::vector<T>::iterator result;
 
-    if (dest.empty()) {
+    if (dest.empty())
+    {
         dest = source;
         result = std::begin(dest);
-    } else {
+    }
+    else
+    {
         result =
             dest.insert(std::end(dest), std::cbegin(source), std::cend(source));
     }
@@ -88,23 +91,25 @@ typename std::vector<T>::iterator append(
  */
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, std::vector<T>&& source)
+    std::vector<T> &dest, std::vector<T> &&source)
 {
     typename std::vector<T>::iterator result;
 
-    if (dest.empty()) {
+    if (dest.empty())
+    {
         dest = std::move(source);
         result = std::begin(dest);
-    } else {
+    }
+    else
+    {
         result = dest.insert(
-            std::end(dest),
-            std::make_move_iterator(std::begin(source)),
-            std::make_move_iterator(std::end(source)));
+                     std::end(dest),
+                     std::make_move_iterator(std::begin(source)),
+                     std::make_move_iterator(std::end(source)));
     }
 
     source.clear();
     source.shrink_to_fit();
-
     return result;
 }
 

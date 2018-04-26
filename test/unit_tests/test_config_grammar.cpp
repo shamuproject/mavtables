@@ -30,11 +30,11 @@
 TEST_CASE("A configuration string must have at least one valid statement "
           "or block.", "[config]")
 {
-        tao::pegtl::string_input<> in("1337", "");
-        REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
-        REQUIRE_THROWS_WITH(
-            config::parse(in),
-            ":1:0(0): expected at least one valid statement or block");
+    tao::pegtl::string_input<> in("1337", "");
+    REQUIRE_THROWS_AS(config::parse(in), tao::pegtl::parse_error);
+    REQUIRE_THROWS_WITH(
+        config::parse(in),
+        ":1:0(0): expected at least one valid statement or block");
 }
 
 

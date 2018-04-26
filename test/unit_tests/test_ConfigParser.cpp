@@ -98,7 +98,7 @@ TEST_CASE("'init_chains' initializes a map of chain names to empty chains"
 }
 
 
-TEST_CASE("'parse_action' parses an action from the given AST node.", 
+TEST_CASE("'parse_action' parses an action from the given AST node.",
           "[ConfigParser]")
 {
     std::map<std::string, std::shared_ptr<Chain>> chains;
@@ -116,7 +116,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], {}, {}, chains);
+                          *root->children[0]->children[0], {}, {}, chains);
         REQUIRE(str(*action) == "accept");
     }
     SECTION("Accept action, with priority.")
@@ -132,7 +132,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], -1, {}, chains);
+                          *root->children[0]->children[0], -1, {}, chains);
         REQUIRE(str(*action) == "accept with priority -1");
     }
     SECTION("Accept action, with condition.")
@@ -147,9 +147,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], {},
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], {},
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(str(*action) == "accept if PING from 192.168 to 127.0/8");
     }
     SECTION("Accept action, with priority and condition.")
@@ -164,9 +165,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], -1,
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], -1,
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(
             str(*action) ==
             "accept with priority -1 if PING from 192.168 to 127.0/8");
@@ -184,7 +186,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], {}, {}, chains);
+                          *root->children[0]->children[0], {}, {}, chains);
         REQUIRE(str(*action) == "reject");
     }
     SECTION("Reject action, with priority (priority ignored for reject).")
@@ -200,7 +202,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], -1, {}, chains);
+                          *root->children[0]->children[0], -1, {}, chains);
         REQUIRE(str(*action) == "reject");
     }
     SECTION("Reject action, with condition.")
@@ -215,9 +217,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], {},
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], {},
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(str(*action) == "reject if PING from 192.168 to 127.0/8");
     }
     SECTION("Reject action, with priority and condition "
@@ -233,9 +236,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], -1,
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], -1,
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(
             str(*action) ==
             "reject if PING from 192.168 to 127.0/8");
@@ -253,7 +257,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], {}, {}, chains);
+                          *root->children[0]->children[0], {}, {}, chains);
         REQUIRE(str(*action) == "call some_chain");
     }
     SECTION("Call action, throws and error if calling the default chain.")
@@ -288,7 +292,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], -1, {}, chains);
+                          *root->children[0]->children[0], -1, {}, chains);
         REQUIRE(str(*action) == "call some_chain with priority -1");
     }
     SECTION("Call action, with condition.")
@@ -303,9 +307,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], {},
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], {},
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(
             str(*action) == "call some_chain if PING from 192.168 to 127.0/8");
     }
@@ -322,9 +327,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], -1,
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], -1,
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(
             str(*action) ==
             "call some_chain with priority -1 if PING from 192.168 to 127.0/8");
@@ -342,7 +348,7 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
         auto action = parse_action(
-            *root->children[0]->children[0], {}, {}, chains);
+                          *root->children[0]->children[0], {}, {}, chains);
         REQUIRE(str(*action) == "goto some_chain");
     }
     SECTION("GoTo action, throws and error if going to the default chain.")
@@ -376,8 +382,8 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], -1, {}, chains);
+        auto action =
+            parse_action(*root->children[0]->children[0], -1, {}, chains);
         REQUIRE(str(*action) == "goto some_chain with priority -1");
     }
     SECTION("GoTo action, with condition.")
@@ -392,9 +398,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], {},
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], {},
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(
             str(*action) == "goto some_chain if PING from 192.168 to 127.0/8");
     }
@@ -411,9 +418,10 @@ TEST_CASE("'parse_action' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         REQUIRE_FALSE(root->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0] != nullptr);
-        auto action = parse_action(
-            *root->children[0]->children[0], -1,
-            If().type("PING").from("192.168").to("127.0/8"), chains);
+        auto action =
+            parse_action(
+                *root->children[0]->children[0], -1,
+                If().type("PING").from("192.168").to("127.0/8"), chains);
         REQUIRE(
             str(*action) ==
             "goto some_chain with priority -1 if PING from 192.168 to 127.0/8");
@@ -439,7 +447,7 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if PING");
     }
     SECTION("Condition source.")
@@ -457,7 +465,7 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if from 192.168");
     }
     SECTION("Condition destination.")
@@ -475,7 +483,7 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if to 128.0/8");
     }
     SECTION("Condition source and destination.")
@@ -493,7 +501,7 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if from 192.168 to 127.0/8");
     }
     SECTION("Condition type and source.")
@@ -511,7 +519,7 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if PING from 192.168");
     }
     SECTION("Condition type and destination.")
@@ -529,7 +537,7 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if PING to 127.0/8");
     }
     SECTION("Condition type, source, and destination.")
@@ -547,13 +555,13 @@ TEST_CASE("'parse_condition' parses a condition from the given AST node.",
         REQUIRE_FALSE(root->children[0]->children[0]->children.empty());
         REQUIRE(root->children[0]->children[0]->children[0] != nullptr);
         auto condition = parse_condition(
-            *root->children[0]->children[0]->children[0]);
+                             *root->children[0]->children[0]->children[0]);
         REQUIRE(str(condition) == "if PING from 192.168 to 127.0/8");
     }
 }
 
 
-TEST_CASE("'parse_chain' parses an action from the given AST node.", 
+TEST_CASE("'parse_chain' parses an action from the given AST node.",
           "[ConfigParser]")
 {
     Chain default_chain("default");
@@ -574,12 +582,12 @@ TEST_CASE("'parse_chain' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         parse_chain(default_chain, *root->children[0], chains);
         REQUIRE(str(default_chain) ==
-            "chain default {\n"
-            "    accept;\n"
-            "    accept with priority -1;\n"
-            "    accept if PING from 192.168 to 127.0/8;\n"
-            "    accept with priority -1 if PING from 192.168 to 127.0/8;\n"
-            "}");
+                "chain default {\n"
+                "    accept;\n"
+                "    accept with priority -1;\n"
+                "    accept if PING from 192.168 to 127.0/8;\n"
+                "    accept with priority -1 if PING from 192.168 to 127.0/8;\n"
+                "}");
     }
     SECTION("Reject action.")
     {
@@ -594,10 +602,10 @@ TEST_CASE("'parse_chain' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         parse_chain(default_chain, *root->children[0], chains);
         REQUIRE(str(default_chain) ==
-            "chain default {\n"
-            "    reject;\n"
-            "    reject if PING from 192.168 to 127.0/8;\n"
-            "}");
+                "chain default {\n"
+                "    reject;\n"
+                "    reject if PING from 192.168 to 127.0/8;\n"
+                "}");
     }
     SECTION("Call action.")
     {
@@ -615,13 +623,13 @@ TEST_CASE("'parse_chain' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         parse_chain(default_chain, *root->children[0], chains);
         REQUIRE(str(default_chain) ==
-            "chain default {\n"
-            "    call some_chain;\n"
-            "    call some_chain with priority -1;\n"
-            "    call some_chain if PING from 192.168 to 127.0/8;\n"
-            "    call some_chain with priority -1 "
-            "if PING from 192.168 to 127.0/8;\n"
-            "}");
+                "chain default {\n"
+                "    call some_chain;\n"
+                "    call some_chain with priority -1;\n"
+                "    call some_chain if PING from 192.168 to 127.0/8;\n"
+                "    call some_chain with priority -1 "
+                "if PING from 192.168 to 127.0/8;\n"
+                "}");
     }
     SECTION("GoTo action.")
     {
@@ -639,18 +647,18 @@ TEST_CASE("'parse_chain' parses an action from the given AST node.",
         REQUIRE(root->children[0] != nullptr);
         parse_chain(default_chain, *root->children[0], chains);
         REQUIRE(str(default_chain) ==
-            "chain default {\n"
-            "    goto some_chain;\n"
-            "    goto some_chain with priority -1;\n"
-            "    goto some_chain if PING from 192.168 to 127.0/8;\n"
-            "    goto some_chain with priority -1 "
-            "if PING from 192.168 to 127.0/8;\n"
-            "}");
+                "chain default {\n"
+                "    goto some_chain;\n"
+                "    goto some_chain with priority -1;\n"
+                "    goto some_chain if PING from 192.168 to 127.0/8;\n"
+                "    goto some_chain with priority -1 "
+                "if PING from 192.168 to 127.0/8;\n"
+                "}");
     }
 }
 
 
-TEST_CASE("'parse_filter' parses the filter from the given AST root node.", 
+TEST_CASE("'parse_filter' parses the filter from the given AST root node.",
           "[ConfigParser]")
 {
     auto ping = packet_v2::Packet(to_vector(PingV2()));
@@ -848,10 +856,10 @@ TEST_CASE("'parse_serial' parses a serial interface from a serial interface "
     {
         auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
         auto set_mode = std::make_shared<packet_v2::Packet>(
-                to_vector(SetModeV2()));
+                            to_vector(SetModeV2()));
         auto param_ext_request_list =
             std::make_shared<packet_v2::Packet>(
-                    to_vector(ParamExtRequestListV2()));
+                to_vector(ParamExtRequestListV2()));
         fakeit::Mock<ConnectionPool> mock_pool;
         std::shared_ptr<Connection> connection;
         fakeit::When(Method(mock_pool, add)).AlwaysDo([&](auto conn)

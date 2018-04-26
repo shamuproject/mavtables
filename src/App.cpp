@@ -66,10 +66,12 @@ void App::run()
     sigaddset(&waitset, SIGINT);
     sigprocmask(SIG_BLOCK, &waitset, nullptr);
     int sig;
+
     if (sigwait(&waitset, &sig) < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
+
     #elif WINDOWS
     throw std::runtime_error("Microsoft Windows is not currently supported.")
     #endif

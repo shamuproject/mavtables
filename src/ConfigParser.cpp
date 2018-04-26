@@ -53,7 +53,7 @@
  *  \returns Map of chain names to chains.
  */
 std::map<std::string, std::shared_ptr<Chain>> init_chains(
-        const config::parse_tree::node &root)
+            const config::parse_tree::node &root)
 {
     std::map<std::string, std::shared_ptr<Chain>> chains;
 
@@ -69,6 +69,7 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
             }
         }
     }
+
     return chains;
 }
 
@@ -97,7 +98,7 @@ std::unique_ptr<Rule> parse_action(
         if (priority)
         {
             return std::make_unique<Accept>(
-                priority.value(), std::move(condition));
+                       priority.value(), std::move(condition));
         }
         else
         {
@@ -116,18 +117,19 @@ std::unique_ptr<Rule> parse_action(
         {
             throw std::invalid_argument("cannot 'call' the default chain");
         }
+
         if (priority)
         {
             return std::make_unique<Call>(
-                chains.at(root.content()),
-                priority.value(),
-                std::move(condition));
+                       chains.at(root.content()),
+                       priority.value(),
+                       std::move(condition));
         }
         else
         {
             return std::make_unique<Call>(
-                chains.at(root.content()),
-                std::move(condition));
+                       chains.at(root.content()),
+                       std::move(condition));
         }
     }
     // Parse call goto.
@@ -137,20 +139,22 @@ std::unique_ptr<Rule> parse_action(
         {
             throw std::invalid_argument("cannot 'goto' the default chain");
         }
+
         if (priority)
         {
             return std::make_unique<GoTo>(
-                chains.at(root.content()),
-                priority.value(),
-                std::move(condition));
+                       chains.at(root.content()),
+                       priority.value(),
+                       std::move(condition));
         }
         else
         {
             return std::make_unique<GoTo>(
-                chains.at(root.content()),
-                std::move(condition));
+                       chains.at(root.content()),
+                       std::move(condition));
         }
     }
+
     // Only called if the AST is invalid, this can't be called as long as
     // config_grammar.hpp does not contain any bugs.
     // LCOV_EXCL_START
@@ -209,6 +213,7 @@ void parse_chain(
 If parse_condition(const config::parse_tree::node &root)
 {
     If condition;
+
     // Parse condition options.
     for (auto &child : root.children)
     {
@@ -228,6 +233,7 @@ If parse_condition(const config::parse_tree::node &root)
             condition.to(child->content());
         }
     }
+
     return condition;
 }
 
@@ -286,6 +292,7 @@ std::vector<std::unique_ptr<Interface>> parse_interfaces(
     std::shared_ptr<Filter> shared_filter = std::move(filter);
     std::vector<std::unique_ptr<Interface>> interfaces;
     auto connection_pool = std::make_shared<ConnectionPool>();
+
     // Loop over each node of the root AST node.
     for (auto &node : root.children)
     {
@@ -302,6 +309,7 @@ std::vector<std::unique_ptr<Interface>> parse_interfaces(
                 parse_serial(*node, shared_filter, connection_pool));
         }
     }
+
     return interfaces;
 }
 
@@ -362,15 +370,17 @@ std::unique_ptr<SerialInterface> parse_serial(
 
     // Construct serial interface.
     auto port = std::make_unique<UnixSerialPort>(
-        device.value(), baud_rate, features);
+                    device.value(), baud_rate, features);
     auto connection = std::make_unique<Connection>(
-            device.value(), filter, false);
+                          device.value(), filter, false);
+
     for (const auto &addr : preload)
     {
         connection->add_address(addr);
     }
+
     return std::make_unique<SerialInterface>(
-        std::move(port), pool, std::move(connection));
+               std::move(port), pool, std::move(connection));
 }
 
 
@@ -409,7 +419,7 @@ std::unique_ptr<UDPInterface> parse_udp(
         else if (node->name() == "config::max_bitrate")
         {
             max_bitrate = static_cast<unsigned long>(
-                    std::stoll(node->content()));
+                              std::stoll(node->content()));
         }
     }
 
@@ -417,7 +427,7 @@ std::unique_ptr<UDPInterface> parse_udp(
     auto socket = std::make_unique<UnixUDPSocket>(port, address, max_bitrate);
     auto factory = std::make_unique<ConnectionFactory<>>(filter, false);
     return std::make_unique<UDPInterface>(
-        std::move(socket), pool, std::move(factory));
+               std::move(socket), pool, std::move(factory));
 }
 
 
@@ -429,6 +439,7 @@ ConfigParser::ConfigParser(std::string filename)
     : in_(filename)
 {
     root_ = config::parse(in_);
+
     if (root_ == nullptr)
     {
         // It is technically impossible parsing errors should be raised as a

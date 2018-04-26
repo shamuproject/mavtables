@@ -115,7 +115,7 @@ TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
     fakeit::Fake(Method(mock_pool, add));
     std::multiset<packet_v2::Packet,
         bool(*)(const packet_v2::Packet &, const packet_v2::Packet &)>
-        send_packets([](const auto &a, const auto &b)
+        send_packets([](const auto & a, const auto & b)
     {
         return a.data() < b.data();
     });

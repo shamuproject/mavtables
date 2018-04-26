@@ -31,16 +31,18 @@ TEST_CASE("The Logger level can be set and retrieved with the static 'level' "
           "method", "[Logger]")
 {
     REQUIRE(Logger::level() == 0);
+
     for (unsigned int i = 0; i <= 10; i++)
     {
         Logger::level(i);
         REQUIRE(Logger::level() == i);
     }
+
     Logger::level(0);
 }
 
 
-TEST_CASE("The Logger can log to stdout with the static 'log' method.", 
+TEST_CASE("The Logger can log to stdout with the static 'log' method.",
           "[Logger]")
 {
     MockCOut mock_cout;
@@ -62,5 +64,5 @@ TEST_CASE("All logged messages have a timestamp (this can sometimes fail if "
     REQUIRE(
         mock_cout.buffer() ==
         str(std::put_time(&tm, "%Y-%m-%d %H:%M:%S")) +
-            "  timestamped log message\n");
+        "  timestamped log message\n");
 }

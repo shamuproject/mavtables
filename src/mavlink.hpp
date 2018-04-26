@@ -68,8 +68,7 @@ namespace mavlink
         uint8_t magic;          //!< Protocol magic marker (0xFD).
         uint8_t len;            //!< Length of payload.
         uint8_t incompat_flags; //!< Flags that must be understood.
-        uint8_t compat_flags;   //!< Flags that can be ignored if not
-                                //!< understood.
+        uint8_t compat_flags;   //!< Flags that can be ignored if not known.
         uint8_t seq;            //!< Sequence of packet.
         uint8_t sysid;          //!< ID of message sender system/aircraft.
         uint8_t compid;         //!< ID of the message sender component.

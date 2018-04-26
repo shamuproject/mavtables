@@ -53,7 +53,7 @@ UnixUDPSocket::UnixUDPSocket(
     unsigned int port, std::optional<IPAddress> address,
     unsigned long max_bitrate, std::unique_ptr<UnixSyscalls> syscalls)
     : port_(port), address_(std::move(address)), max_bitrate_(max_bitrate),
-      syscalls_(std::move(syscalls)), socket_(-1), 
+      syscalls_(std::move(syscalls)), socket_(-1),
       next_time_(std::chrono::steady_clock::now())
 {
     create_socket_();
@@ -81,11 +81,13 @@ void UnixUDPSocket::send(
     {
         // Implement rate limit.
         auto now = std::chrono::steady_clock::now();
+
         if (now < next_time_)
         {
             std::this_thread::sleep_for(next_time_ - now);
         }
-        next_time_ = now + (1000*1000*data.size()*8)/max_bitrate_ * 1us;
+
+        next_time_ = now + (1000 * 1000 * data.size() * 8) / max_bitrate_ * 1us;
     }
 
     // Destination address structure.
@@ -95,7 +97,6 @@ void UnixUDPSocket::send(
     addr.sin_addr.s_addr =
         htonl(static_cast<uint32_t>(address.address()));
     std::memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
-
     // Send the packet.
     auto err = syscalls_->sendto(
                    socket_, data.data(), data.size(), 0,
@@ -237,14 +238,17 @@ std::ostream &UnixUDPSocket::print_(std::ostream &os) const
 {
     os << "udp {" << std::endl;
     os << "    port " << std::to_string(port_) << ";" << std::endl;
+
     if (address_.has_value())
     {
         os << "    address " << address_.value() << ";" << std::endl;
     }
+
     if (max_bitrate_ != 0)
     {
         os << "    max_bitrate " << max_bitrate_ << ";" << std::endl;
     }
+
     os << "}";
     return os;
 }

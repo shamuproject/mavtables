@@ -104,7 +104,7 @@ std::ostream &SerialPort::print_(std::ostream &os) const
  *      flow_control yes;
  *  }
  *  ```
- 
+
  *  \relates SerialPort
  *  \param os The output stream to print to.
  *  \param serial_port The serial port (or any child of SerialPort) to print.

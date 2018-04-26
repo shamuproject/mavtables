@@ -222,10 +222,11 @@ TEST_CASE("Options's class will use the given configuration file "
         });
         // Construct Options object.
         int argc = 3;
-        const char *argv[3] = {
-            "mavtables", "--config", "non_existant_file.conf"};
+        const char *argv[3] =
+        {
+            "mavtables", "--config", "non_existant_file.conf"
+        };
         std::stringstream ss;
-        
         // Verify Options object.
         REQUIRE_THROWS_AS(
             Options(argc, argv, ss, fs_mock.get()), std::runtime_error);
@@ -409,8 +410,10 @@ TEST_CASE("Options's class sets run to false and ast to true when the --ast "
     fakeit::When(Method(fs_mock, exists)).AlwaysReturn(true);
     // Construct Options object.
     int argc = 4;
-    const char *argv[4] = {
-        "mavtables", "--ast", "--config", "test/mavtables.conf"};
+    const char *argv[4] =
+    {
+        "mavtables", "--ast", "--config", "test/mavtables.conf"
+    };
     std::stringstream ss;
     Options options(argc, argv, ss);
     // Verify Options object.
@@ -444,8 +447,10 @@ TEST_CASE("Option's class has a loglevel option", "[Options]")
     {
         // Construct Options object.
         int argc = 5;
-        const char *argv[5] = {
-            "mavtables", "--loglevel", "3", "--config", "test/mavtables.conf"};
+        const char *argv[5] =
+        {
+            "mavtables", "--loglevel", "3", "--config", "test/mavtables.conf"
+        };
         std::stringstream ss;
         Options options(argc, argv, ss);
         // Verify Options object.

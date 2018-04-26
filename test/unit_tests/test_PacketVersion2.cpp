@@ -700,7 +700,7 @@ TEST_CASE("packet_v2::Packet's optionally have a destination address.",
 }
 
 
-TEST_CASE("packet_v2::Packet's optionally have a source connection.", 
+TEST_CASE("packet_v2::Packet's optionally have a source connection.",
           "[packet_v2::Packet]")
 {
     auto heartbeat = packet_v2::Packet(to_vector(HeartbeatV2()));

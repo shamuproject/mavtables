@@ -37,7 +37,7 @@
  *      rejected.
  *  \param packet That is to be accepted/rejected.
  */
-void Connection::log_(bool accept, const Packet& packet)
+void Connection::log_(bool accept, const Packet &packet)
 {
     if (Logger::level() >= 3)
     {
@@ -45,6 +45,7 @@ void Connection::log_(bool accept, const Packet& packet)
         ss << (accept ? "accepted " : "rejected ")
            << packet << " source ";
         auto connection = packet.connection();
+
         if (connection == nullptr)
         {
             ss << "unknown";
@@ -53,6 +54,7 @@ void Connection::log_(bool accept, const Packet& packet)
         {
             ss << *connection;
         }
+
         ss << " dest " << name_;
         Logger::log(ss.str());
     }
@@ -107,8 +109,8 @@ void Connection::send_to_address_(
             if (addr.system() == dest.system())
             {
                 system_found = true;
-
                 auto [accept, priority] = filter_->will_accept(*packet, dest);
+
                 if (accept)
                 {
                     log_(true, *packet);
@@ -191,7 +193,6 @@ void Connection::send_to_system_(
         if (system == addr.system())
         {
             system_found = true;
-
             // Filter packet/address combination.
             auto [accept_, priority_] = filter_->will_accept(*packet, addr);
 
@@ -278,6 +279,7 @@ void Connection::add_address(MAVAddress address)
     {
         Logger::log("new component " + str(address) + " on " + name_);
     }
+
     pool_->add(std::move(address));
 }
 

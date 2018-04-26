@@ -121,7 +121,7 @@ std::ostream &UDPSocket::print_(std::ostream &os) const
  *      flow_control yes;
  *  }
  *  ```
- 
+
  *  \relates SerialPort
  *  \param os The output stream to print to.
  *  \param udp_socket The UDP socket (or any child of UDPSocket) to print.

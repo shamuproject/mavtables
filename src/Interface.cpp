@@ -46,7 +46,7 @@ Interface::~Interface()
  *      address 127.0.0.1;
  *  }
  *  ```
- 
+
  *  \relates Interface
  *  \param os The output stream to print to.
  *  \param interface The interface (or any child of Interface) to print.

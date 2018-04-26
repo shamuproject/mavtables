@@ -69,6 +69,7 @@ void ConnectionPool::send(std::unique_ptr<const Packet> packet)
         std::stringstream ss;
         ss << "received " << str(*packet) << " source ";
         auto connection = packet->connection();
+
         if (connection == nullptr)
         {
             ss << "unknown";
@@ -77,6 +78,7 @@ void ConnectionPool::send(std::unique_ptr<const Packet> packet)
         {
             ss << *connection;
         }
+
         Logger::log(ss.str());
     }
 
