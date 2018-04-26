@@ -59,7 +59,7 @@ function test_complex_ast_printing() {
 
 function test_all_v1_packets_udp() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_1serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v1_packets_udp_to_udp.log" &
@@ -68,14 +68,14 @@ function test_all_v1_packets_udp() {
     sleep 2
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
 
 function test_all_v2_packets_udp() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_1serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v2_packets_udp_to_udp.log" &
@@ -84,7 +84,7 @@ function test_all_v2_packets_udp() {
     sleep 2
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --udp 127.0.0.1:14500
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -92,7 +92,7 @@ function test_all_v2_packets_udp() {
 function test_all_v1_packets_serial() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v1_packets_serial_to_udp.log" &
@@ -101,7 +101,7 @@ function test_all_v1_packets_serial() {
     sleep 2
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -109,7 +109,7 @@ function test_all_v1_packets_serial() {
 function test_all_v2_packets_serial() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
         > "$(dir)/all_v2_packets_serial_to_udp.log" &
@@ -118,7 +118,7 @@ function test_all_v2_packets_serial() {
     sleep 2
     "$(dir)/packet_scripter.py" 192 168 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -126,7 +126,7 @@ function test_all_v2_packets_serial() {
 function test_multiple_senders_v1_packets() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 --verbose \
         | sort --version-sort \
@@ -141,7 +141,7 @@ function test_multiple_senders_v1_packets() {
         --udp 127.0.0.1:14500 --mavlink1 &
     "$(dir)/packet_scripter.py" 127 1 "$(dir)/all_v1_packets.pks" \
         --serial ./ttyS3 --mavlink1
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -149,7 +149,7 @@ function test_multiple_senders_v1_packets() {
 function test_multiple_senders_v2_packets() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 --verbose \
         | sort --version-sort \
@@ -164,14 +164,14 @@ function test_multiple_senders_v2_packets() {
         --udp 127.0.0.1:14500 &
     "$(dir)/packet_scripter.py" 127 1 "$(dir)/all_v2_packets.pks" \
         --serial ./ttyS3
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
 
 function test_routing_v1_packets() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/routing.conf" &
     "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 \
         > "$(dir)/routing_v1_packets_127.1.log" &
@@ -182,14 +182,14 @@ function test_routing_v1_packets() {
     sleep 2
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500 --mavlink1
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
 
 function test_routing_v2_packets() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/routing.conf" &
     "$(dir)/logger.py" 127 1 --udp 127.0.0.1:14500 \
         > "$(dir)/routing_v2_packets_127.1.log" &
@@ -200,7 +200,7 @@ function test_routing_v2_packets() {
     sleep 2
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -215,12 +215,12 @@ function test_priority() {
     perl -e 'for$i(1..50){print "ENCAPSULATED_DATA\n"}' \
         >> "$(dir)/priority.tmp"
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/priority.conf" &
     "$(dir)/logger.py" 192 168 --udp 127.0.0.1:14500 > "$(dir)/priority.log" &
     sleep 2
     "$(dir)/packet_scripter.py" 10 10 "$(dir)/priority.tmp" --serial ./ttyS1
-    sleep 3
+    sleep 2
     perl -e 'for$i(1..100){print "ENCAPSULATED_DATA\n"}' \
         > "$(dir)/priority.tmp"
     perl -e 'for$i(1..100){print "GLOBAL_POSITION_INT\n"}' \
@@ -233,14 +233,14 @@ function test_priority() {
 
 function test_preload_addresses() {
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/preload.conf" &
     "$(dir)/logger.py" 10 10 --noheartbeat --serial ./ttyS1 \
         > "$(dir)/preload.log" &
     sleep 2
     "$(dir)/packet_scripter.py" 123 123 "$(dir)/routing.pks" \
         --udp 127.0.0.1:14500
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -249,7 +249,7 @@ function test_component_broadcast_fallback() {
     perl -e 'for$i(0..255){print "MISSION_REQUEST_LIST to 1.$i\n"}' \
         > "$(dir)/component_broadcast_fallback.tmp"
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" \
         --conf "$(dir)/component_broadcast_fallback.conf" &
     "$(dir)/logger.py" 1 1 --verbose --serial ./ttyS1 \
@@ -261,7 +261,7 @@ function test_component_broadcast_fallback() {
     perl -e \
         'for$i(128..255){print "MISSION_REQUEST_LIST from 10.10 to 1.$i\n"}' \
         > "$(dir)/component_broadcast_fallback.tmp"
-    sleep 3
+    sleep 2
     shutdown_background
 }
 
@@ -271,7 +271,7 @@ function test_large_packets() {
         > "$(dir)/large_packets.tmp"
     socat pty,link=./ttyS0,raw,echo=0 pty,link=./ttyS1,raw,echo=0 &
     socat pty,link=./ttyS2,raw,echo=0 pty,link=./ttyS3,raw,echo=0 &
-    sleep 1
+    sleep 2
     "$(dir)/../../build/mavtables" --conf "$(dir)/all_2serial.conf" &
     "$(dir)/logger.py" 12 26 --udp 127.0.0.1:14500 \
         > "$(dir)/large_packets_to_udp.log" &
@@ -282,7 +282,7 @@ function test_large_packets() {
         --udp 127.0.0.1:14500 &
     "$(dir)/packet_scripter.py" 172 128 "$(dir)/large_packets.tmp" \
         --serial ./ttyS3
-    sleep 30
+    sleep 60
     perl -e 'for$i(1..5000){print "ENCAPSULATED_DATA\n"}' \
         >> "$(dir)/large_packets.tmp"
     shutdown_background
