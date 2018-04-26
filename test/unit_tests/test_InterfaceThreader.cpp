@@ -26,9 +26,6 @@
 #include "Interface.hpp"
 #include "InterfaceThreader.hpp"
 
-#include <iostream>
-#include <thread>
-
 
 using namespace std::chrono_literals;
 

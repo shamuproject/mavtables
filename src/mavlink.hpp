@@ -27,8 +27,8 @@ extern "C"
 
 }
 
-#include "macros.hpp"
 #include <cstdint>
+#include "macros.hpp"
 
 namespace mavlink
 {

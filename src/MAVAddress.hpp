@@ -19,8 +19,8 @@
 #define MAVADDRESS_HPP_
 
 
-#include <string>
 #include <ostream>
+#include <string>
 
 
 /** A MAVLink address.

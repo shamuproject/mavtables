@@ -15,11 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
-#include <string>
-#include <sstream>
 #include <exception>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <boost/tokenizer.hpp>
 

@@ -15,14 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include <catch.hpp>
 
-#include "utility.hpp"
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
+#include "utility.hpp"
 
 
 TEST_CASE("MAVSubnet's are comparable.", "[MAVSubnet]")

@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include <catch.hpp>
 
-#include "utility.hpp"
 #include "IPAddress.hpp"
+#include "utility.hpp"
 
 
 TEST_CASE("IPAddress's store an address and a port number.", "[IPAddress]")

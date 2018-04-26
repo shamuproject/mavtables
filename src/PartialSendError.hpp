@@ -19,8 +19,8 @@
 #define PARTIALSENDERROR_HPP_
 
 
-#include <string>
 #include <exception>
+#include <string>
 
 
 /** Exception type emmited when an interface failes to send a complete packet.

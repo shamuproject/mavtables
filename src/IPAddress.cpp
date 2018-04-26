@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <set>
-#include <vector>
-#include <memory>
-#include <string>
-#include <sstream>
 #include <algorithm>
+#include <memory>
+#include <set>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <cstring>
 #include <netdb.h>
@@ -30,9 +30,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "config.hpp"
-#include "utility.hpp"
 #include "DNSLookupError.hpp"
 #include "IPAddress.hpp"
+#include "utility.hpp"
 
 
 // Private functions.

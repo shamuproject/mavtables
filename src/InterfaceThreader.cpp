@@ -17,8 +17,8 @@
 
 #include <chrono>
 #include <memory>
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include "Interface.hpp"
 #include "InterfaceThreader.hpp"

@@ -22,9 +22,9 @@
 
 #include "InvalidPacketIDError.hpp"
 #include "mavlink.hpp"
+#include "PacketParser.hpp"
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
-#include "PacketParser.hpp"
 
 
 /** Construct a \ref PacketParser.

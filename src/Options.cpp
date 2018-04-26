@@ -20,8 +20,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "Options.hpp"
 #include "config.hpp"
+#include "Options.hpp"
 
 
 namespace po = boost::program_options;

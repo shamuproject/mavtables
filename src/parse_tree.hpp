@@ -28,17 +28,17 @@
 
 #include <cassert>
 #include <memory>
-#include <type_traits>
 #include <typeinfo>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <pegtl/config.hpp>
+#include <pegtl/internal/demangle.hpp>
+#include <pegtl/internal/iterator.hpp>
 #include <pegtl/normal.hpp>
 #include <pegtl/nothing.hpp>
 #include <pegtl/parse.hpp>
-#include <pegtl/internal/demangle.hpp>
-#include <pegtl/internal/iterator.hpp>
 
 
 // Not included in documentation because it is mostly copied from PEGTL.

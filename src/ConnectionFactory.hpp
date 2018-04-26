@@ -23,8 +23,8 @@
 #include <memory>
 #include <string>
 
-#include "Connection.hpp"
 #include "config.hpp"
+#include "Connection.hpp"
 #include "semaphore.hpp"
 
 

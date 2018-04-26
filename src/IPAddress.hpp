@@ -19,10 +19,10 @@
 #define IPADDRESS_HPP_
 
 
-#include <string>
+#include "DNSLookupError.hpp"
 #include <ostream>
 #include <stdexcept>
-#include "DNSLookupError.hpp"
+#include <string>
 
 
 /** An IP address with optional port number.

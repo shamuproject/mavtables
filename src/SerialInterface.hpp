@@ -25,8 +25,8 @@
 #include "Connection.hpp"
 #include "ConnectionPool.hpp"
 #include "Interface.hpp"
-#include "SerialPort.hpp"
 #include "PacketParser.hpp"
+#include "SerialPort.hpp"
 
 
 class SerialInterface : public Interface

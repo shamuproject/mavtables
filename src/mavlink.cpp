@@ -15,11 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string>
 #include <cstdint>
 #include <stdexcept>
+#include <string>
 
 #include "mavlink.hpp"
+
 
 namespace mavlink
 {

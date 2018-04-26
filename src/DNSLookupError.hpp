@@ -19,8 +19,8 @@
 #define DNSLOOKUPERROR_HPP_
 
 
-#include <string>
 #include <exception>
+#include <string>
 
 
 /** Exception type for a failed DNS lookup.

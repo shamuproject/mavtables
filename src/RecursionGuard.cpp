@@ -18,8 +18,8 @@
 #include <mutex>
 #include <thread>
 
-#include <RecursionError.hpp>
 #include <RecursionData.hpp>
+#include <RecursionError.hpp>
 #include <RecursionGuard.hpp>
 
 

@@ -27,7 +27,6 @@
 #include "common_Packet.hpp"
 
 
-
 TEST_CASE("QueuedPacket's can be constructed.", "[QueuedPacket]")
 {
     auto packet = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));

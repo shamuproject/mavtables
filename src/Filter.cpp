@@ -21,8 +21,8 @@
 #include "Action.hpp"
 #include "Chain.hpp"
 #include "Filter.hpp"
-#include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 
 
 /** Construct a new packet filter.

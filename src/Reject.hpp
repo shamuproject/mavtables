@@ -25,8 +25,8 @@
 
 #include "Action.hpp"
 #include "If.hpp"
-#include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 #include "Rule.hpp"
 
 

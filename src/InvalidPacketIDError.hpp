@@ -19,8 +19,8 @@
 #define INVALIDPACKETIDERROR_HPP_
 
 
-#include <string>
 #include <exception>
+#include <string>
 
 
 /** Exception type emmited when parsing a packet with an invalid ID.

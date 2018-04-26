@@ -15,16 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
-#include <string>
-#include <sstream>
 #include <algorithm>
-#include <stdexcept>
-
 #include <cctype>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include "utility.hpp"
 #include "MAVAddress.hpp"
+#include "utility.hpp"
 
 
 /** Construct MAVLink address from an address in numeric representation.

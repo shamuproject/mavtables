@@ -25,7 +25,6 @@
 #include <utility>
 #include <vector>
 
-
 #include "PartialSendError.hpp"
 #include "UnixSerialPort.hpp"
 #include "UnixSyscalls.hpp"

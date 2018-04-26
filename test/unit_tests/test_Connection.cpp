@@ -19,8 +19,8 @@
 #include <memory>
 #include <set>
 #include <stdexcept>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <catch.hpp>
 #include <fakeit.hpp>
@@ -31,8 +31,8 @@
 #include "Logger.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include "PacketVersion2.hpp"
 #include "PacketQueue.hpp"
+#include "PacketVersion2.hpp"
 #include "utility.hpp"
 
 #include "common.hpp"

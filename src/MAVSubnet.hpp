@@ -19,8 +19,8 @@
 #define MAVSUBNET_HPP_
 
 
-#include <string>
 #include <ostream>
+#include <string>
 
 #include "MAVAddress.hpp"
 

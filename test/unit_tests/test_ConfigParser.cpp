@@ -21,12 +21,12 @@
 #include <fakeit.hpp>
 #include <pegtl.hpp>
 
-#include "parse_tree.hpp"
 #include "config_grammar.hpp"
 #include "ConfigParser.hpp"
-#include "PacketVersion2.hpp"
-#include "utility.hpp"
 #include "MAVAddress.hpp"
+#include "PacketVersion2.hpp"
+#include "parse_tree.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

@@ -19,12 +19,12 @@
 #define IF_HPP_
 
 
-#include <string>
 #include <optional>
+#include <string>
 
-#include "Packet.hpp"
-#include "MAVSubnet.hpp"
 #include "MAVAddress.hpp"
+#include "MAVSubnet.hpp"
+#include "Packet.hpp"
 
 
 /** An if statement used to determine if a packet matches a rule.

@@ -20,12 +20,11 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "Accept.hpp"
 #include "App.hpp"
-
 #include "Call.hpp"
 #include "Chain.hpp"
 #include "ConfigParser.hpp"
