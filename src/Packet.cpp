@@ -55,6 +55,20 @@ const std::vector<uint8_t> &Packet::data() const
 }
 
 
+// TODO
+void Packet::connection(std::weak_ptr<Connection> connection)
+{
+    connection_ = connection;
+}
+
+
+// TODO
+const std::shared_ptr<Connection> Packet::connection() const
+{
+    return connection_.lock();
+}
+
+
 /** Equality comparison.
  *
  *  \relates Packet

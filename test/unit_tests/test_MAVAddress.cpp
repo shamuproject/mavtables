@@ -307,12 +307,6 @@ TEST_CASE("MAVAddress's are assignable (by move semantics).", "[MAVAddress]")
 
 TEST_CASE("MAVAddress's are printable", "[MAVAddress]")
 {
-    SECTION("192.168")
-    {
-        REQUIRE(str(MAVAddress(192, 168)) == "192.168");
-    }
-    SECTION("32.128")
-    {
-        REQUIRE(str(MAVAddress(32, 128)) == "32.128");
-    }
+    REQUIRE(str(MAVAddress(192, 168)) == "192.168");
+    REQUIRE(str(MAVAddress(32, 128)) == "32.128");
 }

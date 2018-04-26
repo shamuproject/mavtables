@@ -22,7 +22,9 @@
 
 #include "Connection.hpp"
 #include "ConnectionPool.hpp"
+#include "Logger.hpp"
 #include "PacketVersion2.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -37,23 +39,51 @@ TEST_CASE("ConnectionPool's can be constructed.", "[ConnectionPool]")
 TEST_CASE("ConnectionPool's can store at least one connection and send a "
           "packet over it.", "[ConnectionPool]")
 {
+    Logger::level(1);
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock;
     fakeit::Fake(Method(mock, send));
     std::shared_ptr<Connection> connection = mock_shared(mock);
+    fakeit::Mock<Filter> mock_filter;
+    auto filter = mock_shared(mock_filter);
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    auto ping = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
+    ping->connection(source_connection);
     ConnectionPool pool;
-    pool.add(connection);
-    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-    fakeit::Verify(Method(mock, send).Matching([&](auto a)
+    SECTION("with logging")
     {
-        return *a == *packet;
-    })).Once();
+        Logger::level(2);
+        MockCOut mock_cout;
+        pool.add(connection);
+        pool.send(std::move(ping));
+        fakeit::Verify(Method(mock, send).Matching([&](auto a)
+        {
+            return *a == *packet;
+        })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "received PING (#4) from 192.168 to 127.1 (v2.0) "
+            "source SOURCE\n");
+    }
+    SECTION("without logging")
+    {
+        MockCOut mock_cout;
+        pool.add(connection);
+        pool.send(std::move(ping));
+        fakeit::Verify(Method(mock, send).Matching([&](auto a)
+        {
+            return *a == *packet;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
 TEST_CASE("ConnectionPool's can store more than one connection and send a "
           "packet over them.", "[ConnectionPool]")
 {
+    Logger::level(1);
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;
     fakeit::Mock<Connection> mock2;
@@ -61,18 +91,49 @@ TEST_CASE("ConnectionPool's can store more than one connection and send a "
     fakeit::Fake(Method(mock2, send));
     std::shared_ptr<Connection> connection1 = mock_shared(mock1);
     std::shared_ptr<Connection> connection2 = mock_shared(mock2);
+    fakeit::Mock<Filter> mock_filter;
+    auto filter = mock_shared(mock_filter);
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    auto ping = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
+    ping->connection(source_connection);
     ConnectionPool pool;
-    pool.add(connection1);
-    pool.add(connection2);
-    pool.send(std::make_unique<packet_v2::Packet>(to_vector(PingV2())));
-    fakeit::Verify(Method(mock1, send).Matching([&](auto a)
+    SECTION("with logging")
     {
-        return *a == *packet;
-    })).Once();
-    fakeit::Verify(Method(mock2, send).Matching([&](auto a)
+        Logger::level(2);
+        MockCOut mock_cout;
+        pool.add(connection1);
+        pool.add(connection2);
+        pool.send(std::move(ping));
+        fakeit::Verify(Method(mock1, send).Matching([&](auto a)
+        {
+            return *a == *packet;
+        })).Once();
+        fakeit::Verify(Method(mock2, send).Matching([&](auto a)
+        {
+            return *a == *packet;
+        })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "received PING (#4) from 192.168 to 127.1 (v2.0) "
+            "source SOURCE\n");
+    }
+    SECTION("without logging")
     {
-        return *a == *packet;
-    })).Once();
+        MockCOut mock_cout;
+        pool.add(connection1);
+        pool.add(connection2);
+        pool.send(std::move(ping));
+        fakeit::Verify(Method(mock1, send).Matching([&](auto a)
+        {
+            return *a == *packet;
+        })).Once();
+        fakeit::Verify(Method(mock2, send).Matching([&](auto a)
+        {
+            return *a == *packet;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
@@ -103,8 +164,8 @@ TEST_CASE("ConnectionPool's 'remove' method removes a connection.",
 }
 
 
-TEST_CASE("ConnectionPool's 'send' method connections that have expired.",
-          "[ConnectionPool]")
+TEST_CASE("ConnectionPool's 'send' method removes connections that have "
+          "expired.", "[ConnectionPool]")
 {
     auto packet = std::make_unique<packet_v2::Packet>(to_vector(PingV2()));
     fakeit::Mock<Connection> mock1;

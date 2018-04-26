@@ -363,7 +363,8 @@ std::unique_ptr<SerialInterface> parse_serial(
     // Construct serial interface.
     auto port = std::make_unique<UnixSerialPort>(
         device.value(), baud_rate, features);
-    auto connection = std::make_unique<Connection>(filter, false);
+    auto connection = std::make_unique<Connection>(
+            device.value(), filter, false);
     for (const auto &addr : preload)
     {
         connection->add_address(addr);

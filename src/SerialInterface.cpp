@@ -93,6 +93,7 @@ void SerialInterface::receive_packet(const std::chrono::nanoseconds &timeout)
 
             if (packet != nullptr)
             {
+                packet->connection(connection_);
                 connection_->add_address(packet->source());
                 connection_pool_->send(std::move(packet));
             }

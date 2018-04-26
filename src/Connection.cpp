@@ -17,15 +17,46 @@
 
 #include <algorithm>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
 
 #include "AddressPool.hpp"
 #include "Connection.hpp"
 #include "Filter.hpp"
+#include "Logger.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketQueue.hpp"
+#include "util.hpp"
+
+
+/** Log an accepted/rejected packet.
+ *
+ *  \param accept Set to true if the packet is accepted, false if the packet is
+ *      rejected.
+ *  \param packet That is to be accepted/rejected.
+ */
+void Connection::log_(bool accept, const Packet& packet)
+{
+    if (Logger::level() >= 3)
+    {
+        std::stringstream ss;
+        ss << (accept ? "accepted " : "rejected ")
+           << packet << " source ";
+        auto connection = packet.connection();
+        if (connection == nullptr)
+        {
+            ss << "unknown";
+        }
+        else
+        {
+            ss << *connection;
+        }
+        ss << " dest " << name_;
+        Logger::log(ss.str());
+    }
+}
 
 
 /** Send a packet to a particular address.
@@ -55,26 +86,41 @@ void Connection::send_to_address_(
         // Add packet to the queue.
         if (accept)
         {
+            log_(true, *packet);
             queue_->push(std::move(packet), priority);
+        }
+        else
+        {
+            log_(false, *packet);
         }
     }
     // If the component is not reachable, send it to all components on the
     // system.
     else
     {
+        bool system_found = false;
+
         // Loop over addresses.
         for (const auto &addr : pool_->addresses())
         {
             // System can be reached on connection.
             if (addr.system() == dest.system())
             {
+                system_found = true;
+
                 auto [accept, priority] = filter_->will_accept(*packet, dest);
                 if (accept)
                 {
+                    log_(true, *packet);
                     queue_->push(std::move(packet), priority);
                     return;
                 }
             }
+        }
+
+        if (system_found)
+        {
+            log_(false, *packet);
         }
     }
 }
@@ -112,7 +158,12 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
     // Add packet to the queue.
     if (accept)
     {
+        log_(true, *packet);
         queue_->push(std::move(packet), priority);
+    }
+    else
+    {
+        log_(false, *packet);
     }
 }
 
@@ -130,6 +181,7 @@ void Connection::send_to_all_(std::shared_ptr<const Packet> packet)
 void Connection::send_to_system_(
     std::shared_ptr<const Packet> packet, unsigned int system)
 {
+    bool system_found = false;
     bool accept = false;
     int priority = std::numeric_limits<int>::min();
 
@@ -138,6 +190,8 @@ void Connection::send_to_system_(
     {
         if (system == addr.system())
         {
+            system_found = true;
+
             // Filter packet/address combination.
             auto [accept_, priority_] = filter_->will_accept(*packet, addr);
 
@@ -151,9 +205,17 @@ void Connection::send_to_system_(
     }
 
     // Add packet to the queue.
-    if (accept)
+    if (system_found)
     {
-        queue_->push(std::move(packet), priority);
+        if (accept)
+        {
+            log_(true, *packet);
+            queue_->push(std::move(packet), priority);
+        }
+        else
+        {
+            log_(false, *packet);
+        }
     }
 }
 
@@ -174,10 +236,12 @@ void Connection::send_to_system_(
  *      then the connection will also be threadsafe.
  */
 Connection::Connection(
+    std::string name,
     std::shared_ptr<Filter> filter, bool mirror,
     std::unique_ptr<AddressPool<>> pool,
     std::unique_ptr<PacketQueue> queue)
-    : filter_(std::move(filter)), pool_(std::move(pool)),
+    : name_(std::move(name)),
+      filter_(std::move(filter)), pool_(std::move(pool)),
       queue_(std::move(queue)), mirror_(mirror)
 {
     if (filter_ == nullptr)
@@ -210,6 +274,10 @@ Connection::Connection(
  */
 void Connection::add_address(MAVAddress address)
 {
+    if (Logger::level() >= 1 && !pool_->contains(address))
+    {
+        Logger::log("new component " + str(address) + " on " + name_);
+    }
     pool_->add(std::move(address));
 }
 
@@ -258,6 +326,7 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     // Drop packet if the source is reachable on this connection.
     if (pool_->contains(packet->source()))
     {
+        // log_(false, *packet);
         return;
     }
 
@@ -278,4 +347,18 @@ void Connection::send(std::shared_ptr<const Packet> packet)
     {
         send_to_address_(std::move(packet), dest.value());
     }
+}
+
+
+/** Print the connection name to the given output stream.
+ *
+ *  Some examples are:
+ *      - `/dev/ttyUSB0`
+ *      - `127.0.0.1:8000`
+ *      - `127.0.0.1:14550`
+ */
+std::ostream &operator<<(std::ostream &os, const Connection &connection)
+{
+    os << connection.name_;
+    return os;
 }

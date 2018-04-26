@@ -29,6 +29,9 @@
 #include "MAVAddress.hpp"
 
 
+class Connection;
+
+
 /** A MAVLink packet.
  *
  *  This is an abstract class, it is meant to be overridden by classes
@@ -85,6 +88,8 @@ class Packet
          *      broadcast packet.
          */
         virtual std::optional<MAVAddress> dest() const = 0;
+        void connection(std::weak_ptr<Connection> connection);
+        const std::shared_ptr<Connection> connection() const;
         const std::vector<uint8_t> &data() const;
         /** Assignment operator.
          *
@@ -99,6 +104,7 @@ class Packet
 
     private:
         std::vector<uint8_t> data_;
+        std::weak_ptr<Connection> connection_;
 };
 
 

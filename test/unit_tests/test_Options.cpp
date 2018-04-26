@@ -138,7 +138,8 @@ TEST_CASE("Options's class prints the help message.", "[Options]")
         "  -h [ --help ]         print this message\n"
         "  --config arg          specify configuration file\n"
         "  --ast                 print AST of configuration file (do not run)\n"
-        "  --version             print version and license information\n\n";
+        "  --version             print version and license information\n"
+        "  --loglevel arg        level of logging, between 0 and 3\n\n";
     SECTION("When given the '-h' flag.")
     {
         int argc = 2;
@@ -419,4 +420,37 @@ TEST_CASE("Options's class sets run to false and ast to true when the --ast "
     REQUIRE_FALSE(options.run());
     // Verify printing.
     REQUIRE(ss.str() == "");
+}
+
+
+TEST_CASE("Option's class has a loglevel option", "[Options]")
+{
+    // Setup mocks.
+    fakeit::Mock<Filesystem> fs_mock;
+    fakeit::When(Method(fs_mock, exists)).AlwaysReturn(true);
+    SECTION("defaults to loglevel 0")
+    {
+        // Construct Options object.
+        int argc = 3;
+        const char *argv[3] = {"mavtables", "--config", "test/mavtables.conf"};
+        std::stringstream ss;
+        Options options(argc, argv, ss);
+        // Verify Options object.
+        REQUIRE(options.loglevel() == 0);
+        // Verify printing.
+        REQUIRE(ss.str() == "");
+    }
+    SECTION("sets the loglevel when the --loglevel is given")
+    {
+        // Construct Options object.
+        int argc = 5;
+        const char *argv[5] = {
+            "mavtables", "--loglevel", "3", "--config", "test/mavtables.conf"};
+        std::stringstream ss;
+        Options options(argc, argv, ss);
+        // Verify Options object.
+        REQUIRE(options.loglevel() == 3);
+        // Verify printing.
+        REQUIRE(ss.str() == "");
+    }
 }

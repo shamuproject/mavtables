@@ -26,6 +26,7 @@
 #include "Filter.hpp"
 #include "Packet.hpp"
 #include "PacketVersion2.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -66,12 +67,28 @@ TEST_CASE("ConnectionFactory's 'get' method returns a new connection.",
     auto filter = mock_shared(mock_filter);
     REQUIRE(filter != nullptr);
     ConnectionFactory<> connection_factory(filter);
-    std::unique_ptr<Connection> conn = connection_factory.get();
-    conn->add_address(MAVAddress("192.168"));
-    conn->send(heartbeat);
-    auto packet = conn->next_packet(0s);
-    REQUIRE(packet != nullptr);
-    REQUIRE(*packet == *heartbeat);
+    SECTION("with connection name")
+    {
+        std::unique_ptr<Connection> conn = connection_factory.get("CONNECTION");
+        REQUIRE(conn != nullptr);
+        REQUIRE(str(*conn) == "CONNECTION");
+        conn->add_address(MAVAddress("192.168"));
+        conn->send(heartbeat);
+        auto packet = conn->next_packet(0s);
+        REQUIRE(packet != nullptr);
+        REQUIRE(*packet == *heartbeat);
+    }
+    SECTION("without connection name")
+    {
+        std::unique_ptr<Connection> conn = connection_factory.get();
+        REQUIRE(conn != nullptr);
+        REQUIRE(str(*conn) == "unknown");
+        conn->add_address(MAVAddress("192.168"));
+        conn->send(heartbeat);
+        auto packet = conn->next_packet(0s);
+        REQUIRE(packet != nullptr);
+        REQUIRE(*packet == *heartbeat);
+    }
 }
 
 

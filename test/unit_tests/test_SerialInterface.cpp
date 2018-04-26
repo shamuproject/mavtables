@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
 
 #include <algorithm>
 #include <chrono>
@@ -122,7 +121,6 @@ TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
     });
     fakeit::When(Method(mock_pool, send)).AlwaysDo([&](auto & a)
     {
-        // std::make_shared<packet_v2::Packet>*a
         const Packet *packet = a.get();
         send_packets.insert(
             packet_v2::Packet(
@@ -201,6 +199,9 @@ TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
                              ).Using(MAVAddress("127.1"))).Exactly(1);
         fakeit::Verify(Method(mock_pool, send)).Exactly(1);
         REQUIRE(send_packets.count(*heartbeat) == 1);
+        auto it = send_packets.find(*heartbeat);
+        REQUIRE(it != send_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Multiple packets received (same MAVLink address).")
     {
@@ -226,6 +227,12 @@ TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
                              ).Using(MAVAddress("127.1"))).Exactly(2);
         fakeit::Verify(Method(mock_pool, send)).Exactly(2);
         REQUIRE(send_packets.count(*heartbeat) == 2);
+        auto it = send_packets.find(*heartbeat);
+        REQUIRE(it != send_packets.end());
+        REQUIRE(it->connection() != nullptr);
+        it++;
+        REQUIRE(it != send_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Multiple packets received (different MAVLink address).")
     {
@@ -259,6 +266,12 @@ TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
         fakeit::Verify(Method(mock_pool, send)).Exactly(2);
         REQUIRE(send_packets.count(*heartbeat) == 1);
         REQUIRE(send_packets.count(*encapsulated_data) == 1);
+        auto it = send_packets.find(*heartbeat);
+        REQUIRE(it != send_packets.end());
+        REQUIRE(it->connection() != nullptr);
+        it = send_packets.find(*encapsulated_data);
+        REQUIRE(it != send_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
     SECTION("Partial packets should be combined and parsed.")
     {
@@ -289,6 +302,9 @@ TEST_CASE("SerialInterface's 'receive_packet' method.", "[SerialInterface]")
                              ).Using(MAVAddress("224.255"))).Exactly(1);
         fakeit::Verify(Method(mock_pool, send)).Exactly(1);
         REQUIRE(send_packets.count(*encapsulated_data) == 1);
+        auto it = send_packets.find(*encapsulated_data);
+        REQUIRE(it != send_packets.end());
+        REQUIRE(it->connection() != nullptr);
     }
 }
 

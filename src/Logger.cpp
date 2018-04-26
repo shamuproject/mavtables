@@ -15,43 +15,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef OPTIONS_HPP_
-#define OPTIONS_HPP_
-
-
+#include <ctime>
+#include <mutex>
 #include <iostream>
+#include <iomanip>
 #include <string>
-#include <ostream>
-#include <optional>
 
-#include "Filesystem.hpp"
+#include "Logger.hpp"
 
 
-/** An options class which is used to parse the command line arguments.
- */
-class Options
+void Logger::log(std::string message)
 {
-    public:
-        Options(
-            int argc, const char *argv[], std::ostream &os = std::cout,
-            const Filesystem &filesystem = Filesystem());
-        bool ast();
-        unsigned int loglevel();
-        std::string config_file();
-        bool run();
-        explicit operator bool() const;
-
-    private:
-        bool continue_;
-        unsigned int loglevel_;
-        std::string config_file_;
-        bool print_ast_;
-        bool run_firewall_;
-};
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::cout << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "  "
+              << message << std::endl;
+}
 
 
-std::optional<std::string> find_config(
-    const Filesystem &filesystem = Filesystem());
+void Logger::level(unsigned int level)
+{
+    level_ = level;
+}
 
 
-#endif  // OPTIONS_HPP_
+unsigned int Logger::level()
+{
+    return level_;
+}
+
+
+unsigned int Logger::level_ = 0;
+
+
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wglobal-constructors"
+    #pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+
+std::mutex Logger::mutex_;
+
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif

@@ -20,6 +20,7 @@
 
 
 #include <memory>
+#include <string>
 
 #include "AddressPool.hpp"
 #include "config.hpp"
@@ -39,6 +40,7 @@ class Connection
 {
     public:
         Connection(
+            std::string name,
             std::shared_ptr<Filter> filter, bool mirror = false,
             std::unique_ptr<AddressPool<>> pool =
                 std::make_unique<AddressPool<>>(),
@@ -53,19 +55,27 @@ class Connection
                 std::chrono::nanoseconds(0));
         TEST_VIRTUAL void send(std::shared_ptr<const Packet> packet);
 
+        friend std::ostream &operator<<(
+                std::ostream &os, const Connection &connection);
+
     private:
         // Variables
+        std::string name_;
         std::shared_ptr<Filter> filter_;
         std::unique_ptr<AddressPool<>> pool_;
         std::unique_ptr<PacketQueue> queue_;
         bool mirror_;
         // Methods
+        void log_(bool accept, const Packet& packet);
         void send_to_address_(
             std::shared_ptr<const Packet> packet, const MAVAddress &dest);
         void send_to_all_(std::shared_ptr<const Packet> packet);
         void send_to_system_(
             std::shared_ptr<const Packet> packet, unsigned int system);
 };
+
+
+std::ostream &operator<<(std::ostream &os, const Connection &connection);
 
 
 #endif // CONNECTION_HPP_

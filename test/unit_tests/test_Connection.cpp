@@ -27,11 +27,13 @@
 
 #include "AddressPool.hpp"
 #include "Connection.hpp"
-#include "MAVAddress.hpp"
 #include "Filter.hpp"
+#include "Logger.hpp"
+#include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketVersion2.hpp"
 #include "PacketQueue.hpp"
+#include "util.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -54,55 +56,70 @@ TEST_CASE("Connection's can be constructed.", "[Connection]")
     auto queue = mock_unique(mock_queue);
     SECTION("With default arguments.")
     {
-        REQUIRE_NOTHROW(Connection(filter));
+        REQUIRE_NOTHROW(Connection("name", filter));
     }
     SECTION("As a regular connection.")
     {
-        REQUIRE_NOTHROW(Connection(
-                            filter, false, std::move(pool), std::move(queue)));
+        REQUIRE_NOTHROW(
+            Connection(
+                "name", filter, false, std::move(pool), std::move(queue)));
     }
     SECTION("As a mirror connection.")
     {
         REQUIRE_NOTHROW(
-            Connection(filter, true, std::move(pool), std::move(queue)));
+            Connection(
+                "name", filter, true, std::move(pool), std::move(queue)));
     }
     SECTION("Ensures the filter pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(nullptr, false, std::move(pool), std::move(queue)),
+            Connection(
+                "name", nullptr, false, std::move(pool), std::move(queue)),
             std::invalid_argument);
         pool = mock_unique(mock_pool);
         queue = mock_unique(mock_queue);
         REQUIRE_THROWS_WITH(
-            Connection(nullptr, false, std::move(pool), std::move(queue)),
+            Connection(
+                "name", nullptr, false, std::move(pool), std::move(queue)),
             "Given filter pointer is null.");
     }
     SECTION("Ensures the pool pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(filter, false, nullptr, std::move(queue)),
+            Connection("name", filter, false, nullptr, std::move(queue)),
             std::invalid_argument);
         queue = mock_unique(mock_queue);
         REQUIRE_THROWS_WITH(
-            Connection(filter, false, nullptr, std::move(queue)),
+            Connection("name", filter, false, nullptr, std::move(queue)),
             "Given pool pointer is null.");
     }
     SECTION("Ensures the queue pointer is not null.")
     {
         REQUIRE_THROWS_AS(
-            Connection(filter, false, std::move(pool), nullptr),
+            Connection("name", filter, false, std::move(pool), nullptr),
             std::invalid_argument);
         pool = mock_unique(mock_pool);
         REQUIRE_THROWS_WITH(
-            Connection(filter, false, std::move(pool), nullptr),
+            Connection("name", filter, false, std::move(pool), nullptr),
             "Given queue pointer is null.");
     }
+}
+
+
+TEST_CASE("Connection's are printable", "[Connection]")
+{
+    fakeit::Mock<Filter> mock_filter;
+    auto filter = mock_shared(mock_filter);
+    REQUIRE(str(Connection("some_name", filter)) == "some_name");
+    REQUIRE(str(Connection("/dev/ttyUSB0", filter)) == "/dev/ttyUSB0");
+    REQUIRE(str(Connection("127.0.0.1:14555", filter)) == "127.0.0.1:14555");
 }
 
 
 TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
           "[Connection]")
 {
+    Logger::level(0);
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
     fakeit::Mock<PacketQueue> mock_queue;
@@ -110,12 +127,56 @@ TEST_CASE("Connection's 'add_address' method adds/updates addresses.",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, false, std::move(pool), std::move(queue));
-    conn.add_address(MAVAddress("192.168"));
-    fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+    Connection conn("DEVICE", filter, false, std::move(pool), std::move(queue));
+    SECTION("does not contain address (with logging)")
     {
-        return a == MAVAddress("192.168");
-    })).Once();
+        Logger::level(1);
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(false);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "new component 192.168 on DEVICE\n");
+    }
+    SECTION("does not contain address (without logging)")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(false);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("already contains address (with logging)")
+    {
+        Logger::level(1);
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(true);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("already contains address (without logging)")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, contains)).AlwaysReturn(true);
+        conn.add_address(MAVAddress("192.168"));
+        fakeit::Verify(Method(mock_pool, add).Matching([](auto a)
+        {
+            return a == MAVAddress("192.168");
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
@@ -128,7 +189,7 @@ TEST_CASE("Connection's 'next_packet' method.", "[Connection]")
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Returns the next packet.")
     {
         fakeit::When(
@@ -179,7 +240,7 @@ TEST_CASE("Connection's 'send' method ensures the given packet is not "
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("name", filter, false, std::move(pool), std::move(queue));
     SECTION("Ensures the given packet is not nullptr.")
     {
         REQUIRE_THROWS_AS(conn.send(nullptr), std::invalid_argument);
@@ -192,8 +253,7 @@ TEST_CASE("Connection's 'send' method ensures the given packet is not "
 TEST_CASE("Connection's 'send' method (with destination address).",
           "[Connection]")
 {
-    // Packets for testing.
-    auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -202,11 +262,18 @@ TEST_CASE("Connection's 'send' method (with destination address).",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
+    // Packets for testing.
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    ping->connection(source_connection);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("DEST", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the destination can be "
-            "reached on this connection and the filter allows it.")
+            "reached on this connection and the filter allows it "
+            "(with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -224,9 +291,40 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         {
             return a != nullptr && *a == *ping && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted PING (#4) from 192.168 to 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
-    SECTION("Silently drops the packet if the filter rejects it.")
+    SECTION("Adds the packet to the PacketQueue if the destination can be "
+            "reached on this connection and the filter allows it "
+            "(without logging).")
     {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(true, 2);
+        });
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
+            return a != MAVAddress("192.168");
+        });
+        conn.send(ping);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *ping && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("Silently drops the packet if the filter rejects it "
+            "(with logging).")
+    {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -240,10 +338,35 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         });
         conn.send(ping);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "rejected PING (#4) from 192.168 to 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
+    }
+    SECTION("Silently drops the packet if the filter rejects it "
+            "(without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
+            return a != MAVAddress("192.168");
+        });
+        conn.send(ping);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("Silently drops the packet if the destination cannot be "
-            "reached on this connection.")
+            "reached on this connection (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -260,16 +383,38 @@ TEST_CASE("Connection's 'send' method (with destination address).",
         });
         conn.send(ping);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
     }
+    SECTION("Silently drops the packet if the destination cannot be "
+            "reached on this connection (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(true, 0);
+        });
+        fakeit::When(Method(mock_pool, addresses)).AlwaysReturn(
+            std::vector<MAVAddress>());
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
+            (void)a;
+            return false;
+        });
+        conn.send(ping);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (without destination address).",
           "[Connection]")
 {
-    // Packets for testing.
-    auto heartbeat =
-        std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
@@ -308,12 +453,19 @@ TEST_CASE("Connection's 'send' method (without destination address).",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
+    // Packets for testing.
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    auto heartbeat =
+        std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
+    heartbeat->connection(source_connection);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("DEST", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
-            "(increasing priority).")
+            "(increasing priority) (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
         {
             std::vector<MAVAddress> addr =
@@ -330,11 +482,40 @@ TEST_CASE("Connection's 'send' method (without destination address).",
         {
             return a != nullptr && *a == *heartbeat && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted HEARTBEAT (#0) from 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
-            "(decreasing priority).")
+            "(increasing priority) (without logging).")
     {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("10.10"),
+                MAVAddress("172.16"),
+                MAVAddress("192.168")
+            };
+            return addr;
+        });
+        conn.send(heartbeat);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *heartbeat && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("Adds the packet to the PacketQueue if the filter allows it for "
+            "any of the reachable addresses and favors the higher priority "
+            "(decreasing priority) (with logging).")
+    {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
         {
             std::vector<MAVAddress> addr =
@@ -351,10 +532,39 @@ TEST_CASE("Connection's 'send' method (without destination address).",
         {
             return a != nullptr && *a == *heartbeat && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted HEARTBEAT (#0) from 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
+    }
+    SECTION("Adds the packet to the PacketQueue if the filter allows it for "
+            "any of the reachable addresses and favors the higher priority "
+            "(decreasing priority) (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("192.168"),
+                MAVAddress("172.16"),
+                MAVAddress("10.10")
+            };
+            return addr;
+        });
+        conn.send(heartbeat);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *heartbeat && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("Silently drops the packet if the filter rejects it for all "
-            "reachable addresses.")
+            "reachable addresses (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -374,16 +584,44 @@ TEST_CASE("Connection's 'send' method (without destination address).",
         });
         conn.send(heartbeat);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "rejected HEARTBEAT (#0) from 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
+    SECTION("Silently drops the packet if the filter rejects it for all "
+            "reachable addresses (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("10.10"),
+                MAVAddress("172.16"),
+                MAVAddress("192.168")
+            };
+            return addr;
+        });
+        conn.send(heartbeat);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
           "[Connection]")
 {
-    // Packets for testing.
-    auto mission_set_current =
-        std::make_shared<packet_v2::Packet>(to_vector(MissionSetCurrentV2()));
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
@@ -422,12 +660,19 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
+    // Packets for testing.
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    auto mission_set_current =
+        std::make_shared<packet_v2::Packet>(to_vector(MissionSetCurrentV2()));
+    mission_set_current->connection(source_connection);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("DEST", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
-            "(increasing priority).")
+            "(increasing priority) (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
         {
             std::vector<MAVAddress> addr =
@@ -444,11 +689,40 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         {
             return a != nullptr && *a == *mission_set_current && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted MISSION_SET_CURRENT (#41) from 255.0 to 0.0 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any of the reachable addresses and favors the higher priority "
-            "(decreasing priority).")
+            "(increasing priority) (without logging).")
     {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("10.10"),
+                MAVAddress("172.16"),
+                MAVAddress("192.168")
+            };
+            return addr;
+        });
+        conn.send(mission_set_current);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *mission_set_current && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("Adds the packet to the PacketQueue if the filter allows it for "
+            "any of the reachable addresses and favors the higher priority "
+            "(decreasing priority) (with logging).")
+    {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
         {
             std::vector<MAVAddress> addr =
@@ -465,10 +739,39 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         {
             return a != nullptr && *a == *mission_set_current && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted MISSION_SET_CURRENT (#41) from 255.0 to 0.0 (v2.0) "
+            "source SOURCE dest DEST\n");
+    }
+    SECTION("Adds the packet to the PacketQueue if the filter allows it for "
+            "any of the reachable addresses and favors the higher priority "
+            "(decreasing priority) (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("192.168"),
+                MAVAddress("172.16"),
+                MAVAddress("10.10")
+            };
+            return addr;
+        });
+        conn.send(mission_set_current);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *mission_set_current && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("Silently drops the packet if the filter rejects it for all "
-            "reachable addresses.")
+            "reachable addresses (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -488,15 +791,44 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         });
         conn.send(mission_set_current);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "rejected MISSION_SET_CURRENT (#41) from 255.0 to 0.0 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
+    SECTION("Silently drops the packet if the filter rejects it for all "
+            "reachable addresses (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("10.10"),
+                MAVAddress("192.168"),
+                MAVAddress("172.16")
+            };
+            return addr;
+        });
+        conn.send(mission_set_current);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
           "[Connection]")
 {
-    // Packets for testing.
-    auto set_mode = std::make_shared<packet_v2::Packet>(to_vector(SetModeV2()));
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -539,12 +871,18 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
+    // Packets for testing.
+    auto set_mode = std::make_shared<packet_v2::Packet>(to_vector(SetModeV2()));
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    set_mode->connection(source_connection);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("DEST", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any reachable component address of the given system address and "
-            "favors the higher priority (increasing priority).")
+            "favors the higher priority (increasing priority) (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
         {
             std::vector<MAVAddress> addr =
@@ -562,11 +900,42 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
         {
             return a != nullptr && *a == *set_mode && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted SET_MODE (#11) from 172.0 to 123.0 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
     SECTION("Adds the packet to the PacketQueue if the filter allows it for "
             "any reachable component address of the given system address and "
-            "favors the higher priority (decreasing priority).")
+            "favors the higher priority (increasing priority) "
+            "(without logging).")
     {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("10.10"),
+                MAVAddress("123.16"),
+                MAVAddress("123.17"),
+                MAVAddress("123.168")
+            };
+            return addr;
+        });
+        conn.send(set_mode);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *set_mode && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    SECTION("Adds the packet to the PacketQueue if the filter allows it for "
+            "any reachable component address of the given system address and "
+            "favors the higher priority (decreasing priority) (with logging).")
+    {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
         {
             std::vector<MAVAddress> addr =
@@ -584,10 +953,41 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
         {
             return a != nullptr && *a == *set_mode && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted SET_MODE (#11) from 172.0 to 123.0 (v2.0) "
+            "source SOURCE dest DEST\n");
+    }
+    SECTION("Adds the packet to the PacketQueue if the filter allows it for "
+            "any reachable component address of the given system address and "
+            "favors the higher priority (decreasing priority) "
+            "(without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("123.168"),
+                MAVAddress("123.17"),
+                MAVAddress("123.16"),
+                MAVAddress("10.10")
+            };
+            return addr;
+        });
+        conn.send(set_mode);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *set_mode && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("Silently drops the packet if the filter rejects it for all "
-            "matching addresses.")
+            "matching addresses (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -608,10 +1008,42 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
         });
         conn.send(set_mode);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "rejected SET_MODE (#11) from 172.0 to 123.0 (v2.0) "
+            "source SOURCE dest DEST\n");
+    }
+    SECTION("Silently drops the packet if the filter rejects it for all "
+            "matching addresses (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::When(Method(mock_pool, addresses)).AlwaysDo([]()
+        {
+            std::vector<MAVAddress> addr =
+            {
+                MAVAddress("10.10"),
+                MAVAddress("123.16"),
+                MAVAddress("123.17"),
+                MAVAddress("123.168")
+            };
+            return addr;
+        });
+        conn.send(set_mode);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("Silently drops the packet if the destination system cannot be "
-            "reached on this connection.")
+            "reached on this connection (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -628,15 +1060,38 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
         });
         conn.send(set_mode);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
     }
+    SECTION("Silently drops the packet if the destination system cannot be "
+            "reached on this connection (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            (void)b;
+            return std::pair<bool, int>(true, 0);
+        });
+        fakeit::When(Method(mock_pool, addresses)).AlwaysReturn(
+            std::vector<MAVAddress>());
+        fakeit::When(Method(mock_pool, contains)).AlwaysDo([&](auto & a)
+        {
+            (void)a;
+            return false;
+        });
+        conn.send(set_mode);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }
 
 
 TEST_CASE("Connection's 'send' method (destination address, system reachable, "
           "component unreachable.", "[Connection]")
 {
-    // Packets for testing.
-    auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    Logger::level(2);
     // Mocked objects.
     fakeit::Mock<Filter> mock_filter;
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -675,12 +1130,18 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
     auto filter = mock_shared(mock_filter);
     auto pool = mock_unique(mock_pool);
     auto queue = mock_unique(mock_queue);
+    // Packets for testing.
+    auto ping = std::make_shared<packet_v2::Packet>(to_vector(PingV2()));
+    auto source_connection = std::make_shared<Connection>("SOURCE", filter);
+    ping->connection(source_connection);
     // Connection for testing.
-    Connection conn(filter, false, std::move(pool), std::move(queue));
+    Connection conn("DEST", filter, false, std::move(pool), std::move(queue));
     SECTION("Adds the packet to the PacketQueue if any component of the "
             "system is reachable on the connection and the filter allows it "
-            "to the original component.")
+            "to the original component (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -698,10 +1159,40 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
         {
             return a != nullptr && *a == *ping && b == 2;
         })).Once();
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "accepted PING (#4) from 192.168 to 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
+    }
+    SECTION("Adds the packet to the PacketQueue if any component of the "
+            "system is reachable on the connection and the filter allows it "
+            "to the original component (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            if (b == MAVAddress("127.1"))
+            {
+                return std::pair<bool, int>(true, 2);
+            }
+            return std::pair<bool, int>(false, 0);
+        });
+        fakeit::Fake(Method(mock_queue, push));
+        conn.send(ping);
+        fakeit::Verify(Method(mock_queue, push)).Once();
+        fakeit::Verify(Method(mock_queue, push).Matching([&](auto a, auto b)
+        {
+            return a != nullptr && *a == *ping && b == 2;
+        })).Once();
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("Silently drops the packet if the filter rejects it (using "
-            "it's original address).")
+            "it's original address) (with logging).")
     {
+        Logger::level(3);
+        MockCOut mock_cout;
         fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
             [&](auto & a, auto & b)
         {
@@ -715,5 +1206,29 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
         fakeit::Fake(Method(mock_queue, push));
         conn.send(ping);
         fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(
+            mock_cout.buffer().substr(21) ==
+            "rejected PING (#4) from 192.168 to 127.1 (v2.0) "
+            "source SOURCE dest DEST\n");
     }
+    SECTION("Silently drops the packet if the filter rejects it (using "
+            "it's original address) (without logging).")
+    {
+        MockCOut mock_cout;
+        fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
+            [&](auto & a, auto & b)
+        {
+            (void)a;
+            if (b == MAVAddress("127.1"))
+            {
+                return std::pair<bool, int>(false, 0);
+            }
+            return std::pair<bool, int>(true, 2);
+        });
+        fakeit::Fake(Method(mock_queue, push));
+        conn.send(ping);
+        fakeit::Verify(Method(mock_queue, push)).Exactly(0);
+        REQUIRE(mock_cout.buffer().empty());
+    }
+    Logger::level(0);
 }

@@ -17,6 +17,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_Interface.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_InterfaceThreader.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_IPAddress.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_Logger.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_MAVAddress.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_mavlink.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_MAVSubnet.cpp"
