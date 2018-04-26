@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef UTIL_HPP_
-#define UTIL_HPP_
+#ifndef UTILITY_HPP_
+#define UTILITY_HPP_
 
 
 #include <array>
@@ -53,6 +53,7 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
  *
  *  Taken from https://stackoverflow.com/a/37210097
  *
+ *  \ingroup utility
  *  \param dest Vector to append to.
  *  \param source Vector to append the elements from.
  *  \returns Iterator pointing to the first element appended, or the end of the
@@ -83,6 +84,7 @@ typename std::vector<T>::iterator append(
  *
  *  Taken from https://stackoverflow.com/a/37210097
  *
+ *  \ingroup utility
  *  \param dest Vector to append to.
  *  \param source Vector to append the elements from.  \p source will be a valid
  *      empty vector after this call.
@@ -182,4 +184,4 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
 }
 
 
-#endif // UTIL_HPP_
+#endif // UTILITY_HPP_

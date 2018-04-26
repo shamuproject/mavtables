@@ -22,7 +22,7 @@
 #include <catch.hpp>
 
 #include "Logger.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 

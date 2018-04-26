@@ -41,7 +41,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/UnixSerialPort.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixSyscalls.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/utility.cpp"
 )
 
 set (HEADERS
@@ -90,7 +90,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/UnixSerialPort.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixSyscalls.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/utility.hpp"
 )
 
 target_sources (mavtables 

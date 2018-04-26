@@ -25,7 +25,7 @@
 #include "config_grammar.hpp"
 #include "ConfigParser.hpp"
 #include "PacketVersion2.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 #include "MAVAddress.hpp"
 
 #include "common.hpp"

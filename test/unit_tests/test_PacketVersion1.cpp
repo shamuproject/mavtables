@@ -29,7 +29,7 @@
 #include "MAVAddress.hpp"
 #include "mavlink.hpp"
 #include "PacketVersion1.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

@@ -31,7 +31,7 @@
 #include "PacketVersion2.hpp"
 #include "SerialInterface.hpp"
 #include "SerialPort.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

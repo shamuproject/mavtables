@@ -27,7 +27,7 @@
 #include "ConfigParser.hpp"
 #include "Logger.hpp"
 #include "Options.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 int main(int argc, const char *argv[])

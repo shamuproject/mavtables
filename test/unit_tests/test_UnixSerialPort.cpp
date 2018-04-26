@@ -29,7 +29,7 @@
 #include "PartialSendError.hpp"
 #include "UnixSyscalls.hpp"
 #include "UnixSerialPort.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 

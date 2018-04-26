@@ -20,7 +20,7 @@
 
 #include <catch.hpp>
 
-#include "util.hpp"
+#include "utility.hpp"
 #include "IPAddress.hpp"
 
 

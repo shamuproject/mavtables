@@ -30,7 +30,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "config.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 #include "DNSLookupError.hpp"
 #include "IPAddress.hpp"
 

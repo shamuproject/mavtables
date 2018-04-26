@@ -19,10 +19,10 @@
 
 #include <catch.hpp>
 
-#include "util.hpp"
+#include "utility.hpp"
 
 
-TEST_CASE("'append' appends one vector to another.", "[util]")
+TEST_CASE("'append' appends one vector to another.", "[utility]")
 {
     SECTION("{} + {} = {}")
     {
@@ -64,7 +64,7 @@ TEST_CASE("'append' appends one vector to another.", "[util]")
 
 
 TEST_CASE("'append' (with move semantics) appends one vector to another.",
-          "[util]")
+          "[utility]")
 {
     SECTION("{} + {} = {}")
     {
@@ -105,7 +105,7 @@ TEST_CASE("'append' (with move semantics) appends one vector to another.",
 }
 
 
-TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
+TEST_CASE("'to_bytes' converts numeric types to bytes.", "[utility]")
 {
     SECTION("char's can be converted to at least 1 bytes")
     {
@@ -197,7 +197,7 @@ TEST_CASE("'to_bytes' converts numeric types to bytes.", "[util]")
 }
 
 
-TEST_CASE("'to_lower' converts string to lower case.", "[util]")
+TEST_CASE("'to_lower' converts string to lower case.", "[utility]")
 {
     REQUIRE(to_lower("HELLO WORLD") == "hello world");
     REQUIRE(to_lower("Hello World") == "hello world");
@@ -206,7 +206,7 @@ TEST_CASE("'to_lower' converts string to lower case.", "[util]")
 }
 
 
-TEST_CASE("'str' converts printable types to strings.", "[util]")
+TEST_CASE("'str' converts printable types to strings.", "[utility]")
 {
     REQUIRE(str(256) == "256");
     REQUIRE(str(3.14159) == "3.14159");
@@ -214,7 +214,7 @@ TEST_CASE("'str' converts printable types to strings.", "[util]")
 }
 
 
-TEST_CASE("'operator<<' makes vectors printable", "[util]")
+TEST_CASE("'operator<<' makes vectors printable", "[utility]")
 {
     SECTION("When the vector is empty.")
     {

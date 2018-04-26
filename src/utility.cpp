@@ -19,7 +19,7 @@
 #include <cctype>
 #include <string>
 
-#include "util.hpp"
+#include "utility.hpp"
 
 
 /** \defgroup utility Utility Functions

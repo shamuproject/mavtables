@@ -20,7 +20,7 @@
 #include <catch.hpp>
 
 #include "Action.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 TEST_CASE("Action's 'make_accept' factory method constructs an ACCEPT action.",

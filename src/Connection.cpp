@@ -28,7 +28,7 @@
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
 #include "PacketQueue.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 /** Log an accepted/rejected packet.

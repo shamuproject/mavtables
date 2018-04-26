@@ -35,7 +35,7 @@
 #include "PacketVersion2.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

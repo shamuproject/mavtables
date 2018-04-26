@@ -27,7 +27,7 @@
 #include "PacketVersion1.hpp"
 #include "PacketVersion2.hpp"
 #include "Rule.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

@@ -41,7 +41,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_UDPSocket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_UnixSerialPort.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_UnixUDPSocket.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/test_util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_utility.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/unit_tests.cpp"
 )
 target_sources (unit_tests

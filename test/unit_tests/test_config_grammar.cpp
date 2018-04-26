@@ -22,7 +22,7 @@
 #include <pegtl.hpp>
 
 #include "config_grammar.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 

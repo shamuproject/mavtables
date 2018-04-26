@@ -25,7 +25,7 @@
 #include "ConnectionPool.hpp"
 #include "Logger.hpp"
 #include "Packet.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 /** Add a connection to the pool.

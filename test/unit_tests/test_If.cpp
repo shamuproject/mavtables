@@ -25,7 +25,7 @@
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 using namespace fakeit;
