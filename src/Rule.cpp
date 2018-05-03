@@ -24,7 +24,7 @@
 
 /** Base constructor for Rule classes.
  *
- *  \param condition The condition used to determine the rule matches a
+ *  \param condition The condition used to determine if the rule matches a
  *      particular packet/address combination given to the \ref action method.
  *      The default is {} which indicates the rule matches any packet/address
  *      combination.
@@ -47,17 +47,20 @@ Rule::~Rule()
 
 /** Print the given rule to the given output stream.
  *
+ *  \note This is a polymorphic print, it will work on any child of \ref Rule
+ *      even if the pointer/reference is to the base class \ref Rule.
+ *
  *  Some examples are:
  *      - `accept`
  *      - `accept with priority 3`
- *      - `reject`
- *      - `call gcs_in`
+ *      - `reject if ENCAPSULATED_DATA`
+ *      - `call gcs_in if from 192.168`
  *      - `goto autopilot_out`
  *
  *  \relates Rule
  *  \param os The output stream to print to.
- *  \param rule The rule (or any child of Rule) to print.
- *  \return The output stream.
+ *  \param rule The rule (or any child of \ref Rule) to print.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Rule &rule)
 {

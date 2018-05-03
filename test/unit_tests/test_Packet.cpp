@@ -132,21 +132,21 @@ TEST_CASE("Packet's are movable.", "[Packet]")
 
 TEST_CASE("Packet's are assignable.", "[Packet]")
 {
-    PacketTestClass a({1, 3, 3, 7});
-    PacketTestClass b({0, 7, 7, 3, 4});
-    REQUIRE(a == PacketTestClass({1, 3, 3, 7}));
-    a = b;
-    REQUIRE(a == PacketTestClass({0, 7, 7, 3, 4}));
+    PacketTestClass packet_a({1, 3, 3, 7});
+    PacketTestClass packet_b({0, 7, 7, 3, 4});
+    REQUIRE(packet_a == PacketTestClass({1, 3, 3, 7}));
+    packet_a = packet_b;
+    REQUIRE(packet_a == PacketTestClass({0, 7, 7, 3, 4}));
 }
 
 
 TEST_CASE("Packet's are assignable (by move semantics).", "[Packet]")
 {
-    PacketTestClass a({1, 3, 3, 7});
-    PacketTestClass b({0, 7, 7, 3, 4});
-    REQUIRE(a == PacketTestClass({1, 3, 3, 7}));
-    a = std::move(b);
-    REQUIRE(a == PacketTestClass({0, 7, 7, 3, 4}));
+    PacketTestClass packet_a({1, 3, 3, 7});
+    PacketTestClass packet_b({0, 7, 7, 3, 4});
+    REQUIRE(packet_a == PacketTestClass({1, 3, 3, 7}));
+    packet_a = std::move(packet_b);
+    REQUIRE(packet_a == PacketTestClass({0, 7, 7, 3, 4}));
 }
 
 

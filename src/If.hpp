@@ -30,8 +30,7 @@
 /** An if statement used to determine if a packet matches a rule.
  *
  *  This uses the type, source, and destination of a packet to determine if it
- *  matches a \ref Rule.
- *
+ *  matches.
  */
 class If
 {
@@ -41,7 +40,7 @@ class If
            std::optional<MAVSubnet> dest = {});
         /** Copy constructor.
          *
-         * \param other If to copy.
+         * \param other If to copy from.
          */
         If(const If &other) = default;
         /** Move constructor.
@@ -58,7 +57,7 @@ class If
         bool check(const Packet &packet, const MAVAddress &address) const;
         /** Assignment operator.
          *
-         * \param other If to copy.
+         * \param other If to copy from.
          */
         If &operator=(const If &other) = default;
         /** Assignment operator (by move semantics).

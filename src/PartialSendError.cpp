@@ -21,10 +21,10 @@
 #include "PartialSendError.hpp"
 
 
-/** Construct a PartialSendError..
+/** Construct a \ref PartialSendError.
  *
- *  \param bytes_sent Number of bytes there were sent.
- *  \param total_bytes Number of bytes in the packet.
+ *  \param bytes_sent Number of bytes that were sent.
+ *  \param total_bytes Total number of bytes in the packet.
  */
 PartialSendError::PartialSendError(
     unsigned long bytes_sent, unsigned long total_bytes)
@@ -36,7 +36,7 @@ PartialSendError::PartialSendError(
 
 /** Return error message string.
  *
- *  \return Error message string.
+ *  \returns Error message string containing sent to total bytes ratio.
  */
 const char *PartialSendError::what() const noexcept
 {

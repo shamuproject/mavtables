@@ -28,13 +28,16 @@
 /** The base class for all interfaces.
  *
  *  Derived classes should add one or more connections to queue packets for
- *  sending in.
+ *  sending.
  */
 class Interface
 {
     public:
         virtual ~Interface();
         /** Send a packet from one of the interface's connections.
+         *
+         *  \note Which connection to take this packet from is not defined but
+         *      it must not starve any one of the \ref Interface's connections.
          *
          *  \param timeout The maximum amount of time to wait for a packet to be
          *      available for sending.
@@ -54,7 +57,7 @@ class Interface
         /** Print the interface to the given output stream.
          *
          *  \param os The output stream to print to.
-         *  \return The output stream.
+         *  \returns The output stream.
          */
         virtual std::ostream &print_(std::ostream &os) const = 0;
 };

@@ -31,11 +31,11 @@
 #include "utility.hpp"
 
 
-/** Log an accepted/rejected packet.
+/** Log an accepted/rejected packet to the \ref Logger.
  *
  *  \param accept Set to true if the packet is accepted, false if the packet is
  *      rejected.
- *  \param packet That is to be accepted/rejected.
+ *  \param packet The packet that is to be accepted/rejected.
  */
 void Connection::log_(bool accept, const Packet &packet)
 {
@@ -56,7 +56,7 @@ void Connection::log_(bool accept, const Packet &packet)
         }
 
         ss << " dest " << name_;
-        Logger::log(ss.str());
+        Logger::log(3, ss.str());
     }
 }
 
@@ -223,14 +223,19 @@ void Connection::send_to_system_(
 
 /** Construct a connection.
  *
+ *  \param name The name of the connection, should be the device string for a
+ *      serial connection or the IP address and port number for a UDP
+ *      connection.
  *  \param filter The packet filter to use for determining whether and with what
  *      priority to add a packet to the queue for transmission.
- *  \param pool The AddressPool to use for keeping track of the addresses
- *      reachable by the connection.
- *  \param queue The PacketQueue to used to hold packets awaiting transmission.
  *  \param mirror Set to true if this is to be a mirror connection.  A mirror
  *      connection is one that will receive all packets, regardless of
  *      destination address.  The default is false.
+ *  \param pool The \ref AddressPool to use for keeping track of the addresses
+ *      reachable by the connection.  A default address pool will be used if
+ *      none is given.
+ *  \param queue The \ref PacketQueue to use to hold packets awaiting
+ *      transmission.  A default packet queue will be used if none is given.
  *  \throws std::invalid_argument if the given any of the \p filter, \p pool, or
  *      \p queue pointers are null.
  *  \remarks If the given \ref AddressPool and \ref PacketQueue are threadsafe
@@ -264,20 +269,20 @@ Connection::Connection(
 
 /** Add a MAVLink address to the connection.
  *
- *  This adds an address to the list of components that can be reached on this
- *  connection.
+ *  This adds an address to the list of systems/components that can be reached
+ *  on this connection.
  *
- *  \note Addresses will be removed after the timeout set in the AddressPool
- *      given in the constructor.  Readding the address (even before this time
- *      runs out) will reset the timeout.
+ *  \note Addresses will be removed after the timeout set in the \ref
+ *      AddressPool given in the constructor.  Re-adding the address (even
+ *      before this time runs out) will reset the timeout.
  *
- *  \param address The MAVLink address to add or update the timeout for.
+ *  \param address The MAVLink address to add, or update the timeout for.
  */
 void Connection::add_address(MAVAddress address)
 {
     if (Logger::level() >= 1 && !pool_->contains(address))
     {
-        Logger::log("new component " + str(address) + " on " + name_);
+        Logger::log(1, "new component " + str(address) + " on " + name_);
     }
 
     pool_->add(std::move(address));
@@ -308,11 +313,12 @@ std::shared_ptr<const Packet> Connection::next_packet(
  *  the \ref PacketQueue given in the constructor.  Packets are read from the
  *  queue (for sending) by using the \ref next_packet method.
  *
- *  \note If the packet has a destination address that is not 0.0 (the broadcast
- *      address) it will only be sent if that address is reachable on this
- *      connection.
+ *  \note %If the packet has a destination address that is not 0.0 (the
+ *      broadcast address) it will only be sent if that system is reachable on
+ *      this connection.  It will still be sent even if the particular component
+ *      cannot be found.
  *
- *  \note If this is a mirror connection then the destination address of the
+ *  \note %If this is a mirror connection then the destination address of the
  *      packet is ignored.
  *
  *  \param packet The packet to send.

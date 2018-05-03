@@ -32,6 +32,11 @@
 #include "UDPSocket.hpp"
 
 
+/** A UDP (User Datagram Protocol) interface.
+ *
+ *  An interface (for sending and receiving packets) implementing the user
+ *  datagram protocol.
+ */
 class UDPInterface : public Interface
 {
     public:

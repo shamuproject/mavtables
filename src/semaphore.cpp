@@ -18,12 +18,12 @@
 #include <cstdint>
 #include <mutex>
 
-#include <semaphore.hpp>
+#include "semaphore.hpp"
 
 
 /** Construct a semaphore with the given initial value.
  *
- *  \param initial_value The initial value of the semaphore.
+ *  \param initial_value The initial value of the semaphore.  Defaults to 0.
  */
 semaphore::semaphore(size_t initial_value)
     : value_(initial_value)
@@ -32,6 +32,8 @@ semaphore::semaphore(size_t initial_value)
 
 
 /** Signal the semaphore.
+ *
+ *  Increments the semaphore.
  */
 void semaphore::notify()
 {
@@ -44,6 +46,8 @@ void semaphore::notify()
 
 
 /** Wait on the semaphore.
+ *
+ *  Decrements the semaphore.
  */
 void semaphore::wait()
 {

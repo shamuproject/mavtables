@@ -69,6 +69,8 @@ Accept::Accept(int priority, std::optional<If> condition)
  *  Prints `"reject <Priority> <If Statement>"` where the priority and if
  *  statement are only printed if the priority or condition is set,
  *  respectively.
+ *
+ *  \param os The output stream to print to.
  */
 std::ostream &Accept::print_(std::ostream &os) const
 {
@@ -91,8 +93,8 @@ std::ostream &Accept::print_(std::ostream &os) const
 /** \copydoc Rule::action(const Packet&,const MAVAddress&)const
  *
  *  %If the condition has not been set or it matches the given packet/address
- *  combination then it will return the accept object (with optional priority),
- *  otherwise it will return the continue object.
+ *  combination then it will return the accept \ref Action object (with optional
+ *  priority), otherwise it will return the continue \ref Action object.
  */
 Action Accept::action(
     const Packet &packet, const MAVAddress &address) const

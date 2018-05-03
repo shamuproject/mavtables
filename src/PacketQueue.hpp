@@ -32,6 +32,15 @@
 
 
 /** A threadsafe priority queue for MAVLink packets.
+ *
+ *  This priority queue will order packets based on priority but also maintains
+ *  insertion order among packets of the same priority.
+ *
+ *  This is used to implement the packet priority of the firewall and to provide
+ *  a queueing mechanism for packets when consumers are slower than the
+ *  producers.
+ *
+ *  \sa QueuedPacket
  */
 class PacketQueue
 {

@@ -50,9 +50,11 @@ The installation prefix is `/usr/local` by default but can be changed with
 $ make
 # make PREFIX=/desired/install/path install
 ```
-The makefile will download and use the default MAVLink implementation.  This can
-be overridden by setting the `MDIR` environment variable to the directory
-containing a `mavlink.h` header file.
+The makefile will download and use the default MAVLink implementation with the
+ArduPilot dialect.  This can be overridden by setting the `MDIR` environment
+variable to the library path (containing the `DIALECT`) and/or the `DIALECT`
+environment variable to the MAVLink dialect to use.  For instance the default
+value of `DIALECT` is `ardupilotmega`.
 
 
 ## Running

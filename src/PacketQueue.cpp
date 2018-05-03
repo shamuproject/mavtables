@@ -30,7 +30,8 @@
 
 /** Get packet from queue.
  *
- *  \note The mutex must be locked.
+ *  \note This is an internal method and thus the internal mutex must be locked
+ *      before calling.
  *
  *  \returns The next packet or nullptr if the queue has been closed or is
  *      empty.
@@ -80,6 +81,8 @@ void PacketQueue::close()
  *
  *  retval true There are no packets in the queue.
  *  retval false There is at least one packet in the queue.
+ *  \remarks
+ *      Threadsafe (locking).
  */
 bool PacketQueue::empty()
 {
@@ -115,7 +118,7 @@ std::shared_ptr<const Packet> PacketQueue::pop()
 /** Remove and return the packet at the front of the queue.
  *
  *  This version will block on an empty queue and will not return until the
- *  queue becomes non empty, is closed with \ref close, or the timeout has
+ *  queue becomes non empty, is closed with \ref close, or the \p timeout has
  *  expired.
  *
  *  \param timeout How long to block waiting for an empty queue.  Set to 0s for
@@ -124,6 +127,7 @@ std::shared_ptr<const Packet> PacketQueue::pop()
  *      queue was closed or the timeout expired.
  *  \remarks
  *      Threadsafe (locking).
+ *  \sa pop()
  */
 std::shared_ptr<const Packet> PacketQueue::pop(
     const std::chrono::nanoseconds &timeout)
@@ -146,8 +150,8 @@ std::shared_ptr<const Packet> PacketQueue::pop(
 
 /** Add a new packet to the queue, with a priority.
  *
- *  A higher \p priority will result in the packet being pushed to the front of
- *  the queue.  When priorities are equal the order in which the packets were
+ *  A higher \p priority will result in the \p packet being pushed to the front
+ *  of the queue.  When priorities are equal the order in which the packets were
  *  added to the queue is maintained.
  *
  *  \param packet The packet to add to the queue.  It must not be nullptr.

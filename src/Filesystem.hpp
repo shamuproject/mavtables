@@ -28,6 +28,12 @@
 #include "config.hpp"
 
 
+/** A class containing filesystem operations.
+ *
+ *  \note This class exists for testing purposes and to provide a level of
+ *      indirection so the underlying filesystem library can be changed to
+ *      std::filesystem once it is moved out of experimental.
+ */
 class Filesystem
 {
     public:

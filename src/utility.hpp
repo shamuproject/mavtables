@@ -20,13 +20,14 @@
 
 
 #include <array>
-#include <boost/range/irange.hpp>
 #include <iterator>
 #include <ostream>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/range/irange.hpp>
 
 
 template <typename T>
@@ -121,7 +122,7 @@ typename std::vector<T>::iterator append(
  *  \ingroup utility
  *  \tparam T Type of the object to convert to a string.
  *  \param object The object to convert to a string.
- *  \return The string representing the object.
+ *  \returns The string representing the object.
  */
 template <class T>
 std::string str(const T &object)
@@ -138,7 +139,7 @@ std::string str(const T &object)
  *  \tparam ByteType Numeric type to return in the array of bytes.
  *  \tparam T Type of the number being converted to bytes.
  *  \param number Number to convert to bytes
- *  \return The array of bytes from the given number, in LSB order.
+ *  \returns The array of bytes from the given number, in LSB order.
  *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type \p T.
  */
 template <class ByteType, class T>
@@ -162,6 +163,7 @@ std::array<ByteType, sizeof(T)> to_bytes(T number)
  *  \tparam T The type stored in the vector, it must support the << operator.
  *  \param os The output stream to print to.
  *  \param vector The vector of elements to print.
+ *  \returns The output stream.
  */
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)

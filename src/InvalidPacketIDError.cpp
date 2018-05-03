@@ -34,7 +34,7 @@ InvalidPacketIDError::InvalidPacketIDError(unsigned long id)
 
 /** Return error message string.
  *
- *  \return Error message string.
+ *  \returns Error message string.
  */
 const char *InvalidPacketIDError::what() const noexcept
 {

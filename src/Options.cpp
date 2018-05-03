@@ -30,11 +30,18 @@ namespace po = boost::program_options;
 
 /** Construct an options object.
  *
+ *  This will parse the command line arguments and construct an object for
+ *  passing the result of these arguments to the application.
+ *
+ *  The first two arguments are designed to be taken directly from the inputs to
+ *  the standard `main` function.
+ *
  *  \param argc The number of command line arguments given.
  *  \param argv The command line arguments, as given in the arguments to the
  *      main function.
  *  \param filesystem A filesystem instance.  The default is to construct an
- *      instance.
+ *      instance.  This exists for testing purposes.
+ *  \throws std::runtime_error if no configuration file can be found.
  */
 Options::Options(
     int argc, const char *argv[], const Filesystem &filesystem)
@@ -133,7 +140,8 @@ bool Options::ast()
 
 /** Get path to an existing configuration file.
  *
- *  \returns The path to an existing, but necessarily valid configuration file.
+ *  \returns The path to an existing, but not necessarily valid configuration
+ *      file.
  */
 std::string Options::config_file()
 {
@@ -151,7 +159,7 @@ unsigned int Options::loglevel()
 }
 
 
-/** Determine whether to run the firewall/router or note.
+/** Determine whether to run the firewall/router or not.
  *
  *  \retval true Run the firewall/router.
  *  \retval false Don't run the firewall/router.
@@ -162,11 +170,11 @@ bool Options::run()
 }
 
 
-/** Determine if options object is valid.
+/** Determine if the \ref Options object is valid.
  *
- *  \retval true If the options object sucessfully parsed the command line
+ *  \retval true %If the options object successfully parsed the command line
  *      arguments.
- *  \retval false If the program should exit imediatly.
+ *  \retval false %If the program should exit immediately.
  */
 Options::operator bool() const
 {
@@ -176,14 +184,16 @@ Options::operator bool() const
 
 /** Find the configuration file.
  *
+ *  Find the first configuration file in the list below:
  *  1. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
  *  2. `.mavtablesrc` in the current directory.
  *  3. `.mavtablesrc` at `$HOME/.mavtablesrc`.
  *  4. The main configuration file at `PREFIX/etc/mavtables.conf`.
  *
+ *  \relates Options
  *  \param filesystem A filesystem instance.  The default is to construct an
- *      instance.
- *  \returns The path the first configuration file found.  {} if no
+ *      instance.  This exists for testing purposes.
+ *  \returns The path to the first configuration file found.  {} if no
  *      configuration file could be found.
  */
 std::optional<std::string> find_config(const Filesystem &filesystem)

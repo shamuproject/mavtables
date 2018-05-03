@@ -64,9 +64,9 @@ void InterfaceThreader::rx_runner_()
 }
 
 
-/** Construct and optionally start an interface.
+/** Construct and optionally start an interface threader.
  *
- *  \param interface The interface to run in TX/RX threads.  It's \ref
+ *  \param interface The \ref Interface to run in TX/RX threads.  It's \ref
  *      Interface::send_packet and \ref Interface::receive_packet methods will
  *      be called repeatedly in two separate worker threads.
  *  \param timeout The maximum amount of time to wait for incoming data or a
@@ -102,7 +102,7 @@ InterfaceThreader::~InterfaceThreader()
 
 /** Start the worker threads for the interface.
  *
- *  This starts a receiver and transmitter thread.
+ *  This starts the receiver and transmitter threads.
  */
 void InterfaceThreader::start()
 {

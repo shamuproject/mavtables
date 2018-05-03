@@ -33,7 +33,7 @@ RecursionError::RecursionError(std::string message)
 
 /** Return error message string.
  *
- *  \return Error message string.
+ *  \returns Error message string.
  */
 const char *RecursionError::what() const noexcept
 {

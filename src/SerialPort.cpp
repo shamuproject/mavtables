@@ -36,8 +36,12 @@ SerialPort::~SerialPort()
 
 /** Read data from the serial port.
  *
- *  \param timeout How long to wait for data to arrive on the serial port.  The
- *      default is to not wait.
+ *  \note The \p timeout is not guaranteed to be up to nanosecond precision, the
+ *      actual precision is up to the operating system's implementation but is
+ *      guaranteed to have at least millisecond precision.
+ *
+ *  \param timeout How long to wait for data to arrive on the serial port if
+ *      there is not already data to read.  The default is to not wait.
  *  \returns The data read from the serial port.
  */
 std::vector<uint8_t> SerialPort::read(const std::chrono::nanoseconds &timeout)
@@ -50,9 +54,13 @@ std::vector<uint8_t> SerialPort::read(const std::chrono::nanoseconds &timeout)
 
 /** Read data from the serial port.
  *
+ *  \note The \p timeout is not guaranteed to be up to nanosecond precision, the
+ *      actual precision is up to the operating system's implementation but is
+ *      guaranteed to have at least millisecond precision.
+ *
  *  \param it A back insert iterator to read bytes into.
- *  \param timeout How long to wait for data to arrive on the serial port.  The
- *  default is to not wait.
+ *  \param timeout How long to wait for data to arrive on the serial port if
+ *      there is not already data to read.  The default is to not wait.
  */
 void SerialPort::read(
     std::back_insert_iterator<std::vector<uint8_t>> it,
@@ -63,7 +71,7 @@ void SerialPort::read(
 }
 
 
-/** Write data to the serial port.
+/** Write data to the serial port (blocking write).
  *
  *  \param data The bytes to send.
  */
@@ -73,7 +81,7 @@ void SerialPort::write(const std::vector<uint8_t> &data)
 }
 
 
-/** Write data to the serial port.
+/** Write data to the serial port (blocking write).
  *
  *  \param first Iterator to first byte in range to send.
  *  \param last Iterator to one past the last byte to send.
@@ -88,6 +96,11 @@ void SerialPort::write(
 }
 
 
+/** Print the serial port to the given output stream.
+ *
+ *  \param os The output stream to print to.
+ *  \returns The output stream.
+ */
 std::ostream &SerialPort::print_(std::ostream &os) const
 {
     os << "unknown serial port";
@@ -97,6 +110,10 @@ std::ostream &SerialPort::print_(std::ostream &os) const
 
 /** Print the given serial port to the given output stream.
  *
+ *  \note This is a polymorphic print, it will work on any child of \ref
+ *      SerialPort even if the pointer/reference is to the base class \ref
+ *      SerialPort.
+ *
  *  An example:
  *  ```
  *  serial {
@@ -105,11 +122,17 @@ std::ostream &SerialPort::print_(std::ostream &os) const
  *      flow_control yes;
  *  }
  *  ```
+ *
+ *  The base \ref SerialPort class will print:
+ *  ```
+ *  unknown serial port
+ *  ```
 
  *  \relates SerialPort
  *  \param os The output stream to print to.
- *  \param serial_port The serial port (or any child of SerialPort) to print.
- *  \return The output stream.
+ *  \param serial_port The serial port (or any child of \ref SerialPort) to
+ *      print.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const SerialPort &serial_port)
 {

@@ -30,7 +30,8 @@
  *  ```
  *  system.component
  *  ```
- *  Therefore, a system of 16 and a component of 8 can be represented as `16.8`.
+ *  Therefore, a system ID of 16 and a component ID of 8 can be represented as
+ *  `16.8`.
  *
  *  `0.0` is reserved as the broadcast address.
  */
@@ -39,7 +40,7 @@ class MAVAddress
     public:
         /** Copy constructor.
          *
-         * \param other MAVLink address to copy.
+         * \param other MAVLink address to copy from.
          */
         MAVAddress(const MAVAddress &other) = default;
         /** Move constructor.
@@ -55,7 +56,7 @@ class MAVAddress
         unsigned int component() const;
         /** Assignment operator.
          *
-         * \param other MAVLink address to copy.
+         * \param other MAVLink address to copy from.
          */
         MAVAddress &operator=(const MAVAddress &other) = default;
         /** Assignment operator (by move semantics).

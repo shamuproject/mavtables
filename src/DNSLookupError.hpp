@@ -23,7 +23,7 @@
 #include <string>
 
 
-/** Exception type for a failed DNS lookup.
+/** Exception type emitted when a DNS lookup fails.
  */
 class DNSLookupError : public std::exception
 {

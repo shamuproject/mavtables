@@ -224,7 +224,7 @@ namespace config
  *  \ingroup config
  *  \param os The output stream to print to.
  *  \param node The node to print, also prints it's children.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(
     std::ostream &os, const config::parse_tree::node &node)

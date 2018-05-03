@@ -27,7 +27,7 @@
 #include "MAVSubnet.hpp"
 
 
-/** Construct MAVLink subnet from a MAVLink address and mask.
+/** Construct a MAVLink subnet from a MAVLink address and mask.
  *
  *  \param address MAVLink address of subnet.
  *  \param mask Two byte subnet mask, where the system mask is in the MSB and
@@ -57,10 +57,10 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int mask)
  *  \param address MAVLink address of subnet.
  *  \param system_mask One byte subnet system mask with the bits set that must
  *      match the subnet address for a MAVLink address to be contained within
- *      the subnet.
+ *      the subnet.  Valid range is 0 to 255.
  *  \param component_mask One byte subnet component mask with the bits set that
  *      must match the subnet address for a MAVLink address to be contained
- *      within the subnet.
+ *      within the subnet.  Valid range is 0 to 255.
  *  \throws std::out_of_range if the system and component masks are not each
  *      between 0x00 and 0xFF.
  *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
@@ -92,9 +92,9 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
 }
 
 
-/** Construct MAVLink subnet from a string.
+/** Construct a MAVLink subnet from a string.
  *
- *  There are three string forms of of MAVLink subnets.
+ *  There are three string forms of MAVLink subnets.
  *
  *    1. "<System ID>.<Component ID>:<System ID mask>.<Component ID mask>"
  *    2. "<System ID>.<Component ID>/<bits>"
@@ -105,7 +105,7 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  In the 2nd case the number of bits (0 - 16) is the number of bits from the
  *  left that must match for an address to be in the subnet.  The 3rd form is
  *  like the 2nd, but does not require the system ID (first octet) to match and
- *  stats with the number of bits of the component ID (0 - 16) that must match
+ *  starts with the number of bits of the component ID (0 - 8) that must match
  *  from the left for an address to be in the subnet.  The last form is
  *  shorthand for "<System ID>.<Component ID>/16".
  *
@@ -151,9 +151,11 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *      16.
  *
  *  \param subnet String representing the MAVLink subnet.
- *  \throws std::out_of_range if either the System ID or the component ID is out
+ *  \throws std::out_of_range if either the system ID or the component ID is out
  *      of range.
  *  \throws std::out_of_range if the mask or slash bits are out of range.
+ *  \throws std::invalid_argument if the subnet string does not represent a
+ *      valid MAVLink subnet.
  *  \sa Check if a \ref MAVAddress is within the subnet with \ref contains.
  */
 MAVSubnet::MAVSubnet(std::string subnet)
@@ -254,6 +256,8 @@ bool MAVSubnet::contains(const MAVAddress &address) const
 
 /** Equality comparison.
  *
+ *  Compares both address and mask.
+ *
  *  \relates MAVSubnet
  *  \param lhs The left hand side MAVLink subnet.
  *  \param rhs The right hand side MAVLink subnet.
@@ -268,6 +272,8 @@ bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs)
 
 
 /** Inequality comparison.
+ *
+ *  Compares both address and mask.
  *
  *  \relates MAVSubnet
  *  \param lhs The left hand side MAVLink subnet.
@@ -297,10 +303,13 @@ bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs)
  *  See \ref MAVSubnet::MAVSubnet(std::string address) for more information on
  *  the string format.
  *
+ *  \note The string constructor \ref MAVSubnet(std::string) and the output
+ *      stream operator are not inverses because of form preferences:
+ *
  *  \relates MAVSubnet
  *  \param os The output stream to print to.
  *  \param mavsubnet The MAVLink subnet to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const MAVSubnet &mavsubnet)
 {

@@ -45,7 +45,7 @@
 #include "utility.hpp"
 
 
-/** Construct map of non default chains.
+/** Construct a map of non default chains.
  *
  *  \relates ConfigParser
  *  \param root Root of configuration AST.
@@ -73,7 +73,7 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
 }
 
 
-/** Construct action from AST, priority, and condition.
+/** Construct a \ref Rule with action from AST, priority, and condition.
  *
  *  \relates ConfigParser
  *  \param root AST action node.
@@ -84,6 +84,10 @@ std::map<std::string, std::shared_ptr<Chain>> init_chains(
  *  \param chains Map of chain names to chains for call and goto actions.
  *  \returns The action (or rule) parsed from the given AST node, priority, and
  *      condition.
+ *  \throws std::invalid_argument if the action attempts to `call` or `goto` the
+ *      default chain.
+ *  \throws std::runtime_error if the action is not one of `accept`, `reject`,
+ *      `call`, or `goto`.
  */
 std::unique_ptr<Rule> parse_action(
     const config::parse_tree::node &root,
@@ -97,7 +101,7 @@ std::unique_ptr<Rule> parse_action(
         if (priority)
         {
             return std::make_unique<Accept>(
-                       priority.value(), std::move(condition));
+                priority.value(), std::move(condition));
         }
         else
         {
@@ -162,7 +166,7 @@ std::unique_ptr<Rule> parse_action(
 }
 
 
-/** Add rules from AST to a chain.
+/** Add \ref Rule's from AST to a \ref Chain.
  *
  *  \relates ConfigParser
  *  \param chain Chain to add rules to.
@@ -203,7 +207,7 @@ void parse_chain(
 }
 
 
-/** Construct conditional from AST.
+/** Construct conditional (\ref If) from AST.
  *
  *  \relates ConfigParser
  *  \param root AST conditional node.
@@ -237,11 +241,11 @@ If parse_condition(const config::parse_tree::node &root)
 }
 
 
-/** Parse filter from AST.
+/** Parse \ref Filter from AST.
  *
  *  \relates ConfigParser
  *  \param root Root of configuration AST.
- *  \returns The filter parsed from the AST.
+ *  \returns The \ref Filter parsed from the AST.
  */
 std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
 {
@@ -281,8 +285,8 @@ std::unique_ptr<Filter> parse_filter(const config::parse_tree::node &root)
 /** Parse UDP and serial port interfaces from AST root.
  *
  *  \relates ConfigParser
- *  \param root The root of the AST to create interfaces from.
- *  \param filter The packet filter to use for the interfaces.
+ *  \param root The root of the AST to create \ref Interface's from.
+ *  \param filter The packet \ref Filter to use for the interfaces.
  *  \returns A vector of UDP and serial port interfaces.
  */
 std::vector<std::unique_ptr<Interface>> parse_interfaces(
@@ -317,10 +321,11 @@ std::vector<std::unique_ptr<Interface>> parse_interfaces(
  *
  *  \relates ConfigParser
  *  \param root The serial port node to parse.
- *  \param filter The filter to use for the interface.
+ *  \param filter The \ref Filter to use for the \ref SerialInterface.
  *  \param pool The connection pool to add the interface's connection to.
  *  \returns The serial port interface parsed from the AST and using the given
  *      filter and connection pool.
+ *  \throws std::invalid_argument if the device string is missing.
  */
 std::unique_ptr<SerialInterface> parse_serial(
     const config::parse_tree::node &root,
@@ -387,8 +392,8 @@ std::unique_ptr<SerialInterface> parse_serial(
  *
  *  \relates ConfigParser
  *  \param root The UDP node to parse.
- *  \param filter The filter to use for the interface.
- *  \param pool The connection pool to add the interface's connection to.
+ *  \param filter The \ref Filter to use for the \ref UDPInterface.
+ *  \param pool The connection pool to add the interface's connections to.
  *  \returns The UDP interface parsed from the AST and using the given filter
  *      and connection pool.
  */
@@ -432,7 +437,8 @@ std::unique_ptr<UDPInterface> parse_udp(
 
 /** Construct a configuration parser from a file.
  *
- *  \param filename The path to the configuration file to parse.
+ *  \param filename The path of the configuration file to parse.
+ *  \throws std::runtime_error if the configuration file cannot be parsed.
  */
 ConfigParser::ConfigParser(std::string filename)
     : in_(filename)
@@ -451,6 +457,10 @@ ConfigParser::ConfigParser(std::string filename)
 }
 
 
+/** Build a mavtables application from the AST contained by the parser.
+ *
+ *  \returns A mavtables application.
+ */
 std::unique_ptr<App> ConfigParser::make_app()
 {
     auto filter = parse_filter(*root_);
@@ -461,43 +471,43 @@ std::unique_ptr<App> ConfigParser::make_app()
 
 /** Print the configuration settings to the given output stream.
  *
- *  An example (that of examples/test.conf) is:
+ *  An example (that of test/mavtables.conf) is:
  *
  *  ```
- *  examples/test.conf:001:  default_action
- *  examples/test.conf:001:  |  accept
- *  examples/test.conf:004:  udp
- *  examples/test.conf:005:  |  port 14500
- *  examples/test.conf:006:  |  address 127.0.0.1
- *  examples/test.conf:010:  serial
- *  examples/test.conf:011:  |  device /dev/ttyUSB0
- *  examples/test.conf:012:  |  baudrate 115200
- *  examples/test.conf:013:  |  flow_control yes
- *  examples/test.conf:017:  serial
- *  examples/test.conf:018:  |  device COM1
- *  examples/test.conf:019:  |  baudrate 9600
- *  examples/test.conf:020:  |  flow_control no
- *  examples/test.conf:025:  chain default
- *  examples/test.conf:027:  |  call some_chain10
- *  examples/test.conf:027:  |  |  condition
- *  examples/test.conf:027:  |  |  |  source 127.1
- *  examples/test.conf:027:  |  |  |  dest 192.0
- *  examples/test.conf:028:  |  reject
- *  examples/test.conf:033:  chain some_chain10
- *  examples/test.conf:035:  |  accept
- *  examples/test.conf:035:  |  |  priority 99
- *  examples/test.conf:035:  |  |  condition
- *  examples/test.conf:035:  |  |  |  dest 192.0
- *  examples/test.conf:036:  |  accept
- *  examples/test.conf:036:  |  |  condition
- *  examples/test.conf:036:  |  |  |  packet_type PING
- *  examples/test.conf:037:  |  accept
+ *  ===== test/mavtables.conf =====
+ *  :001:  default_action
+ *  :001:  |  accept
+ *  :004:  udp
+ *  :005:  |  port 14500
+ *  :006:  |  address 127.0.0.1
+ *  :007:  |  max_bitrate 8388608
+ *  :011:  serial
+ *  :012:  |  device ./ttyS0
+ *  :013:  |  baudrate 115200
+ *  :014:  |  flow_control yes
+ *  :015:  |  preload 1.1
+ *  :016:  |  preload 62.34
+ *  :020:  chain default
+ *  :022:  |  call some_chain10
+ *  :022:  |  |  condition
+ *  :022:  |  |  |  source 127.1
+ *  :022:  |  |  |  dest 192.0
+ *  :023:  |  reject
+ *  :027:  chain some_chain10
+ *  :029:  |  accept
+ *  :029:  |  |  priority 99
+ *  :029:  |  |  condition
+ *  :029:  |  |  |  dest 192.0
+ *  :030:  |  accept
+ *  :030:  |  |  condition
+ *  :030:  |  |  |  packet_type PING
+ *  :031:  |  accept
  *  ```
  *
- *  \relates MAVAddress
+ *  \relates ConfigParser
  *  \param os The output stream to print to.
- *  \param config_parser The MAVLink address to print.
- *  \return The output stream.
+ *  \param config_parser The configuration parser to print.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const ConfigParser &config_parser)
 {

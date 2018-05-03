@@ -278,7 +278,7 @@ namespace config
             // https://stackoverflow.com/a/16000226
             template <typename T>
             struct has_error_message <T, decltype((void) T::error_message, 0)>
-: std::true_type {};
+                : std::true_type {};
 
             template<template<typename> class S>
             struct make_control

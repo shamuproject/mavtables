@@ -30,15 +30,10 @@
 
 /** Add a connection to the pool.
  *
- *  \param connection The connection to add.
- *  \throws std::invalid_argument if the given connection pointer is nullptr.
+ *  \param connection The connection to add to the pool.
  */
 void ConnectionPool::add(std::weak_ptr<Connection> connection)
 {
-    // if (connection == nullptr)
-    // {
-    //     throw std::invalid_argument("Given Connection pointer is null.");
-    // }
     std::lock_guard<std::shared_mutex> lock(mutex_);
     connections_.insert(std::move(connection));
 }
@@ -46,7 +41,7 @@ void ConnectionPool::add(std::weak_ptr<Connection> connection)
 
 /** Remove a connection from the pool.
  *
- *  \param connection The connection to remove.
+ *  \param connection The connection to remove from the pool.
  */
 void ConnectionPool::remove(const std::weak_ptr<Connection> &connection)
 {
@@ -57,13 +52,19 @@ void ConnectionPool::remove(const std::weak_ptr<Connection> &connection)
 
 /** Send a packet to every connection.
  *
- *  \note Each connection may decide to ignore the packet based on the filter
+ *  \note Each connection may decide to ignore the packet based on it's filter
  *      rules.
  *
- *  \param packet Packet to send to every connection, must not be nullptr.
+ *  \param packet The packet to send to every connection, must not be nullptr.
+ *  \throws std::invalid_argument if the \p packet pointer is null.
  */
 void ConnectionPool::send(std::unique_ptr<const Packet> packet)
 {
+    if (packet == nullptr)
+    {
+        throw std::invalid_argument("Given packet pointer is null.");
+    }
+
     if (Logger::level() >= 2)
     {
         std::stringstream ss;
@@ -79,7 +80,7 @@ void ConnectionPool::send(std::unique_ptr<const Packet> packet)
             ss << *connection;
         }
 
-        Logger::log(ss.str());
+        Logger::log(2, ss.str());
     }
 
     std::shared_lock<std::shared_mutex> lock(mutex_);

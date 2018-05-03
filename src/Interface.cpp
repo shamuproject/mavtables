@@ -30,7 +30,10 @@ Interface::~Interface()
 // LCOV_EXCL_STOP
 
 
-/** Print the give interface to the given output stream.
+/** Print the given \ref Interface to the given output stream.
+ *
+ *  \note This is a polymorphic print.  Therefore, it can print any derived class
+ *      as well.
  *
  *  Some examples are:
  *  ```
@@ -49,8 +52,8 @@ Interface::~Interface()
 
  *  \relates Interface
  *  \param os The output stream to print to.
- *  \param interface The interface (or any child of Interface) to print.
- *  \return The output stream.
+ *  \param interface The interface (or any child of the Interface) to print.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Interface &interface)
 {

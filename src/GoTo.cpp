@@ -31,16 +31,17 @@
 
 /** Construct a goto rule given a chain to delegate to, without a priority.
  *
- *  A call rule is used to delegate the decision on whether to accept or reject
- *  a packet/address combination to another filter \ref Chain.
+ *  A goto rule is used to delegate the decision on whether to accept or reject
+ *  a packet/address combination to another filter \ref Chain.  If this called
+ *  chain does not make a decision then the default action should be taken.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet to.  null is not valid.
+ *      a packet/address combination to.  nullptr is not valid.
  *  \param condition The condition used to determine the rule matches a
  *      particular packet/address combination given to the \ref action method.
  *      The default is {} which indicates the rule matches any packet/address
  *      combination.
- *  \throws std::invalid_argument if the given pointer is nullptr.
+ *  \throws std::invalid_argument if the given pointer is null.
  *  \sa action
  */
 GoTo::GoTo(
@@ -54,20 +55,22 @@ GoTo::GoTo(
 }
 
 
-/** Construct a goto rule given a chain to delegate to, without a priority.
+/** Construct a goto rule given a chain to delegate to, with a priority.
  *
- *  A call rule is used to delegate the decision on whether to accept or reject
- *  a packet/address combination to another filter \ref Chain.
+ *  A goto rule is used to delegate the decision on whether to accept or reject
+ *  a packet/address combination to another filter \ref Chain.  If this called
+ *  chain does not make a decision then the default action should be taken.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet to.  null is not valid.
+ *      a packet/address combination to.  nullptr is not valid.
  *  \param priority The priority to accept packets with.  A higher number is
  *      more important and will be routed first.
  *  \param condition The condition used to determine the rule matches a
  *      particular packet/address combination given to the \ref action method.
  *      The default is {} which indicates the rule matches any packet/address
  *      combination.
- *  \throws std::invalid_argument if the given pointer is nullptr.
+ *  \throws std::invalid_argument if the given pointer is null.
+ *  \sa action
  */
 GoTo::GoTo(
     std::shared_ptr<Chain> chain, int priority,

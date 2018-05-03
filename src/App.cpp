@@ -50,6 +50,11 @@ App::App(std::vector<std::unique_ptr<Interface>> interfaces)
 
 
 /** Start the application.
+ *
+ *  This starts listening on all interfaces.
+ *
+ *  \throws std::system_error if an error is generated while waiting for Ctrl+C.
+ *  \throws std::runtime_error if run on Microsoft Windows.
  */
 void App::run()
 {

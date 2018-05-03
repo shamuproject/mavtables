@@ -28,7 +28,8 @@
 #include <vector>
 
 #include <pegtl.hpp>
-#include <parse_tree.hpp>
+
+#include "parse_tree.hpp"
 
 
 namespace config
@@ -376,13 +377,13 @@ namespace config
     /// @endcond
 
 
-    /** Parses given input into and abstract syntax tree.
+    /** Parses given input into an abstract syntax tree.
      *
      *  \note The returned AST is only valid while the input exists.  Therefore,
      *      the input should be kept until the AST passes out of scope.
      *
      *  \tparam Input The type of input, usually either read_input or
-     *      string_input.
+     *      string_input (see PEGTL).
      *  \param in The input, from read_input etc, to parse.
      *  \returns The abstract syntax tree parsed from the input.
      */

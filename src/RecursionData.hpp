@@ -24,16 +24,17 @@
 #include <thread>
 
 
-/** A data structure used by RecursionGuard to detect unwanted recursion.
+/** A data structure used by \ref RecursionGuard to detect unwanted recursion.
  *
- *  \note While RecursionData supports copy and move semantics both is
- *      constructors and assignment, a recursion data structure should never
- *      change instance.  One way to deal with this would have been to delete
- *      these operators but this would force users to manually implement copy
- *      and move semantics for their classes.  Therefore, RecursionData will
- *      always make a new data structure on copy, move or assignment, allowed
- *      default copy and move constructors/assignment operators to be created
- *      for classes using RecursionData.
+ *  \note While \ref RecursionData supports copy and move semantics both with
+ *      constructors and assignment operator, a recursion data structure should
+ *      never change instance.  One way to deal with this would have been to
+ *      delete these operators but this would force users to manually implement
+ *      copy and move semantics for their classes.  Therefore, \ref
+ *      RecursionData will always make a new data structure on copy, move or
+ *      assignment, allowing default copy and move constructors/assignment
+ *      operators to be created for classes containing a \ref RecursionData
+ *      instance.
  */
 class RecursionData
 {

@@ -44,10 +44,12 @@ using namespace std::chrono_literals;
  *  \param port The port number to listen on.
  *  \param address The address to listen on (the port portion of the address is
  *      ignored).  The default is to listen on any address.
- *  \param syscalls The object to use for Unix system calls.  It is default
- *      constructed to the production implementation.
  *  \param max_bitrate The maximum number of bits per second to transmit on the
  *      UDP interface.  The default is 0, which indicates no limit.
+ *  \param syscalls The object to use for unix system calls.  It is default
+ *      constructed to the production implementation.  This argument is only
+ *      used for testing.
+ *  \throws std::system_error if a system call produces an error.
  */
 UnixUDPSocket::UnixUDPSocket(
     unsigned int port, std::optional<IPAddress> address,
@@ -62,7 +64,7 @@ UnixUDPSocket::UnixUDPSocket(
 
 /** The socket destructor.
  *
- *  This closes the underlying file descriptor.
+ *  Closes the underlying file descriptor of the UDP socket.
  */
 // LCOV_EXCL_START
 UnixUDPSocket::~UnixUDPSocket()
@@ -73,6 +75,8 @@ UnixUDPSocket::~UnixUDPSocket()
 
 
 /** \copydoc UDPSocket::send(const std::vector<uint8_t> &, const IPAddress &)
+ *
+ *  \throws PartialSendError if it fails to write all the data it is given.
  */
 void UnixUDPSocket::send(
     const std::vector<uint8_t> &data, const IPAddress &address)
@@ -112,6 +116,8 @@ void UnixUDPSocket::send(
 /** \copydoc UDPSocket::receive(const std::chrono::nanoseconds &)
  *
  *  \note The timeout precision of this implementation is 1 millisecond.
+ *
+ *  \throws std::system_error if a system call produces an error.
  */
 std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive(
     const std::chrono::nanoseconds &timeout)
@@ -149,7 +155,9 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive(
 }
 
 
-/** Create socket given port_ and address_ member variables.
+/** Create socket using the `port_` and `address_` member variables.
+ *
+ *  \throws std::system_error if a system call produces an error.
  */
 void UnixUDPSocket::create_socket_()
 {
@@ -188,10 +196,11 @@ void UnixUDPSocket::create_socket_()
 
 /** Read data from socket.
  *
- *  \note There must be data to read, otherwise calling this method is
+ *  \note There must be a packet to receive, otherwise calling this method is
  *      undefined.
  *
  *  \returns The data read from the socket and the IP address it was sent from.
+ *  \throws std::system_error if a system call produces an error.
  */
 std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
 {
@@ -233,6 +242,17 @@ std::pair<std::vector<uint8_t>, IPAddress> UnixUDPSocket::receive_()
 
 
 /** \copydoc UDPSocket::print_(std::ostream &os)const
+ *
+ *  An example:
+ *  ```
+ *  udp {
+ *      port 14555;
+ *      address 127.0.0.1;
+ *      max_bitrate 262144;
+ *  }
+ *  ```
+ *
+ *  \param os The output stream to print to.
  */
 std::ostream &UnixUDPSocket::print_(std::ostream &os) const
 {

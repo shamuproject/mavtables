@@ -30,6 +30,10 @@
 #include "utility.hpp"
 
 
+/** mavtables: A MAVLink router and firewall.
+ *
+ *  See the README for further documentation.
+ */
 int main(int argc, const char *argv[])
 {
     try

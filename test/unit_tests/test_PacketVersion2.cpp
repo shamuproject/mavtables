@@ -559,21 +559,21 @@ TEST_CASE("packet_v2::Packet's are movable.", "[packet_v2::Packet]")
 
 TEST_CASE("packet_v2::Packet's are assignable.", "[Packet]")
 {
-    packet_v2::Packet a(to_vector(PingV2()));
-    packet_v2::Packet b(to_vector(SetModeV2()));
-    REQUIRE(a == packet_v2::Packet(to_vector(PingV2())));
-    a = b;
-    REQUIRE(b == packet_v2::Packet(to_vector(SetModeV2())));
+    packet_v2::Packet packet_a(to_vector(PingV2()));
+    packet_v2::Packet packet_b(to_vector(SetModeV2()));
+    REQUIRE(packet_a == packet_v2::Packet(to_vector(PingV2())));
+    packet_a = packet_b;
+    REQUIRE(packet_b == packet_v2::Packet(to_vector(SetModeV2())));
 }
 
 
 TEST_CASE("packet_v2::Packet's are assignable (by move semantics).", "[Packet]")
 {
-    packet_v2::Packet a(to_vector(PingV2()));
-    packet_v2::Packet b(to_vector(SetModeV2()));
-    REQUIRE(a == packet_v2::Packet(to_vector(PingV2())));
-    a = b;
-    REQUIRE(b == packet_v2::Packet(to_vector(SetModeV2())));
+    packet_v2::Packet packet_a(to_vector(PingV2()));
+    packet_v2::Packet packet_b(to_vector(SetModeV2()));
+    REQUIRE(packet_a == packet_v2::Packet(to_vector(PingV2())));
+    packet_a = packet_b;
+    REQUIRE(packet_b == packet_v2::Packet(to_vector(SetModeV2())));
 }
 
 

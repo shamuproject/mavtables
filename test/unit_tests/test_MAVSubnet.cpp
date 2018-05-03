@@ -284,45 +284,45 @@ TEST_CASE("MAVSubnet's can be constructed from strings.", "[MAVSubnet]")
 
 TEST_CASE("MAVSubnet's are copyable.", "[MAVSubnet]")
 {
-    MAVSubnet a(MAVAddress(0x0000), 0, 0);
-    MAVSubnet b(MAVAddress(0xFFFF), 255, 255);
-    MAVSubnet a_copy = a;
-    MAVSubnet b_copy(b);
-    REQUIRE(&a != &a_copy);
-    REQUIRE(a == a_copy);
-    REQUIRE(&b != &b_copy);
-    REQUIRE(b == b_copy);
+    MAVSubnet subnet_a(MAVAddress(0x0000), 0, 0);
+    MAVSubnet subnet_b(MAVAddress(0xFFFF), 255, 255);
+    MAVSubnet subnet_a_copy = subnet_a;
+    MAVSubnet subnet_b_copy(subnet_b);
+    REQUIRE(&subnet_a != &subnet_a_copy);
+    REQUIRE(subnet_a == subnet_a_copy);
+    REQUIRE(&subnet_b != &subnet_b_copy);
+    REQUIRE(subnet_b == subnet_b_copy);
 }
 
 
 TEST_CASE("MAVSubnet's are movable.", "[MAVSubnet]")
 {
-    MAVSubnet a(MAVAddress(0x0000), 0, 0);
-    MAVSubnet b(MAVAddress(0xFFFF), 255, 255);
-    MAVSubnet a_moved = std::move(a);
-    MAVSubnet b_moved(std::move(b));
-    REQUIRE(a_moved == MAVSubnet(MAVAddress(0x0000), 0, 0));
-    REQUIRE(b_moved == MAVSubnet(MAVAddress(0xFFFF), 255, 255));
+    MAVSubnet subnet_a(MAVAddress(0x0000), 0, 0);
+    MAVSubnet subnet_b(MAVAddress(0xFFFF), 255, 255);
+    MAVSubnet subnet_a_moved = std::move(subnet_a);
+    MAVSubnet subnet_b_moved(std::move(subnet_b));
+    REQUIRE(subnet_a_moved == MAVSubnet(MAVAddress(0x0000), 0, 0));
+    REQUIRE(subnet_b_moved == MAVSubnet(MAVAddress(0xFFFF), 255, 255));
 }
 
 
 TEST_CASE("MAVSubnet's are assignable.", "[MAVSubnet]")
 {
-    MAVSubnet a(MAVAddress(0x0000), 0, 0);
-    MAVSubnet b(MAVAddress(0xFFFF), 255, 255);
-    REQUIRE(a == MAVSubnet(MAVAddress(0x0000), 0, 0));
-    a = b;
-    REQUIRE(a == MAVSubnet(MAVAddress(0xFFFF), 255, 255));
+    MAVSubnet subnet_a(MAVAddress(0x0000), 0, 0);
+    MAVSubnet subnet_b(MAVAddress(0xFFFF), 255, 255);
+    REQUIRE(subnet_a == MAVSubnet(MAVAddress(0x0000), 0, 0));
+    subnet_a = subnet_b;
+    REQUIRE(subnet_a == MAVSubnet(MAVAddress(0xFFFF), 255, 255));
 }
 
 
 TEST_CASE("MAVSubnet's are assignable (by move semantics).", "[MAVSubnet]")
 {
-    MAVSubnet a(MAVAddress(0x0000), 0, 0);
-    MAVSubnet b(MAVAddress(0xFFFF), 255, 255);
-    REQUIRE(a == MAVSubnet(MAVAddress(0x0000), 0, 0));
-    a = std::move(b);
-    REQUIRE(a == MAVSubnet(MAVAddress(0xFFFF), 255, 255));
+    MAVSubnet subnet_a(MAVAddress(0x0000), 0, 0);
+    MAVSubnet subnet_b(MAVAddress(0xFFFF), 255, 255);
+    REQUIRE(subnet_a == MAVSubnet(MAVAddress(0x0000), 0, 0));
+    subnet_a = std::move(subnet_b);
+    REQUIRE(subnet_a == MAVSubnet(MAVAddress(0xFFFF), 255, 255));
 }
 
 

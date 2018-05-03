@@ -61,7 +61,7 @@ void PacketParser::clear()
 }
 
 
-/** Parse MAVLink wire protocol bytes, v1.0 or v2.0.
+/** Parse a MAVLink wire protocol byte, v1.0 or v2.0.
  *
  *  When a packet is completed it will be returned and the parser reset so it
  *  can be used to continue parsing.
@@ -94,10 +94,10 @@ std::unique_ptr<Packet> PacketParser::parse_byte(uint8_t byte)
 
 /** Check for start of packet.
  *
- *  Start packet parsing if the given byte is a start byte for either v1.0 or
- *  v2.0 packets.  Next state will be WAITING_FOR_HEADER if this is the case.
+ *  Start packet parsing if the given \p byte is a start byte for either v1.0 or
+ *  v2.0 packets.  Next state will be `WAITING_FOR_HEADER` if this is the case.
  *
- *  \param byte The next byte to attempt parsing.
+ *  \param byte The byte to attempt parsing.
  */
 void PacketParser::waiting_for_start_byte_(uint8_t byte)
 {
@@ -118,11 +118,12 @@ void PacketParser::waiting_for_start_byte_(uint8_t byte)
 }
 
 
-/** Parser header bytes.
+/** Parser header byte.
  *
- *  Next state will be WAITING_FOR_PACKET if the given byte complete the header.
+ *  Next state will be `WAITING_FOR_PACKET` if the given \p byte completes the
+ *  header.
  *
- *  \param byte The next byte to attempt parsing.
+ *  \param byte The byte to attempt parsing.
  */
 void PacketParser::waiting_for_header_(uint8_t byte)
 {
@@ -165,11 +166,11 @@ void PacketParser::waiting_for_header_(uint8_t byte)
 
 /** Parse packet bytes.
  *
- *  %If this byte completes the packet a \ref std::unique_ptr to the packet is
- *  returned and the parser is reset to begin parsing another packet (next state
- *  WAITING_FOR_START_BYTE).  Otherwise a nullptr is returned.
+ *  %If this \p byte completes the packet a \ref std::unique_ptr to the packet
+ *  is returned and the parser is reset to begin parsing another packet (next
+ *  state WAITING_FOR_START_BYTE).  Otherwise a nullptr is returned.
  *
- *  \param byte The next byte to attempt parsing.
+ *  \param byte The byte to attempt parsing.
  *  \returns A unique pointer to the complete packet.  %If the packet is not
  *      complete a nullptr is returned.
  */

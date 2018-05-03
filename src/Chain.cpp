@@ -28,12 +28,12 @@
 #include "MAVAddress.hpp"
 #include "MAVSubnet.hpp"
 #include "Packet.hpp"
-#include <RecursionGuard.hpp>
+#include "RecursionGuard.hpp"
 
 
 /** Copy constructor.
  *
- *  \param other Chain to copy.
+ *  \param other Chain to copy from.
  */
 Chain::Chain(const Chain &other)
     : name_(other.name_)
@@ -53,8 +53,8 @@ Chain::Chain(const Chain &other)
  *  \param name The name of the filter chain.  This is only used when printing
  *      the chain.  The name cannot contain whitespace.
  *  \param rules A vector of the rules used in the filter chain.  This must be
- *      moved from since the vector is made up of std::unique_ptr.
- *  \throws std::invalid_argument if the name contains whitespace.
+ *      moved from since the vector is made up of std::unique_ptr's.
+ *  \throws std::invalid_argument if the \p name contains whitespace.
  */
 Chain::Chain(
     std::string name, std::vector<std::unique_ptr<Rule>> &&rules)
@@ -74,8 +74,8 @@ Chain::Chain(
  *  Action class.
  *
  *  The filter chain will loop through all the rules and the first one that
- *  matches and returns something other than the continue action will be taken
- *  as the result.
+ *  matches and returns something other than the continue \ref Action will be
+ *  taken as the result.
  *
  *  \note An error will be thrown if any \ref Call or \ref GoTo rule matches
  *      that directly or indirectly loops back to this chain.
@@ -83,8 +83,8 @@ Chain::Chain(
  *  \param packet The packet to determine whether to allow or not.
  *  \param address The address the \p packet will be sent out on if the
  *      action allows it.
- *  \returns The action to take with the packet.  %If this is the accept
- *      object, it may also contain a priority for the packet.
+ *  \returns The action to take with the packet.  %If this is the accept \ref
+ *      Action object, it may also contain a priority for the packet.
  *  \throws RecursionError if a rule loops back to this chain.
  */
 Action Chain::action(
@@ -131,6 +131,10 @@ const std::string &Chain::name() const
 }
 
 
+/** Assignment operator.
+ *
+ * \param other Chain to copy from.
+ */
 Chain &Chain::operator=(const Chain &other)
 {
     name_ = other.name_;
@@ -146,23 +150,16 @@ Chain &Chain::operator=(const Chain &other)
 }
 
 
-// Chain &Chain::operator=(Chain &&other)
-// {
-//     name_ = other.name_;
-//     rules_ = std::move(other.rules_);
-//     recursion_data_ = RecursionData();
-//     return *this;
-// }
-
-
 /** Equality comparison.
-*
-*  \relates Chain
-*  \param lhs The left hand side filter chain.
-*  \param rhs The right hand side filter chain.
-*  \retval true if \p lhs is the same as rhs.
-*  \retval false if \p lhs is not the same as rhs.
-*/
+ *
+ *  Compares the chain name and each \ref Rule in the chain.
+ *
+ *  \relates Chain
+ *  \param lhs The left hand side filter chain.
+ *  \param rhs The right hand side filter chain.
+ *  \retval true if \p lhs is the same as rhs.
+ *  \retval false if \p lhs is not the same as rhs.
+ */
 bool operator==(const Chain &lhs, const Chain &rhs)
 {
     // Compare names.
@@ -191,6 +188,8 @@ bool operator==(const Chain &lhs, const Chain &rhs)
 
 
 /** Inequality comparison.
+ *
+ *  Compares the chain name and each \ref Rule in the chain.
  *
  *  \relates Chain
  *  \param lhs The left hand side action.
@@ -221,7 +220,7 @@ bool operator!=(const Chain &lhs, const Chain &rhs)
  *  \relates Chain
  *  \param os The output stream to print to.
  *  \param chain The filter chain to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Chain &chain)
 {

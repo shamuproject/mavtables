@@ -24,6 +24,9 @@
 
 /** Construct an Action.
  *
+ *  \note Private constructor, use \ref make_accept, \ref make_reject, \ref
+ *  make_continue, or \ref make_default.
+ *
  *  \param action The action this result represents.
  *  \param priority The priority, only used with Action::ACCEPT.
  *  \sa Action::Option
@@ -33,7 +36,6 @@ Action::Action(
     : action_(action), priority_(std::move(priority))
 {
 }
-
 
 
 /** Return the action that has been chosen.
@@ -52,7 +54,8 @@ Action::Option Action::action() const
  *  priority has never been set before.
  *
  *  The default priority is 0.  A higher priority will result in the
- *  packet being prioritized over other packets.
+ *  packet being prioritized over other packets while a lower (negative)
+ *  priority will de-prioritize the packet.
  *
  *  \param priority The priority to apply to the accept action.
  */
@@ -71,8 +74,8 @@ void Action::priority(int priority)
 /** Return the priority if it exists.
  *
  *  \returns The priority of the action.  This will always be 0 if the \ref
- *  action is not Action::ACCEPT.  It will also be 0 (the default priority) if
- *  the priority was never set.
+ *      action is not Action::ACCEPT.  It will also be 0 (the default priority)
+ *      if the priority has never been set.
  */
 int Action::priority() const
 {
@@ -85,7 +88,7 @@ int Action::priority() const
 }
 
 
-/** Return a new action result with the Action::ACCEPT action.
+/** Make a new action result with the Action::ACCEPT action.
  *
  *  An accept action indicates that the packet/address combination this action
  *  is the response to should be accepted without any further processing.
@@ -100,7 +103,7 @@ Action Action::make_accept(std::optional<int> priority)
 }
 
 
-/** Return a new action result with the Action::REJECT action.
+/** Make a new action result with the Action::REJECT action.
  *
  *  A reject action indicates that the packet/address combination this action is
  *  the response to should be rejected without any further processing.
@@ -113,7 +116,7 @@ Action Action::make_reject()
 }
 
 
-/** Return a new action result with the Action::CONTINUE action.
+/** Make a new action result with the Action::CONTINUE action.
  *
  *  A continue action indicates that filtering of the packet/address combination
  *  this action is the response should continue with the next \ref Rule.
@@ -126,7 +129,7 @@ Action Action::make_continue()
 }
 
 
-/** Return a new action result with the Action::DEFAULT action.
+/** Make a new action result with the Action::DEFAULT action.
  *
  *  A default action indicates that the default action (defined in \ref Filter)
  *  should be taken for the packet/address combination this action is the
@@ -168,12 +171,19 @@ bool operator!=(const Action &lhs, const Action &rhs)
 }
 
 
-/** Print the action. to the given output stream.
+/** Print the action to the given output stream.
+ *
+ *  Some examples are:
+ *      - `accept`
+ *      - `accept with priority 3`
+ *      - `reject`
+ *      - `continue`
+ *      - `default`
  *
  *  \relates Action
  *  \param os The output stream to print to.
  *  \param action The action result to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Action &action)
 {

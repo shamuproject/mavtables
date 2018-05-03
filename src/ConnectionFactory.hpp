@@ -51,10 +51,17 @@ class ConnectionFactory
 
 /** Construct a connection factory.
  *
- *  \tparam C The Connection class to use.
- *  \tparam AP The AddressPool to use.
- *  \tparam PQ The PacketQueue to use, must accept a callback function in it's
- *      constructor.
+ *  \tparam C The Connection class (or derived class) to use.
+ *  \tparam AP The AddressPool class (or derived class) to use.
+ *  \tparam PQ The PacketQueue class (or derived class) to use, must accept a
+ *      callback function in it's constructor.
+ *  \param filter The packet filter to use for determining whether and with what
+ *      priority to add a packet to the queue for transmission.  This will be
+ *      given to each constructed \ref Connection.  Cannot be nullptr.
+ *  \param mirror Set to true if all \ref Connection's made by this factory are
+ *      to be mirror connections.  A mirror connection is one that will receive
+ *      all packets, regardless of destination address.  The default is false.
+ *  \throws std::invalid_argument if the given \p filter pointer is null.
  */
 template <class C, class AP, class PQ>
 ConnectionFactory<C, AP, PQ>::ConnectionFactory(
@@ -71,9 +78,10 @@ ConnectionFactory<C, AP, PQ>::ConnectionFactory(
 /** Construct and return a new connection.
  *
  *  This connection will share a common semaphore with all other connections
- *      made by this factory instance.
+ *  made by this factory instance.
  *
  *  \param name The name of the new connection.
+ *  \returns The new connection.
  */
 template <class C, class AP, class PQ>
 std::unique_ptr<C> ConnectionFactory<C, AP, PQ>::get(std::string name)
@@ -90,10 +98,12 @@ std::unique_ptr<C> ConnectionFactory<C, AP, PQ>::get(std::string name)
 
 /** Wait for a packet to be available on any connection made by this factory.
  *
+ *  \param timeout How long to block waiting for a packet.  Set to 0s for non
+ *      blocking.
  *  \retval true There is a packet on at lest one of the connections created by
  *      this factory instance.
  *  \retval false The wait timed out, there is no packet available on any of the
- *      connections create by this factory instance.
+ *      connections created by this factory instance.
  */
 template <class C, class AP, class PQ>
 bool ConnectionFactory<C, AP, PQ>::wait_for_packet(

@@ -29,6 +29,11 @@
 #include "SerialPort.hpp"
 
 
+/** A serial port interface.
+ *
+ *  An interface (for sending and receiving packets) implementing the serial
+ *  port protocol.
+ */
 class SerialInterface : public Interface
 {
     public:

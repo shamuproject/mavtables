@@ -34,7 +34,7 @@
  *
  *  The connection class does not actually send anything.  It filters and sorts
  *  packets in a queue for sending by an \ref Interface.  It also maintains a
- *  list of addresses reachable on this connection.
+ *  list of MAVLink addresses reachable on this connection.
  */
 class Connection
 {

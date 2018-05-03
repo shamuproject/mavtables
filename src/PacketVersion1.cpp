@@ -33,9 +33,10 @@ namespace packet_v1
 
     /** \copydoc ::Packet::Packet(std::vector<uint8_t> data)
      *
-     *  \throws std::invalid_argument %If packet data does not start with magic
-     *      byte (0xFE).
-     *  \throws std::length_error %If packet data is not of correct length.
+     *  \throws std::invalid_argument if packet data does not start with the
+     *      magic byte (0xFE).
+     *  \throws std::length_error if packet data is either too short or too
+     *      long.
      */
     Packet::Packet(std::vector<uint8_t> data)
         : ::Packet(std::move(data))
@@ -117,7 +118,7 @@ namespace packet_v1
 
     /** \copydoc ::Packet::name()
      *
-     *  \throws std::runtime_error %If the packet data has an invalid ID.
+     *  \throws std::runtime_error if the packet data has an invalid ID.
      *  \complexity \f$O(log(n))\f$ where \f$n\f$ is the total number of MAVLink
      *      messages.
      */
@@ -153,8 +154,6 @@ namespace packet_v1
      *  \complexity \f$O(1)\f$
      *  \thanks The [mavlink-router](https://github.com/intel/mavlink-router)
      *      project for an example of how to extract the destination address.
-     *
-     *  \throws std::runtime_error %If the packet data has an invalid ID.
      */
     std::optional<MAVAddress> Packet::dest() const
     {
@@ -204,11 +203,11 @@ namespace packet_v1
 
     /** Determine if the given data contains a complete v1.0 header.
      *
-     *  \relates Packet
+     *  \relates packet_v1::Packet
+     *  \param data The packet data.
      *  \retval true if \p data contains a complete header (starting with the
      *      magic byte).
-     *  \retval false if \p data contains does not contain a complete v1.0
-     *      header.
+     *  \retval false if \p data does not contain a complete v1.0 header.
      */
     bool header_complete(const std::vector<uint8_t> &data)
     {
@@ -221,11 +220,12 @@ namespace packet_v1
 
     /** Determine if the given data contains a complete v1.0 packet.
      *
-     *  \relates Packet
+     *  \relates packet_v1::Packet
+     *  \param data The packet data.
      *  \retval true if \p data contains a complete packet (starting with the
      *      magic byte).
-     *  \retval false if \p data contains does not contain a complete v1.0
-     *      packet, or if there is extra bytes in \p data beyond the packet.
+     *  \retval false if \p data does not contain a complete v1.0 packet, or if
+     *      there is extra bytes in \p data beyond the packet.
      */
     bool packet_complete(const std::vector<uint8_t> &data)
     {
@@ -242,7 +242,9 @@ namespace packet_v1
 
     /** Cast data as a v1.0 packet header structure pointer.
      *
-     *  \return A pointer to the given data, cast to a v1.0 header structure.
+     *  \relates packet_v1::Packet
+     *  \param data The packet data.
+     *  \returns A pointer to the given data, cast to a v1.0 header structure.
      *      %If an incomplete header is given a nullptr will be returned.
      */
     const struct mavlink::v1_header *header(

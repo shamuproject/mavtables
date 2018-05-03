@@ -15,5 +15,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// Enforce a packed structure.
+/** \defgroup macros Macros
+ *
+ *  Macros used elsewhere.
+ */
+
+
+/** Enforce a packed structure.
+ *
+ *  A packed structure will not have any padding regardless of the typical
+ *  alignment restrictions.
+ *
+ *  Example:
+ *  ```
+ *  struct PACKED a_packed_structure
+ *  {
+ *      uint8_t a;
+ *      uint16_t b;
+ *      uint32_t c;
+ *  }
+ *  ```
+ *
+ *  \ingroup macros
+ */
 #define PACKED __attribute__((packed))

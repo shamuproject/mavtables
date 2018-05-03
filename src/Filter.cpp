@@ -45,7 +45,7 @@ Filter::Filter(Chain default_chain, bool accept_by_default)
  *  \param packet The packet to determine whether to allow or not.
  *  \param address The address the \p packet will be sent out on if the
  *      action allows it.
- *  \returns A pair (tuple) with the first value being whether to accept hte
+ *  \returns A pair (tuple) with the first value being whether to accept the
  *      packet or not and the second being the priority to use when sending the
  *      packet.  The second value is only defined if the first value is true
  *      (accept).
@@ -73,13 +73,15 @@ std::pair<bool, int> Filter::will_accept(
 
 
 /** Equality comparison.
-*
-*  \relates Filter
-*  \param lhs The left hand side packet filter.
-*  \param rhs The right hand side packet filter.
-*  \retval true if \p lhs is the same as rhs.
-*  \retval false if \p lhs is not the same as rhs.
-*/
+ *
+ *  The default chain and default action are compared.
+ *
+ *  \relates Filter
+ *  \param lhs The left hand side packet filter.
+ *  \param rhs The right hand side packet filter.
+ *  \retval true if \p lhs is the same as rhs.
+ *  \retval false if \p lhs is not the same as rhs.
+ */
 bool operator==(const Filter &lhs, const Filter &rhs)
 {
     return (lhs.default_chain_ == rhs.default_chain_) &&
@@ -88,13 +90,15 @@ bool operator==(const Filter &lhs, const Filter &rhs)
 
 
 /** Inequality comparison.
-*
-*  \relates Filter
-*  \param lhs The left hand side packet filter.
-*  \param rhs The right hand side packet filter.
-*  \retval true if \p lhs is not the same as rhs.
-*  \retval false if \p lhs is the same as rhs.
-*/
+ *
+ *  The default chain and default action are compared.
+ *
+ *  \relates Filter
+ *  \param lhs The left hand side packet filter.
+ *  \param rhs The right hand side packet filter.
+ *  \retval true if \p lhs is not the same as rhs.
+ *  \retval false if \p lhs is the same as rhs.
+ */
 bool operator!=(const Filter &lhs, const Filter &rhs)
 {
     return (lhs.default_chain_ != rhs.default_chain_) ||

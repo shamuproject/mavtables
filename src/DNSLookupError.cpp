@@ -20,7 +20,7 @@
 #include "DNSLookupError.hpp"
 
 
-/** Construct a DNSLookupError given the unresolvable URL.
+/** Construct a \ref DNSLookupError given the unresolvable URL.
  *
  *  \param url The URL that could not be resolved.
  */
@@ -31,9 +31,9 @@ DNSLookupError::DNSLookupError(std::string url)
 }
 
 
-/** Return error string.
+/** Return error message string.
  *
- *  \return Error string containing unresolvable hostname.
+ *  \returns Error string containing unresolvable hostname.
  */
 const char *DNSLookupError::what() const noexcept
 {

@@ -30,7 +30,7 @@
 #include "Rule.hpp"
 
 
-/** Rule to accept a packet, possibly with a priority.
+/** Rule to accept a packet, optionally with a priority.
  */
 class Accept : public Rule
 {

@@ -154,21 +154,21 @@ TEST_CASE("If's are movable.", "[If]")
 
 TEST_CASE("If's are assignable.", "[If]")
 {
-    If a(4, {}, MAVSubnet("255.255"));
-    If b(11, MAVSubnet("255.255"), {});
-    REQUIRE(a == If(4, {}, MAVSubnet("255.255")));
-    a = b;
-    REQUIRE(a == If(11, MAVSubnet("255.255"), {}));
+    If if_a(4, {}, MAVSubnet("255.255"));
+    If if_b(11, MAVSubnet("255.255"), {});
+    REQUIRE(if_a == If(4, {}, MAVSubnet("255.255")));
+    if_a = if_b;
+    REQUIRE(if_a == If(11, MAVSubnet("255.255"), {}));
 }
 
 
 TEST_CASE("If's are assignable (by move semantics.)", "[If]")
 {
-    If a(4, {}, MAVSubnet("255.255"));
-    If b(11, MAVSubnet("255.255"), {});
-    REQUIRE(a == If(4, {}, MAVSubnet("255.255")));
-    a = std::move(b);
-    REQUIRE(a == If(11, MAVSubnet("255.255"), {}));
+    If if_a(4, {}, MAVSubnet("255.255"));
+    If if_b(11, MAVSubnet("255.255"), {});
+    REQUIRE(if_a == If(4, {}, MAVSubnet("255.255")));
+    if_a = std::move(if_b);
+    REQUIRE(if_a == If(11, MAVSubnet("255.255"), {}));
 }
 
 

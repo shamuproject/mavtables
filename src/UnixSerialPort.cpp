@@ -34,11 +34,15 @@
  *
  *  \param device The string representing the serial port.  For example
  *      "/dev/ttyUSB0".
- *  \param baud_rate Bits per second, the default value is 9600 bps.
- *  \param features A bitflag of the features to enable, default is not
- *      to enable any features.  See \ref SerialPort::Feature for flags.
- *  \param syscalls The object to use for Unix system calls.  It is default
- *      constructed to the production implementation.
+ *  \param baud_rate The baud rate in bits per second, the default value is 9600
+ *      bps.
+ *  \param features A bitflag of the features to enable, default is to not
+ *      enable any features.  See \ref SerialPort::Feature for flags.
+ *  \param syscalls The object to use for unix system calls.  It is default
+ *      constructed to the production implementation.  This argument is only
+ *      used for testing.
+ *  \throws std::invalid_argument if the baud rate is not supported.
+ *  \throws std::system_error if a system call produces an error.
  */
 UnixSerialPort::UnixSerialPort(
     std::string device,
@@ -52,9 +56,9 @@ UnixSerialPort::UnixSerialPort(
 }
 
 
-/** The port destructor.
+/** The serial port destructor.
  *
- *  This closes the underlying file descriptor.
+ *  Closes the underlying file descriptor of the serial port device.
  */
 // LCOV_EXCL_START
 UnixSerialPort::~UnixSerialPort()
@@ -67,6 +71,8 @@ UnixSerialPort::~UnixSerialPort()
 /** \copydoc SerialPort::read(const std::chrono::nanoseconds &)
  *
  *  \note The timeout precision of this implementation is 1 millisecond.
+ *
+ *  \throws std::system_error if a system call produces an error.
  */
 std::vector<uint8_t> UnixSerialPort::read(
     const std::chrono::nanoseconds &timeout)
@@ -105,6 +111,9 @@ std::vector<uint8_t> UnixSerialPort::read(
 
 
 /** \copydoc SerialPort::write(const std::vector<uint8_t> &)
+ *
+ *  \throws std::system_error if a system call produces an error.
+ *  \throws PartialSendError if it fails to write all the data it is given.
  */
 void UnixSerialPort::write(const std::vector<uint8_t> &data)
 {
@@ -204,6 +213,9 @@ void UnixSerialPort::configure_port_(
 
 
 /** Open the serial port.
+ *
+ *  \throws std::invalid_argument if the baud rate is not supported.
+ *  \throws std::system_error if a system call produces an error.
  */
 void UnixSerialPort::open_port_()
 {
@@ -231,12 +243,13 @@ void UnixSerialPort::open_port_()
 }
 
 
-/** Read data from serial port.
+/** Read data from the serial port.
  *
- *  \note There must be data to read, otherwise calling this method is
+ *  \warning There must be data to read, otherwise calling this method is
  *      undefined.
  *
  *  \returns The data read from the port, up to 1024 bytes at a time.
+ *  \throws std::system_error if a system call produces an error.
  */
 std::vector<uint8_t> UnixSerialPort::read_()
 {
@@ -259,8 +272,8 @@ std::vector<uint8_t> UnixSerialPort::read_()
  *  See \ref UnixSerialPort::UnixSerialPort for valid baud rates.
  *
  *  \param baud_rate The baud rate to convert.
- *  \returns The baud rate constant.
- *  \throws std::invalid_argument if the given buad rate is not supported.
+ *  \returns The termios baud rate constant.
+ *  \throws std::invalid_argument if the given baud rate is not supported.
  */
 speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
 {
@@ -330,7 +343,19 @@ speed_t UnixSerialPort::speed_constant_(unsigned long baud_rate)
     }
 }
 
+
 /** \copydoc SerialPort::print_(std::ostream &os)const
+ *
+ *  Example:
+ *  ```
+ *  serial {
+ *      device /dev/ttyUSB0;
+ *      baudrate 115200;
+ *      flow_control yes;
+ *  }
+ *  ```
+ *
+ *  \param os The output stream to print to.
  */
 std::ostream &UnixSerialPort::print_(std::ostream &os) const
 {

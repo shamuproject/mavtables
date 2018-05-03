@@ -31,9 +31,9 @@
 
 /** Base class of all rules, used in filter \ref Chain's.
  *
- *  Rules are used to determine an \ref Action to take with a packet based on
- *  its type, source address, and destination address.  The are very much like
- *  the rules found in typical software defined firewalls.
+ *  \ref Rule's are used to determine an \ref Action to take with a packet based
+ *  on its type, source address, and destination address.  They are very much
+ *  like the rules found in a typical software defined firewalls.
  */
 class Rule
 {
@@ -49,7 +49,7 @@ class Rule
          *
          *  \param packet The packet to determine whether to allow or not.
          *  \param address The address the \p packet will be sent out on if the
-         *      action allows it.
+         *      action dictates it.
          *  \returns The action to take with the packet.  %If this is the accept
          *      object, it may also contain a priority for the packet.
          */
@@ -65,12 +65,18 @@ class Rule
         virtual std::unique_ptr<Rule> clone() const = 0;
         /** Equality comparison.
          *
+         *  Compares the type of the \ref Rule and the condition (\ref If) if
+         *  set.
+         *
          *  \param other The other rule to compare this to.
          *  \retval true if this rule is the same as \p other.
          *  \retval false if this rule is not the same as \p other.
          */
         virtual bool operator==(const Rule &other) const = 0;
         /** Inequality comparison.
+         *
+         *  Compares the type of the \ref Rule and the condition (\ref If) if
+         *  set.
          *
          *  \param other The other rule to compare this to.
          *  \retval true if this rule is not the same as \p other.
@@ -81,11 +87,13 @@ class Rule
         friend std::ostream &operator<<(std::ostream &os, const Rule &action);
 
     protected:
+        // Variables
         std::optional<If> condition_;
+        // Methods
         /** Print the rule to the given output stream.
          *
          *  \param os The output stream to print to.
-         *  \return The output stream.
+         *  \returns The output stream.
          */
         virtual std::ostream &print_(std::ostream &os) const = 0;
 };
