@@ -26,6 +26,7 @@
 
 #include "IPAddress.hpp"
 #include "UDPSocket.hpp"
+#include <utility.hpp>
 
 
 using namespace std::chrono_literals;
@@ -156,4 +157,10 @@ TEST_CASE("UDPSocket's 'receive' method takes a back inserter and a timeout "
     {
         return a == 1ms;
     })).Once();
+}
+
+
+TEST_CASE("UDPSocket's are printable.", "UDPSocket")
+{
+    REQUIRE(str(UDPSocket()) == "unknown UDP socket");
 }
