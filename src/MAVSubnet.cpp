@@ -246,7 +246,6 @@ MAVSubnet::MAVSubnet(std::string subnet)
  *
  *  \param address The MAVLink address to test.
  *  \retval true if \p address is part of the subnet.
- *  \complexity \f$O(1)\f$
  */
 bool MAVSubnet::contains(const MAVAddress &address) const
 {
@@ -263,7 +262,6 @@ bool MAVSubnet::contains(const MAVAddress &address) const
  *  \param rhs The right hand side MAVLink subnet.
  *  \retval true if \p lhs and \p rhs are the same.
  *  \retval false if \p lhs and \p rhs are not the same.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs)
 {
@@ -280,7 +278,6 @@ bool operator==(const MAVSubnet &lhs, const MAVSubnet &rhs)
  *  \param rhs The right hand side MAVLink subnet.
  *  \retval true if \p lhs and \p rhs are not the same.
  *  \retval false if \p lhs and \p rhs are the same.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const MAVSubnet &lhs, const MAVSubnet &rhs)
 {

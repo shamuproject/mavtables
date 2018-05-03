@@ -101,7 +101,7 @@ std::unique_ptr<Rule> parse_action(
         if (priority)
         {
             return std::make_unique<Accept>(
-                priority.value(), std::move(condition));
+                       priority.value(), std::move(condition));
         }
         else
         {

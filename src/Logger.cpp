@@ -61,6 +61,7 @@ void Logger::log(unsigned int level, std::string message)
     {
         level = 1;
     }
+
     if (level_ >= level)
     {
         auto t = std::time(nullptr);

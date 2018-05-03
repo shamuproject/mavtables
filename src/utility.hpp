@@ -140,7 +140,6 @@ std::string str(const T &object)
  *  \tparam T Type of the number being converted to bytes.
  *  \param number Number to convert to bytes
  *  \returns The array of bytes from the given number, in LSB order.
- *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type \p T.
  */
 template <class ByteType, class T>
 std::array<ByteType, sizeof(T)> to_bytes(T number)

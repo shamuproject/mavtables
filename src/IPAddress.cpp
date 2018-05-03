@@ -201,7 +201,6 @@ IPAddress::IPAddress(std::string address)
  *
  *  \returns The 32-bit IP address (in system byte order) as an integer
  *      (0x00000000 - 0xFFFFFFFF).
- *  \complexity \f$O(1)\f$
  */
 unsigned long IPAddress::address() const
 {
@@ -212,7 +211,6 @@ unsigned long IPAddress::address() const
 /** Return the port.
  *
  *  \returns The port number (0 - 65535).
- *  \complexity \f$O(1)\f$
  */
 unsigned int IPAddress::port() const
 {
@@ -229,7 +227,6 @@ unsigned int IPAddress::port() const
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs have the same address and port.
  *  \retval false if \p lhs and \p rhs do not have the same address and port.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -246,7 +243,6 @@ bool operator==(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs do not have the same address and port.
  *  \retval false if \p lhs and \p rhs have the same address and port.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -263,7 +259,6 @@ bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than \p rhs.
  *  \retval false if \p lhs is not less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -281,7 +276,6 @@ bool operator<(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than \p rhs.
  *  \retval false if \p lhs is not greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -299,7 +293,6 @@ bool operator>(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than or eqaul to \p rhs.
  *  \retval false if \p lhs is greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -316,7 +309,6 @@ bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than or equal to \p rhs.
  *  \retval false if \p lhs is less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -446,6 +438,6 @@ namespace
 
 #elif WINDOWS
 
-    // Place a windows implementation of windows_dnslookup here.
+// Place a windows implementation of windows_dnslookup here.
 
 #endif

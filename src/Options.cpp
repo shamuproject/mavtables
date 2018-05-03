@@ -79,10 +79,10 @@ Options::Options(
         std::cout << "Copyright (C) 2018  Michael R. Shannon\n";
         std::cout << "\n";
         std::cout << "License: GPL v2.0 or any later version.\n";
-        std::cout <<
-            "This is free software; see the source for copying conditions.  ";
-        std::cout <<
-            "There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS ";
+        std::cout << "This is free software; see the source for copying "
+                  "conditions.  ";
+        std::cout << "There is NO\nwarranty; not even for MERCHANTABILITY or "
+                  "FITNESS ";
         std::cout << "FOR A PARTICULAR PURPOSE." << std::endl;
         continue_ = false;
         return;

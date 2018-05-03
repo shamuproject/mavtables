@@ -32,8 +32,8 @@ Interface::~Interface()
 
 /** Print the given \ref Interface to the given output stream.
  *
- *  \note This is a polymorphic print.  Therefore, it can print any derived class
- *      as well.
+ *  \note This is a polymorphic print.  Therefore, it can print any derived
+ *      class as well.
  *
  *  Some examples are:
  *  ```

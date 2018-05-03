@@ -44,7 +44,8 @@ class Connection;
 class Packet
 {
     public:
-        enum Version {
+        enum Version
+        {
             V1 = 0x0100,  //!< MAVLink Version 1.0
             V2 = 0x0200   //!< MAVLink Version 2.0
         };
@@ -91,7 +92,7 @@ class Packet
          *  component, a component ID of 0 will be used (the broadcast ID).
          *
          *  \returns The destination MAVLink address of the packet if not a
-         *      broadcast packet.  If the packet does not have a destination
+         *      broadcast packet.  %If the packet does not have a destination
          *      address then {} will be returned.
          */
         virtual std::optional<MAVAddress> dest() const = 0;

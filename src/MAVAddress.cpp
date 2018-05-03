@@ -147,7 +147,6 @@ MAVAddress::MAVAddress(std::string address)
  *
  *  \returns The MAVLink address as a two byte number with the system ID encoded
  *      in the MSB and the component ID in the LSB.
- *  \complexity \f$O(1)\f$
  */
 unsigned int MAVAddress::address() const
 {
@@ -158,7 +157,6 @@ unsigned int MAVAddress::address() const
 /** Return the System ID.
  *
  *  \returns The system ID (0 - 255).
- *  \complexity \f$O(1)\f$
  */
 unsigned int MAVAddress::system() const
 {
@@ -169,7 +167,6 @@ unsigned int MAVAddress::system() const
 /** Return the Component ID.
  *
  *  \returns The component ID (0 - 255).
- *  \complexity \f$O(1)\f$
  */
 unsigned int MAVAddress::component() const
 {
@@ -185,7 +182,6 @@ unsigned int MAVAddress::component() const
  *  \retval true if \p lhs and \p rhs have the same system and component ID's.
  *  \retval false if \p lhs and \p rhs do not have the same system and component
  *      ID's.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -201,7 +197,6 @@ bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \retval true if \p lhs and \p rhs do not have the same system and component
  *      ID's
  *  \retval false if \p lhs and \p rhs have the same system and component ID's.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -218,7 +213,6 @@ bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side MAVLink address.
  *  \retval true if \p lhs is less than \p rhs.
  *  \retval false if \p lhs is not less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -235,7 +229,6 @@ bool operator<(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than \p rhs.
  *  \retval false if \p lhs is not greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -252,7 +245,6 @@ bool operator>(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than or eqaul to \p rhs.
  *  \retval false if \p lhs is greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -269,7 +261,6 @@ bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than or equal to \p rhs.
  *  \retval false if \p lhs is less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs)
 {

@@ -190,7 +190,6 @@ bool If::check(const Packet &packet, const MAVAddress &address) const
  *  \param rhs The right hand side if statement.
  *  \retval true if \p lhs and \p rhs are the same.
  *  \retval false if \p lhs and \p rhs are not the same.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const If &lhs, const If &rhs)
 {
@@ -206,7 +205,6 @@ bool operator==(const If &lhs, const If &rhs)
  *  \param rhs The right hand side if statement.
  *  \retval true if \p lhs and \p rhs are not the same.
  *  \retval false if \p lhs and \p rhs are the same.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const If &lhs, const If &rhs)
 {
