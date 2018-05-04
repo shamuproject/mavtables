@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=@PREFIX@/bin/mavtables
+ExecStart=@PREFIX@/bin/mavtables --config @PREFIX@/etc/mavtables.conf --loglevel 1
 Restart=always
 
 [Install]

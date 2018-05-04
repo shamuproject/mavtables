@@ -94,12 +94,12 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
 
 /** Construct a MAVLink subnet from a string.
  *
- *  There are three string forms of MAVLink subnets.
+ *  There are four string forms of MAVLink subnets:
  *
  *    1. "<System ID>.<Component ID>:<System ID mask>.<Component ID mask>"
  *    2. "<System ID>.<Component ID>/<bits>"
  *    3. "<System ID>.<Component ID>\<bits>"
- *    3. "<System ID>.<Component ID>"
+ *    4. "<System ID>.<Component ID>"
  *
  *  The first form is self explanatory, but the 2nd and 3rd are not as simple.
  *  In the 2nd case the number of bits (0 - 16) is the number of bits from the
@@ -107,12 +107,12 @@ MAVSubnet::MAVSubnet(const MAVAddress &address, unsigned int system_mask,
  *  like the 2nd, but does not require the system ID (first octet) to match and
  *  starts with the number of bits of the component ID (0 - 8) that must match
  *  from the left for an address to be in the subnet.  The last form is
- *  shorthand for "<System ID>.<Component ID>/16".
+ *  shorthand for "<System ID>.<Component ID>/16", that is an exact match.
  *
  *  Below is a table relating the slash postfix to the subnet mask in \<System
  *  mask\>.\<Component mask\> notation.
  *
- *  | Mask with `/` | Mask with `\` | Postfix (#bits) |
+ *  | Mask with `/` | Mask with `\` | Postfix (\#bits) |
  *  | -------------:| -------------:| ----------------:|
  *  |       255.255 |  out of range |               16 |
  *  |       255.254 |  out of range |               15 |
