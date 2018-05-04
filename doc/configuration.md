@@ -33,7 +33,7 @@ and filter chains.  A full example configuration file can be found at
 [`../examples/mavtables.conf`](../examples/mavtables.conf).
 
 
-# MAVLink Addressing {#mavlink-addressing}
+# MAVLink Addressing
 
 A MAVLink address consists of 2 octets.  The first being the system ID and the
 second the component ID.  Therefore, a MAVLink address looks like half of an
@@ -43,7 +43,7 @@ IPv4 address.
 ```
 
 
-## MAVLink Subnets {#mavlink-subnets}
+## MAVLink Subnets
 
 MAVLink subnets are similar to IP subnets and thus it is recommended that the
 reader understand IP subnets before continuing.
@@ -87,7 +87,7 @@ reader understand IP subnets before continuing.
  |           0.0 |             0 |                0 |
 
 
-# Basic Grammar {#basic-grammar}
+# Basic Grammar
 
 There are four major types of grammar elements in configuration files.  These
 are identifiers, statements, blocks, and comments.  Configuration files have
@@ -95,14 +95,14 @@ a similar syntax to the C programming language and like C they are not
 whitespace sensitive.
 
 
-## Identifiers {#identifiers}
+## Identifiers
 
 An identifier is a name containing any combination of letters (upper and lower),
 digits, and the underscores ('\_').  However, it must not start with a number.
 This is the same definition as identifiers in the C programming language.
 
 
-## Statements {#statements}
+## Statements
 
 A statement is defined as an identifier, followed by a value, and then the *end
 of statement* character '`;`'.  Therefore, it takes the form of
@@ -117,7 +117,7 @@ where '`boadrate`' is the identifier, '`57600`' is the value (in this case
 a number) and it ends with `;`.
 
 
-## Blocks {#blocks}
+## Blocks
 
 A block is a sectioning construct that can contain one or more statements, or in
 the special case of filter blocks, a rule.  Blocks consist of a type and
@@ -140,7 +140,7 @@ udp {
 ```
 
 
-## Comments {#comments}
+## Comments
 
 The comment character is '`#`'.  Everything after this character to the end of
 the line is considered a comment and will be ignored.  An example of using
@@ -154,7 +154,7 @@ udp {  # UDP Inteface
 
 
 
-# Global Settings {#global-settings}
+# Global Settings
 
 The following sections document the components of a configuration file.
 
@@ -176,7 +176,7 @@ default_action reject;
 
 
 
-# udp block {#udp-block}
+# udp block
 
 The `udp` block defines a UDP interface to listen for connections on.  An
 example is:
@@ -191,7 +191,7 @@ udp {
 There is no limit to the number of UDP interfaces that can be defined.
 
 
-## port statement {#port-statement}
+## port statement
 
 A statement that sets the port number to listen on.  The format is:
 ```
@@ -206,7 +206,7 @@ port 14555;
 This is the only required statement in a `udp` block.
 
 
-## address statement (optional) {#address-statement}
+## address statement (optional)
 
 A statement that sets the IP address to listen on.  The format is:
 ```
@@ -224,7 +224,7 @@ accept connections from remote systems (subject to the firewall's running on the
 host operating system).
 
 
-## max_bitrate statement (optional) {#max_bitrate-statement}
+## max_bitrate statement (optional)
 
 A statement that sets the bitrate limit (in bits per second) when transmitting
 packets over UDP.  The format is:
@@ -249,7 +249,7 @@ buffers.
 
 
 
-# serial block {#serial-block}
+# serial block
 
 The `serial` block defines a serial port interface to listen for connections on.
 An example is:
@@ -265,7 +265,7 @@ serial {
 There is no limit to the number of serial port interfaces that can be defined.
 
 
-## device statement {#device-statement}
+## device statement
 
 A statement that sets the serial device to listen on.  The format is:
 ```
@@ -281,7 +281,7 @@ device /dev/ttyUSB0;
 This is the only required statement in a `serial` block.
 
 
-## baudrate statement (optional) {#baudrate-statement}
+## baudrate statement (optional)
 
 A statement that sets the bitrate (in bits per second) of the serial port.  The
 format is:
@@ -298,7 +298,7 @@ which sets the baudrate to 112.5 kbps.
 If not provided the default is to use a baudrate of 9600 (9.4 kbps)
 
 
-## flow_control statement (optional) {#flow_control-statement}
+## flow_control statement (optional)
 
 A statement that enables/disables hardware flow control on the serial port.  The
 format is:
@@ -318,7 +318,7 @@ flow_control no;
 
 If not provided the default is to disable hardware flow control.
 
-## preload statement (optional) {#preload-statement}
+## preload statement (optional)
 
 A statement that can preload a MAVLink address on the serial port.  Typically
 mavtables learns about a component when that component sends a packet to the
@@ -349,7 +349,7 @@ added to the serial port.
 
 
 
-# chain block {#chain-block}
+# chain block
 
 A `chain` block defines a filter chain consisting of one or more rules.  Filter
 chains are used to define firewall rules and collect them into groups.  The
@@ -382,7 +382,7 @@ There is no limit to the number of filter chains, or to the number of rules in
 a filter chain.
 
 
-## Rules {#rules}
+## Rules
 
 A rule has the form
 ```
@@ -397,7 +397,7 @@ When evaluating the filter, the first rule a packet matches will decide the fate
 of the packet.  If a condition is not provided the rule will match all packets,
 otherwise the condition decides whether the rule matches or not.
 
-### Action {#action}
+### Action
 
 There are 4 types of actions a rule can have.
 
@@ -409,7 +409,7 @@ There are 4 types of actions a rule can have.
     `<chain name>`.  If the target chain never matches the packet then the
     default action, set in `default_action` is used.
 
-### Priority {#priority}
+### Priority
 
 The priority form is:
 ```
@@ -424,7 +424,7 @@ A greater integer indicates a higher priority.  Packets have a priority of 0 by
 default.  If communications slow down and mavtables starts to build a queue of
 packets to send it will send out the higher priority packets first.
 
-### Condition {#condition}
+### Condition
 
 A condition determines whether or not a packet and the address it is being sent
 to matches a rule.  Conditions have the form:
@@ -435,17 +435,17 @@ where `<packet type>`, `from <source address>`, and `to <dest address>` are all
 optional, but one is required, otherwise the rule should not have a condition at
 all.
 
-#### <packet type> {#packet-type}
+#### <packet type>
 
 The name of the packet type to match (upper case).  If left out all packet types
 will match.
 
-#### <source address> {#source-address}
+#### <source address>
 
 A MAVLink subnet to test for containment of the source MAVLink address of the
 packet.
 
-#### <dest address> {#dest-address}
+#### <dest address>
 
 A MAVLink subnet to test for containment of the destination MAVLink address of
 the packet.  The destination address is not regarded as the destination
