@@ -242,4 +242,4 @@ This feature can be used to debug configuration files.
 
 
 For and explanation of configuration files see
-[Configuration](configuration.md)
+[Configuration](configuration.md).

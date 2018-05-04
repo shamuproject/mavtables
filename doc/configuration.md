@@ -50,10 +50,10 @@ reader understand IP subnets before continuing.
 
  There are four representations of MAVLink subnets:
  
-   1. "<System ID>.<Component ID>:<System ID mask>.<Component ID mask>"
-   2. "<System ID>.<Component ID>/<bits>"
-   3. "<System ID>.<Component ID>\<bits>"
-   4. "<System ID>.<Component ID>"
+   1. "\<System ID>.<Component ID\>:\<System ID mask\>.\<Component ID mask\>"
+   2. "\<System ID>.<Component ID\>/\<bits\>"
+   3. "\<System ID>.<Component ID\>\\<bits\>"
+   4. "\<System ID>.<Component ID\>"
  
  The first form is self explanatory, but the 2nd and 3rd are not as simple.
  In the 2nd case the number of bits (0 - 16) is the number of bits from the
