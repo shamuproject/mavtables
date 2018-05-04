@@ -30,7 +30,7 @@ Configuration {#configuration}
 
 mavtables' configuration files are used to define default actions, interfaces,
 and filter chains.  A full example configuration file can be found at
-[`examples/mavtables.conf`](examples/mavtables.conf).
+[`../examples/mavtables.conf`](../examples/mavtables.conf).
 
 
 # MAVLink Addressing {#mavlink-addressing}
