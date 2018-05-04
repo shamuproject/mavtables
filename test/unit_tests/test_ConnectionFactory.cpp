@@ -26,7 +26,7 @@
 #include "Filter.hpp"
 #include "Packet.hpp"
 #include "PacketVersion2.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"

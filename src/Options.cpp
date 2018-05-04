@@ -15,13 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
 #include <boost/program_options.hpp>
 
-#include "Options.hpp"
 #include "config.hpp"
+#include "Options.hpp"
 
 
 namespace po = boost::program_options;
@@ -29,16 +30,21 @@ namespace po = boost::program_options;
 
 /** Construct an options object.
  *
- *  \param os The output stream to use for printing the help message.
+ *  This will parse the command line arguments and construct an object for
+ *  passing the result of these arguments to the application.
+ *
+ *  The first two arguments are designed to be taken directly from the inputs to
+ *  the standard `main` function.
+ *
  *  \param argc The number of command line arguments given.
  *  \param argv The command line arguments, as given in the arguments to the
  *      main function.
  *  \param filesystem A filesystem instance.  The default is to construct an
- *      instance.
+ *      instance.  This exists for testing purposes.
+ *  \throws std::runtime_error if no configuration file can be found.
  */
 Options::Options(
-    int argc, const char *argv[], std::ostream &os,
-    const Filesystem &filesystem)
+    int argc, const char *argv[], const Filesystem &filesystem)
     : continue_(true), loglevel_(0)
 {
     // Command line options.
@@ -58,7 +64,7 @@ Options::Options(
     // Print help.
     if (vm.count("help"))
     {
-        os << options << std::endl;
+        std::cout << options << std::endl;
         continue_ = false;
         return;
     }
@@ -66,16 +72,18 @@ Options::Options(
     // Print version information.
     if (vm.count("version"))
     {
-        os << "mavtables (SHAMU Project) ";
-        os << "v" << std::to_string(VERSION_MAJOR);
-        os << "." << std::to_string(VERSION_MINOR);
-        os << "." << std::to_string(VERSION_PATCH) << "\n";
-        os << "Copyright (C) 2018  Michael R. Shannon\n";
-        os << "\n";
-        os << "License: GPL v2.0 or any later version.\n";
-        os << "This is free software; see the source for copying conditions.  ";
-        os << "There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS ";
-        os << "FOR A PARTICULAR PURPOSE." << std::endl;
+        std::cout << "mavtables (SHAMU Project) ";
+        std::cout << "v" << std::to_string(VERSION_MAJOR);
+        std::cout << "." << std::to_string(VERSION_MINOR);
+        std::cout << "." << std::to_string(VERSION_PATCH) << "\n";
+        std::cout << "Copyright (C) 2018  Michael R. Shannon\n";
+        std::cout << "\n";
+        std::cout << "License: GPL v2.0 or any later version.\n";
+        std::cout << "This is free software; see the source for copying "
+                  "conditions.  ";
+        std::cout << "There is NO\nwarranty; not even for MERCHANTABILITY or "
+                  "FITNESS ";
+        std::cout << "FOR A PARTICULAR PURPOSE." << std::endl;
         continue_ = false;
         return;
     }
@@ -132,7 +140,8 @@ bool Options::ast()
 
 /** Get path to an existing configuration file.
  *
- *  \returns The path to an existing, but necessarily valid configuration file.
+ *  \returns The path to an existing, but not necessarily valid configuration
+ *      file.
  */
 std::string Options::config_file()
 {
@@ -150,7 +159,7 @@ unsigned int Options::loglevel()
 }
 
 
-/** Determine whether to run the firewall/router or note.
+/** Determine whether to run the firewall/router or not.
  *
  *  \retval true Run the firewall/router.
  *  \retval false Don't run the firewall/router.
@@ -161,11 +170,11 @@ bool Options::run()
 }
 
 
-/** Determine if options object is valid.
+/** Determine if the \ref Options object is valid.
  *
- *  \retval true If the options object sucessfully parsed the command line
+ *  \retval true %If the options object successfully parsed the command line
  *      arguments.
- *  \retval false If the program should exit imediatly.
+ *  \retval false %If the program should exit immediately.
  */
 Options::operator bool() const
 {
@@ -175,14 +184,16 @@ Options::operator bool() const
 
 /** Find the configuration file.
  *
+ *  Find the first configuration file in the list below:
  *  1. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
  *  2. `.mavtablesrc` in the current directory.
  *  3. `.mavtablesrc` at `$HOME/.mavtablesrc`.
  *  4. The main configuration file at `PREFIX/etc/mavtables.conf`.
  *
+ *  \relates Options
  *  \param filesystem A filesystem instance.  The default is to construct an
- *      instance.
- *  \returns The path the first configuration file found.  {} if no
+ *      instance.  This exists for testing purposes.
+ *  \returns The path to the first configuration file found.  {} if no
  *      configuration file could be found.
  */
 std::optional<std::string> find_config(const Filesystem &filesystem)

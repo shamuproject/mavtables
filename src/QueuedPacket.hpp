@@ -27,17 +27,21 @@
 
 /** A packet in the queue to be sent out.
  *
+ *  Forms a node in the \ref PacketQueue class.
+ *
  *  This is the data structure used in the priority queues used by the \ref
  *  Connection class.  It stores a MAVLink packet as well as a priority and
  *  ticket number used to maintain packet order in the priority queue when
  *  packets have the same priority.
+ *
+ *  \sa PacketQueue
  */
 class QueuedPacket
 {
     public:
         /** Copy constructor.
          *
-         *  \param other QueuedPacket to copy.
+         *  \param other QueuedPacket to copy from.
          */
         QueuedPacket(const QueuedPacket &other) = default;
         /** Move constructor.
@@ -51,7 +55,7 @@ class QueuedPacket
         std::shared_ptr<const Packet> packet() const;
         /** Assignment operator.
          *
-         * \param other QueuedPacket to copy.
+         * \param other QueuedPacket to copy from.
          */
         QueuedPacket &operator=(const QueuedPacket &other) = default;
         /** Assignment operator (by move semantics).

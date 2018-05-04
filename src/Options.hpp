@@ -20,20 +20,30 @@
 
 
 #include <iostream>
-#include <string>
-#include <ostream>
 #include <optional>
+#include <ostream>
+#include <string>
 
 #include "Filesystem.hpp"
 
 
 /** An options class which is used to parse the command line arguments.
+ *
+ *  This class is what provides the command line help for mavtables.
+ *  ```
+ *  usage: mavtables:
+ *  -h [ --help ]         print this message
+ *  --config arg          specify configuration file
+ *  --ast                 print AST of configuration file (do not run)
+ *  --version             print version and license information
+ *  --loglevel arg        level of logging, between 0 and 3
+ *  ```
  */
 class Options
 {
     public:
         Options(
-            int argc, const char *argv[], std::ostream &os = std::cout,
+            int argc, const char *argv[],
             const Filesystem &filesystem = Filesystem());
         bool ast();
         unsigned int loglevel();

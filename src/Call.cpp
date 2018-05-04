@@ -32,15 +32,17 @@
 /** Construct a call rule given a chain to delegate to, without a priority.
  *
  *  A call rule is used to delegate the decision on whether to accept or reject
- *  a packet/address combination to another filter \ref Chain.
+ *  a packet/address combination to another filter \ref Chain.  If this called
+ *  chain does not make a decision then rule evaluation should continue in the
+ *  calling chain.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet/address combination to.  null is not valid.
+ *      a packet/address combination to.  nullptr is not valid.
  *  \param condition The condition used to determine the rule matches a
  *      particular packet/address combination given to the \ref action method.
  *      The default is {} which indicates the rule matches any packet/address
  *      combination.
- *  \throws std::invalid_argument if the given pointer is nullptr.
+ *  \throws std::invalid_argument if the given \p chain pointer is null.
  *  \sa action
  */
 Call::Call(
@@ -60,14 +62,14 @@ Call::Call(
  *  a packet/address combination to another filter \ref Chain.
  *
  *  \param chain The chain to delegate decisions of whether to accept or reject
- *      a packet/address combination to. null is not valid.
+ *      a packet/address combination to. nullptr is not valid.
  *  \param priority The priority to accept packets with.  A higher number is
  *      more important and will be routed first.
  *  \param condition The condition used to determine the rule matches a
  *      particular packet/address combination given to the \ref action method.
  *      The default is {} which indicates the rule matches any packet/address
  *      combination.
- *  \throws std::invalid_argument if the given pointer is nullptr.
+ *  \throws std::invalid_argument if the given pointer is null.
  *  \sa action
  */
 Call::Call(
@@ -112,8 +114,9 @@ std::ostream &Call::print_(std::ostream &os) const
  *  combination then the choice of \ref Action will be delegated to the
  *  contained \ref Chain.
  *
- *  %If the result from the chain is an accept object and no priority has been
- *  set on it but this \ref Rule has a priority then the priority will be set.
+ *  %If the result from the chain is an accept \ref Action object and no
+ *  priority has been set on it but this \ref Rule has a priority then the
+ *  priority will be set.
  */
 Action Call::action(
     const Packet &packet, const MAVAddress &address) const

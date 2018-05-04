@@ -37,15 +37,22 @@ class Connection;
  *  This is an abstract class, it is meant to be overridden by classes
  *  implementing either version 1 or version 2 of the MAVLink packet wire
  *  protocol.
+ *
+ *  \internal The \ref Version enum must be changed if another packet version is
+ *      added.
  */
 class Packet
 {
     public:
-        enum Version {V1 = 0x0100, V2 = 0x0200};
+        enum Version
+        {
+            V1 = 0x0100,  //!< MAVLink Version 1.0
+            V2 = 0x0200   //!< MAVLink Version 2.0
+        };
 
         /** Copy constructor.
          *
-         *  \param other Packet to copy.
+         *  \param other Packet to copy from.
          */
         Packet(const Packet &other) = default;
         /** Move constructor.
@@ -81,11 +88,12 @@ class Packet
         /** Return destination address.
          *
          *  Where the packet is sent to.  This is optional because not all
-         *  packets have a destination.   %If a system is specified but not a
-         *  component a component ID of 0 will be used (the broadcast ID).
+         *  packets have a destination.   %If a system is specified, but not a
+         *  component, a component ID of 0 will be used (the broadcast ID).
          *
          *  \returns The destination MAVLink address of the packet if not a
-         *      broadcast packet.
+         *      broadcast packet.  %If the packet does not have a destination
+         *      address then {} will be returned.
          */
         virtual std::optional<MAVAddress> dest() const = 0;
         void connection(std::weak_ptr<Connection> connection);
@@ -93,7 +101,7 @@ class Packet
         const std::vector<uint8_t> &data() const;
         /** Assignment operator.
          *
-         *  \param other Packet to copy.
+         *  \param other Packet to copy from.
          */
         Packet &operator=(const Packet &other) = default;
         /** Assignment operator (by move semantics).

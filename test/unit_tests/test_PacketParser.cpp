@@ -16,10 +16,8 @@
 
 
 #include <cstdint>
-// #include <iostream>
 #include <memory>
 #include <optional>
-// #include <sstream>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -144,10 +142,12 @@ TEST_CASE("PacketParser's can parse packets with 'parse_byte'.",
         auto data = to_vector(PingV1());
         data[5] = 255;
         std::unique_ptr<Packet> packet;
+
         for (auto byte : data)
         {
             packet = parser.parse_byte(byte);
         }
+
         REQUIRE(packet == nullptr);
         REQUIRE(
             mock_cerr.buffer() ==

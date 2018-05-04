@@ -19,8 +19,8 @@
 #include <memory>
 #include <set>
 #include <stdexcept>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <catch.hpp>
 #include <fakeit.hpp>
@@ -31,9 +31,9 @@
 #include "Logger.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include "PacketVersion2.hpp"
 #include "PacketQueue.hpp"
-#include "util.hpp"
+#include "PacketVersion2.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -421,14 +421,17 @@ TEST_CASE("Connection's 'send' method (without destination address).",
         [&](auto & a, auto & b)
     {
         (void)a;
+
         if (b == MAVAddress("192.168"))
         {
             return std::pair<bool, int>(true, 2);
         }
+
         if (b == MAVAddress("172.16"))
         {
             return std::pair<bool, int>(true, -3);
         }
+
         return std::pair<bool, int>(false, 0);
     });
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -438,14 +441,17 @@ TEST_CASE("Connection's 'send' method (without destination address).",
         {
             return true;
         }
+
         if (addr == MAVAddress("172.16"))
         {
             return true;
         }
+
         if (addr == MAVAddress("192.168"))
         {
             return true;
         }
+
         return false;
     });
     fakeit::Mock<PacketQueue> mock_queue;
@@ -628,14 +634,17 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         [&](auto & a, auto & b)
     {
         (void)a;
+
         if (b == MAVAddress("192.168"))
         {
             return std::pair<bool, int>(true, 2);
         }
+
         if (b == MAVAddress("172.16"))
         {
             return std::pair<bool, int>(true, -3);
         }
+
         return std::pair<bool, int>(false, 0);
     });
     fakeit::Mock<AddressPool<>> mock_pool;
@@ -645,14 +654,17 @@ TEST_CASE("Connection's 'send' method (with broadcast address 0.0).",
         {
             return true;
         }
+
         if (addr == MAVAddress("172.16"))
         {
             return true;
         }
+
         if (addr == MAVAddress("192.168"))
         {
             return true;
         }
+
         return false;
     });
     fakeit::Mock<PacketQueue> mock_queue;
@@ -838,32 +850,39 @@ TEST_CASE("Connection's 'send' method (with component broadcast address x.0).",
         {
             return true;
         }
+
         if (addr == MAVAddress("123.16"))
         {
             return true;
         }
+
         if (addr == MAVAddress("123.17"))
         {
             return true;
         }
+
         if (addr == MAVAddress("123.168"))
         {
             return true;
         }
+
         return false;
     });
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
         [&](auto & a, auto & b)
     {
         (void)a;
+
         if (b == MAVAddress("123.168"))
         {
             return std::pair<bool, int>(true, 2);
         }
+
         if (b == MAVAddress("123.16"))
         {
             return std::pair<bool, int>(true, -3);
         }
+
         return std::pair<bool, int>(false, 0);
     });
     fakeit::Mock<PacketQueue> mock_queue;
@@ -1112,18 +1131,22 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
         {
             return true;
         }
+
         if (addr == MAVAddress("127.16"))
         {
             return true;
         }
+
         if (addr == MAVAddress("127.17"))
         {
             return true;
         }
+
         if (addr == MAVAddress("127.168"))
         {
             return true;
         }
+
         return false;
     });
     fakeit::Mock<PacketQueue> mock_queue;
@@ -1146,10 +1169,12 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
             [&](auto & a, auto & b)
         {
             (void)a;
+
             if (b == MAVAddress("127.1"))
             {
                 return std::pair<bool, int>(true, 2);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
@@ -1173,10 +1198,12 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
             [&](auto & a, auto & b)
         {
             (void)a;
+
             if (b == MAVAddress("127.1"))
             {
                 return std::pair<bool, int>(true, 2);
             }
+
             return std::pair<bool, int>(false, 0);
         });
         fakeit::Fake(Method(mock_queue, push));
@@ -1197,10 +1224,12 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
             [&](auto & a, auto & b)
         {
             (void)a;
+
             if (b == MAVAddress("127.1"))
             {
                 return std::pair<bool, int>(false, 0);
             }
+
             return std::pair<bool, int>(true, 2);
         });
         fakeit::Fake(Method(mock_queue, push));
@@ -1219,10 +1248,12 @@ TEST_CASE("Connection's 'send' method (destination address, system reachable, "
             [&](auto & a, auto & b)
         {
             (void)a;
+
             if (b == MAVAddress("127.1"))
             {
                 return std::pair<bool, int>(false, 0);
             }
+
             return std::pair<bool, int>(true, 2);
         });
         fakeit::Fake(Method(mock_queue, push));

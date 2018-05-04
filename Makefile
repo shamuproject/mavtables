@@ -47,7 +47,7 @@ coverage: test
 
 linecheck:
 	-grep -rPIn --color=always '(.{81})' src | grep -v '\\copydoc'
-	-grep -rPIn --color=always '(.{81})' test | grep -v '\\copydoc'
+	-grep -rPIn --color=always '(.{81})' test/unit_tests | grep -v '\\copydoc'
 
 style:
 	astyle --options=.astylerc "src/*.cpp" "src/*.hpp" "test/*.cpp" | grep 'Formatted' || true

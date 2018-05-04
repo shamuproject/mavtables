@@ -26,12 +26,25 @@
 #include <vector>
 
 
-/** A serial port.
+/** The base class of all serial port classes.
+ *
+ *  This provides an abstraction of serial ports across operating systems.
+ *
+ *  \warning This class should be treated as pure virtual and should never be
+ *      instantiated.
+ *
+ *  \warning Either \ref read(const std::chrono::nanoseconds &) or
+ *      read(std::back_insert_iterator<std::vector<uint8_t>>,const std::chrono::nanoseconds &)
+ *      must be overridden in child classes to avoid infinite recursion.
+ *
+ *  \warning Either \ref write(const std::vector<uint8_t> &data) or
+ *      write(std::vector<uint8_t>::const_iterator,std::vector<uint8_t>::const_iterator)
+ *      must be overridden in child classes to avoid infinite recursion.
  */
 class SerialPort
 {
     public:
-        /** Parity.
+        /** Parity options.
          */
         enum Parity
         {
@@ -45,8 +58,8 @@ class SerialPort
          */
         enum Feature
         {
-            DEFAULT = 0,        //!< No special features.
-            FLOW_CONTROL = 1 << 0 //!< Enable flow control.
+            DEFAULT = 0,            //!< No special features.
+            FLOW_CONTROL = 1 << 0   //!< Enable flow control.
         };
         virtual ~SerialPort();
         virtual std::vector<uint8_t> read(
@@ -65,11 +78,6 @@ class SerialPort
             std::ostream &os, const SerialPort &serial_port);
 
     protected:
-        /** Print the serial port to the given output stream.
-         *
-         *  \param os The output stream to print to.
-         *  \return The output stream.
-         */
         virtual std::ostream &print_(std::ostream &os) const;
 };
 

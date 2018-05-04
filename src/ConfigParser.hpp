@@ -35,7 +35,7 @@
 
 
 std::map<std::string, std::shared_ptr<Chain>> init_chains(
-        const config::parse_tree::node &root);
+            const config::parse_tree::node &root);
 
 std::unique_ptr<Rule> parse_action(
     const config::parse_tree::node &root,
@@ -82,7 +82,7 @@ class ConfigParser
         ConfigParser &operator=(ConfigParser &&other) = delete;
 
         friend std::ostream &operator<<(
-                std::ostream &os, const ConfigParser &config_parser);
+            std::ostream &os, const ConfigParser &config_parser);
 
     protected:
         tao::pegtl::read_input<> in_;

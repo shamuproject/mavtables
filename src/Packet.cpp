@@ -47,7 +47,7 @@ Packet::~Packet()
 
 /** Return the packet data.
  *
- *  \return The packet data as a vector of bytes.
+ *  \returns The packet data as a vector of bytes.
  */
 const std::vector<uint8_t> &Packet::data() const
 {
@@ -55,14 +55,23 @@ const std::vector<uint8_t> &Packet::data() const
 }
 
 
-// TODO
+/** Set the source connection of the packet.
+ *
+ *  \param connection The source connection.
+ *  \sa connection()
+ */
 void Packet::connection(std::weak_ptr<Connection> connection)
 {
     connection_ = connection;
 }
 
 
-// TODO
+/** Get the source connection of the packet.
+ *
+ *  \returns The source connection if set and it still exists, otherwise
+ *      nullptr.
+ *  \sa connection(std::weak_ptr<Connection>)
+ */
 const std::shared_ptr<Connection> Packet::connection() const
 {
     return connection_.lock();
@@ -70,6 +79,8 @@ const std::shared_ptr<Connection> Packet::connection() const
 
 
 /** Equality comparison.
+ *
+ *  Compares the raw packet data.
  *
  *  \relates Packet
  *  \param lhs The left hand side packet.
@@ -84,6 +95,8 @@ bool operator==(const Packet &lhs, const Packet &rhs)
 
 
 /** Inequality comparison.
+ *
+ *  Compares the raw packet data.
  *
  *  \relates Packet
  *  \param lhs The left hand side packet.
@@ -113,7 +126,7 @@ bool operator!=(const Packet &lhs, const Packet &rhs)
  *  \relates Packet
  *  \param os The output stream to print to.
  *  \param packet The MAVLink packet to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const Packet &packet)
 {

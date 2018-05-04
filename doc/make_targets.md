@@ -25,8 +25,20 @@ debug flags and turn off optimizations.  The executables are located at
 
 ## test
 
-Build and run all tests.  Currently this is just unit tests at
-`build/unit_tests` which are built with the `debug` target above.
+Build and run all tests.  Runs both `test/unit_tests/run_tests.sh` and
+`test/integration_tests/run_tests.sh`.  The latter requires Python with the
+packages located in `test/integration_tests/requirements.txt`.
+
+
+## unit_tests
+
+Build and run unit tests only.
+
+
+## integration_tests
+
+Build and run integration tests only.  Requires Python with the packages located
+in `test/integration_tests/requirements.txt`.
 
 
 ## coverage

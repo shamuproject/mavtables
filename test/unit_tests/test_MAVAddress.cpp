@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include <catch.hpp>
 
-#include "util.hpp"
 #include "MAVAddress.hpp"
+#include "utility.hpp"
 
 
 TEST_CASE("MAVAddress's store a system and component ID.", "[MAVAddress]")
@@ -263,45 +263,45 @@ TEST_CASE("MAVAddress's can be constructed from strings.", "[MAVAddress]")
 
 TEST_CASE("MAVAddress's are copyable.", "[MAVAddress]")
 {
-    MAVAddress a(0, 0);
-    MAVAddress b(255, 255);
-    MAVAddress a_copy = a;
-    MAVAddress b_copy(b);
-    REQUIRE(&a != &a_copy);
-    REQUIRE(a == a_copy);
-    REQUIRE(&b != &b_copy);
-    REQUIRE(b == b_copy);
+    MAVAddress address_a(0, 0);
+    MAVAddress address_b(255, 255);
+    MAVAddress address_a_copy = address_a;
+    MAVAddress address_b_copy(address_b);
+    REQUIRE(&address_a != &address_a_copy);
+    REQUIRE(address_a == address_a_copy);
+    REQUIRE(&address_b != &address_b_copy);
+    REQUIRE(address_b == address_b_copy);
 }
 
 
 TEST_CASE("MAVAddress's are movable.", "[MAVAddress]")
 {
-    MAVAddress a(0, 0);
-    MAVAddress b(255, 255);
-    MAVAddress a_moved = std::move(a);
-    MAVAddress b_moved(std::move(b));
-    REQUIRE(a_moved == MAVAddress(0, 0));
-    REQUIRE(b_moved == MAVAddress(255, 255));
+    MAVAddress address_a(0, 0);
+    MAVAddress address_b(255, 255);
+    MAVAddress address_a_moved = std::move(address_a);
+    MAVAddress address_b_moved(std::move(address_b));
+    REQUIRE(address_a_moved == MAVAddress(0, 0));
+    REQUIRE(address_b_moved == MAVAddress(255, 255));
 }
 
 
 TEST_CASE("MAVAddress's are assignable.", "[MAVAddress]")
 {
-    MAVAddress a(0, 0);
-    MAVAddress b(255, 255);
-    REQUIRE(a == MAVAddress(0, 0));
-    a = b;
-    REQUIRE(a == MAVAddress(255, 255));
+    MAVAddress address_a(0, 0);
+    MAVAddress address_b(255, 255);
+    REQUIRE(address_a == MAVAddress(0, 0));
+    address_a = address_b;
+    REQUIRE(address_a == MAVAddress(255, 255));
 }
 
 
 TEST_CASE("MAVAddress's are assignable (by move semantics).", "[MAVAddress]")
 {
-    MAVAddress a(0, 0);
-    MAVAddress b(255, 255);
-    REQUIRE(a == MAVAddress(0, 0));
-    a = std::move(b);
-    REQUIRE(a == MAVAddress(255, 255));
+    MAVAddress address_a(0, 0);
+    MAVAddress address_b(255, 255);
+    REQUIRE(address_a == MAVAddress(0, 0));
+    address_a = std::move(address_b);
+    REQUIRE(address_a == MAVAddress(255, 255));
 }
 
 

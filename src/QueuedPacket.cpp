@@ -29,7 +29,8 @@
  *  \param priority The priority to send the packet with, higher numbers result
  *      in a higher priority.
  *  \param ticket_number A number that should always be incremented for each
- *      queued packet created per packet queue.
+ *      queued packet created per packet queue, even if this increment causes an
+ *      unsigned integer wraparound.
  *  \throws std::invalid_argument if the given packet pointer is nullptr.
  */
 QueuedPacket::QueuedPacket(
@@ -64,7 +65,7 @@ std::shared_ptr<const Packet> QueuedPacket::packet() const
  *  \param lhs The left hand side queued packet.
  *  \param rhs The right hand side queued packet.
  *  \retval true if \p lhs and \p rhs have the same priority and ticket number.
- *  \retval false if \p lhs and \p rhs have do not have the same priority and
+ *  \retval false if \p lhs and \p rhs do not have the same priority and
  *      ticket number.
  */
 bool operator==(const QueuedPacket &lhs, const QueuedPacket &rhs)
@@ -82,8 +83,8 @@ bool operator==(const QueuedPacket &lhs, const QueuedPacket &rhs)
  *  \relates QueuedPacket
  *  \param lhs The left hand side queued packet.
  *  \param rhs The right hand side queued packet.
- *  \retval true if \p lhs and \p rhs have do not have the same priority and
- *      ticket number.
+ *  \retval true if \p lhs and \p rhs do not have the same priority and ticket
+ *      number.
  *  \retval false if \p lhs and \p rhs have the same priority and ticket number.
  */
 bool operator!=(const QueuedPacket &lhs, const QueuedPacket &rhs)
@@ -186,7 +187,7 @@ bool operator>=(const QueuedPacket &lhs, const QueuedPacket &rhs)
  *  \relates QueuedPacket
  *  \param os The output stream to print to.
  *  \param queued_packet The queued packet to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const QueuedPacket &queued_packet)
 {

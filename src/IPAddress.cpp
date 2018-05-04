@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <set>
-#include <vector>
-#include <memory>
-#include <string>
-#include <sstream>
 #include <algorithm>
+#include <memory>
+#include <set>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <cstring>
 #include <netdb.h>
@@ -30,9 +30,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "config.hpp"
-#include "util.hpp"
 #include "DNSLookupError.hpp"
 #include "IPAddress.hpp"
+#include "utility.hpp"
 
 
 // Private functions.
@@ -45,7 +45,13 @@ namespace
 #endif
 
 
-// Construct IP address from address and port number.
+/** Construct IP address from address and port number.
+ *
+ *  \param address Numeric (32 bit) IP address.
+ *  \param port 16 bit port number.
+ *  \throws std::out_of_range if either the IP address or the port number is
+ *      outside of the respectively allowed 32 or 16 bit ranges.
+ */
 void IPAddress::construct_(unsigned long address, unsigned int port)
 {
     if (address > 0xFFFFFFFF)
@@ -69,13 +75,15 @@ void IPAddress::construct_(unsigned long address, unsigned int port)
 }
 
 
-/** Construct IP from another IP address, changing the port number.
+/** Construct IP address from another IP address, changing the port number.
  *
  *  Copy constructor that also changes the port.
  *
  *  \param other IP address to copy from.
- *  \param port Port number (0 - 65535).  A port of 0 means no specific port.
- *  \throws std::out_of_range %If the port number is out of range.
+ *  \param port Port number (0 - 65535).  A port number of 0 has the special
+ *      meaning of no specific port.
+ *  \throws std::out_of_range if the port number is outside of the allowed 16
+ *      bit range.
  */
 IPAddress::IPAddress(const IPAddress &other, unsigned int port)
 {
@@ -87,8 +95,10 @@ IPAddress::IPAddress(const IPAddress &other, unsigned int port)
  *
  *  \param address 32-bit IP address in system byte order (0x00000000 -
  *      0xFFFFFFFF).
- *  \param port Port number (0 - 65535).  A port of 0 means no specific port.
- *  \throws std::out_of_range %If the address or port number is out of range.
+ *  \param port Port number (0 - 65535).  A port number of 0 has the special
+ *      meaning of no specific port.
+ *  \throws std::out_of_range if either the IP address or the port number is
+ *      outside of the respectively allowed 32 or 16 bit ranges.
  */
 IPAddress::IPAddress(unsigned long address, unsigned int port)
 {
@@ -109,9 +119,9 @@ IPAddress::IPAddress(unsigned long address, unsigned int port)
  *
  *  \param address String representing the IP address and optionally the port
  *      number.
- *  \throws std::invalid_argument %If the string does not represent a valid IP
+ *  \throws std::invalid_argument if the string does not represent a valid IP
  *      address.
- *  \throws std::out_of_range %If an address octet or the port number is out of
+ *  \throws std::out_of_range if an address octet or the port number is out of
  *      range.
  */
 IPAddress::IPAddress(std::string address)
@@ -189,9 +199,8 @@ IPAddress::IPAddress(std::string address)
 
 /** Return the IP address.
  *
- *  \return The 32-bit IP address (in system byte order) as an integer
+ *  \returns The 32-bit IP address (in system byte order) as an integer
  *      (0x00000000 - 0xFFFFFFFF).
- *  \complexity \f$O(1)\f$
  */
 unsigned long IPAddress::address() const
 {
@@ -201,8 +210,7 @@ unsigned long IPAddress::address() const
 
 /** Return the port.
  *
- *  \return The port number (0 - 65535).
- *  \complexity \f$O(1)\f$
+ *  \returns The port number (0 - 65535).
  */
 unsigned int IPAddress::port() const
 {
@@ -212,12 +220,13 @@ unsigned int IPAddress::port() const
 
 /** Equality comparison.
  *
+ *  \note Compares address and port number.
+ *
  *  \relates IPAddress
  *  \param lhs The left hand side IP address.
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs have the same address and port.
  *  \retval false if \p lhs and \p rhs do not have the same address and port.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -227,12 +236,13 @@ bool operator==(const IPAddress &lhs, const IPAddress &rhs)
 
 /** Inequality comparison.
  *
+ *  \note Compares address and port number.
+ *
  *  \relates IPAddress
  *  \param lhs The left hand side IP address.
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs and \p rhs do not have the same address and port.
  *  \retval false if \p lhs and \p rhs have the same address and port.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -249,7 +259,6 @@ bool operator!=(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than \p rhs.
  *  \retval false if \p lhs is not less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -267,7 +276,6 @@ bool operator<(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than \p rhs.
  *  \retval false if \p lhs is not greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -285,7 +293,6 @@ bool operator>(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than or eqaul to \p rhs.
  *  \retval false if \p lhs is greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -302,7 +309,6 @@ bool operator<=(const IPAddress &lhs, const IPAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than or equal to \p rhs.
  *  \retval false if \p lhs is less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>=(const IPAddress &lhs, const IPAddress &rhs)
 {
@@ -317,12 +323,19 @@ bool operator>=(const IPAddress &lhs, const IPAddress &rhs)
  *
  *  Some examples are:
  *      - `127.0.0.1`
- *      - `127.0.0.1:8888`
+ *      - `127.0.0.1:14555`
  *      - `183.125.120.42:443`
+ *
+ *  \note The string constructor \ref IPAddress(std::string) and the output
+ *      stream operator are inverses and thus:
+ *  ```
+ *  std::string addr = "127.0.0.1:14555"
+ *  str(IPAddress(addr)) == addr
+ *  ```
  *
  *  \param os The output stream to print to.
  *  \param ipaddress The IP address to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
 {
@@ -346,10 +359,14 @@ std::ostream &operator<<(std::ostream &os, const IPAddress &ipaddress)
 
 /** Lookup an IP address based on a hostname.
  *
+ *  \warning Currently only supports IPv4.
+ *
+ *  \note Currently only UNIX based operating system are supported.
+ *
  *  \relates IPAddress
  *  \param url The URL to get an IP address for.
- *  \return IP addresses corrensponding to the given URL.
- *  \throws DNSLookupError %If the address cannot be found.
+ *  \returns IP addresses corresponding to the given URL.
+ *  \throws DNSLookupError if the address cannot be found.
  */
 IPAddress dnslookup(const std::string &url)
 {
@@ -366,10 +383,16 @@ IPAddress dnslookup(const std::string &url)
 namespace
 {
 
-    /* Lookup an IP address based on a hostname.
+    /** Lookup an IP address based on a hostname.
      *
-     * This version is unix only and will be called by \ref dnslookup on UNIX
-     * systems.
+     *  This version is UNIX only and will be called by \ref dnslookup on UNIX
+     *  systems.
+     *
+     *  \relates IPAddress
+     *  \param url The URL to get an IP address for.
+     *  \returns IP addresses corresponding to the given URL.
+     *  \throws DNSLookupError if the address cannot be found.
+     *
      */
     IPAddress unix_dnslookup(const std::string &url, unsigned int port)
     {
@@ -414,5 +437,7 @@ namespace
 }
 
 #elif WINDOWS
+
+// Place a windows implementation of windows_dnslookup here.
 
 #endif

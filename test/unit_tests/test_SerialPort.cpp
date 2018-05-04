@@ -25,6 +25,7 @@
 #include <fakeit.hpp>
 
 #include "SerialPort.hpp"
+#include "utility.hpp"
 
 
 using namespace std::chrono_literals;
@@ -145,4 +146,10 @@ TEST_CASE("SerialPort's 'write' method accepts two vector iterators",
             mock_port, write,
             void(const std::vector<uint8_t> &))).Once();
     REQUIRE(vec == write_vec);
+}
+
+
+TEST_CASE("SerialPort's are printable.", "SerialPort")
+{
+    REQUIRE(str(SerialPort()) == "unknown serial port");
 }

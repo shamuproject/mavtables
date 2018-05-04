@@ -17,8 +17,8 @@
 
 #include <chrono>
 #include <memory>
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include "Interface.hpp"
 #include "InterfaceThreader.hpp"
@@ -40,7 +40,7 @@ void InterfaceThreader::tx_runner_()
         // Ignore partial write errors on shutdown.
         // TODO: A better way to handle this error might be in order.  Not even
         //       sure exactly why it happens on close.
-        catch (const PartialSendError&)
+        catch (const PartialSendError &)
         {
             if (running_.load())
             {
@@ -64,9 +64,9 @@ void InterfaceThreader::rx_runner_()
 }
 
 
-/** Construct and optionally start an interface.
+/** Construct and optionally start an interface threader.
  *
- *  \param interface The interface to run in TX/RX threads.  It's \ref
+ *  \param interface The \ref Interface to run in TX/RX threads.  It's \ref
  *      Interface::send_packet and \ref Interface::receive_packet methods will
  *      be called repeatedly in two separate worker threads.
  *  \param timeout The maximum amount of time to wait for incoming data or a
@@ -102,7 +102,7 @@ InterfaceThreader::~InterfaceThreader()
 
 /** Start the worker threads for the interface.
  *
- *  This starts a receiver and transmitter thread.
+ *  This starts the receiver and transmitter threads.
  */
 void InterfaceThreader::start()
 {

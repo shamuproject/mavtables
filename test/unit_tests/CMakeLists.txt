@@ -24,9 +24,9 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_Options.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_Packet.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketParser.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_PacketQueue.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PacketVersion2.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/test_PacketQueue.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_PartialSendError.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_QueuedPacket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_RecursionError.cpp"
@@ -41,7 +41,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/test_UDPSocket.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_UnixSerialPort.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test_UnixUDPSocket.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/test_util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/test_utility.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/unit_tests.cpp"
 )
 target_sources (unit_tests

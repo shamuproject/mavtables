@@ -26,7 +26,7 @@
 #include "IPAddress.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 using namespace std::chrono_literals;
@@ -35,8 +35,8 @@ using namespace std::chrono_literals;
 /** Update connections.
  *
  *  Adds a MAVLink address to the connection corresponding to the given IP
- *  address.  If this connection does not exist, it will be constructed from the
- *  connection factory.
+ *  address.  If this connection does not exist, it will be constructed using
+ *  the \ref UDPInterface's connection factory.
  *
  *  \param mav_address The MAVLink address of the received packet.
  *  \param ip_address The IP address the packet was received on.
@@ -57,13 +57,16 @@ void UDPInterface::update_connections_(
 }
 
 
-/** Construct a UDP interface.
+/** Construct a UDP interface using a given socket.
  *
- *  \param socket The UDP socket to communcate over.
+ *  \param socket The UDP socket to communicate over.
  *  \param connection_pool The connection pool to use for sending packets and to
  *      register new connections with.
- *  \param connection_factory The connection factory to use for contructing
- *      connections.
+ *  \param connection_factory The connection factory to use for constructing
+ *      new connections when an outside connection is made.
+ *  \throws std::invalid_argument if the serial \p port device pointer is null.
+ *  \throws std::invalid_argument if the \p connection_pool pointer is null.
+ *  \throws std::invalid_argument if the \p connection_factory pointer is null.
  */
 UDPInterface::UDPInterface(
     std::unique_ptr<UDPSocket> socket,
@@ -94,8 +97,8 @@ UDPInterface::UDPInterface(
 
 /** \copydoc Interface::send_packet(const std::chrono::nanoseconds &)
  *
- *  Sends up to one packet from each connection belonging to the interface over
- *  the UDP socket.
+ *  Sends up to one packet from each connection, belonging to the interface,
+ *  over the UDP socket.
  */
 void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
 {
@@ -129,7 +132,8 @@ void UDPInterface::send_packet(const std::chrono::nanoseconds &timeout)
 /** \copydoc Interface::receive_packet(const std::chrono::nanoseconds &)
  *
  *  Receives up to one UDP packet worth of data and parses it into MAVLink
- *  packets before sending these packets onto the connection pool.
+ *  packets before passing these packets onto the connection pool.  Will wait up
+ *  to \p timeout for a UDP packet to be received.
  */
 void UDPInterface::receive_packet(const std::chrono::nanoseconds &timeout)
 {

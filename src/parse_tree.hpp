@@ -28,17 +28,17 @@
 
 #include <cassert>
 #include <memory>
-#include <type_traits>
 #include <typeinfo>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <pegtl/config.hpp>
+#include <pegtl/internal/demangle.hpp>
+#include <pegtl/internal/iterator.hpp>
 #include <pegtl/normal.hpp>
 #include <pegtl/nothing.hpp>
 #include <pegtl/parse.hpp>
-#include <pegtl/internal/demangle.hpp>
-#include <pegtl/internal/iterator.hpp>
 
 
 // Not included in documentation because it is mostly copied from PEGTL.
@@ -278,7 +278,7 @@ namespace config
             // https://stackoverflow.com/a/16000226
             template <typename T>
             struct has_error_message <T, decltype((void) T::error_message, 0)>
-                : std::true_type {};
+: std::true_type {};
 
             template<template<typename> class S>
             struct make_control
@@ -298,9 +298,9 @@ namespace config
 
                 // custom error message
                 template< typename Input, typename... States >
-                static void raise( const Input& in, States&&... )
+                static void raise(const Input &in, States &&...)
                 {
-                    if constexpr (has_error_message<S<Rule>>::value)
+                    if constexpr(has_error_message<S<Rule>>::value)
                     {
                         throw pegtl::parse_error(S<Rule>::error_message, in);
                     }
@@ -322,9 +322,9 @@ namespace config
 
                 // custom error message
                 template< typename Input, typename... States >
-                static void raise( const Input& in, States&&... )
+                static void raise(const Input &in, States &&...)
                 {
-                    if constexpr (has_error_message<S<Rule>>::value)
+                    if constexpr(has_error_message<S<Rule>>::value)
                     {
                         throw pegtl::parse_error(S<Rule>::error_message, in);
                     }
@@ -389,8 +389,8 @@ namespace config
 
             if (!pegtl::parse <
                     Rule, pegtl::nothing,
-                    internal::make_control<S>::template type>
-                    (in, state, st...))
+                    internal::make_control<S>::template type >
+            (in, state, st...))
             {
                 return nullptr;
             }

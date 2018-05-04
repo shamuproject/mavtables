@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <sstream>
 #include <stdexcept>
 
 #include "catch.hpp"
@@ -133,6 +132,7 @@ TEST_CASE("'find_config' returns the path to the highest priority "
 
 TEST_CASE("Options's class prints the help message.", "[Options]")
 {
+    MockCOut mock_cout;
     std::string help_message =
         "usage: <program name here>:\n"
         "  -h [ --help ]         print this message\n"
@@ -144,18 +144,16 @@ TEST_CASE("Options's class prints the help message.", "[Options]")
     {
         int argc = 2;
         const char *argv[2] = {"<program name here>", "-h"};
-        std::stringstream ss;
-        Options options(argc, argv, ss);
-        REQUIRE(ss.str() == help_message);
+        Options options(argc, argv);
+        REQUIRE(mock_cout.buffer() == help_message);
         REQUIRE_FALSE(options);
     }
     SECTION("When given the '--help' flag.")
     {
         int argc = 2;
         const char *argv[2] = {"<program name here>", "--help"};
-        std::stringstream ss;
-        Options options(argc, argv, ss);
-        REQUIRE(ss.str() == help_message);
+        Options options(argc, argv);
+        REQUIRE(mock_cout.buffer() == help_message);
         REQUIRE_FALSE(options);
     }
 }
@@ -164,12 +162,12 @@ TEST_CASE("Options's class prints the help message.", "[Options]")
 TEST_CASE("Options's class prints version information when given the "
           "'--version' flag.", "[Options]")
 {
+    MockCOut mock_cout;
     int argc = 2;
     const char *argv[2] = {"<program name here>", "--version"};
-    std::stringstream ss;
-    Options options(argc, argv, ss);
+    Options options(argc, argv);
     REQUIRE(
-        ss.str() ==
+        mock_cout.buffer() ==
         "mavtables (SHAMU Project) v" + std::to_string(VERSION_MAJOR) +
         "." + std::to_string(VERSION_MINOR) +
         "." + std::to_string(VERSION_PATCH) +
@@ -183,10 +181,10 @@ TEST_CASE("Options's class prints version information when given the "
 }
 
 
-
 TEST_CASE("Options's class will use the given configuration file "
           "(--config flag).", "[Options]")
 {
+    MockCOut mock_cout;
     std::vector<Filesystem::path> paths;
     fakeit::Mock<Filesystem> fs_mock;
     SECTION("File found.")
@@ -200,13 +198,14 @@ TEST_CASE("Options's class will use the given configuration file "
         // Construct Options object.
         int argc = 3;
         const char *argv[3] = {"mavtables", "--config", "examples/test.conf"};
-        std::stringstream ss;
-        Options options(argc, argv, ss, fs_mock.get());
+        Options options(argc, argv, fs_mock.get());
         // Verify Options object.
         REQUIRE(options.config_file() == "examples/test.conf");
         REQUIRE(options);
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
+        // Verify printing.
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(1);
         REQUIRE(paths.size() == 1);
@@ -222,16 +221,18 @@ TEST_CASE("Options's class will use the given configuration file "
         });
         // Construct Options object.
         int argc = 3;
-        const char *argv[3] = {
-            "mavtables", "--config", "non_existant_file.conf"};
-        std::stringstream ss;
-        
+        const char *argv[3] =
+        {
+            "mavtables", "--config", "non_existant_file.conf"
+        };
         // Verify Options object.
         REQUIRE_THROWS_AS(
-            Options(argc, argv, ss, fs_mock.get()), std::runtime_error);
+            Options(argc, argv, fs_mock.get()), std::runtime_error);
         REQUIRE_THROWS_WITH(
-            Options(argc, argv, ss, fs_mock.get()),
+            Options(argc, argv, fs_mock.get()),
             "mavtables could not locate a configuration file");
+        // Verify printing.
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(2);
         REQUIRE(paths.size() == 2);
@@ -243,6 +244,7 @@ TEST_CASE("Options's class will use the given configuration file "
 
 TEST_CASE("Options's class finds the configuration file.", "[Options]")
 {
+    MockCOut mock_cout;
     std::vector<Filesystem::path> paths;
     fakeit::Mock<Filesystem> fs_mock;
     SECTION("First found is given by MAVTABLES_CONFIG_PATH environment "
@@ -258,8 +260,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         // Construct Options object.
         int argc = 1;
         const char *argv[2] = {"mavtables"};
-        std::stringstream ss;
-        Options options(argc, argv, ss, fs_mock.get());
+        Options options(argc, argv, fs_mock.get());
         unsetenv("MAVTABLES_CONFIG_PATH");
         // Verify Options object.
         REQUIRE(options.config_file() == "mtbls.conf");
@@ -267,7 +268,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
         // Verify printing.
-        REQUIRE(ss.str() == "");
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(1);
         REQUIRE(paths.size() == 1);
@@ -285,8 +286,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         // Construct Options object.
         int argc = 1;
         const char *argv[2] = {"mavtables"};
-        std::stringstream ss;
-        Options options(argc, argv, ss, fs_mock.get());
+        Options options(argc, argv, fs_mock.get());
         unsetenv("MAVTABLES_CONFIG_PATH");
         // Verify Options object.
         REQUIRE(options.config_file() == ".mavtablesrc");
@@ -294,7 +294,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
         // Verify printing.
-        REQUIRE(ss.str() == "");
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(2);
         REQUIRE(paths.size() == 2);
@@ -315,8 +315,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         // Construct Options object.
         int argc = 1;
         const char *argv[2] = {"mavtables"};
-        std::stringstream ss;
-        Options options(argc, argv, ss, fs_mock.get());
+        Options options(argc, argv, fs_mock.get());
         unsetenv("MAVTABLES_CONFIG_PATH");
         // Verify Options object.
         REQUIRE(options.config_file() == home_path);
@@ -324,7 +323,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
         // Verify printing.
-        REQUIRE(ss.str() == "");
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(3);
         REQUIRE(paths.size() == 3);
@@ -346,8 +345,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         // Construct Options object.
         int argc = 1;
         const char *argv[2] = {"mavtables"};
-        std::stringstream ss;
-        Options options(argc, argv, ss, fs_mock.get());
+        Options options(argc, argv, fs_mock.get());
         unsetenv("MAVTABLES_CONFIG_PATH");
         // Verify Options object.
         REQUIRE(options.config_file() == (PREFIX "/etc/mavtables.conf"));
@@ -355,7 +353,7 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         REQUIRE_FALSE(options.ast());
         REQUIRE(options.run());
         // Verify printing.
-        REQUIRE(ss.str() == "");
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(4);
         REQUIRE(paths.size() == 4);
@@ -378,14 +376,15 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
         // Construct Options object.
         int argc = 1;
         const char *argv[2] = {"mavtables"};
-        std::stringstream ss;
         REQUIRE_THROWS_AS(
-            Options(argc, argv, ss, fs_mock.get()),
+            Options(argc, argv, fs_mock.get()),
             std::runtime_error);
         REQUIRE_THROWS_WITH(
-            Options(argc, argv, ss, fs_mock.get()),
+            Options(argc, argv, fs_mock.get()),
             "mavtables could not locate a configuration file");
         unsetenv("MAVTABLES_CONFIG_PATH");
+        // Verify printing.
+        REQUIRE(mock_cout.buffer().empty());
         // Verify exists calls.
         fakeit::Verify(Method(fs_mock, exists)).Exactly(8);
         REQUIRE(paths.size() == 8);
@@ -404,27 +403,30 @@ TEST_CASE("Options's class finds the configuration file.", "[Options]")
 TEST_CASE("Options's class sets run to false and ast to true when the --ast "
           "flag is given.", "[Options]")
 {
+    MockCOut mock_cout;
     // Setup mocks.
     fakeit::Mock<Filesystem> fs_mock;
     fakeit::When(Method(fs_mock, exists)).AlwaysReturn(true);
     // Construct Options object.
     int argc = 4;
-    const char *argv[4] = {
-        "mavtables", "--ast", "--config", "test/mavtables.conf"};
-    std::stringstream ss;
-    Options options(argc, argv, ss);
+    const char *argv[4] =
+    {
+        "mavtables", "--ast", "--config", "test/mavtables.conf"
+    };
+    Options options(argc, argv);
     // Verify Options object.
     REQUIRE(options.config_file() == "test/mavtables.conf");
     REQUIRE(options);
     REQUIRE(options.ast());
     REQUIRE_FALSE(options.run());
     // Verify printing.
-    REQUIRE(ss.str() == "");
+    REQUIRE(mock_cout.buffer().empty());
 }
 
 
 TEST_CASE("Option's class has a loglevel option", "[Options]")
 {
+    MockCOut mock_cout;
     // Setup mocks.
     fakeit::Mock<Filesystem> fs_mock;
     fakeit::When(Method(fs_mock, exists)).AlwaysReturn(true);
@@ -433,24 +435,24 @@ TEST_CASE("Option's class has a loglevel option", "[Options]")
         // Construct Options object.
         int argc = 3;
         const char *argv[3] = {"mavtables", "--config", "test/mavtables.conf"};
-        std::stringstream ss;
-        Options options(argc, argv, ss);
+        Options options(argc, argv);
         // Verify Options object.
         REQUIRE(options.loglevel() == 0);
         // Verify printing.
-        REQUIRE(ss.str() == "");
+        REQUIRE(mock_cout.buffer().empty());
     }
     SECTION("sets the loglevel when the --loglevel is given")
     {
         // Construct Options object.
         int argc = 5;
-        const char *argv[5] = {
-            "mavtables", "--loglevel", "3", "--config", "test/mavtables.conf"};
-        std::stringstream ss;
-        Options options(argc, argv, ss);
+        const char *argv[5] =
+        {
+            "mavtables", "--loglevel", "3", "--config", "test/mavtables.conf"
+        };
+        Options options(argc, argv);
         // Verify Options object.
         REQUIRE(options.loglevel() == 3);
         // Verify printing.
-        REQUIRE(ss.str() == "");
+        REQUIRE(mock_cout.buffer().empty());
     }
 }

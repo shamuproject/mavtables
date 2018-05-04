@@ -120,8 +120,8 @@ std::vector<MAVAddress> AddressPool<TC>::addresses()
 /** Determine if the pool contains a given MAVLink address.
  *
  *  \param address The MAVLink address to test for.
- *  \retval true If the pool contains \p address.
- *  \retval false If the pool does not contain \p address.
+ *  \retval true %If the pool contains \p address.
+ *  \retval false %If the pool does not contain \p address.
  *  \remarks
  *      Threadsafe (locking).
  */

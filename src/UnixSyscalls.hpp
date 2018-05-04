@@ -32,7 +32,7 @@
 #include "config.hpp"
 
 
-/** This is a thin wrapper around Unix system calls.
+/** A thin wrapper around Unix system calls.
  *
  *  The purpose of this is to allow system calls to be mocked during testing.
  *

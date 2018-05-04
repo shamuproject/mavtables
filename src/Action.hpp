@@ -39,12 +39,10 @@ class Action
             CONTINUE, //!< Continue evaluating rules.
             DEFAULT   //!< Use the default rule.
         };
-        // Variables
-        Action::Option action_;
         // Methods
         /** Copy constructor.
          *
-         *  \param other Action to copy.
+         *  \param other Action to copy from.
          */
         Action(const Action &other) = default;
         /** Move constructor.
@@ -57,7 +55,7 @@ class Action
         int priority() const;
         /** Assignment operator.
          *
-         * \param other Action to copy.
+         * \param other Action to copy from.
          */
         Action &operator=(const Action &other) = default;
         /** Assignment operator (by move semantics).
@@ -72,11 +70,12 @@ class Action
         static Action make_default();
 
     private:
+        Action::Option action_;
         // Note: The reason this is optional is because there is a difference
         //       between {} and 0.  This is because a priority of {} can still
-        //       be set to something other than 0 by a higher level rule (see
-        //       \ref Call or \ref GoTo) while if the priority has been set to 0
-        //       it cannot be set again.
+        //       be set to something other than 0 by a rule higher up the chain
+        //       (see \ref Call or \ref GoTo) while if the priority has been set
+        //       to 0 it should not be set again.
         std::optional<int> priority_;
         Action(Action::Option action, std::optional<int> priority = {});
 };

@@ -31,10 +31,17 @@
 
 /** A UDP socket, listening on a port/address combination.
  *
- *  One of the \ref send methods and one of the \ref receive methods must be
- *  implemented in derived classes to avoid infinite recursion because this is
- *  technically and abstract class.  The other send and receive methods will be
- *  defaulted.
+ *  \warning This class should be treated as pure virtual and should never be
+ *      instantiated.
+ *
+ *  \warning Either \ref send(const std::vector<uint8_t> &data, const IPAddress &) or
+ *      send(std::vector<uint8_t>::const_iterator,std::vector<uint8_t>::const_iterator, const IPAddress &)
+ *      must be overridden in child classes to avoid infinite recursion.
+ *
+ *  \warning Either \ref receive(const std::chrono::nanoseconds &) or
+ *      receive(std::back_insert_iterator<std::vector<uint8_t>>,const std::chrono::nanoseconds &)
+ *      must be overridden in child classes to avoid infinite recursion.
+ *
  */
 class UDPSocket
 {
@@ -61,7 +68,7 @@ class UDPSocket
         /** Print the UDP socket to the given output stream.
          *
          *  \param os The output stream to print to.
-         *  \return The output stream.
+         *  \returns The output stream.
          */
         virtual std::ostream &print_(std::ostream &os) const;
 };

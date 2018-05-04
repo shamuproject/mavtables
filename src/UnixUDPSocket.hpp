@@ -31,7 +31,7 @@
 #include "UnixSyscalls.hpp"
 
 
-/** A Unix UDP socket, listening on a port/address combination.
+/** A unix UDP socket, listening on a port/address combination.
  */
 class UnixUDPSocket : public UDPSocket
 {

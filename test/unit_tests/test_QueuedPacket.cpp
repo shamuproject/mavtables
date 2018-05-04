@@ -22,10 +22,9 @@
 
 #include "PacketVersion2.hpp"
 #include "QueuedPacket.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common_Packet.hpp"
-
 
 
 TEST_CASE("QueuedPacket's can be constructed.", "[QueuedPacket]")

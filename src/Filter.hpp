@@ -25,11 +25,11 @@
 #include "Action.hpp"
 #include "Chain.hpp"
 #include "config.hpp"
-#include "Packet.hpp"
 #include "MAVAddress.hpp"
+#include "Packet.hpp"
 
 
-/** The filter used to determin wheather to accept or reject a packet.
+/** The filter used to determine whether to accept or reject a packet.
  *
  *  \sa Chain
  *  \sa Rule
@@ -40,7 +40,7 @@ class Filter
     public:
         /** Copy constructor.
          *
-         *  \param other Filter to copy.
+         *  \param other Filter to copy from.
          */
         Filter(const Filter &other) = default;
         /** Move constructor.
@@ -56,7 +56,7 @@ class Filter
             const Packet &packet, const MAVAddress &address);
         /** Assignment operator.
          *
-         * \param other Filter to copy.
+         * \param other Filter to copy from.
          */
         Filter &operator=(const Filter &other) = default;
         /** Assignment operator (by move semantics).

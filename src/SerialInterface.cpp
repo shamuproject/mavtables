@@ -25,13 +25,16 @@
 #include "SerialPort.hpp"
 
 
-/** Construct a serial port interface.
+/** Construct a serial port interface using a given device.
  *
- *  \param port The serial port to communcate over.
- *  \param connection_pool The connection pool to use for sending packets and to
- *      register the \p connection with.
- *  \param connection The connection to send packets from.  This will be
- *      registered with the given \ref ConnectionPool.
+ *  \param port The serial port device to communicate over.
+ *  \param connection_pool The connection pool to use for sending packets the
+ *      interface has received and to register the \p connection with.
+ *  \param connection The connection to get packets to send packets from.  This
+ *      will be registered with the given \ref ConnectionPool.
+ *  \throws std::invalid_argument if the serial \p port device pointer is null.
+ *  \throws std::invalid_argument if the \p connection_pool pointer is null.
+ *  \throws std::invalid_argument if the \p connection pointer is null.
  */
 SerialInterface::SerialInterface(
     std::unique_ptr<SerialPort> port,
@@ -77,8 +80,8 @@ void SerialInterface::send_packet(const std::chrono::nanoseconds &timeout)
 
 /** \copydoc Interface::receive_packet(const std::chrono::nanoseconds &)
  *
- *  Reads the data in the serial port's receive buffer or waits for up to\p
- *  timeout until data arives if no data is present the serial port buffer.
+ *  Reads the data in the serial port's receive buffer or waits for up to \p
+ *  timeout until data arrives if no data is present in the serial port buffer.
  */
 void SerialInterface::receive_packet(const std::chrono::nanoseconds &timeout)
 {
@@ -112,6 +115,8 @@ void SerialInterface::receive_packet(const std::chrono::nanoseconds &timeout)
  *      flow_control yes;
  *  }
  *  ```
+ *
+ *  \param os The output stream to print to.
  */
 std::ostream &SerialInterface::print_(std::ostream &os) const
 {

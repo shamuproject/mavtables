@@ -15,9 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <catch.hpp>
 
@@ -33,7 +33,7 @@
 #include "PacketVersion2.hpp"
 #include "RecursionError.hpp"
 #include "Reject.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common_Packet.hpp"
 
@@ -167,37 +167,37 @@ TEST_CASE("Chain's are movable.", "[Chain]")
 
 TEST_CASE("Chain's are assignable.", "[Chain]")
 {
-    Chain a("test_chain_a");
-    a.append(std::make_unique<Accept>(If().to("192.168")));
-    a.append(std::make_unique<Reject>());
-    Chain a_compare("test_chain_a");
-    a_compare.append(std::make_unique<Accept>(If().to("192.168")));
-    a_compare.append(std::make_unique<Reject>());
-    Chain b("test_chain_b");
-    b.append(std::make_unique<Reject>());
-    Chain b_compare("test_chain_b");
-    b_compare.append(std::make_unique<Reject>());
-    REQUIRE(a == a_compare);
-    a = b;
-    REQUIRE(a == b_compare);
+    Chain chain_a("test_chain_a");
+    chain_a.append(std::make_unique<Accept>(If().to("192.168")));
+    chain_a.append(std::make_unique<Reject>());
+    Chain chain_a_compare("test_chain_a");
+    chain_a_compare.append(std::make_unique<Accept>(If().to("192.168")));
+    chain_a_compare.append(std::make_unique<Reject>());
+    Chain chain_b("test_chain_b");
+    chain_b.append(std::make_unique<Reject>());
+    Chain chain_b_compare("test_chain_b");
+    chain_b_compare.append(std::make_unique<Reject>());
+    REQUIRE(chain_a == chain_a_compare);
+    chain_a = chain_b;
+    REQUIRE(chain_a == chain_b_compare);
 }
 
 
 TEST_CASE("Chain's are assignable (by move semantics).", "[Chain]")
 {
-    Chain a("test_chain_a");
-    a.append(std::make_unique<Accept>(If().to("192.168")));
-    a.append(std::make_unique<Reject>());
-    Chain a_compare("test_chain_a");
-    a_compare.append(std::make_unique<Accept>(If().to("192.168")));
-    a_compare.append(std::make_unique<Reject>());
-    Chain b("test_chain_b");
-    b.append(std::make_unique<Reject>());
-    Chain b_compare("test_chain_b");
-    b_compare.append(std::make_unique<Reject>());
-    REQUIRE(a == a_compare);
-    a = std::move(b);
-    REQUIRE(a == b_compare);
+    Chain chain_a("test_chain_a");
+    chain_a.append(std::make_unique<Accept>(If().to("192.168")));
+    chain_a.append(std::make_unique<Reject>());
+    Chain chain_a_compare("test_chain_a");
+    chain_a_compare.append(std::make_unique<Accept>(If().to("192.168")));
+    chain_a_compare.append(std::make_unique<Reject>());
+    Chain chain_b("test_chain_b");
+    chain_b.append(std::make_unique<Reject>());
+    Chain chain_b_compare("test_chain_b");
+    chain_b_compare.append(std::make_unique<Reject>());
+    REQUIRE(chain_a == chain_a_compare);
+    chain_a = std::move(chain_b);
+    REQUIRE(chain_a == chain_b_compare);
 }
 
 

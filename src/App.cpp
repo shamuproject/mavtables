@@ -50,6 +50,11 @@ App::App(std::vector<std::unique_ptr<Interface>> interfaces)
 
 
 /** Start the application.
+ *
+ *  This starts listening on all interfaces.
+ *
+ *  \throws std::system_error if an error is generated while waiting for Ctrl+C.
+ *  \throws std::runtime_error if run on Microsoft Windows.
  */
 void App::run()
 {
@@ -66,10 +71,12 @@ void App::run()
     sigaddset(&waitset, SIGINT);
     sigprocmask(SIG_BLOCK, &waitset, nullptr);
     int sig;
+
     if (sigwait(&waitset, &sig) < 0)
     {
         throw std::system_error(std::error_code(errno, std::system_category()));
     }
+
     #elif WINDOWS
     throw std::runtime_error("Microsoft Windows is not currently supported.")
     #endif

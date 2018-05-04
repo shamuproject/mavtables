@@ -35,7 +35,7 @@
 #include "PacketVersion2.hpp"
 #include "UDPInterface.hpp"
 #include "UDPSocket.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -109,13 +109,13 @@ TEST_CASE("UDPInterace's 'receive_packet' method.", "[UPDInterface]")
     fakeit::Mock<Filter> mock_filter;
     std::multiset<packet_v2::Packet,
         bool(*)(const packet_v2::Packet &, const packet_v2::Packet &)>
-        will_accept_packets([](const auto &a, const auto &b)
+        will_accept_packets([](const auto & a, const auto & b)
     {
         return a.data() < b.data();
     });
     std::multiset<MAVAddress> will_accept_addresses;
     fakeit::When(Method(mock_filter, will_accept)).AlwaysDo(
-        [&](auto &a, auto &b)
+        [&](auto & a, auto & b)
     {
         will_accept_packets.insert(
             dynamic_cast<const packet_v2::Packet &>(a));
@@ -816,8 +816,8 @@ TEST_CASE("OLD TEST: UDPInterface's 'receive_packet' method receives one or "
           "more MAVLink packets.", "[UPDInterface]")
 {
     using receive_type = IPAddress(
-        std::back_insert_iterator<std::vector<uint8_t>>,
-        const std::chrono::nanoseconds &);
+                             std::back_insert_iterator<std::vector<uint8_t>>,
+                             const std::chrono::nanoseconds &);
     auto heartbeat =
         std::make_shared<packet_v2::Packet>(to_vector(HeartbeatV2()));
     fakeit::Mock<Filter> mock_filter;

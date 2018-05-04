@@ -15,12 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef UTIL_HPP_
-#define UTIL_HPP_
+#ifndef UTILITY_HPP_
+#define UTILITY_HPP_
 
 
 #include <array>
-#include <boost/range/irange.hpp>
 #include <iterator>
 #include <ostream>
 #include <sstream>
@@ -28,14 +27,16 @@
 #include <utility>
 #include <vector>
 
+#include <boost/range/irange.hpp>
+
 
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, const std::vector<T>& source);
+    std::vector<T> &dest, const std::vector<T> &source);
 
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, std::vector<T>&& source);
+    std::vector<T> &dest, std::vector<T> &&source);
 
 template <class T>
 std::string str(const T &object);
@@ -53,6 +54,7 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
  *
  *  Taken from https://stackoverflow.com/a/37210097
  *
+ *  \ingroup utility
  *  \param dest Vector to append to.
  *  \param source Vector to append the elements from.
  *  \returns Iterator pointing to the first element appended, or the end of the
@@ -60,14 +62,17 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector);
  */
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, const std::vector<T>& source)
+    std::vector<T> &dest, const std::vector<T> &source)
 {
     typename std::vector<T>::iterator result;
 
-    if (dest.empty()) {
+    if (dest.empty())
+    {
         dest = source;
         result = std::begin(dest);
-    } else {
+    }
+    else
+    {
         result =
             dest.insert(std::end(dest), std::cbegin(source), std::cend(source));
     }
@@ -80,6 +85,7 @@ typename std::vector<T>::iterator append(
  *
  *  Taken from https://stackoverflow.com/a/37210097
  *
+ *  \ingroup utility
  *  \param dest Vector to append to.
  *  \param source Vector to append the elements from.  \p source will be a valid
  *      empty vector after this call.
@@ -88,23 +94,25 @@ typename std::vector<T>::iterator append(
  */
 template <typename T>
 typename std::vector<T>::iterator append(
-    std::vector<T>& dest, std::vector<T>&& source)
+    std::vector<T> &dest, std::vector<T> &&source)
 {
     typename std::vector<T>::iterator result;
 
-    if (dest.empty()) {
+    if (dest.empty())
+    {
         dest = std::move(source);
         result = std::begin(dest);
-    } else {
+    }
+    else
+    {
         result = dest.insert(
-            std::end(dest),
-            std::make_move_iterator(std::begin(source)),
-            std::make_move_iterator(std::end(source)));
+                     std::end(dest),
+                     std::make_move_iterator(std::begin(source)),
+                     std::make_move_iterator(std::end(source)));
     }
 
     source.clear();
     source.shrink_to_fit();
-
     return result;
 }
 
@@ -114,7 +122,7 @@ typename std::vector<T>::iterator append(
  *  \ingroup utility
  *  \tparam T Type of the object to convert to a string.
  *  \param object The object to convert to a string.
- *  \return The string representing the object.
+ *  \returns The string representing the object.
  */
 template <class T>
 std::string str(const T &object)
@@ -131,8 +139,7 @@ std::string str(const T &object)
  *  \tparam ByteType Numeric type to return in the array of bytes.
  *  \tparam T Type of the number being converted to bytes.
  *  \param number Number to convert to bytes
- *  \return The array of bytes from the given number, in LSB order.
- *  \complexity \f$O(n)\f$ where \f$n\f$ is the number of bytes in type \p T.
+ *  \returns The array of bytes from the given number, in LSB order.
  */
 template <class ByteType, class T>
 std::array<ByteType, sizeof(T)> to_bytes(T number)
@@ -155,6 +162,7 @@ std::array<ByteType, sizeof(T)> to_bytes(T number)
  *  \tparam T The type stored in the vector, it must support the << operator.
  *  \param os The output stream to print to.
  *  \param vector The vector of elements to print.
+ *  \returns The output stream.
  */
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
@@ -177,4 +185,4 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vector)
 }
 
 
-#endif // UTIL_HPP_
+#endif // UTILITY_HPP_

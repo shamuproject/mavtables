@@ -28,13 +28,13 @@
 InvalidPacketIDError::InvalidPacketIDError(unsigned long id)
 {
     message_ = "Packet ID (#" + std::to_string(id) +
-        ") is not part of the '" MAVLINK_DIALECT "' MAVLink dialect.";
+               ") is not part of the '" MAVLINK_DIALECT "' MAVLink dialect.";
 }
 
 
 /** Return error message string.
  *
- *  \return Error message string.
+ *  \returns Error message string.
  */
 const char *InvalidPacketIDError::what() const noexcept
 {

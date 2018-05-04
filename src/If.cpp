@@ -32,17 +32,17 @@
  *
  *  The \ref type, \ref to, and \ref from methods can be used to apply
  *  conditions after construction.  Some examples are:
- *      - `If().type("PING").from("1.0/8").to("255.0");`
- *      - `If().type("HEARTBEAT").from("255.0/8");`
- *      - `If().type("SET_MODE").to("255.0/8");`
- *      - `If().from("255.0/8");`
+ *      - `%If().type("PING").from("1.0/8").to("255.0");`
+ *      - `%If().type("HEARTBEAT").from("255.0/8");`
+ *      - `%If().type("SET_MODE").to("255.0/8");`
+ *      - `%If().from("255.0/8");`
  *
- *  \param id The packet ID to match.  %If {} or std::nullopt then any packet ID
+ *  \param id The packet ID to match.  %If {} (std::nullopt) then any packet ID
  *      will match.  The defaut is {}.
- *  \param source The subnet a source address must be in to match.  %If {} or
- *      nullopt then any source address will match.  The default is {}.
- *  \param dest The subnet a destination address must be in to match.  %If {} or
- *      std::nullopt then any destination address will match.  The default is
+ *  \param source The subnet a source address must be in to match.  %If {}
+ *      (std::nullopt) then any source address will match.  The default is {}.
+ *  \param dest The subnet a destination address must be in to match.  %If {}
+ *      (std::nullopt) then any destination address will match.  The default is
  *      {}.
  *  \throws std::invalid_argument if the given \p id is not valid.
  */
@@ -101,10 +101,11 @@ If &If::from(MAVSubnet subnet)
     return *this;
 }
 
+
 /** Set subnet for source address matching by string.
  *
  *  See \ref MAVSubnet::MAVSubnet(std::string address) for the acceptable
- *  formats and passible errors.
+ *  formats and possible errors.
  *
  *  \param subnet The subnet used for source address matching.
  *  \returns A reference to itself.
@@ -189,7 +190,6 @@ bool If::check(const Packet &packet, const MAVAddress &address) const
  *  \param rhs The right hand side if statement.
  *  \retval true if \p lhs and \p rhs are the same.
  *  \retval false if \p lhs and \p rhs are not the same.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const If &lhs, const If &rhs)
 {
@@ -205,7 +205,6 @@ bool operator==(const If &lhs, const If &rhs)
  *  \param rhs The right hand side if statement.
  *  \retval true if \p lhs and \p rhs are not the same.
  *  \retval false if \p lhs and \p rhs are the same.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const If &lhs, const If &rhs)
 {
@@ -214,7 +213,7 @@ bool operator!=(const If &lhs, const If &rhs)
 }
 
 
-/** Print the if statement to the given output stream.
+/** Print the \ref If statement to the given output stream.
  *
  *  Some examples are:
  *  - `if PING from 1.0/8 to 255.0`

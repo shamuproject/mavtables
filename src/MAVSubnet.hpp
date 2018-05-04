@@ -19,8 +19,8 @@
 #define MAVSUBNET_HPP_
 
 
-#include <string>
 #include <ostream>
+#include <string>
 
 #include "MAVAddress.hpp"
 
@@ -38,7 +38,7 @@ class MAVSubnet
     public:
         /** Copy constructor.
          *
-         * \param other MAVLink subnet to copy.
+         * \param other MAVLink subnet to copy from.
          */
         MAVSubnet(const MAVSubnet &other) = default;
         /** Move constructor.
@@ -53,7 +53,7 @@ class MAVSubnet
         bool contains(const MAVAddress &address) const;
         /** Assignment operator.
          *
-         * \param other MAVLink subnet to copy.
+         * \param other MAVLink subnet to copy from.
          */
         MAVSubnet &operator=(const MAVSubnet &other) = default;
         /** Assignment operator (by move semantics).

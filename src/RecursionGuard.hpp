@@ -31,7 +31,7 @@
  *  structure used to raise an error upon recursion.  The constructor marks a
  *  \ref RecursionData structure, acquiring ownership of the containing function
  *  (within the given thread).  Recursion guards treat calls from different
- *  threads and different, therefore, it will not guard against reentrancy.
+ *  threads separately, therefore, it will not guard against re-entrantcy.
  *
  *  An example of how to use this is:
  *
@@ -49,11 +49,12 @@
  *  }
  *  ```
  *
- *  If `b_function`, or any function it calls, ever calls `a_function` then this
- *  will throw \ref RecursionError.  However, if multiple threads call
+ *  %If `b_function`, or any function it calls, ever calls `a_function` then
+ *  this will throw \ref RecursionError.  However, if multiple threads call
  *  `a_function` (possibly at the same time) but `b_function` does not call
  *  `a_function` then no error will be thrown.
  *
+ *  \sa RecursionData
  *  \sa RecursionError
  */
 class RecursionGuard

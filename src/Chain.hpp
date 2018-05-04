@@ -28,7 +28,7 @@
 #include "config.hpp"
 #include "MAVAddress.hpp"
 #include "Packet.hpp"
-#include <RecursionGuard.hpp>
+#include "RecursionGuard.hpp"
 #include "Rule.hpp"
 
 

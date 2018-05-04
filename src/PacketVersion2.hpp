@@ -63,7 +63,7 @@ namespace packet_v2
         public:
             /** Copy constructor.
              *
-             *  \param other Packet to copy.
+             *  \param other Packet to copy from.
              */
             Packet(const Packet &other) = default;
             /** Move constructor.
@@ -79,7 +79,7 @@ namespace packet_v2
             virtual std::optional<MAVAddress> dest() const;
             /** Assignment operator.
              *
-             *  \param other Packet to copy.
+             *  \param other Packet to copy from.
              */
             Packet &operator=(const Packet &other) = default;
             /** Assignment operator (by move semantics).

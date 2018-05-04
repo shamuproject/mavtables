@@ -29,7 +29,7 @@
 #include "UnixSyscalls.hpp"
 
 
-/** A serial port.
+/** A unix serial port.
  */
 class UnixSerialPort : public SerialPort
 {
@@ -58,10 +58,10 @@ class UnixSerialPort : public SerialPort
         int port_;
         // Methods
         void configure_port_(
-            unsigned long buad_rate, SerialPort::Feature features);
+            unsigned long baud_rate, SerialPort::Feature features);
         void open_port_();
         std::vector<uint8_t> read_();
-        speed_t speed_constant_(unsigned long buad_rate);
+        speed_t speed_constant_(unsigned long baud_rate);
 };
 
 

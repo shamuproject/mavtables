@@ -18,8 +18,8 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <system_error>
 
 #include <catch.hpp>
@@ -27,9 +27,9 @@
 #include <fakeit.hpp>
 
 #include "PartialSendError.hpp"
-#include "UnixSyscalls.hpp"
 #include "UnixSerialPort.hpp"
-#include "util.hpp"
+#include "UnixSyscalls.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 

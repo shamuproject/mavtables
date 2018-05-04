@@ -28,7 +28,8 @@
 #include <vector>
 
 #include <pegtl.hpp>
-#include <parse_tree.hpp>
+
+#include "parse_tree.hpp"
 
 
 namespace config
@@ -107,14 +108,14 @@ namespace config
     template <typename K, typename... Statements>
     struct t_block : seq<K,
         p<must<opening_brace>>,
-        star<p<sor<Statements...>>>,
-        p<must<closing_brace>>> {};
+                            star<p<sor<Statements...>>>,
+                            p<must<closing_brace>>> {};
 
     // Generic named block.
     template <typename K, typename N, typename... Statements>
     struct t_named_block
         : seq<K, p<must<N>>, p<must<opening_brace>>,
-        star<p<sor<Statements...>>>, p<must<closing_brace>>> {};
+          star<p<sor<Statements...>>>, p<must<closing_brace>>> {};
 
     // Yes/No (boolean) value.
     struct yesno
@@ -222,7 +223,7 @@ namespace config
         : if_must<a0_statement<identifier>, unsupported_statement> {};
     struct sa1_catch
         : if_must<a1_statement<identifier,
-        star<not_one<';'>>>, unsupported_statement> {};
+          star<not_one<';'>>>, unsupported_statement> {};
     struct s_catch : sor<sa0_catch, sa1_catch> {};
 
     // Catch unsuported rules.
@@ -230,7 +231,7 @@ namespace config
     struct sa0_rule_catch : if_must<a0_statement<identifier>, invalid_rule> {};
     struct sa1_rule_catch
         : if_must<a1_statement<identifier,
-        star<not_one<';'>>>, invalid_rule> {};
+          star<not_one<';'>>>, invalid_rule> {};
     struct rule_catch : sor<sa0_rule_catch, sa1_rule_catch> {};
 
     // Filter chain.
@@ -241,7 +242,7 @@ namespace config
     struct chain : chain_name {};
     template<> struct store<chain> : yes<chain> {};
     struct chain_container
-        : t_named_block<TAO_PEGTL_STRING("chain"), chain, rule> {};
+    : t_named_block<TAO_PEGTL_STRING("chain"), chain, rule> {};
     template<> struct store<chain_container>
         : replace_with_first_child<chain_container> {};
 
@@ -257,7 +258,7 @@ namespace config
     struct s_port : a1_statement<TAO_PEGTL_STRING("port"), port> {};
     struct s_address : a1_statement<TAO_PEGTL_STRING("address"), address> {};
     struct s_max_bitrate
-        : a1_statement<TAO_PEGTL_STRING("max_bitrate"), max_bitrate> {};
+    : a1_statement<TAO_PEGTL_STRING("max_bitrate"), max_bitrate> {};
     struct udp
     : t_block<TAO_PEGTL_STRING("udp"),
       s_port, s_address, s_max_bitrate, s_catch> {};
@@ -367,7 +368,7 @@ namespace config
     // Default error message.
     template<typename T>
     const std::string error<T>::error_message =
-       "parse error matching " + internal::demangle<T>();
+        "parse error matching " + internal::demangle<T>();
 
 #ifdef __clang__
     #pragma clang diagnostic pop
@@ -376,13 +377,13 @@ namespace config
     /// @endcond
 
 
-    /** Parses given input into and abstract syntax tree.
+    /** Parses given input into an abstract syntax tree.
      *
      *  \note The returned AST is only valid while the input exists.  Therefore,
      *      the input should be kept until the AST passes out of scope.
      *
      *  \tparam Input The type of input, usually either read_input or
-     *      string_input.
+     *      string_input (see PEGTL).
      *  \param in The input, from read_input etc, to parse.
      *  \returns The abstract syntax tree parsed from the input.
      */

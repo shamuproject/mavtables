@@ -23,16 +23,21 @@
 #include <string>
 
 
+/** A global static logger for use by all of mavtables.
+ *
+ *  \note Only supports writing to stdout.
+ */
 class Logger
 {
     public:
         static void log(std::string message);
+        static void log(unsigned int level, std::string message);
         static void level(unsigned int level);
         static unsigned int level();
-        Logger(const Logger &logger) = delete;
-        void operator=(const Logger &logger) = delete;
 
     private:
+        Logger(const Logger &logger) = delete;
+        void operator=(const Logger &logger) = delete;
         Logger() = default;
         static unsigned int level_;
         static std::mutex mutex_;

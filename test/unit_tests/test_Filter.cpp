@@ -92,21 +92,21 @@ TEST_CASE("Filter's are movable.", "[Filter]")
 
 TEST_CASE("Filter's are assignable.", "[Filter]")
 {
-    auto a = Filter(Chain("test_chain_a"));
-    auto b = Filter(Chain("test_chain_b"));
-    REQUIRE(a == Filter(Chain("test_chain_a")));
-    a = b;
-    REQUIRE(a == Filter(Chain("test_chain_b")));
+    auto filter_a = Filter(Chain("test_chain_a"));
+    auto filter_b = Filter(Chain("test_chain_b"));
+    REQUIRE(filter_a == Filter(Chain("test_chain_a")));
+    filter_a = filter_b;
+    REQUIRE(filter_a == Filter(Chain("test_chain_b")));
 }
 
 
 TEST_CASE("Filter's are assignable (by move semantics).", "[Filter]")
 {
-    auto a = Filter(Chain("test_chain_a"));
-    auto b = Filter(Chain("test_chain_b"));
-    REQUIRE(a == Filter(Chain("test_chain_a")));
-    a = std::move(b);
-    REQUIRE(a == Filter(Chain("test_chain_b")));
+    auto filter_a = Filter(Chain("test_chain_a"));
+    auto filter_b = Filter(Chain("test_chain_b"));
+    REQUIRE(filter_a == Filter(Chain("test_chain_a")));
+    filter_a = std::move(filter_b);
+    REQUIRE(filter_a == Filter(Chain("test_chain_b")));
 }
 
 

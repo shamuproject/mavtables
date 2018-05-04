@@ -29,7 +29,7 @@
 #include "MAVAddress.hpp"
 #include "mavlink.hpp"
 #include "PacketVersion1.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 #include "common.hpp"
 #include "common_Packet.hpp"
@@ -323,21 +323,21 @@ TEST_CASE("packet_v1::Packet's are movable.", "[packet_v1::Packet]")
 
 TEST_CASE("packet_v1::Packet's are assignable.", "[Packet]")
 {
-    packet_v1::Packet a(to_vector(PingV1()));
-    packet_v1::Packet b(to_vector(SetModeV1()));
-    REQUIRE(a == packet_v1::Packet(to_vector(PingV1())));
-    a = b;
-    REQUIRE(b == packet_v1::Packet(to_vector(SetModeV1())));
+    packet_v1::Packet packet_a(to_vector(PingV1()));
+    packet_v1::Packet packet_b(to_vector(SetModeV1()));
+    REQUIRE(packet_a == packet_v1::Packet(to_vector(PingV1())));
+    packet_a = packet_b;
+    REQUIRE(packet_b == packet_v1::Packet(to_vector(SetModeV1())));
 }
 
 
 TEST_CASE("packet_v1::Packet's are assignable (by move semantics).", "[Packet]")
 {
-    packet_v1::Packet a(to_vector(PingV1()));
-    packet_v1::Packet b(to_vector(SetModeV1()));
-    REQUIRE(a == packet_v1::Packet(to_vector(PingV1())));
-    a = b;
-    REQUIRE(b == packet_v1::Packet(to_vector(SetModeV1())));
+    packet_v1::Packet packet_a(to_vector(PingV1()));
+    packet_v1::Packet packet_b(to_vector(SetModeV1()));
+    REQUIRE(packet_a == packet_v1::Packet(to_vector(PingV1())));
+    packet_a = packet_b;
+    REQUIRE(packet_b == packet_v1::Packet(to_vector(SetModeV1())));
 }
 
 
@@ -426,7 +426,7 @@ TEST_CASE("packet_v1::Packet's optionally have a destination address.",
 }
 
 
-TEST_CASE("packet_v1::Packet's optionally have a source connection.", 
+TEST_CASE("packet_v1::Packet's optionally have a source connection.",
           "[packet_v1::Packet]")
 {
     auto heartbeat = packet_v1::Packet(to_vector(HeartbeatV1()));

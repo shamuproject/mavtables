@@ -27,9 +27,13 @@
 #include "ConfigParser.hpp"
 #include "Logger.hpp"
 #include "Options.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
+/** mavtables: A MAVLink router and firewall.
+ *
+ *  See the README for further documentation.
+ */
 int main(int argc, const char *argv[])
 {
     try
@@ -39,12 +43,14 @@ int main(int argc, const char *argv[])
         if (options)
         {
             auto config = std::make_unique<ConfigParser>(options.config_file());
+
             if (options.ast())
             {
                 std::cout << "===== " << options.config_file()
-                    << " =====" << std::endl;
+                          << " =====" << std::endl;
                 std::cout << *config;
             }
+
             if (options.run())
             {
                 Logger::level(options.loglevel());
@@ -55,7 +61,7 @@ int main(int argc, const char *argv[])
     }
     catch (const std::exception &e)
     {
-        std::cout << "error: " << e.what() << std::endl;
+        std::cerr << "error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 

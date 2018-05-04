@@ -41,7 +41,7 @@ set (SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/UnixSerialPort.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixSyscalls.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/utility.cpp"
 )
 
 set (HEADERS
@@ -71,15 +71,15 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Options.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Packet.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketParser.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion1.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PacketVersion2.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/PacketQueue.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/parse_tree.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/PartialSendError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/QueuedPacket.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/RecursionData.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionError.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/RecursionGuard.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/RecursionData.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Reject.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/Rule.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/semaphore.hpp"
@@ -90,7 +90,7 @@ set (HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/UnixSerialPort.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixSyscalls.hpp"
     "${CMAKE_CURRENT_LIST_DIR}/UnixUDPSocket.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/util.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/utility.hpp"
 )
 
 target_sources (mavtables 

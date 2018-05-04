@@ -26,6 +26,19 @@
 #include "Interface.hpp"
 
 
+/** A multithreaded interface runner.
+ *
+ *  This class runs a given interface.  It does this by calling the \ref
+ *  Interface's \ref Interface::send_packet and \ref Interface::receive_packet
+ *  methods repeatedly until the runner is shutdown.  This is a threaded runner
+ *  and thus it runs these methods in two separate threads which are managed by
+ *  the \ref InterfaceThreader class.
+ *
+ *  %Call the \ref shutdown method to stop running the interface and cleanup the
+ *  threads.
+ *
+ *  \note This is the only place where threading occurs in mavtables.
+ */
 class InterfaceThreader
 {
     public:

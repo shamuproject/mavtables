@@ -31,7 +31,7 @@ Filesystem::~Filesystem()
 
 /** Returns true if the given path exists.
  *
- *  \param p The path to check if it exists.
+ *  \param p The path to check for existence.
  */
 bool Filesystem::exists(const Filesystem::path &p) const
 {

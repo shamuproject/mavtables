@@ -22,8 +22,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "Filesystem.hpp"
 #include "config_grammar.hpp"
+#include "Filesystem.hpp"
 #include "parse_tree.hpp"
 
 
@@ -47,103 +47,103 @@ namespace config
 
     template<>
     const std::string error<eos>::error_message =
-           "expected end of statement ';' character";
+        "expected end of statement ';' character";
 
     template<>
     const std::string error<opening_brace>::error_message =
-           "expected opening brace '{'";
+        "expected opening brace '{'";
 
     template<>
     const std::string error<closing_brace>::error_message =
-           "expected closing brace '}'";
+        "expected closing brace '}'";
 
     template<>
     const std::string error<unsupported_statement>::error_message =
-           "unsupported statement";
+        "unsupported statement";
 
     template<>
     const std::string error<default_action_option>::error_message =
-           "expected 'accept' or 'reject'";
+        "expected 'accept' or 'reject'";
 
     template<>
     const std::string error<port>::error_message =
-           "expected a valid port number";
+        "expected a valid port number";
 
     template<>
     const std::string error<address>::error_message =
-           "expected a valid IP address";
+        "expected a valid IP address";
 
     template<>
     const std::string error<max_bitrate>::error_message =
-           "expected a valid bitrate";
+        "expected a valid bitrate";
 
     template<>
     const std::string error<device>::error_message =
-           "expected a valid serial port device name";
+        "expected a valid serial port device name";
 
     template<>
     const std::string error<baudrate>::error_message =
-           "expected a valid baud rate";
+        "expected a valid baud rate";
 
     template<>
     const std::string error<flow_control>::error_message =
-           "expected 'yes' or 'no'";
+        "expected 'yes' or 'no'";
 
     template<>
     const std::string error<preload>::error_message =
-           "expected a valid MAVLink address";
+        "expected a valid MAVLink address";
 
     template<>
     const std::string error<chain_name>::error_message =
-           "expected a valid chain name";
+        "expected a valid chain name";
 
     template<>
     const std::string error<chain>::error_message =
-           "expected a valid chain name";
+        "expected a valid chain name";
 
     template<>
     const std::string error<call>::error_message =
-           "expected a valid chain name";
+        "expected a valid chain name";
 
     template<>
     const std::string error<goto_>::error_message =
-           "expected a valid chain name";
+        "expected a valid chain name";
 
     template<>
     const std::string error<invalid_rule>::error_message =
-           "expected a valid rule";
+        "expected a valid rule";
 
     template<>
     const std::string error<condition_value>::error_message =
-           "condition is empty or invalid";
+        "condition is empty or invalid";
 
     template<>
     const std::string error<dest>::error_message =
-           "expected a valid MAVLink subnet";
+        "expected a valid MAVLink subnet";
 
     template<>
     const std::string error<source>::error_message =
-           "expected a valid MAVLink subnet";
+        "expected a valid MAVLink subnet";
 
     template<>
     const std::string error<mavaddr>::error_message =
-           "expected a valid MAVLink address";
+        "expected a valid MAVLink address";
 
     template<>
     const std::string error<integer>::error_message =
-           "expected an integer";
+        "expected an integer";
 
     template<>
     const std::string error<priority>::error_message =
-           "expected priority level";
+        "expected priority level";
 
     template<>
     const std::string error<priority_keyword>::error_message =
-           "'with' keyword must be followed by the 'priority' keyword";
+        "'with' keyword must be followed by the 'priority' keyword";
 
     template<>
     const std::string error<elements>::error_message =
-           "expected at least one valid statement or block";
+        "expected at least one valid statement or block";
 
 #ifdef __clang__
     #pragma clang diagnostic pop
@@ -175,7 +175,6 @@ namespace config
         {
             // Add 2 spaces to the indent.
             new_prefix = prefix + "|  ";
-
             // Remove "config::" prefix from node name.
             auto node_name = node.name();
             node_name.erase(0, 8);
@@ -198,6 +197,7 @@ namespace config
             {
                 os << " " << node.content() << "";
             }
+
             os << std::endl;
         }
 
@@ -209,6 +209,7 @@ namespace config
                 print_node(os, *up, print_location, new_prefix);
             }
         }
+
         return os;
     }
 
@@ -223,7 +224,7 @@ namespace config
  *  \ingroup config
  *  \param os The output stream to print to.
  *  \param node The node to print, also prints it's children.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(
     std::ostream &os, const config::parse_tree::node &node)

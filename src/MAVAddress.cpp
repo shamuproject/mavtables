@@ -15,25 +15,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
-#include <string>
-#include <sstream>
 #include <algorithm>
-#include <stdexcept>
-
 #include <cctype>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include "util.hpp"
 #include "MAVAddress.hpp"
+#include "utility.hpp"
 
 
-/** Construct MAVLink address from an address in numeric representation.
+/** Construct a MAVLink address from an address in numeric representation.
  *
  *  The numeric representation of a MAVLink address is two bytes, the MSB
- *  contains the System ID and the LSB contains the Component ID.
+ *  contains the system ID and the LSB contains the component ID.
  *
- *  \param address Address (0 - 65535) with System encoded in MSB and Component
- *      encoded in LSB.
+ *  \param address Address (0 - 65535) with system ID encoded in MSB and
+ *      component ID encoded in LSB.
  *  \throws std::out_of_range if the address is not between 0 and 65535.
  */
 MAVAddress::MAVAddress(unsigned int address)
@@ -49,7 +48,13 @@ MAVAddress::MAVAddress(unsigned int address)
 }
 
 
-// Construct from system and component ID's.
+/** Construct a MAVLink address from system and component ID's.
+ *
+ *  \param system System ID (0 - 255).
+ *  \param component Component ID (0 - 255).
+ *  \throws std::out_of_range if either the \p system ID or the \p component ID
+ *      is out of range.
+ */
 void MAVAddress::construct_(unsigned int system, unsigned int component)
 {
     if (system > 255)
@@ -70,14 +75,14 @@ void MAVAddress::construct_(unsigned int system, unsigned int component)
 }
 
 
-/** Construct MAVLink address from the System ID and Component ID.
+/** Construct a MAVLink address from the system ID and component ID.
  *
  *  \note component=0 and system=0 is the broadcast address.
  *
  *  \param system System ID (0 - 255).
  *  \param component Component ID (0 - 255).
- *  \throws std::out_of_range if either the System ID or the component ID is out
- *      of range.
+ *  \throws std::out_of_range if either the \p system ID or the \p component ID
+ *      is out of range.
  */
 MAVAddress::MAVAddress(unsigned int system, unsigned int component)
 {
@@ -95,6 +100,10 @@ MAVAddress::MAVAddress(unsigned int system, unsigned int component)
  *      - "128.4"
  *
  *  \param address String representing the MAVLink address.
+ *  \throws std::invalid_argument if the address string does not represent a
+ *      valid MAVLink address.
+ *  \throws std::out_of_range if either the \p system ID or the \p component ID
+ *      is out of range.
  */
 MAVAddress::MAVAddress(std::string address)
 {
@@ -136,9 +145,8 @@ MAVAddress::MAVAddress(std::string address)
 
 /** Return the MAVLink address in numeric form.
  *
- *  \return The MAVLink address as a two byte number with the System ID encoded
- *      in the MSB and the Component ID in the LSB.
- *  \complexity \f$O(1)\f$
+ *  \returns The MAVLink address as a two byte number with the system ID encoded
+ *      in the MSB and the component ID in the LSB.
  */
 unsigned int MAVAddress::address() const
 {
@@ -148,8 +156,7 @@ unsigned int MAVAddress::address() const
 
 /** Return the System ID.
  *
- *  \return The System ID (0 - 255).
- *  \complexity \f$O(1)\f$
+ *  \returns The system ID (0 - 255).
  */
 unsigned int MAVAddress::system() const
 {
@@ -159,8 +166,7 @@ unsigned int MAVAddress::system() const
 
 /** Return the Component ID.
  *
- *  \return The Component ID (0 - 255).
- *  \complexity \f$O(1)\f$
+ *  \returns The component ID (0 - 255).
  */
 unsigned int MAVAddress::component() const
 {
@@ -176,7 +182,6 @@ unsigned int MAVAddress::component() const
  *  \retval true if \p lhs and \p rhs have the same system and component ID's.
  *  \retval false if \p lhs and \p rhs do not have the same system and component
  *      ID's.
- *  \complexity \f$O(1)\f$
  */
 bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -192,7 +197,6 @@ bool operator==(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \retval true if \p lhs and \p rhs do not have the same system and component
  *      ID's
  *  \retval false if \p lhs and \p rhs have the same system and component ID's.
- *  \complexity \f$O(1)\f$
  */
 bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -209,7 +213,6 @@ bool operator!=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side MAVLink address.
  *  \retval true if \p lhs is less than \p rhs.
  *  \retval false if \p lhs is not less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -226,7 +229,6 @@ bool operator<(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than \p rhs.
  *  \retval false if \p lhs is not greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -243,7 +245,6 @@ bool operator>(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is less than or eqaul to \p rhs.
  *  \retval false if \p lhs is greater than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -260,7 +261,6 @@ bool operator<=(const MAVAddress &lhs, const MAVAddress &rhs)
  *  \param rhs The right hand side IP address.
  *  \retval true if \p lhs is greater than or equal to \p rhs.
  *  \retval false if \p lhs is less than \p rhs.
- *  \complexity \f$O(1)\f$
  */
 bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs)
 {
@@ -277,10 +277,17 @@ bool operator>=(const MAVAddress &lhs, const MAVAddress &rhs)
  *      - `16.8`
  *      - `128.4`
  *
+ *  \note The string constructor \ref MAVAddress(std::string) and the output
+ *      stream operator are inverses and thus:
+ *  ```
+ *  std::string addr = "192.168"
+ *  str(MAVAddress(addr)) == addr
+ *  ```
+ *
  *  \relates MAVAddress
  *  \param os The output stream to print to.
  *  \param mavaddress The MAVLink address to print.
- *  \return The output stream.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const MAVAddress &mavaddress)
 {

@@ -20,7 +20,7 @@
 #include <catch.hpp>
 
 #include "Action.hpp"
-#include "util.hpp"
+#include "utility.hpp"
 
 
 TEST_CASE("Action's 'make_accept' factory method constructs an ACCEPT action.",
@@ -145,21 +145,21 @@ TEST_CASE("Action's are movable.", "[Action]")
 
 TEST_CASE("Action's are assignable.", "[Action]")
 {
-    auto a = Action::make_accept(-10);
-    auto b = Action::make_accept(100);
-    REQUIRE(a == Action::make_accept(-10));
-    a = b;
-    REQUIRE(a == Action::make_accept(100));
+    auto action_a = Action::make_accept(-10);
+    auto action_b = Action::make_accept(100);
+    REQUIRE(action_a == Action::make_accept(-10));
+    action_a = action_b;
+    REQUIRE(action_a == Action::make_accept(100));
 }
 
 
 TEST_CASE("Action's are assignable (by move semantics).", "[Action]")
 {
-    auto a = Action::make_accept(-10);
-    auto b = Action::make_accept(100);
-    REQUIRE(a == Action::make_accept(-10));
-    a = std::move(b);
-    REQUIRE(a == Action::make_accept(100));
+    auto action_a = Action::make_accept(-10);
+    auto action_b = Action::make_accept(100);
+    REQUIRE(action_a == Action::make_accept(-10));
+    action_a = std::move(action_b);
+    REQUIRE(action_a == Action::make_accept(100));
 }
 
 

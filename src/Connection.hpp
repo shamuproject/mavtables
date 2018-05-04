@@ -34,7 +34,7 @@
  *
  *  The connection class does not actually send anything.  It filters and sorts
  *  packets in a queue for sending by an \ref Interface.  It also maintains a
- *  list of addresses reachable on this connection.
+ *  list of MAVLink addresses reachable on this connection.
  */
 class Connection
 {
@@ -56,7 +56,7 @@ class Connection
         TEST_VIRTUAL void send(std::shared_ptr<const Packet> packet);
 
         friend std::ostream &operator<<(
-                std::ostream &os, const Connection &connection);
+            std::ostream &os, const Connection &connection);
 
     private:
         // Variables
@@ -66,7 +66,7 @@ class Connection
         std::unique_ptr<PacketQueue> queue_;
         bool mirror_;
         // Methods
-        void log_(bool accept, const Packet& packet);
+        void log_(bool accept, const Packet &packet);
         void send_to_address_(
             std::shared_ptr<const Packet> packet, const MAVAddress &dest);
         void send_to_all_(std::shared_ptr<const Packet> packet);

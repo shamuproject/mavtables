@@ -27,8 +27,8 @@ extern "C"
 
 }
 
-#include "macros.hpp"
 #include <cstdint>
+#include "macros.hpp"
 
 namespace mavlink
 {
@@ -38,9 +38,14 @@ namespace mavlink
      *  MAVLink utility macros, defines, types and functions.
      *
      *  Including this file also includes the main MAVLink C library.  This will
-     *  be the reference implementation using the common dialect by default.
-     *  Set the `MAVLINK_INCLUDE_PATH` environment variable to the path
-     *  containing the desired `mavlink.h` file to override this.
+     *  be the reference implementation using the ArduPilot dialect by default.
+     *
+     *  The dialect can be changed by setting the `DIALECT` environment
+     *  variable. The default is `ardupilotmega`.
+     *
+     *  The MAVLink library can be changed with the `MDIR` environement variable
+     *  which should point to the directory where the `DIALECT` directory can be
+     *  found.
      */
 
 
@@ -50,12 +55,12 @@ namespace mavlink
      */
     struct PACKED v1_header
     {
-        uint8_t magic;  //!< Protocol magic marker (0xFE).
-        uint8_t len;    //!< Length of payload.
-        uint8_t seq;    //!< Sequence of packet.
-        uint8_t sysid;  //!< ID of message sender system/aircraft.
-        uint8_t compid; //!< ID of the message sneder component.
-        uint8_t msgid;  //!< ID of message in payload.
+        uint8_t magic;   //!< Protocol magic marker (0xFE).
+        uint8_t len;     //!< Length of payload.
+        uint8_t seq;     //!< Sequence of packet.
+        uint8_t sysid;   //!< ID of message sender system/aircraft.
+        uint8_t compid;  //!< ID of the message sneder component.
+        uint8_t msgid;   //!< ID of message in payload.
     };
 
 
@@ -68,8 +73,7 @@ namespace mavlink
         uint8_t magic;          //!< Protocol magic marker (0xFD).
         uint8_t len;            //!< Length of payload.
         uint8_t incompat_flags; //!< Flags that must be understood.
-        uint8_t compat_flags;   //!< Flags that can be ignored if not
-                                //!< understood.
+        uint8_t compat_flags;   //!< Flags that can be ignored if not known.
         uint8_t seq;            //!< Sequence of packet.
         uint8_t sysid;          //!< ID of message sender system/aircraft.
         uint8_t compid;         //!< ID of the message sender component.

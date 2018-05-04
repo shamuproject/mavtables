@@ -18,19 +18,19 @@
 #include <mutex>
 #include <thread>
 
-#include <RecursionError.hpp>
-#include <RecursionData.hpp>
-#include <RecursionGuard.hpp>
+#include "RecursionData.hpp"
+#include "RecursionError.hpp"
+#include "RecursionGuard.hpp"
 
 
 /** Construct a RecursionGuard.
  *
- *  This marks the given \ref RecursionData structure, ensuring it cannot
- *  be used to construct another guard.
+ *  This marks the given \ref RecursionData structure, ensuring it cannot be
+ *  used to construct another guard without raising a \ref RecursionError.
  *
  *  \param data The object used to prevent recursion.
- *  \throws RecursionError if the given data has already been marked by a
- *      RecursionGuard that is still in scope.
+ *  \throws RecursionError if the given \p data structure has already been
+ *      marked by a \ref RecursionGuard instance that is still in scope.
  */
 RecursionGuard::RecursionGuard(RecursionData &data)
     : data_(data)
@@ -45,6 +45,10 @@ RecursionGuard::RecursionGuard(RecursionData &data)
 }
 
 
+/** Release the lock on the contain \ref RecursionData.
+ *
+ *  This allows the function to be called again without error.
+ */
 RecursionGuard::~RecursionGuard()
 {
     std::lock_guard<std::mutex> lock(data_.mutex_);

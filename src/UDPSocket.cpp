@@ -34,10 +34,11 @@ UDPSocket::~UDPSocket()
 // LCOV_EXCL_STOP
 
 
-/** Send data on the socket to the given address.
+/** Send data to the given address using the socket.
  *
  *  \param data The bytes to send.
- *  \param address The address/port to send the bytes to over UDP.
+ *  \param address The IP address (with port number) to send the bytes to, using
+ *      UDP.
  */
 void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
 {
@@ -45,11 +46,12 @@ void UDPSocket::send(const std::vector<uint8_t> &data, const IPAddress &address)
 }
 
 
-/** Send data on the socket to the given address.
+/** Send data to the given address using the socket.
  *
  *  \param first Iterator to first byte in range to send.
  *  \param last Iterator to one past the last byte to send.
- *  \param address IP address (with port number) to send the bytes to.
+ *  \param address The IP address (with port number) to send the bytes to, using
+ *      UDP.
  */
 void UDPSocket::send(
     std::vector<uint8_t>::const_iterator first,
@@ -64,10 +66,9 @@ void UDPSocket::send(
 
 /** Receive data on the socket.
  *
- *  \note The \p timeout is not guaranteed to be up to nanosecond
- *      precision, the actual precision is up to the operating system's
- *      implementation but is guaranteed to be have at least millisecond
- *      precision.
+ *  \note The \p timeout is not guaranteed to be up to nanosecond precision, the
+ *      actual precision is up to the operating system's implementation but is
+ *      guaranteed to have at least millisecond precision.
  *
  *  \param timeout How long to wait for data to arrive on the socket.  The
  *      default is to not wait.
@@ -83,10 +84,9 @@ std::pair<std::vector<uint8_t>, IPAddress> UDPSocket::receive(
 
 /** Receive data on the socket.
  *
- *  \note The \p timeout is not guaranteed to be up to nanosecond
- *      precision, the actual precision is up to the operating system's
- *      implementation but is guaranteed to be have at least millisecond
- *      precision.
+ *  \note The \p timeout is not guaranteed to be up to nanosecond precision, the
+ *      actual precision is up to the operating system's implementation but is
+ *      guaranteed to have at least millisecond precision.
  *
  *  \param it A back insert iterator to read bytes into.
  *  \param timeout How long to wait for data to arrive on the socket.
@@ -104,6 +104,11 @@ IPAddress UDPSocket::receive(
 }
 
 
+/** Print the UDP socket to the given output stream.
+ *
+ *  \param os The output stream to print to.
+ *  \returns The output stream.
+ */
 std::ostream &UDPSocket::print_(std::ostream &os) const
 {
     os << "unknown UDP socket";
@@ -115,17 +120,22 @@ std::ostream &UDPSocket::print_(std::ostream &os) const
  *
  *  An example:
  *  ```
- *  serial {
- *      device /dev/ttyUSB0;
- *      baudrate 115200;
- *      flow_control yes;
+ *  udp {
+ *      port 14555;
+ *      address 127.0.0.1;
+ *      max_bitrate 262144;
  *  }
  *  ```
- 
- *  \relates SerialPort
+ *
+ *  The base \ref UDPSocket class will print:
+ *  ```
+ *  unknown UDP socket
+ *  ```
+ *
+ *  \relates UDPSocket
  *  \param os The output stream to print to.
- *  \param udp_socket The UDP socket (or any child of UDPSocket) to print.
- *  \return The output stream.
+ *  \param udp_socket The UDP socket (or any child of \ref UDPSocket) to print.
+ *  \returns The output stream.
  */
 std::ostream &operator<<(std::ostream &os, const UDPSocket &udp_socket)
 {

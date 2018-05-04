@@ -19,9 +19,10 @@
 #define IPADDRESS_HPP_
 
 
-#include <string>
 #include <ostream>
 #include <stdexcept>
+#include <string>
+
 #include "DNSLookupError.hpp"
 
 
@@ -32,7 +33,7 @@ class IPAddress
     public:
         /** Copy constructor.
          *
-         * \param other IP address to copy.
+         * \param other IP address to copy from.
          */
         IPAddress(const IPAddress &other) = default;
         /** Move constructor.
@@ -47,7 +48,7 @@ class IPAddress
         unsigned int port() const;
         /** Assignment operator.
          *
-         * \param other IP address to copy.
+         * \param other IP address to copy from.
          */
         IPAddress &operator=(const IPAddress &other) = default;
         /** Assignment operator (by move semantics).
