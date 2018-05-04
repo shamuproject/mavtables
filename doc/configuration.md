@@ -435,17 +435,17 @@ where `<packet type>`, `from <source address>`, and `to <dest address>` are all
 optional, but one is required, otherwise the rule should not have a condition at
 all.
 
-#### <packet type>
+#### \<packet type\>
 
 The name of the packet type to match (upper case).  If left out all packet types
 will match.
 
-#### <source address>
+#### \<source address\>
 
 A MAVLink subnet to test for containment of the source MAVLink address of the
 packet.
 
-#### <dest address>
+#### \<dest address\>
 
 A MAVLink subnet to test for containment of the destination MAVLink address of
 the packet.  The destination address is not regarded as the destination

@@ -17,9 +17,9 @@ MAVTables User Manual {#user_manual}
 * [Configuration](configuration.md)
 
 
-# Installing {#installing}
+# Installing
 
-## Requirements {#requirements}
+## Requirements
 
 In order to compile you will need the following packages:
 
@@ -37,7 +37,7 @@ mavtables is tested on both Linux and Mac OS X and should work on any unix
 compatible system.
 
 
-## CMake Installation {#cmake-installation}
+## CMake Installation
 
 To install via CMake simple run:
 ```
@@ -71,7 +71,7 @@ $ make MDIR=/tmp/mavlink/v2
 Both the `MDIR` and `DIALECT` variables can be used together.
 
 
-## Manual Installation {#manual-installation}
+## Manual Installation
 
 To manually install mavtables first make a release build:
 ```
@@ -88,9 +88,9 @@ Copy binary, configuration, and systemd unit files to their proper locations
 ```
 
 
-# Usage {#usage}
+# Usage
 
-## Running {#running}
+## Running
 
 To run mavtables and begin routing packets
 ```
@@ -129,17 +129,17 @@ systemd will keep mavtables running (even if it crashes) and will use the
 discussed in the [Log Level](#log-level) section below.
 
 
-## Log Level {#log-level}
+## Log Level
 
 The `--loglevel` flag can be use to set the logging level.  This is the
 verbosity to print to stdout when mavtables is running.  Each loglevel,
 0 through 3, is documented below.
 
-### --loglevel 0 {#loglevel-0}
+### --loglevel 0
 
 Do not log anything to stdcout.
 
-### --loglevel 1 {#loglevel-1}
+### --loglevel 1
 
 Log each new component.  Therefore, every time a new system/component address is
 connected to the router it will be printed to stdcout.  An example log output
@@ -151,7 +151,7 @@ new component 172.128 on ./ttyS0
 new component 10.10 on 127.0.0.1
 ```
 
-### --loglevel 2 {#loglevel-2}
+### --loglevel 2
 
 In addition to everything in `--loglevel 1` this will log received packets to
 stdcout.  An example log output is:
@@ -178,7 +178,7 @@ received SCALED_IMU (#26) from 10.10 (v2.0) source 127.0.0.1
 received PARAM_REQUEST_READ (#20) from 10.10 to 192.168 (v2.0) source 127.0.0.1
 ```
 
-### --loglevel 3 {#loglevel-3}
+### --loglevel 3
 
 In addition to everything in `--loglevel 1` and `--loglevel 2` this will log
 routed packets, indicating whether they are `accepted` or `rejected`, to
@@ -214,7 +214,7 @@ accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
 accepted GPS_RAW_INT (#24) from 10.10 (v2.0) source 127.0.0.1 dest 127.0.0.1
 ```
 
-## Abstract Syntax Tree {#abstract-syntax-tree}
+## Abstract Syntax Tree
 
 mavtables can print the abstract syntax tree of the configuration file instead
 of routing packets.  When run in this mode it will return immediately  This is
