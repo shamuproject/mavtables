@@ -6,11 +6,17 @@ mavtables {#mainpage}
 
 ## Introduction
 
-A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
-more MAVLink endpoints such as autopilots, ground control software, loggers,
-image capture systems, etc.  MAVLink packets will be routed when they are
-addressed and can be filtered based on source system/component and message type.
+A MAVLink router and firewall.  It can connect 2 or more MAVLink endpoints such
+as autopilots, ground control software, loggers, image capture systems, etc over
+serial and UDP. MAVLink packets will be routed to specific components when they
+have a destination address.  Any packet, targeted or broadcasted, can be
+filtered based on source system/component, destination system/component and
+message type.  The filter can also apply a priority to packets allowing more
+important packets to take priority over lower priority packets when an endpoint
+is choked.
 
+* [User Manual](\ref user_manual)
+* [Configuration](\ref configuration)
 * [README](\ref readme)
 * [LICENSE](\ref license)
 * [CONTRIBUTING](\ref contributing)
@@ -44,3 +50,5 @@ The installation prefix is `/usr/local` by default but can be changed with
 $ make
 # make PREFIX=/desired/install/path install
 ```
+
+See the [README](\ref readme) for further documentation.

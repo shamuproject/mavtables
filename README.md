@@ -3,16 +3,21 @@ mavtables {#readme}
 
 [![Build Status](https://travis-ci.org/shamuproject/mavtables.svg?branch=master)](https://travis-ci.org/shamuproject/mavtables) [![Coverage Status](https://coveralls.io/repos/github/shamuproject/mavtables/badge.svg?branch=master)](https://coveralls.io/github/shamuproject/mavtables?branch=master)
 
-A MAVLink router and firewall.  It can connect over serial and UDP with 2 or
-more MAVLink endpoints such as autopilots, ground control software, loggers,
-image capture systems, etc.  MAVLink packets will be routed when they are
-addressed and can be filtered based on source system/component and message type.
+A MAVLink router and firewall.  It can connect 2 or more MAVLink endpoints such
+as autopilots, ground control software, loggers, image capture systems, etc over
+serial and UDP. MAVLink packets will be routed to specific components when they
+have a destination address.  Any packet, targeted or broadcasted, can be
+filtered based on source system/component, destination system/component and
+message type.  The filter can also apply a priority to packets allowing more
+important packets to take priority over lower priority packets when an endpoint
+is choked.
 
 
 ## Links
 
-* [HTML Documentation](https://shamuproject.github.io/mavtables)
-* [PDF Documentation](https://shamuproject.github.io/mavtables/mavtables.pdf)
+* [User Documentation](doc/user_manual.md)
+* [HTML Developer Documentation](https://shamuproject.github.io/mavtables)
+* [PDF Developer Documentation](https://shamuproject.github.io/mavtables/mavtables.pdf)
 * [Download](https://github.com/shamuproject/mavtables/archive/master.zip)
 * [GitHub](https://github.com/shamuproject/mavtables)
 * [Theory of MAVLink Routing](http://ardupilot.org/dev/docs/mavlink-routing-in-ardupilot.html)
@@ -63,27 +68,40 @@ To run mavtables and begin routing packets
 ```
 $ mavtables
 ```
-This will use the first configuration file it finds in the config file priority
-order given in the next section.  To force a specific configuration file the
-`-c` or `--config` flag may be used.
+This will use the first configuration file it finds in the configuration file
+priority order given in the next section.  To force a specific configuration
+file the `--config` flag may be used.
 ```
 $ mavtables --config <path/to/config>
+```
+The inbuilt help may be accessed with the `-h` or `--help` flags.
+```
+$ mavtalbes --help
+usage: mavtables:
+  -h [ --help ]         print this message
+  --config arg          specify configuration file
+  --ast                 print AST of configuration file (do not run)
+  --version             print version and license information
+  --loglevel arg        level of logging, between 0 and 3
 ```
 
 
 ## Configuration File
 
 Both interfaces and filter rules are defined in a configuration file.  The
-format of this configuration file is documented in the comments of
+format of this configuration file is documented in
+[`doc/configuration.md`](doc/configuration.md) and an example is located at
 `examples/mavtables.conf` which is the same file that is installed at
 `/etc/mavtables.conf` when using `make install`.  The configuration file used is
 the first one found in the following order:
 
-1. A file given by the `--config` flag when calling mavtables.
-2. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
-3. `.mavtablesrc` in the current directory.
-4. `.mavtablesrc` at `$HOME/.mavtablesrc`.
-5. The main configuration file at `/etc/mavtables.conf`.
+1. The target of the `MAVTABLES_CONFIG_PATH` environment variable.
+2. `.mavtablesrc` in the current directory.
+3. `.mavtablesrc` at `$HOME/.mavtablesrc`.
+4. The main configuration file at `/etc/mavtables.conf`.
+
+If the `--config` flag is given then mavtables will only look for the given
+configuration file.
 
 
 ## Contributing
