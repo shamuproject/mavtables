@@ -15,7 +15,7 @@ configure_file (
 
 # compiler
 set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_STANDARD_REQUIRE ON)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     add_compile_options ("$<$<CONFIG:DEBUG>:-Werror>")
     add_compile_options (-Wdocumentation -Wno-documentation-unknown-command)
